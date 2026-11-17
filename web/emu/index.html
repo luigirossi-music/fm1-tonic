@@ -22,7 +22,7 @@ a { color: var(--accent); }
 /* at phone width the drawn panel keeps its controls 24 px or more (WCAG 2.5.8): it keeps a minimum width and
    scrolls sideways in its own box, not the page */
 .devicebox { overflow-x: auto; overscroll-behavior-x: contain; }
-.device { position: relative; width: 100%; min-width: 560px; aspect-ratio: 1000 / 700; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: manipulation; }
+.device { position: relative; width: 100%; min-width: 0; aspect-ratio: 1000 / 700; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: manipulation; }
 .device svg { pointer-events: none; }
 .controls { position: absolute; inset: 0; pointer-events: none; }
 .hit { position: absolute; touch-action: none; cursor: pointer; -webkit-tap-highlight-color: transparent; border-radius: 12px;
@@ -51,6 +51,8 @@ a { color: var(--accent); }
                 border: 2px solid #6a6a6a; border-radius: 10px; cursor: pointer; }
 .start[hidden] { display: none; }
 .turn { display: none; margin: 0 0 .8rem; color: var(--muted); font-size: .92rem; }
+/* wip440: on a phone the WHOLE panel is always in view (no sideways scroll): upright = the full width; sideways = it fits the screen height, centred. Pinch to zoom for bigger controls. */
+@media (orientation: landscape) and (max-height: 520px) { .devicebox { overflow: visible; } .device { width: min(100%, calc((100vh - 24px) * 1.4286)); width: min(100%, calc((100svh - 24px) * 1.4286)); margin: 0 auto; } }
 @media (orientation: portrait) and (max-width: 700px) { .turn { display: block; } }
 .start button:disabled { opacity: .6; cursor: progress; }
 .bar { display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; align-items: center; margin: .9rem 0 0; color: var(--muted); font-size: .92rem; }
@@ -176,12 +178,12 @@ details.cheat .cheat-in { padding: 0 1rem 1rem; }
   <p>Drum machine firmware for the M-VAVE FM-1, inspired by Microtonic (a trademark of Sonic Charge) but with its own engine, not the same one. This is the same code the FM-1 runs, in your browser.</p>
   <nav aria-label="Downloads">
     <a href="downloads/FM1-Tonic-cheat-sheet.pdf" download>Cheat sheet (PDF)</a>
-    <a href="downloads/FM1-Tonic-manual.html" target="_blank" rel="noopener">User manual <!--mv-->1.44<!--/mv--> (all languages)</a>
-    <a href="downloads/FM1-Tonic-manual.html" download="FM1-Tonic-manual-1.44.html">Download the manual <!--mv-->1.44<!--/mv--></a>
+    <a href="downloads/FM1-Tonic-manual.html" target="_blank" rel="noopener">User manual <!--mv-->1.46<!--/mv--> (all languages)</a>
+    <a href="downloads/FM1-Tonic-manual.html" download="FM1-Tonic-manual-1.46.html">Download the manual <!--mv-->1.46<!--/mv--></a>
   </nav>
 </header>
 
-<p class="turn">Turn your phone sideways for bigger controls.</p>
+<p class="turn">Turn your phone sideways for a bigger panel. Pinch to zoom.</p>
 <div class="devicebox">
 <div class="device" id="device" role="group" aria-label="The FM-1" tabindex="-1">
   <svg id="panel" viewBox="0 0 1000 700" aria-hidden="true" focusable="false"></svg>
@@ -238,7 +240,7 @@ details.cheat .cheat-in { padding: 0 1rem 1rem; }
 
 <section class="credits" aria-labelledby="credits-h">
   <h2 id="credits-h">Credits</h2>
-  <p class="note big"><b>FM1 Tonic is made by Luigi Rossi</b>, the developer and creative mind behind this firmware: the Tonic drum machine, its sequencer, screens, presets and the web tools (emulator, installer, backup). It is free software under the GNU General Public License, version 3; if you share the firmware you must share its source code. <a class="dl" href="downloads/FM1-Tonic-manual.html" target="_blank" rel="noopener">User manual <!--mv-->1.44<!--/mv--> (all languages)</a> <a class="dl" href="downloads/FM1-Tonic-manual.html" download="FM1-Tonic-manual-1.44.html">Download the manual <!--mv-->1.44<!--/mv--></a></p>
+  <p class="note big"><b>FM1 Tonic is made by Luigi Rossi</b>, the developer and creative mind behind this firmware: the Tonic drum machine, its sequencer, screens, presets and the web tools (emulator, installer, backup). It is free software under the GNU General Public License, version 3; if you share the firmware you must share its source code. <a class="dl" href="downloads/FM1-Tonic-manual.html" target="_blank" rel="noopener">User manual <!--mv-->1.46<!--/mv--> (all languages)</a> <a class="dl" href="downloads/FM1-Tonic-manual.html" download="FM1-Tonic-manual-1.46.html">Download the manual <!--mv-->1.46<!--/mv--></a></p>
   <p class="note"><b>Luigi Rossi online:</b> <a href="https://linktr.ee/luigirossi" target="_blank" rel="noopener">linktr.ee/luigirossi</a></p>
   <details class="cheat" id="cheat">
     <summary>Read more: the cheat sheet</summary>

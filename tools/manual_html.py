@@ -129,7 +129,8 @@ html { scroll-padding-top: calc(var(--barh, 72px) + 10px); }
 .tocpanel li { margin: .35rem 0; }
 .tocpanel h3 { margin: 0 0 .6rem; font-size: 1.1rem; }
 .langbar .short { display: none; }
-@media (max-width: 640px) {
+/* wip440: the same compact one-row bar on a phone turned sideways (the two-row bar ate the whole screen, little was left for the contents) */
+@media (max-width: 640px), (orientation: landscape) and (max-height: 520px) {
   .topbar { gap: .4rem; padding: .4rem 12px; margin-inline: -16px; }
   .topbar button, .langbar a { min-height: 40px; padding: .25rem .8rem; }
   #tocbtn .lbl { display: none; }
@@ -218,8 +219,10 @@ SCRIPT = """<script>
       size(); addEventListener("resize", size);
       const wide = matchMedia("(min-width: 1000px)");   // wide: the contents is a permanent column, it never closes
       const searchBox = document.querySelector(".search");
-      const place = () => { if (wide.matches) tsearch.append(searchBox); else bar.insertBefore(searchBox, null); };   // wide: the search is under the contents; narrow: in the top bar
+      const side = matchMedia("(min-width: 1000px), (orientation: landscape) and (max-height: 520px)");   // wide or phone sideways: the search is under the contents
+      const place = () => { if (side.matches) tsearch.append(searchBox); else bar.insertBefore(searchBox, null); };   // else (phone upright): in the top bar
       place();
+      side.addEventListener("change", () => { place(); size(); });
       const closeToc = () => { if (wide.matches) return; panel.hidden = true; tocBtn.setAttribute("aria-expanded", "false"); };
       panel.hidden = !wide.matches;
       wide.addEventListener("change", () => { place(); panel.hidden = !wide.matches; tocBtn.setAttribute("aria-expanded", "false"); size(); });
@@ -550,7 +553,7 @@ def build_multi(dst):
             '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600&'
             'family=Barlow+Semi+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400&display=swap">\n'
             f"<style>{CSS}</style>\n</head>\n<body>\n{bar}\n"
-            '<a class="skip" href="#content">Skip to content</a>\n<main id="content">\n' + "\n".join(parts) +
+            '<noscript><style>@media screen { .lang nav.contents, .lang nav.contents + hr { display: block; } }</style></noscript>\n<a class="skip" href="#content">Skip to content</a>\n<main id="content">\n' + "\n".join(parts) +
             f"\n</main>\n{SCRIPT}</body>\n</html>\n")
     Path(dst).write_text(page)
     print(f"{dst}: {len(page)} bytes, languages: {', '.join(c for c, _ in have)}")

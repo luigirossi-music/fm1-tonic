@@ -407,12 +407,14 @@ static void fm1_main(void)
     uint32_t last_frame = 0, k;
     uint8_t last_pat = 0xFF;
     {
-        uint32_t f = irq_save();
+        uint32_t f = irq_save(), jid;
         fm1_vdc14_raise(7);                         /* M-VAVE's own supplies before anything loads them: */
         fm1_sysvdd_raise(15);                       /* 1.60 V, then 1.38 V (fm1_sys.h) */
         plat_vdc14_level = (uint8_t)fm1_vdc14();
         plat_sysvdd_level = (uint8_t)fm1_sysvdd();
-        flash_ok = FL_FAR(fl_jedec_ram)() == 0x856014u;   /* the expected 1 MiB part, else RAM only */
+        jid = FL_FAR(fl_jedec_ram)();
+        /* wip439: both 1 MiB parts the FM-1 ships with (the firmware hub asks for both): 0x856014 (P25Q80H) and the newer 0xB36014 (UC25HQ80); else RAM only */
+        flash_ok = (jid == 0x856014u || jid == 0xB36014u);
         irq_restore(f);
         if (flash_ok) {
             rs_boot();                              /* a restore's commit cut short by a power loss: finished */

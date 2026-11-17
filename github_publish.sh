@@ -52,6 +52,9 @@ cd "$WORK" || die "cannot enter $WORK"
 if git remote get-url origin >/dev/null 2>&1; then git remote set-url origin "$REMOTE"; else git remote add origin "$REMOTE"; fi
 git config user.name >/dev/null 2>&1 || git config user.name "Luigi Rossi"
 git config user.email >/dev/null 2>&1 || git config user.email "$OWNER@users.noreply.github.com"
+# wip440: files that are now in .gitignore (FEATURES.md, the handoffs) must also LEAVE the repository if an earlier push had them:
+# empty the index, then add again what .gitignore allows (the working copy is not touched)
+git rm -r -q --cached . >/dev/null 2>&1
 git add -A
 BIG="$(git diff --cached --name-only | while read -r f; do [ -f "$f" ] && [ "$(stat -c %s "$f")" -gt 50000000 ] && echo "$f"; done)"
 [ -z "$BIG" ] || { git reset -q; die "these files are over 50 MB (GitHub refuses 100 MB): $BIG   (send me this line)"; }
