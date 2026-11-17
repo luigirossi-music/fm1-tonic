@@ -1,0 +1,58 @@
+# Probability: hold a step (SEQ, or the voice pages ENV, LFO, EDIT, SEL, FX since wip197) and turn SELECT: its chance, in 5 % steps (a T_PROB lane,
+# one per drum track; 100 % is no lane). Played: a kick on every step, step 1 at 50 %, step 2 at
+# 5 %, with NOTES OUT on, so midi_out.txt counts the kicks that played.
+wait 300
+expect part 0
+tapkey w0
+tapkey w1
+tapkey w2
+tapkey w3
+key w0 down
+turn SELECT -10
+key w0 up
+expect hit0.0.0 1
+expect lanes 1
+expect laneval6.0.0.0 50
+key w1 down
+turn SELECT -19
+key w1 up
+expect laneval6.0.0.1 5
+# back to 100 %: the lane's step is empty again (the lane stays for step 2)
+key w0 down
+turn SELECT 20
+key w0 up
+expect laneval6.0.0.0 255
+expect lanes 1
+# and step 2 back too: no lane left
+key w1 down
+turn SELECT 30
+key w1 up
+expect lanes 0
+# the voice pages work the same (wip197: they did not, V_PART is not reached on the Tonic): EDIT, then ENV
+tap EDIT
+expect view 14
+key w0 down
+turn SELECT -10
+key w0 up
+expect laneval6.0.0.0 50
+tap ENV
+expect view 12
+key w1 down
+turn SELECT -19
+key w1 up
+expect laneval6.0.0.1 5
+expect lanes 1
+# a step held on the EDIT page is not an extra jump of the page: still the same view
+tap EDIT
+key w0 down
+turn SELECT 20
+key w0 up
+expect laneval6.0.0.0 255
+expect view 14
+# the SEQ page again, from another page
+tap SEQ
+expect view 7
+key w1 down
+turn SELECT 30
+key w1 up
+expect lanes 0

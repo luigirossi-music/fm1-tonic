@@ -1,0 +1,29 @@
+# wip252 ARP step 2b: REC + PLAY on the ARP page records the key as a trig and its note (semitones) at the playing step.
+# Not recording (REC off, or stopped): a key only sounds. Key raw 19 = the C an octave up = +12; OCT+ moves the keyboard +12 more.
+wait 300
+tap ARP
+expect arp 1
+expect notesum0.0 0
+# stopped: nothing recorded, even with REC on
+tap REC
+tapkey 19
+expect notesum0.0 0
+tap REC
+# playing, REC off: nothing recorded
+tap PLAY
+wait 300
+tapkey 19
+expect notesum0.0 0
+# REC + PLAY: key 19 (+12) is recorded on the voice 1 track
+tap REC
+expect rec 1
+tapkey 19
+wait 50
+expect notesum0.0 12
+# another voice (SELECT 1), key raw 0 (-7), one octave up (OCT+): -7 + 12 = +5, on track 2 (notesum0.1)
+turn SELECT 1
+tap OCT+
+tapkey 0
+wait 50
+expect notesum0.1 5
+tap PLAY

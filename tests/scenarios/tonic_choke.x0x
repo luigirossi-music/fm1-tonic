@@ -1,0 +1,83 @@
+# wip328: EDIT (view 14) = K1 envelope mode (top left), K2 = the CHOKE button (top right), K3 attack, K4 decay.
+# wip333: K2 right = the selected track is IN the group, left = OUT; ALGORITHM right shows the CHOKE screen (black keys 1-8 = in / out), ALGORITHM left closes it; the group is saved in the preset.
+wait 300
+tap EDIT
+expect view 14
+expect choke 0
+expect chkscreen 0
+shot choke_edit.png
+# K3 = attack (pot 11), K4 = decay (pot 12); K2 does not change a value
+expect sound0.0.11 0
+turn K3 10 80
+wait 300
+expect sound0.0.11 >0
+expect sound0.0.12 >-1
+turn K4 5 80
+wait 300
+expect sound0.0.12 >0
+wait 300
+expect chkscreen 0
+turn K2 1 80
+wait 100
+expect choke 0   # wip337: K2 alone only warns (HOLD FUNC + TURN K2: CHOKE)
+shot choke_warn.png
+key b10 down
+turn K2 1 80
+wait 100
+key b10 up
+wait 300
+expect choke 1
+expect chkscreen 0
+shot choke_edit_in.png
+key b10 down
+turn K2 -1 80
+wait 100
+key b10 up
+wait 300
+expect choke 0
+turn ALGO 1 80
+wait 300
+expect chkscreen 1
+shot choke_screen_empty.png
+tapkey b0
+tapkey b2
+tapkey b5
+wait 200
+expect choke 37
+shot choke_screen.png
+tapkey b2
+wait 200
+expect choke 33
+turn ALGO -1 80
+wait 300
+expect chkscreen 0
+expect choke 33
+expect view 14
+turn ALGO 1 80
+wait 200
+expect chkscreen 1
+tap EDIT
+expect chkscreen 0
+expect view 14
+expect choke 33
+# the group is saved in the preset (byte 12): SAVE AS into place 9, go to the empty place 10 (no group), back to 9 (the group is back)
+turn ALGO 1 80
+wait 200
+tapkey b1
+wait 100
+expect choke 35
+tap SAVE
+tap OCT+
+tap OCT+
+tap OCT+
+expect presetcur 9
+turn PRESET 1
+tap OCT+
+wait 100
+expect presetcur 10
+expect choke 0
+turn PRESET -1
+tap OCT+
+wait 100
+expect presetcur 9
+expect choke 35

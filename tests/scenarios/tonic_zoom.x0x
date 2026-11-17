@@ -1,0 +1,24 @@
+# GLO > ZOOM KNOB (YES / NO): NO = a turned knob shows no zoom, only the cell highlighted. Default YES.
+wait 300
+tap FX
+tap SEL
+expect view 11
+turn K2 10 80
+shot zoom_yes.png
+wait 3000
+# GLO: rows (headers skipped): CLOCK OUT, NOTES OUT, 3 x MIDI CH, OUT LOUD, USB, KEY LED, KEY SOUND, THEME, ZOOM KNOB = 9 steps down
+tap GLO   # wip290: 1st press = VEL
+tap GLO
+tap GLO   # (wip124: the 1st press is the mixer, the 2nd the settings list)
+shot zoom_glo.png
+turn SELECT 9
+shot zoom_row.png
+turn ALGO -1
+shot zoom_row_no.png
+tap GLO
+wait 300
+tap SEL
+expect view 11
+turn K2 10 80
+shot zoom_no.png
+wait 3000

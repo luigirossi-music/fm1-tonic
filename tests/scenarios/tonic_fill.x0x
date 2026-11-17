@@ -1,0 +1,38 @@
+# TONIC FILL playing: a fill trig retriggers 4 times over its step. Kick on 1 and 5, step 5 has FILL.
+# With NOTES OUT, one bar = 1 + 4 notes; at 120 BPM a bar is 2 s, so 3 s is 5 + 5 = 10 notes.
+wait 300
+tapkey b0
+tapkey w0
+tapkey w4
+key w4 down
+tapkey b9
+key w4 up
+expect vfill0.0.4 1
+tap GLO   # wip290: 1st press = VEL
+tap GLO
+tap GLO   # (wip129: the 1st press is the mixer, the 2nd COMP, the 3rd the settings list)
+tap GLO
+tap GLO   # wip267: ...then MEMORY, then the settings list
+turn SELECT 1
+turn ALGO 1
+tap HOME
+tap FX
+tap SEQ
+expect noteons 0
+tap PLAY
+wait 3000
+tap PLAY
+expect noteons 10
+# the same without the fill: 1 + 1 per bar, 4 in two bars
+key w4 down
+tapkey b9
+key w4 up
+expect vfill0.0.4 0
+tap PLAY
+wait 3000
+tap PLAY
+expect noteons 14
+# a muted track does not retrigger: mute track 1 (HOME + black key 1), play on: no new notes
+key w4 down
+tapkey b9
+key w4 up

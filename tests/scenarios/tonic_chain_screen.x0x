@@ -1,0 +1,65 @@
+# PATTERNS screen (FUNC + SEQ, OCT+ with an empty song; wip211: FUNC + OCT+ no longer opens it), white keys 1-16 add patterns (the same one twice is fine),
+# OCT- takes the last off, OCT+ makes the chain the song (one bar each, every part), HOME cancels.
+wait 300
+expect chainn -1
+key b10 down
+tap SEQ
+key b10 up
+tap OCT+
+expect chainn 0
+tapkey w0
+tapkey w2
+tapkey w2
+tapkey w15
+expect chainn 4
+shot chain_1.png
+expect chainp1 1
+expect chainp2 3
+expect chainp3 3
+expect chainp4 16
+tap OCT-
+expect chainn 3
+# FUNC + a white key takes the last one off, every press one more (wip218); a plain white key adds again
+key b10 down
+tapkey w7
+tapkey w7
+key b10 up
+expect chainn 1
+expect chainp1 1
+tapkey w7
+expect chainn 2
+expect chainp2 8
+key b10 down
+tapkey w0
+key b10 up
+expect chainn 1
+tapkey w2
+tapkey w2
+expect chainn 3
+# HOME cancels, nothing is written
+tap HOME
+expect chainn -1
+expect songlen 0
+# again, then OK
+key b10 down
+tap SEQ
+key b10 up
+tap OCT+
+expect chainn 0
+tapkey w1
+tapkey w0
+tapkey w1
+tap OCT+
+expect chainn -1
+expect songlen 3
+expect songbar1.0 2
+expect songbar2.0 1
+expect songbar3.0 2
+expect songbar3.2 2
+# OCT+ alone, and FUNC + OCT+, do not open it
+tap OCT+
+expect chainn -1
+key b10 down
+tap OCT+
+key b10 up
+expect chainn -1

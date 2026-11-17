@@ -1,0 +1,57 @@
+FM1 TONIC EMULATOR ON LINUX: HOW TO USE
+=======================================
+You do not need to know programming. You only copy a command into a terminal and press Enter.
+(A "terminal" is the black window where you type commands. Open it from the menu: search "Terminal".)
+
+THE USUAL WAY (every time there is a new zip)
+---------------------------------------------
+1. Save the zip I give you anywhere in your home folder (Desktop, Downloads... the name is like fm1-tonic-wip66.zip).
+   Leave old zips where they are if you like: the script searches your whole home folder and takes the highest number.
+2. Open a terminal and copy this ONE line, then press Enter:
+
+   bash ~/tonic.sh
+
+3. Wait. It says "Unpacking...", then "Building..." (about a minute), then "Emulator: http://localhost:8000".
+   The browser opens by itself. Press the "Switch on" button on the page.
+4. To change something and try again: get the new zip, save it, run the same line again.
+5. To stop the emulator: go back to the terminal and press Ctrl+C (hold Ctrl, press C).
+
+THE FIRST TIME ONLY (put tonic.sh in your home folder)
+------------------------------------------------------
+Download tonic.sh from the chat, then in the terminal:
+
+   cp ~/Downloads/tonic.sh ~/tonic.sh
+
+(If the file went somewhere else, drag the file into the terminal window instead of ~/Downloads/tonic.sh.)
+
+TO FLASH THE FM-1 FROM THE WEB PAGE (the local website: Install, Back up my presets, Restore)
+-----------------------------------------------------------------------------------------------
+Put tonic_site.sh in your home folder the same way as tonic.sh (cp ~/Downloads/tonic_site.sh ~/tonic_site.sh), plug in the FM-1,
+then:
+
+   bash ~/tonic_site.sh
+
+It unpacks the newest zip, builds the emulator and the firmware, makes the website and opens the Install page
+(http://localhost:8001/install/) in the browser: use Chrome or Edge, and press Install. The Back up page is at
+http://localhost:8001/backup/. The first run takes a few minutes; running it again for the same zip starts at once.
+Ctrl+C in the terminal stops it. It shares the folder with tonic.sh (the emulator, port 8000): both can run together.
+
+WHAT IF...
+----------
+* It says "emscripten not found": the building tool is missing. Do block C below once.
+* "BUILD FAILED": it shows the last lines of the error. Copy those lines to me.
+* The page looks old: nothing to do, the script stops the browser from keeping an old copy. If it still looks old,
+  close the page and open http://localhost:8000 again (look at the address the script printed: if 8000 was busy it
+  uses 8001, 8002...).
+* Nothing happens after "Switch on": press F12 in the browser, open "Console", copy the red lines to me.
+* To use an older zip: bash ~/tonic.sh ~/Desktop/fm1-tonic-wip64.zip
+
+ON THE EMULATOR PAGE
+--------------------
+* Black key 11 is called FUNC. The computer's Shift key is "hold down": Shift + click (or Shift + a shortcut key)
+  keeps a button or key held until you press it again. The page lists all the shortcuts and has a cheat sheet.
+
+C) ONLY IF EMSCRIPTEN IS MISSING (once)
+   sudo apt update && sudo apt install -y git python3 xz-utils unzip
+   git clone https://github.com/emscripten-core/emsdk.git ~/emsdk
+   cd ~/emsdk && ./emsdk install latest && ./emsdk activate latest

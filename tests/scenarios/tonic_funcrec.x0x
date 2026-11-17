@@ -1,0 +1,12 @@
+# wip312: while playing, FUNC + REC switches recording on as well as the mode
+wait 300
+listen
+tap PLAY
+wait 200
+expect rec 0
+key b10 down
+tap REC
+key b10 up
+said UNQUANTIZED REC ON
+expect rec 1
+tap PLAY

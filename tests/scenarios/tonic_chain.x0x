@@ -1,0 +1,61 @@
+# FREE-PLAY CHAIN (wip122, option B): loading a preset turns SONG ON; PLAY runs through the preset, chain after chain:
+# a pattern flagged CHAINED runs into the next, the first one without the flag ends its chain and the next chain follows,
+# after pattern 8 back to 1. K1 of the pattern page (SEQ 2nd press) turns SONG off (right = on): the pattern then loops.
+# build/test_chain.tnp: 4 patterns, 1, 2 and 4 flagged CHAINED, 3 not (chains: 1-2-3, 4-5). 120 BPM: a bar is 2 s.
+wait 300
+preset build/test_chain.tnp
+expect preset_rc 0
+expect pchain0 1
+expect pchain1 1
+expect pchain2 0
+expect pchain3 1
+expect pchain4 0
+expect pattern 1
+expect chainon 1
+tap PLAY
+wait 1000
+expect pattern 1
+wait 2000
+expect pattern 2
+wait 2000
+expect pattern 3
+# 3 is not chained: the chain ends, the next chain (4) follows; 5 ends it, then 6, 7, 8, and back to 1
+wait 2000
+expect pattern 4
+wait 2000
+expect pattern 5
+wait 6000
+expect pattern 8
+wait 2000
+expect pattern 1
+tap PLAY
+wait 300
+# PLAY from the middle of a chain starts at the chain's first pattern: FUNC + white key 2 = pattern 3 (chain 1-2-3) -> starts at 1
+key b10 down
+tapkey w2
+key b10 up
+expect pattern 3
+tap PLAY
+wait 500
+expect pattern 1
+tap PLAY
+wait 300
+# the pattern page: K1 left = SONG OFF, shown bottom left; the pattern loops on itself
+tap SEQ
+expect seqpat 1
+shot chain_on.png
+turn K1 -1
+expect chainon 0
+wait 100
+shot chain_off.png
+tap SEQ
+expect seqpat 0
+tap PLAY
+wait 5000
+expect pattern 1
+tap PLAY
+wait 300
+# K1 right = SONG ON again
+tap SEQ
+turn K1 1
+expect chainon 1

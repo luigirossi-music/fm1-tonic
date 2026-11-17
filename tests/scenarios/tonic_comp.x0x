@@ -1,0 +1,66 @@
+# wip121: FX button, last page = COMP: the master compressor, Glue style: needle meter (gain reduction, 0 .. 20 dB) and four knobs:
+# K1 ATTACK, K2 RELEASE, K3 THRESHOLD, K4 MAKEUP. The ratio stays 4:1. MST pots: .0 THRESH .1 RATIO .2 ATTACK .3 RELEASE .4 MAKEUP .6 PUMP.
+# Default = nothing compressed (threshold 0 dB, makeup 0, pump 0) with the drum-bus voicing ready: 30 ms attack, 120 ms release (a 16th at 120-130 BPM).
+wait 300
+preset presets/01_Marchiav.tnp
+expect preset_rc 0
+expect sound5.0.0 127
+expect sound5.0.1 4
+expect sound5.0.2 105
+expect sound5.0.3 63
+expect sound5.0.4 0
+expect sound5.0.6 0
+# wip129: the FX cycle is MIX, PERFORM, REVERB, DELAY, MIX (no COMP); COMP is GLO page 2 (GLO: mixer, COMP, settings)
+# wip223: FX short = MIX, PERFORM; HOLD FX = REVERB, HOLD HOME = DELAY; a short FX from there = MIX
+tap FX
+expect view 9
+tap FX
+expect fxpage 0
+press FX
+wait 700
+release FX
+wait 100
+expect fxpage 1
+press HOME
+wait 700
+release HOME
+wait 100
+expect fxpage 2
+tap FX
+expect view 9
+tap GLO   # wip290: 1st press = VEL
+expect view 15
+tap GLO
+expect view 3
+tap GLO
+expect view 4
+shot comp_default.png
+# default: it plays, nothing is squeezed
+tap PLAY
+wait 4000
+expect grdb10 <3
+shot comp_off_playing.png
+# THRESHOLD (K3) down: the meter moves; the other knobs
+turn K3 -30 80
+expect sound5.0.0 <100
+turn K1 -4 80
+expect sound5.0.2 <105
+turn K1 4 80
+turn K2 3 80
+expect sound5.0.3 >63
+turn K4 5 80
+expect sound5.0.4 >0
+shot comp_knobs.png
+# a drum-bus setting: -16 dB, 30 ms, 120 ms, +4.5 dB: some gain reduction while it plays
+param 5 0 0 85
+param 5 0 2 105
+param 5 0 3 63
+param 5 0 4 24
+wait 4000
+expect grdb10 >5
+shot comp_working.png
+# the ratio is untouched, and the page goes on to MIX
+expect sound5.0.1 4
+tap PLAY
+tap FX
+expect view 9

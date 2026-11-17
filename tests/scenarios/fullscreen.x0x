@@ -1,0 +1,22 @@
+# Whole-screen messages (wip199): a warning (warn()) and a question (CHANGE PRESET?) take the whole 240 x 240
+# screen: no header, no knob row, no legend; a plain confirmation (say) stays in the header. The shots are to be
+# looked at (build/scenarios/fullscreen/*.png); the expects only check that the screens come and go.
+wait 300
+expect view 7
+# nothing copied yet: a warning, the whole screen for about 1.8 s, then the SEQ page again
+key b10 down
+tapkey b9
+key b10 up
+wait 100
+shot warn_full.png
+wait 2500
+expect view 7
+shot warn_gone.png
+# the PRESETS knob: the question, the whole screen, the preset big and purple; OCT- goes back
+turn PRESET 1
+wait 100
+shot ask_full.png
+tap OCT-
+wait 100
+expect view 7
+shot ask_gone.png

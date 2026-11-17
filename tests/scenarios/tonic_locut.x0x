@@ -1,0 +1,19 @@
+# wip368: PERFORM K3 = the master LOW CUT (the filter is kept in the code, not on a knob). Footer text is blue.
+wait 300
+press FX
+wait 100
+release FX
+wait 200
+press FX
+wait 100
+release FX
+wait 300
+shot locut_perf_fx.png
+turn K3 60
+wait 200
+shot locut_perf_fx_turned.png
+press HOME
+wait 100
+release HOME
+wait 300
+shot locut_home.png

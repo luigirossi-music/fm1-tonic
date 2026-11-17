@@ -1,0 +1,125 @@
+# wip242: every track has its own REVERB SEND and DELAY SEND (HOME 1st press = MIX PAGE 2: K1 level, K2 pan, K3 reverb send, K4 delay send;
+# engine pots 22 / 23 of the track). They add to the PERFORM D/W (T_MIX 4.0.1 / 4.0.2) and do NOT depend on it or on ALL FX (which mutes only the PERFORM sends).
+# They are saved in the preset (TFX2 trailer) and come back with it.
+wait 300
+expect sound0.0.22 0
+expect sound0.0.23 0
+tap HOME
+expect view 8
+# wip288: the sends are on the 2nd press (the SENDS page of MIX PAGE 2): K1 reverb send, K2 delay send; K3 / K4 of MIX 2 do nothing now
+turn K3 5 80
+turn K4 5 80
+expect sound0.0.22 0
+expect sound0.0.23 0
+tap HOME
+expect view 8
+turn K1 20 80
+turn K2 10 80
+shot home_sends.png
+expect sound0.0.22 20
+expect sound0.0.23 10
+param 0 0 22 0
+param 0 0 23 0
+wait 100
+# the window 200-500 ms after a hit of track 1: no sends = about -56 dB, the reverb send at 127 = about -47 dB
+peakreset
+tapkey b0
+wait 200
+peakreset
+wait 300
+expect peak_db_max -52
+wait 1800
+param 0 0 22 127
+wait 100
+tapkey b0
+wait 200
+peakreset
+wait 300
+expect peak_db_min -50
+wait 1800
+# the PERFORM reverb D/W alone (track send 0) is heard with ALL FX on ...
+param 0 0 22 0
+param 4 0 1 127
+wait 100
+tapkey b0
+wait 200
+peakreset
+wait 300
+expect peak_db_min -50
+wait 1800
+# ... and muted by ALL FX OFF (PERFORM, K4 left)
+tap FX
+tap FX
+expect view 2
+turn K4 -1 80
+expect fxoff 1
+tap HOME
+wait 100
+tapkey b0
+wait 200
+peakreset
+wait 300
+expect peak_db_max -52
+wait 1800
+# the track's own send passes with ALL FX OFF and the PERFORM D/W at 127
+param 0 0 22 127
+wait 100
+tapkey b0
+wait 200
+peakreset
+wait 300
+expect peak_db_min -50
+wait 1800
+tap FX
+expect view 2
+turn K4 1 80
+expect fxoff 0
+# saved in the preset: SAVE AS twice (slots 9 and 10), a preset without them (all zero), the two saved ones again
+param 4 0 1 0
+param 0 0 22 55
+param 0 0 23 44
+param 0 3 22 66
+tap SAVE
+tap OCT+
+tap OCT+
+tap OCT+
+expect svstage -1
+wait 500
+param 0 0 22 11
+param 0 0 23 12
+param 0 3 22 13
+tap SAVE
+expect svstage 3
+tap OCT-
+tap OCT+
+tap OCT+
+tap OCT+
+expect svstage -1
+wait 500
+preset presets/01_Marchiav.tnp
+expect preset_rc 0
+expect sound0.0.22 0
+expect sound0.0.23 0
+expect sound0.3.22 0
+turn PRESET -1
+tap OCT+
+wait 300
+expect presetcur 9
+expect sound0.0.22 55
+expect sound0.0.23 44
+expect sound0.3.22 66
+turn PRESET 1
+tap OCT+
+wait 300
+expect presetcur 10
+expect sound0.0.22 11
+expect sound0.0.23 12
+expect sound0.3.22 13
+# and a restart keeps them (they are the project's sound, like level and pan)
+wait 21000
+tapkey w9
+wait 6000
+reboot
+expect sound0.0.22 11
+expect sound0.0.23 12
+expect sound0.3.22 13

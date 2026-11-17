@@ -1,0 +1,32 @@
+# A black drum key plays its voice: stopped, playing (audition, wip108) and with REC on (which also records it).
+wait 300
+# (the factory pattern: the 808 and the break are silent too, so only the 909's key sounds are heard)
+tap HOME
+tap SEQ
+expect part 0
+# stopped: the key plays its drum
+peakreset
+tapkey b0
+wait 300
+expect peak_db_min -40
+wait 1500
+# playing an empty pattern: silent by itself; a black key selects AND sounds its voice (audition while playing, wip108)
+tap PLAY
+expect playing 1
+wait 500
+peakreset
+wait 400
+expect peak_db_max -70
+tapkey b1
+wait 100
+expect peak_db_min -40
+expect sel 1
+# REC on: the key plays (and records)
+tap REC
+peakreset
+tapkey b0
+wait 300
+expect peak_db_min -40
+tap REC
+tap PLAY
+wait 1500

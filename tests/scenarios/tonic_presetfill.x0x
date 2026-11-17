@@ -1,0 +1,15 @@
+# A preset's own accents, fills and mutes load (build/test_fill.tnp, made by tests/make_test_tnp.py).
+wait 300
+preset build/test_fill.tnp
+expect preset_rc 0
+expect tempo 120
+expect phit0.0.0 1
+expect phit0.0.4 1
+expect vacc0.0.4 1
+expect vacc0.0.0 0
+expect vfill0.0.4 1
+expect vfill0.0.0 0
+expect vfill0.1.2 1
+expect vacc0.1.2 0
+expect vfill1.0.0 0
+expect vmute 4

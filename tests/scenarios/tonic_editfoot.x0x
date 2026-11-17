@@ -1,0 +1,5 @@
+# wip374: EDIT first page: the footer is only CHOKE ALGORITHM, at the right, next to the blue triangle
+wait 300
+tap EDIT
+wait 300
+shot edit_footer.png

@@ -1,0 +1,116 @@
+# wip389: FUNC + PLAY asks to clear, FUNC + SEQ asks song mode, from the first page of every button
+wait 300
+tapkey b0
+tapkey w0
+tap SEL
+wait 150
+key b10 down
+tap PLAY
+key b10 up
+wait 150
+expect clearask 1
+tap OCT-
+wait 100
+key b10 down
+tap SEQ
+key b10 up
+wait 150
+expect songask 1
+tap OCT-
+wait 100
+tap ENV
+wait 150
+key b10 down
+tap PLAY
+key b10 up
+wait 150
+expect clearask 1
+tap OCT-
+wait 100
+key b10 down
+tap SEQ
+key b10 up
+wait 150
+expect songask 1
+tap OCT-
+wait 100
+tap LFO
+wait 150
+key b10 down
+tap PLAY
+key b10 up
+wait 150
+expect clearask 1
+tap OCT-
+wait 100
+key b10 down
+tap SEQ
+key b10 up
+wait 150
+expect songask 1
+tap OCT-
+wait 100
+tap EDIT
+wait 150
+key b10 down
+tap PLAY
+key b10 up
+wait 150
+expect clearask 1
+tap OCT-
+wait 100
+key b10 down
+tap SEQ
+key b10 up
+wait 150
+expect songask 1
+tap OCT-
+wait 100
+tap FX
+wait 150
+key b10 down
+tap PLAY
+key b10 up
+wait 150
+expect clearask 1
+tap OCT-
+wait 100
+key b10 down
+tap SEQ
+key b10 up
+wait 150
+expect songask 1
+tap OCT-
+wait 100
+tap HOME
+wait 150
+key b10 down
+tap PLAY
+key b10 up
+wait 150
+expect clearask 1
+tap OCT-
+wait 100
+key b10 down
+tap SEQ
+key b10 up
+wait 150
+expect songask 1
+tap OCT-
+wait 100
+tap GLO
+wait 150
+key b10 down
+tap PLAY
+key b10 up
+wait 150
+expect clearask 1
+tap OCT-
+wait 100
+key b10 down
+tap SEQ
+key b10 up
+wait 150
+expect songask 1
+tap OCT-
+wait 100

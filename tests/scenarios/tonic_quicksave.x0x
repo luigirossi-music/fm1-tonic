@@ -1,0 +1,146 @@
+# wip263: FUNC + SAVE = quick save into the loaded place (same number, same name), no question.
+wait 300
+expect presetcur 0
+# nothing loaded since power on: FUNC + SAVE says so and saves nothing, no question opens
+key b10 down
+tap SAVE
+key b10 up
+expect svstage -1
+expect slotused0 0
+# SAVE AS puts the project into user slot 1 (place 9) first
+tap SAVE
+tap OCT+
+tap OCT+
+tap OCT+
+expect presetcur 9
+expect slotused0 1
+# a change of our own (track 1, step 9: accent and fill), then FUNC + SAVE keeps it in place 9 without any question
+tapkey b1
+key w8 down
+tapkey b8
+tapkey b9
+key w8 up
+expect vacc0.1.8 1
+expect vfill0.1.8 1
+key b10 down
+tap SAVE
+key b10 up
+expect svstage -1
+expect presetcur 9
+# a used place asks OVERWRITE SLOT?: OCT- = EXIT (nothing saved), again + OCT+ = YES
+shot qsave_ask.png
+tap OCT-
+expect svstage -1
+key b10 down
+tap SAVE
+key b10 up
+tap OCT+
+# go to place 10 (empty: no steps), come back to 9: the change is there
+turn PRESET 1
+tap OCT+
+wait 100
+expect presetcur 10
+expect vacc0.1.8 0
+turn PRESET -1
+tap OCT+
+wait 100
+expect presetcur 9
+expect vacc0.1.8 1
+expect vfill0.1.8 1
+# place 10 is empty: FUNC + SAVE saves at once (no name screens, no question), named UNTITLED 01 (wip308)
+turn PRESET 1
+tap OCT+
+wait 100
+expect presetcur 10
+expect slotused1 0
+expect slotun1 0
+key b10 down
+tap SAVE
+key b10 up
+expect svstage -1
+expect slotused1 1
+expect slotun1 1
+expect presetcur 10
+turn PRESET -1
+tap OCT+
+wait 100
+expect presetcur 9
+# wip286: while playing it works too (no STOP FIRST): a used place asks only OVERWRITE, OCT- = no (menu closes, nothing saved), OCT+ saves and the playing goes on
+tap PLAY
+wait 200
+expect playing 1
+tapkey b1
+key w9 down
+tapkey b8
+key w9 up
+key b10 down
+tap SAVE
+key b10 up
+expect svstage -1
+tap OCT-
+expect playing 1
+tapkey b1
+key b10 down
+tap SAVE
+key b10 up
+tap OCT+
+expect dirty 0
+expect playing 1
+tap PLAY
+wait 300
+# an empty place while playing: saved at once, named UNTITLED 02 (the next number, wip308), the playing goes on
+turn PRESET 1
+turn PRESET 1
+tap OCT+
+wait 100
+expect presetcur 11
+tap PLAY
+wait 200
+expect playing 1
+key b10 down
+tap SAVE
+key b10 up
+expect svstage -1
+expect svstage -1
+expect slotused2 1
+expect slotun2 2
+expect playing 1
+tap PLAY
+wait 300
+turn PRESET -1
+turn PRESET -1
+tap OCT+
+wait 100
+expect presetcur 9
+# a factory place (1) is saved over itself the same way (its override slot)
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+tap OCT+
+wait 100
+expect presetcur 1
+expect vfill0.1.8 0
+tapkey b1
+key w8 down
+tapkey b9
+key w8 up
+expect vfill0.1.8 1
+key b10 down
+tap SAVE
+key b10 up
+tap OCT+
+turn PRESET 1
+tap OCT+
+wait 100
+expect presetcur 2
+expect vfill0.1.8 0
+turn PRESET -1
+tap OCT+
+wait 100
+expect presetcur 1
+expect vfill0.1.8 1

@@ -1,0 +1,42 @@
+# wip255 option B step B1: a preset written over number 1-8 (flash slot 32-39) replaces the factory preset of that number.
+# (SAVE AS can not choose it yet: B2. presetmove puts a user slot there, as the flash would hold it.)
+wait 300
+tapkey b1
+key w8 down
+tapkey b8
+tapkey b9
+key w8 up
+expect vacc0.1.8 1
+tap SAVE
+tap OCT+
+tap OCT+
+expect svslot 0
+tap OCT+
+expect slotused0 1
+expect presetcur 9
+# before: preset 1 is the factory one (no accent on track 2 step 9)
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+tap OCT+
+expect presetcur 1
+expect vacc0.1.8 0
+# slot 9's preset is now written over preset 1 (flash 32): the same turn finds OUR preset at 1, and the slot 9 is empty
+presetmove 0 32
+expect slotused0 0
+turn PRESET 1
+turn PRESET -1
+tap OCT+
+expect presetcur 1
+expect vacc0.1.8 1
+expect vfill0.1.8 1
+# preset 2 is still the factory one
+turn PRESET 1
+tap OCT+
+expect presetcur 2
+expect vacc0.1.8 0

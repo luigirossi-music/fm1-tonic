@@ -1,0 +1,44 @@
+# SEQ pressed a 2nd time (the Tonic): a black screen with only the pattern number; white keys 1-16 = the next pattern
+# (at the end of the current one; stopped: at once). A 3rd press goes back to the SEQUENCE page.
+expect view 7
+expect seqpat 0
+tap SEQ
+expect view 7
+expect seqpat 1
+shot seqpat_1.png
+tapkey w2
+wait 200
+expect pattern 3
+shot seqpat_3.png
+tap PLAY
+wait 500
+tapkey w4
+expect cue 5
+expect pattern 3
+shot seqpat_cue.png
+wait 270
+shot seqpat_cue2.png
+wait 4000
+expect pattern 5
+tap PLAY
+wait 300
+tap SEQ
+expect seqpat 0
+expect view 7
+tap FX
+tap SEQ
+expect seqpat 0
+# the pattern page: black keys 1-8 = mute buttons (1st press mutes, 2nd unmutes), as on PERFORM (wip112)
+tap SEQ
+expect seqpat 1
+expect vmute 0
+tapkey b0
+expect vmute 1
+tapkey b2
+expect vmute 5
+shot seqpat_mute.png
+tapkey b0
+expect vmute 4
+tapkey b2
+expect vmute 0
+expect seqpat 1

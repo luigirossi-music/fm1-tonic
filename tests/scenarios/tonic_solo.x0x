@@ -1,0 +1,45 @@
+# wip264: FILL + black key 1-8 = SOLO that voice (its key blinks); FILL + the same key again, or a press of that voice's key: solo gone.
+wait 300
+expect solo 0
+# FILL held + black key 3 = solo track 3
+key b9 down
+tapkey b2
+key b9 up
+expect solo 3
+# FILL + black key 5 moves the solo
+key b9 down
+tapkey b4
+key b9 up
+expect solo 5
+# a press of the soloed voice's key ends it (and selects the track as usual)
+tapkey b4
+expect solo 0
+# FILL + the same key again = off
+key b9 down
+tapkey b4
+expect solo 5
+tapkey b4
+key b9 up
+expect solo 0
+# FUNC + FILL + a key does not solo (it is the track paste)
+key b10 down
+key b9 down
+tapkey b2
+key b9 up
+key b10 up
+expect solo 0
+# the sound: trigs on step 1 of tracks 1 and 2, solo track 2, play: only track 2 hits
+tapkey b0
+tapkey w0
+tapkey b1
+tapkey w0
+key b9 down
+tapkey b1
+key b9 up
+expect solo 2
+tap PLAY
+wait 3000
+tap PLAY
+wait 300
+expect hits0 1
+expect hits1 3

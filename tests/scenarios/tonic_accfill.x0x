@@ -1,0 +1,61 @@
+# TONIC hold-to-edit: keep a trig key (white) pressed and press black key 9 (ACCENT) and / or 10 (FILL).
+wait 300
+tapkey b0
+# an empty step: held it goes on at once; ACCENT then FILL on it; the quick release keeps it
+key w0 down
+wait 40
+tapkey b8
+expect hit0.0.0 1
+expect vacc0.0.0 1
+expect vfill0.0.0 0
+tapkey b9
+key w0 up
+expect hit0.0.0 1
+expect vacc0.0.0 1
+expect vfill0.0.0 1
+# pressing ACCENT again while holding takes the accent off; the trig and the fill stay
+key w0 down
+tapkey b8
+key w0 up
+expect hit0.0.0 1
+expect vacc0.0.0 0
+expect vfill0.0.0 1
+# a quick tap on a trig with no modifier takes it off, and its flags with it
+tapkey w0
+expect hit0.0.0 0
+expect vfill0.0.0 0
+expect vacc0.0.0 0
+# an existing plain trig, held, then FILL: it keeps the trig and the quick release does not remove it
+tapkey w2
+expect hit0.0.2 1
+key w2 down
+tapkey b9
+key w2 up
+expect hit0.0.2 1
+expect vfill0.0.2 1
+# the other order: FILL + ACCENT held first, then white keys (an empty step gets a trig with both)
+key b9 down
+key b8 down
+tapkey w5
+key b8 up
+key b9 up
+expect hit0.0.5 1
+expect vacc0.0.5 1
+expect vfill0.0.5 1
+# the flags belong to the selected track: track 2's step 5 is untouched
+tapkey b1
+expect hit0.1.5 0
+expect vacc0.1.5 0
+# ACCENT / FILL alone (no trig held) change nothing and are not tracks: still track 2
+tapkey b8
+tapkey b9
+expect sel 1
+expect vacc0.1.5 0
+# the grid colours: white trig, red accent, blue fill, purple both
+tapkey b0
+key w8 down
+tapkey b8
+key w8 up
+tapkey w10
+expect vacc0.0.8 1
+shot tonic_grid.png

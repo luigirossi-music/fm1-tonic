@@ -1,0 +1,17 @@
+# OCT+ / OCT- on the Tonic (any page): the selected voice PITCH one octave up / down (6576 of 65535 on the 20 Hz - 20 kHz scale)
+wait 300
+expect tn16.0.1 30970
+# OCT+ = one octave up (+6576), on the HOME page too (no longer the pattern bank), OCT- = down again
+tap OCT+
+expect tn16.0.1 37546
+expect tn16.1.1 30970
+tap OCT-
+tap OCT-
+expect tn16.0.1 24394
+tap OCT+
+expect tn16.0.1 30970
+# the selected voice (black key 1 = voice 2) is the one that moves; the other pages too (the sequencer page)
+tapkey b1
+tap SEQ
+tap OCT+
+expect tn16.1.1 37546

@@ -1,0 +1,62 @@
+# FX, 1st press: MIX (view 9) = the selected track's Mix (K1), EQ Freq (K2), Distort (K3), EQ Gain (K4).
+# FX again: the effects (view 2), its 3 pages (REVERB, DELAY, COMP), then MIX again.
+# Tonic BD: Mix = sound0.0.13 (0), Dist = .14 (0), EQFreq = .15 (0), EQGain = .16 (64).
+wait 300
+tap FX
+expect view 9
+turn K1 3 80
+expect sound0.0.13 3
+turn K2 5 80
+expect sound0.0.15 5
+turn K3 2 80
+expect sound0.0.14 2
+turn K4 -4 80
+expect sound0.0.16 60
+shot fxmix_track1.png
+# black key 2 = track 2: the knobs now set its own sound
+tapkey b1
+turn K1 1 80
+shot fxmix_track2.png
+# FX again: PERFORM, REVERB, DELAY, COMP (view 2), then back to MIX (view 9)
+tap FX
+expect view 2
+tap FX
+expect view 2
+tap FX
+expect view 2
+tap FX
+expect view 2
+expect fxpage 3
+tap FX
+expect view 9
+# from any other page, FX goes to MIX
+tap EDIT
+expect view 14
+tap FX
+expect view 9
+# wip72: slider look + the big values rectangle
+turn K1 20 80
+shot fxmix_mixbox.png
+wait 3000
+shot fxmix_idle.png
+turn K2 40 80
+shot fxmix_eqbox.png
+# wip101 FX bug: a 2nd cycle starts at PERFORM again (it used to land on DELAY): MIX, PERFORM, REVERB, DELAY, COMP, MIX, PERFORM
+tap EDIT
+tap FX
+expect view 9
+tap FX
+expect view 2
+expect fxpage 0
+tap FX
+expect fxpage 1
+tap FX
+expect fxpage 2
+tap FX
+expect fxpage 3
+tap FX
+expect view 9
+tap FX
+expect view 2
+expect fxpage 0
+shot fxmix_cycle2_perform.png

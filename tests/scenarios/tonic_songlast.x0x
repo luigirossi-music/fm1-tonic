@@ -1,0 +1,25 @@
+# wip360: deleting the LAST bar (FILL on the SONG screen, no question) deletes the song: song mode off, SONG OFF
+wait 300
+key b10 down
+tap SEQ
+key b10 up
+tap OCT+
+tapkey w0
+tapkey w1
+tap OCT+
+expect songlen 2
+expect songmode 1
+expect chainon 1
+# first bar: the song stays
+key b9 down
+key b9 up
+wait 100
+expect songlen 1
+expect songmode 1
+# last bar: the song is gone
+key b9 down
+key b9 up
+wait 100
+expect songlen 0
+expect songmode 0
+expect chainon 0

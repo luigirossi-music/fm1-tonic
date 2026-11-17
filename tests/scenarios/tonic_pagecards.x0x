@@ -1,0 +1,49 @@
+# wip381: the FX button's pages as the manual's chapter 1A describes them (and the screenshots of its page cards,
+# docs/img/pages/shot-*.png: fx1_mix, fx2_perform, fx2b_msp, fx_sel1 = REVERB, fx_sel3 = REVERB 2, fx_sel2 = DELAY, fx_sel4 = DELAY 2)
+wait 300
+tap FX
+expect view 9
+shot fx1_mix.png
+tap FX
+expect view 2
+expect curpage 1
+shot fx2_perform.png
+turn ALGO 1 80
+wait 200
+shot fx2b_msp.png
+turn ALGO -1 80
+wait 200
+# SELECT walks PERFORM, REVERB, DELAY, REVERB 2, DELAY 2 and stops at the end
+turn SELECT 1 80
+wait 200
+expect curpage 2
+shot fx_sel1.png
+turn SELECT 1 80
+wait 200
+expect curpage 3
+shot fx_sel2.png
+turn SELECT 1 80
+wait 200
+expect curpage 4
+shot fx_sel3.png
+turn SELECT 1 80
+wait 200
+expect curpage 5
+shot fx_sel4.png
+turn SELECT 1 80
+wait 200
+expect curpage 5
+# FX = back to MIX 1; hold FX = REVERB; ALGO right = REVERB 2; FX = MIX 1
+tap FX
+expect view 9
+press FX
+wait 700
+release FX
+wait 200
+expect view 2
+expect curpage 2
+turn ALGO 1 80
+wait 200
+expect curpage 4
+tap FX
+expect view 9

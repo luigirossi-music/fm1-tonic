@@ -1,0 +1,71 @@
+# wip250: the chain flags follow the notes. Bank tests/fixtures/bank_chain (build: X0X_PRESET_BANK=tests/fixtures/bank_chain sh host/build_host.sh):
+# 01 pattern 1 chained with notes, pattern 2 chained but EMPTY; 02 both chained with notes; 03 chain flags and no notes anywhere.
+# An empty user place (9) = a blank project. After each load the ones with chain flags on patterns WITH notes play through (SONG ON).
+wait 300
+expect chainon 0
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+tap OCT+
+wait 100
+expect presetcur 9
+expect chainon 0
+expect pchain0 0
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+tap OCT+
+wait 100
+expect presetcur 1
+expect pchain0 1
+expect pchain1 0
+expect chainon 1
+turn PRESET 1
+turn PRESET 1
+tap OCT+
+wait 100
+expect presetcur 3
+expect pchain0 0
+expect pchain1 0
+expect chainon 0
+turn PRESET -1
+tap OCT+
+wait 100
+expect presetcur 2
+expect pchain0 1
+expect pchain1 1
+expect chainon 1
+# clear pattern 1 (FUNC + PLAY, OCT+): its flag goes, pattern 2 still follows
+key b10 down
+tap PLAY
+key b10 up
+expect clearask 1
+tap OCT+
+wait 100
+expect pchain0 0
+expect pchain1 1
+expect chainon 1
+# pattern 2 (FUNC + white key 2), clear it too: the last flag goes and the chain is not followed any more
+key b10 down
+tapkey w1
+key b10 up
+expect ppat0 2
+key b10 down
+tap PLAY
+key b10 up
+expect clearask 1
+tap OCT+
+wait 100
+expect pchain1 0
+expect chainon 0

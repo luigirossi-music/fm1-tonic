@@ -1,0 +1,43 @@
+# wip327: K4 alone only warns HOLD FUNC + TURN K4: RANDOM (nothing changes); FUNC (key b10 in scenarios) held + K4 randomizes.
+# wip326: GLO 1st press = VEL (view 15); K4 = RANDOM SOUND: the selected track's 21 libpo32 parameters get new random values,
+# the extras (pan 21, rev send 22, dly send 23) stay; wip344: LEVEL (17) stays as it was; a step held = no random; K1-K3 still work
+wait 300
+tap GLO
+expect view 15
+shot random_idle.png
+expect sound0.0.21 64
+expect sound0.0.22 0
+expect sound0.0.23 0
+expect sound0.0.3 78
+turn K4 1 80
+shot random_warn.png
+expect sound0.0.3 78
+key b10 down
+turn K4 1 80
+shot random_blink.png
+wait 200
+shot random_blink2.png
+expect view 15
+expect sound0.0.21 64
+expect sound0.0.22 0
+expect sound0.0.23 0
+expect sound0.0.17 101 # wip344: RANDOM never touches the volume (LEVEL)
+wait 2000
+shot random_after.png
+turn K4 1 80
+wait 300
+expect sound0.0.21 64
+expect sound0.0.22 0
+expect sound0.0.23 0
+expect sound0.0.17 101 # wip344: RANDOM never touches the volume (LEVEL)
+wait 2000
+shot random_after2.png
+key b10 up
+# the other tracks are untouched (track 2 keeps its power-on level)
+expect sound0.1.17 101
+# K1 still sets the OSC velocity
+turn K1 20 80
+wait 500
+expect view 15
+tap GLO
+expect view 3

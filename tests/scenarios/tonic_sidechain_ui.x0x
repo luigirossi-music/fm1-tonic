@@ -1,0 +1,51 @@
+# wip349: SIDECHAIN step 2a: SENDS (HOME 2nd press) K4 = intensity, K3 = input (global, the same on every track)
+wait 300
+tap HOME
+tap HOME
+expect view 8
+expect scint 0
+expect scin 0
+turn K4 20 80
+wait 100
+shot sidechain_sends.png
+turn K3 2 80
+wait 100
+expect scin 2
+turn K3 -10 80
+expect scin 0
+turn K3 20 80
+expect scin 7
+turn K4 -200 80
+expect scint 0
+turn K4 200 80
+expect scint 127
+# K1 / K2 (the track's sends) still work
+turn K1 20 80
+expect sound0.0.22 20
+# wip350: the DUCK screen: ALGORITHM right opens it, black keys 1-8 duck / un-duck, the INPUT track is refused
+turn K4 -200 80
+turn K3 -20 80
+expect scin 0
+turn ALGO 1
+expect dck 1
+tapkey b2
+expect scmask 4
+tapkey b0
+expect scmask 4
+shot sidechain_duck.png
+tapkey b2
+expect scmask 0
+# K3 onto a ducked track: the bit stays, it comes back when the input moves away
+tapkey b1
+turn ALGO -1
+expect dck 0
+turn K3 1 80
+expect scin 1
+turn ALGO 1
+tapkey b1
+expect scmask 2
+turn ALGO -1
+# HOME closes the screen
+turn ALGO 1
+tap HOME
+expect dck 0

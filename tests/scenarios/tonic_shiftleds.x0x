@@ -1,0 +1,34 @@
+# While SHIFT is held (any page) the black keys light only the tracks that have notes (steady; a muted one blinks slowly;
+# empty ones off) and the white keys only the patterns that have notes (steady; a cued pattern blinks). All normal again
+# when SHIFT is let go. This scenario prints the LEDs: check the log (tests/scenarios/tonic_shiftleds.expect lists what is right).
+wait 300
+# pattern 1: tracks 1 and 3 have notes
+tapkey b0
+tapkey w0
+tapkey b2
+tapkey w4
+# pattern 3: track 1 has a note
+key b10 down
+tapkey w2
+key b10 up
+tapkey b0
+tapkey w1
+# back to pattern 1, mute track 3
+key b10 down
+tapkey w0
+key b10 up
+key b10 down
+tapkey b2
+key b10 up
+wait 100
+echo SHIFT NOT HELD
+leds
+key b10 down
+wait 100
+echo SHIFT HELD
+leds
+shot shiftleds_1.png
+key b10 up
+wait 100
+echo SHIFT LET GO
+leds

@@ -1,0 +1,112 @@
+# wip317: FUNC + HOME = RENAME PROJECT: the name screen alone, saved into the loaded place (1-8 too), OCT- / HOME cancel.
+wait 300
+# nothing loaded since power on: it says so, no screen opens
+key b10 down
+tap HOME
+key b10 up
+expect svstage -1
+# SAVE AS puts the project into user slot 1 (place 9)
+tap SAVE
+tap OCT+
+tap OCT+
+tap OCT+
+expect presetcur 9
+expect slotused0 1
+# a change of our own (track 1, step 9: accent and fill)
+tapkey b1
+key w8 down
+tapkey b8
+tapkey b9
+key w8 up
+expect vacc0.1.8 1
+# FUNC + HOME opens the name screen alone (stage 1); ALGORITHM makes another name; OCT- cancels: the place keeps its old name
+key b10 down
+tap HOME
+key b10 up
+expect svstage 1
+shot rename_1.png
+turn ALGO 1
+tap OCT-
+expect svstage -1
+expect plmatch8 0
+# HOME cancels too
+key b10 down
+tap HOME
+key b10 up
+expect svstage 1
+tap HOME
+expect svstage -1
+expect plmatch8 0
+# OCT+ saves under the new name into the same place; the place stays 9; the change is saved with it
+key b10 down
+tap HOME
+key b10 up
+turn ALGO 1
+tap OCT+
+expect svstage -1
+expect presetcur 9
+expect plmatch8 1
+expect dirty 0
+turn PRESET 1
+tap OCT+
+wait 100
+expect presetcur 10
+expect vacc0.1.8 0
+turn PRESET -1
+tap OCT+
+wait 100
+expect presetcur 9
+expect vacc0.1.8 1
+# a factory place (1) is renamed in its override slot: it stays place 1, place 9 keeps its name
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+tap OCT+
+wait 100
+expect presetcur 1
+key b10 down
+tap HOME
+key b10 up
+expect svstage 1
+turn ALGO 1
+tap OCT+
+expect svstage -1
+expect presetcur 1
+expect plmatch0 1
+expect plmatch8 0
+turn PRESET 1
+tap OCT+
+wait 100
+expect presetcur 2
+turn PRESET -1
+tap OCT+
+wait 100
+expect presetcur 1
+expect plmatch0 1
+# while playing: it works, the playing goes on
+tap PLAY
+wait 200
+expect playing 1
+key b10 down
+tap HOME
+key b10 up
+expect svstage 1
+turn ALGO 1
+tap OCT+
+expect svstage -1
+expect playing 1
+expect plmatch0 1
+tap PLAY
+wait 300
+# the ordinary SAVE after a rename is the normal SAVE again: SAVE HERE? first, OCT- goes on to CHOOSE SLOT, OCT- again exits
+tap SAVE
+expect svstage 3
+tap OCT-
+expect svstage 4
+tap OCT-
+expect svstage -1

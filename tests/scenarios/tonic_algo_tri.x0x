@@ -1,0 +1,34 @@
+# wip341: ALGORITHM on PERFORM / REVERB / DELAY / EDIT goes by DIRECTION (right = 2nd page, left = back; no toggle: a 2nd tick does not hide it)
+# and the blue triangle in the bottom right corner shows it (right = there is a 2nd page, left = back).
+wait 300
+tap FX
+tap FX
+shot algo_tri_perf.png
+spin ALGO 1
+spin ALGO 1
+wait 300
+shot algo_tri_msp.png
+spin ALGO 1
+wait 100
+shot algo_tri_msp_still.png
+spin ALGO -1
+wait 100
+shot algo_tri_perf_back.png
+spin SELECT 1
+spin ALGO 1
+wait 100
+shot algo_tri_reverb2.png
+spin ALGO -1
+wait 100
+spin SELECT 1
+spin ALGO 1
+wait 100
+shot algo_tri_delay2.png
+tap EDIT
+spin ALGO 1
+spin ALGO 1
+wait 100
+shot algo_tri_choke.png
+spin ALGO -1
+wait 100
+shot algo_tri_edit.png

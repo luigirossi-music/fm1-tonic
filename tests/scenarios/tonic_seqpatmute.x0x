@@ -1,0 +1,36 @@
+# wip285: the pattern page (SEQ, 2nd press) works like PERFORM for mute / solo: black keys = mute, FUNC = all mutes off, FILL = SOLO mode / all solos off, many solos
+wait 300
+tap SEQ
+expect seqpat 1
+expect view 7
+expect mutes 0
+tapkey b0
+tapkey b2
+tapkey b5
+expect mutes 3
+shot sp_three.png
+tapkey b10
+expect mutes 0
+tapkey b10
+expect mutes 0
+# SOLO mode: FILL, black 4 and 7 = two solos; FUNC leaves them; FILL clears
+tapkey b9
+tapkey b3
+tapkey b6
+expect solo 4
+shot sp_solo.png
+tapkey b10
+expect solo 4
+tapkey b9
+expect solo 0
+# a white key = the next pattern still
+tapkey w2
+wait 200
+expect pattern 3
+expect seqpat 1
+# the knob K1 is untouched; ALGO does not open a boxes page here
+turn ALGO 1
+expect view 7
+expect seqpat 1
+tap SEQ
+expect seqpat 0

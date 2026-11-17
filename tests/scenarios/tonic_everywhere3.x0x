@@ -1,0 +1,131 @@
+# wip389: white key = step (tap on / off) and white key held + ACCENT + FILL = flags, on the first page of every button
+wait 300
+tapkey b0
+tap SEL
+wait 120
+tapkey w5
+wait 60
+expect hit0.0.5 1
+key w5 down
+wait 40
+tapkey b8
+tapkey b9
+key w5 up
+wait 60
+expect vacc0.0.5 1
+expect vfill0.0.5 1
+tapkey w5
+wait 60
+expect hit0.0.5 0
+tap ENV
+wait 120
+tapkey w5
+wait 60
+expect hit0.0.5 1
+key w5 down
+wait 40
+tapkey b8
+tapkey b9
+key w5 up
+wait 60
+expect vacc0.0.5 1
+expect vfill0.0.5 1
+tapkey w5
+wait 60
+expect hit0.0.5 0
+tap LFO
+wait 120
+tapkey w5
+wait 60
+expect hit0.0.5 1
+key w5 down
+wait 40
+tapkey b8
+tapkey b9
+key w5 up
+wait 60
+expect vacc0.0.5 1
+expect vfill0.0.5 1
+tapkey w5
+wait 60
+expect hit0.0.5 0
+tap EDIT
+wait 120
+tapkey w5
+wait 60
+expect hit0.0.5 1
+key w5 down
+wait 40
+tapkey b8
+tapkey b9
+key w5 up
+wait 60
+expect vacc0.0.5 1
+expect vfill0.0.5 1
+tapkey w5
+wait 60
+expect hit0.0.5 0
+tap FX
+wait 120
+tapkey w5
+wait 60
+expect hit0.0.5 1
+key w5 down
+wait 40
+tapkey b8
+tapkey b9
+key w5 up
+wait 60
+expect vacc0.0.5 1
+expect vfill0.0.5 1
+tapkey w5
+wait 60
+expect hit0.0.5 0
+tap HOME
+wait 120
+tapkey w5
+wait 60
+expect hit0.0.5 1
+key w5 down
+wait 40
+tapkey b8
+tapkey b9
+key w5 up
+wait 60
+expect vacc0.0.5 1
+expect vfill0.0.5 1
+tapkey w5
+wait 60
+expect hit0.0.5 0
+tap GLO
+wait 120
+tapkey w5
+wait 60
+expect hit0.0.5 1
+key w5 down
+wait 40
+tapkey b8
+tapkey b9
+key w5 up
+wait 60
+expect vacc0.0.5 1
+expect vfill0.0.5 1
+tapkey w5
+wait 60
+expect hit0.0.5 0
+tap SEQ
+wait 120
+tapkey w5
+wait 60
+expect hit0.0.5 1
+key w5 down
+wait 40
+tapkey b8
+tapkey b9
+key w5 up
+wait 60
+expect vacc0.0.5 1
+expect vfill0.0.5 1
+tapkey w5
+wait 60
+expect hit0.0.5 0

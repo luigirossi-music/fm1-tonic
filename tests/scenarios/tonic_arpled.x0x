@@ -1,0 +1,21 @@
+# wip418: the ARP page: the CURRENT track's black key (1-8) blinks slowly, it follows ALGO (the voice)
+wait 300
+tap ARP
+wait 50
+expect arp 1
+expect sel 0
+# black key 1 is lit at some moment of the slow blink and dark at another (~16 frames each)
+wait 10
+leds
+wait 300
+leds
+wait 300
+leds
+turn ALGO 2
+expect sel 2
+wait 10
+leds
+wait 300
+leds
+wait 300
+leds

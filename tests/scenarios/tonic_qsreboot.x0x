@@ -1,0 +1,23 @@
+# wip309: the loaded place survives a power cycle, so FUNC + SAVE after switch-on asks OVERWRITE SLOT? (no NO SLOT YET)
+wait 300
+expect presetcur 0
+# SAVE AS into user slot 1 (place 9)
+tap SAVE
+tap OCT+
+tap OCT+
+tap OCT+
+expect presetcur 9
+# a change, then wait for the autosave and switch off / on
+tapkey b1
+tapkey b8
+wait 6000
+reboot
+wait 300
+expect presetcur 9
+# FUNC + SAVE: the OVERWRITE question opens (OCT+ = yes), nothing says NO SLOT YET
+key b10 down
+tap SAVE
+key b10 up
+tap OCT+
+expect svstage -1
+expect presetcur 9

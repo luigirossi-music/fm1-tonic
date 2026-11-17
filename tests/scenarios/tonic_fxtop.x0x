@@ -1,0 +1,12 @@
+# wip269: the REVERB / DELAY pages: no send bars (TNC / 808 / BRK) at the top, the page's name instead
+wait 300
+press FX
+wait 700
+release FX
+wait 200
+shot fxtop_reverb.png
+press HOME
+wait 700
+release HOME
+wait 200
+shot fxtop_delay.png

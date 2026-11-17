@@ -1,0 +1,21 @@
+# wip267: GLO 3rd press = the MEMORY page (a vertical battery); 4th = the settings list; HOME leaves
+wait 300
+tap GLO   # wip290: 1st press = VEL
+tap GLO
+shot mem_1_mixer.png
+tap GLO
+shot mem_2_comp.png
+tap GLO
+wait 200
+shot mem_3_memory.png
+wait 150
+shot mem_3b_memory.png
+tap GLO
+shot mem_4_list.png
+tap HOME
+tap GLO   # wip290: 1st press = VEL
+tap GLO
+tap GLO
+tap GLO
+tap HOME
+shot mem_5_home_from_memory.png

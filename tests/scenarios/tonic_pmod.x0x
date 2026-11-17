@@ -1,0 +1,29 @@
+# SEL = PITCH MOD (view 11): shape, amount, rate of the selected track. No more "this screen as a list".
+wait 300
+tap FX
+expect view 9
+tap SEL
+expect view 11
+shot pmod_idle.png
+turn K2 10 80
+shot pmod_amount.png
+wait 1000
+turn K1 4 80
+wait 3000
+shot pmod_sin.png
+turn K1 4 80
+wait 3000
+shot pmod_rnd.png
+turn K3 5 80
+shot pmod_rate.png
+# SEL again: stays on PITCH MOD (no list opens)
+tap SEL
+expect view 11
+shot pmod_again.png
+# wip82: K1 turned = the zoom is the CIRCLE (icon + MOD MODE + the mode name), K2 = MOD AMT in sm
+wait 3000
+turn K1 4 80
+shot pmod_zoom_k1.png
+wait 3000
+turn K2 10 80
+shot pmod_zoom_k2.png

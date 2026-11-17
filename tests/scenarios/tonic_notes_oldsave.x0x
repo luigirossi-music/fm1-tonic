@@ -1,0 +1,11 @@
+# wip252: a project saved by wip251 (before the ARP notes; fixtures/project_wip251.x0b: track 1 steps 1 + 9, track 3 step 5)
+# still loads: the steps are there, the notes are empty.
+wait 300
+restore tests/fixtures/project_wip251.x0b
+wait 500
+expect restore_rc 0
+expect hit0.0.0 1
+expect hit0.0.8 1
+expect hit0.2.4 1
+expect note0.0.0 0
+expect note0.2.4 0

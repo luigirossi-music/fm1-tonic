@@ -1,0 +1,34 @@
+# wip238: a voice (track) keeps at most 3 lanes (p-locked / recorded knobs) in a pattern: the 4th is refused, other tracks are free.
+wait 300
+tapkey w4
+tap ENV
+key w4 down
+spin K1 1
+spin K2 10
+spin K3 10
+key w4 up
+expect lanes 3
+# the 4th knob of the same track: refused (a knob that has a lane still takes more steps)
+spin K4 10
+key w4 down
+spin K4 10
+key w4 up
+expect lanes 3
+key w4 down
+spin K1 1
+key w4 up
+tapkey w5
+key w5 down
+spin K1 1
+key w5 up
+expect lanes 3
+expect laneval0.0.0.5 >-1
+# another track: free again
+tapkey b1
+key w4 down
+spin K1 1
+spin K2 10
+spin K3 10
+spin K4 10
+key w4 up
+expect lanes 6

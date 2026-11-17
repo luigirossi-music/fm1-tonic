@@ -1,0 +1,21 @@
+# wip234: GLO > 4/4 LED (under LIGHTS): OFF by default (no beat lights), ON shows the faint beat lights (white keys 1 5 9 13) on SEQ; saved.
+wait 300
+tap SEQ
+leds
+tap GLO   # wip290: 1st press = VEL
+tap GLO
+tap GLO
+tap GLO
+turn SELECT 6
+shot beatled_list.png
+turn ALGO 1
+tap SEQ
+leds
+tap GLO   # wip290: 1st press = VEL
+tap GLO
+tap GLO
+tap GLO
+turn SELECT 6
+turn ALGO -1
+tap SEQ
+leds

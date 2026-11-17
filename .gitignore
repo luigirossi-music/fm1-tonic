@@ -1,0 +1,11 @@
+build/
+.DS_Store
+__pycache__/
+*.o
+/*.png
+/midi_out.txt
+
+# the handoffs and the work-in-progress zips stay on the author's PC (our working notes), not on GitHub
+/HANDOFF_*.md
+/fm1-tonic-wip*.zip
+/fm1_tonic_user_manual_*.html

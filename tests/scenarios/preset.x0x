@@ -1,0 +1,56 @@
+# A Tonic preset (tnp.h, packed from the Rostoma .mtpreset by tools/tnp_pack) loaded as the working project.
+# Needs build/rostoma.tnp (tests/run_tests.sh packs it when the Rostoma preset and libpo32 are present).
+wait 300
+preset build/rostoma.tnp
+expect preset_rc 0
+expect tempo 121
+expect plen0 16
+expect plen5 8
+expect plen7 16
+expect pswing0 4
+expect pswing7 4
+expect pswing20 4
+# pattern a: BD on 1 5 9 13 16, SD (track 2) on 1 3 8 11, track 8 silent
+expect phit0.0.0 1
+expect phit0.0.1 0
+expect phit0.0.4 1
+expect phit0.1.2 1
+expect phit0.1.7 1
+expect phit0.7.0 0
+# own accents: BD accented on step 1 only, SD on steps 3 and 4 (step 4 has no hit: stays inert)
+expect vacc0.0.0 1
+expect vacc0.0.4 0
+expect vacc0.1.2 1
+expect vacc0.1.3 1
+expect vacc0.1.0 0
+# patterns 1-8 only: pattern i (9th) has a kick on step 5 in the file, here it is empty
+expect phit8.0.4 0
+expect phit8.0.0 0
+# fills: track 4 step 16, track 7 step 1 (pattern a)
+expect vfill0.3.15 1
+expect vfill0.6.0 1
+expect vfill0.6.6 1
+# pattern b is there too, and slot 13 is empty
+expect phit1.0.0 1
+expect phit12.0.0 0
+# the exact 16-bit values survived (drum 1 OscFreq 5645, drum 8 OscWave 65535)
+expect tn16_0.1 5645
+expect tn16_7.0 65535
+expect tn16_0.17 59726
+# the pan pots (drum 1: 73)
+expect sound0.0.21 73
+shot preset_loaded.png
+# play it: sounds, and the autosave keeps the load
+wav preset.wav
+tap PLAY
+expect playing 1
+wait 4000
+# a preset is refused while playing
+preset build/rostoma.tnp
+expect preset_rc 10
+tap PLAY
+wait 500
+wavstop
+expect playing 0
+expect peak_db_min -30
+expect dirty 1

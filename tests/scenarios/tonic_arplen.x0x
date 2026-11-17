@@ -1,0 +1,15 @@
+# wip315: a bigger fixed length copies the ARP notes with the trigs (16 -> 32: the note of step n lands on n + 16 too)
+wait 300
+tap ARP
+tap REC
+tap PLAY
+wait 100
+tapkey 19
+wait 50
+tap PLAY
+tap REC
+expect notesum0.0 12
+expect len0 16
+turn K1 4 80
+expect len0 32
+expect notesum0.0 24

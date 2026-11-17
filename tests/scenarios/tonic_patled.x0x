@@ -1,0 +1,28 @@
+# wip375: PERFORM and the pattern page: empty pattern = no light, pattern with notes = low light ('o'), the CURRENT one blinks slowly, the cued (next) one blinks
+wait 300
+tapkey w0
+tap FX
+wait 100
+key w0 down
+spin K1 40
+wait 200
+key w0 up
+wait 200
+press FX
+wait 100
+release FX
+wait 100
+leds
+wait 200
+leds
+wait 200
+leds
+wait 200
+leds
+tap PLAY
+wait 200
+tapkey w5
+wait 100
+leds
+wait 100
+leds

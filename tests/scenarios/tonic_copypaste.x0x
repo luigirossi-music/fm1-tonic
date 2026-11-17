@@ -1,0 +1,174 @@
+# TONIC copy / paste / clear (FUNC = black key 11), wip206 key map:
+#   FUNC + ACCENT (black key 9) = copy the pattern; FUNC + FILL (black key 10) = paste it here (when FILL is let go);
+#   FUNC + FILL held + a white key = paste into that slot (the key blinks fast a moment); FUNC + PLAY = CLEAR PATTERN? (OCT+ confirms,
+#   OCT- goes back); FUNC + a black key 1-8 + PLAY = CLEAR TRACK PATTERN?; FUNC + black key 1-8 mutes when the key is let go
+#   (not if it was used with PLAY / ACCENT / FILL).
+wait 300
+tap EDIT
+expect view 14
+# pattern 1: track 1 steps 1, 9 (w0, w8) and an accent on step 3, a fill on step 4; track 3 step 5
+tapkey b0
+tapkey w0
+tapkey w8
+key b8 down
+tapkey w2
+key b8 up
+key b9 down
+tapkey w3
+key b9 up
+tapkey b2
+tapkey w4
+# nothing copied yet: SHIFT + REC pastes nothing and REC does not turn recording on
+expect clip 0
+key b10 down
+tapkey b9
+key b10 up
+expect rec 0
+expect clip 0
+expect pasteask 0
+# SHIFT + SEQ copies pattern 1 (and does not leave for the SEQ page)
+key b10 down
+tapkey b8
+key b10 up
+expect clip 1
+expect view 14
+# go to pattern 4 (SHIFT + white key 4), SHIFT + REC pastes there (REC does not record)
+key b10 down
+tapkey w3
+key b10 up
+expect pattern 4
+expect hit0.0.0 0
+# wip416: FUNC + FILL on the pattern asks PASTE PATTERN? first: nothing is pasted yet; OCT- = NO, nothing is pasted
+key b10 down
+tapkey b9
+key b10 up
+expect pasteask 1
+expect hit0.0.0 0
+shot copypaste_0.png
+tap OCT-
+expect pasteask 0
+expect hit0.0.0 0
+# again: OCT+ = YES, the pattern is pasted
+key b10 down
+tapkey b9
+key b10 up
+expect pasteask 1
+tap OCT+
+expect pasteask 0
+expect rec 0
+expect hit0.0.0 1
+expect hit0.0.8 1
+expect hit0.2.4 1
+expect vacc3.0.2 1
+expect vfill3.0.3 1
+# pattern 1 itself is untouched
+expect vacc0.0.2 1
+# SHIFT + REC + white key 7: pastes into pattern 7, the key blinks fast; the pattern shown (2, empty) stays empty
+key b10 down
+tapkey w0
+key b10 up
+key b10 down
+tapkey b8
+tapkey w1
+key b10 up
+expect pattern 2
+expect clip 1
+key b10 down
+key b9 down
+tapkey w6
+expect pasteblink 7
+key b9 up
+key b10 up
+expect pasteblink 7
+expect hit0.0.0 0
+expect vacc6.0.2 1
+expect vfill6.0.3 1
+expect rec 0
+wait 800
+expect pasteblink 0
+shot copypaste_1.png
+# CLEAR PATTERN?: SHIFT + PLAY asks (and does not start); OCT- goes back, nothing is cleared
+key b10 down
+tapkey w3
+key b10 up
+expect hit0.0.0 1
+key b10 down
+tap PLAY
+key b10 up
+expect clearask 1
+expect playing 0
+shot copypaste_2.png
+tap OCT-
+expect clearask 0
+expect hit0.0.0 1
+# again, OCT+ clears the whole pattern, flags too (pattern 7 and the copy in pattern 1 stay)
+key b10 down
+tap PLAY
+key b10 up
+tap OCT+
+expect clearask 0
+expect hit0.0.0 0
+expect hit0.0.8 0
+expect hit0.2.4 0
+expect vacc3.0.2 0
+expect vfill3.0.3 0
+expect hit1.0.0 0
+key b10 down
+tapkey w0
+key b10 up
+expect hit0.0.0 1
+# CLEAR TRACK PATTERN?: SHIFT + black key 1 held + PLAY: asks; the track is not muted by it
+key b10 down
+key b0 down
+tap PLAY
+expect clearask 2
+key b0 up
+key b10 up
+expect vmute 0
+tap OCT-
+expect clearask 0
+expect hit0.0.0 1
+key b10 down
+key b0 down
+tap PLAY
+key b0 up
+key b10 up
+tap OCT+
+expect clearask 0
+expect hit0.0.0 0
+expect hit0.0.8 0
+expect vacc0.0.2 0
+expect vfill0.0.3 0
+expect hit0.2.4 1
+expect vmute 0
+# (FUNC + ACCENT / FILL used to clear a track's accents / fills: removed in wip206, they are copy / paste now)
+# SHIFT + black key: mute when it is let go (not before), again: unmute
+key b10 down
+key b3 down
+expect vmute 0
+key b3 up
+key b10 up
+expect vmute 8
+key b10 down
+tapkey b3
+key b10 up
+expect vmute 0
+# SHIFT + SEQ with SHIFT let go first: nothing odd, then the page is SEQ as usual
+tap SEQ
+expect view 7
+# the lights: SHIFT held and a paste into slot 12: white key 12 blinks fast (the LED dump is printed: check it, key 12 flips)
+tap EDIT
+key b10 down
+tapkey b8
+key b9 down
+tapkey w11
+echo PASTE BLINK 1
+leds
+wait 40
+echo PASTE BLINK 2
+leds
+wait 40
+echo PASTE BLINK 3
+leds
+key b9 up
+key b10 up

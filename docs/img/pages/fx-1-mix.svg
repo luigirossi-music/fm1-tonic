@@ -1,0 +1,194 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" role="img" aria-label="The FM1 Tonic panel with its labels: knobs, buttons, black keys (TRACK 1-8, ACCENT, FILL, FUNC) and white keys (STEP 1-16)" font-family="Arial, Helvetica, sans-serif">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cdcdcd"/><stop offset="1" stop-color="#a9a9a9"/></linearGradient><radialGradient id="kn" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#b4b4b4"/></radialGradient></defs>
+<rect x="4" y="4" width="992" height="692" rx="40" fill="url(#bg)" stroke="#6a6a6a" stroke-width="2"/>
+<rect x="292" y="44" width="256" height="256" rx="18" fill="#0b0b0c"/>
+<text x="420" y="200" text-anchor="middle" font-size="11" font-weight="600" fill="#7d8fb0">4 big values = KNOB 1 2 3 4</text>
+<circle cx="105" cy="110" r="24" fill="url(#kn)" stroke="#7a7a7a" stroke-width="2"/>
+<line x1="105" y1="110" x2="105" y2="90.8" stroke="#2146c8" stroke-width="5" stroke-linecap="round"/>
+<text x="105" y="62" text-anchor="middle" font-size="14" font-weight="700" fill="#202020">MASTER</text>
+<text x="105" y="77" text-anchor="middle" font-size="10.5" font-weight="600" fill="#202020">VOLUME</text>
+<circle cx="215" cy="110" r="24" fill="url(#kn)" stroke="#7a7a7a" stroke-width="2"/>
+<line x1="215" y1="110" x2="215" y2="90.8" stroke="#2146c8" stroke-width="5" stroke-linecap="round"/>
+<text x="215" y="62" text-anchor="middle" font-size="14" font-weight="700" fill="#202020">SELECT</text>
+<text x="215" y="77" text-anchor="middle" font-size="10.5" font-weight="600" fill="#202020">STEP HELD: CHANCE</text>
+<circle cx="105" cy="215" r="24" fill="url(#kn)" stroke="#7a7a7a" stroke-width="2"/>
+<line x1="105" y1="215" x2="105" y2="195.8" stroke="#2146c8" stroke-width="5" stroke-linecap="round"/>
+<text x="105" y="167" text-anchor="middle" font-size="14" font-weight="700" fill="#202020">PRESETS</text>
+<text x="105" y="182" text-anchor="middle" font-size="10.5" font-weight="600" fill="#202020">PRESET (40)</text>
+<circle cx="215" cy="215" r="24" fill="url(#kn)" stroke="#7a7a7a" stroke-width="2"/>
+<line x1="215" y1="215" x2="215" y2="195.8" stroke="#2146c8" stroke-width="5" stroke-linecap="round"/>
+<text x="215" y="167" text-anchor="middle" font-size="14" font-weight="700" fill="#202020">ALGORITHM</text>
+<text x="215" y="182" text-anchor="middle" font-size="10.5" font-weight="600" fill="#6a6a6a">-</text>
+<circle cx="610" cy="110" r="22" fill="url(#kn)" stroke="#7a7a7a" stroke-width="2"/>
+<line x1="610" y1="110" x2="610" y2="92.4" stroke="#2146c8" stroke-width="5" stroke-linecap="round"/>
+<text x="610" y="64" text-anchor="middle" font-size="14" font-weight="700" fill="#202020">KNOB 1</text>
+<text x="610" y="79" text-anchor="middle" font-size="10.5" font-weight="600" fill="#202020">MIX</text>
+<circle cx="714" cy="110" r="22" fill="url(#kn)" stroke="#7a7a7a" stroke-width="2"/>
+<line x1="714" y1="110" x2="714" y2="92.4" stroke="#2146c8" stroke-width="5" stroke-linecap="round"/>
+<text x="714" y="64" text-anchor="middle" font-size="14" font-weight="700" fill="#202020">KNOB 2</text>
+<text x="714" y="79" text-anchor="middle" font-size="10.5" font-weight="600" fill="#202020">EQ FREQ</text>
+<circle cx="818" cy="110" r="22" fill="url(#kn)" stroke="#7a7a7a" stroke-width="2"/>
+<line x1="818" y1="110" x2="818" y2="92.4" stroke="#2146c8" stroke-width="5" stroke-linecap="round"/>
+<text x="818" y="64" text-anchor="middle" font-size="14" font-weight="700" fill="#202020">KNOB 3</text>
+<text x="818" y="79" text-anchor="middle" font-size="10.5" font-weight="600" fill="#202020">DIST</text>
+<circle cx="922" cy="110" r="22" fill="url(#kn)" stroke="#7a7a7a" stroke-width="2"/>
+<line x1="922" y1="110" x2="922" y2="92.4" stroke="#2146c8" stroke-width="5" stroke-linecap="round"/>
+<text x="922" y="64" text-anchor="middle" font-size="14" font-weight="700" fill="#202020">KNOB 4</text>
+<text x="922" y="79" text-anchor="middle" font-size="10.5" font-weight="600" fill="#202020">EQ GAIN</text>
+<rect x="50" y="260" width="220" height="50" rx="14" fill="#141415"/>
+<rect x="556" y="156" width="416" height="158" rx="14" fill="#141415"/>
+<rect x="562" y="162" width="64" height="64" rx="9" fill="#1d6b73" stroke="#45b3bd" stroke-width="2"/>
+<text x="594.0" y="185" text-anchor="middle" font-size="11.5" font-weight="700" fill="#ffffff">MIX /</text>
+<text x="594.0" y="199" text-anchor="middle" font-size="11.5" font-weight="700" fill="#ffffff">PERFORM</text>
+<text x="594.0" y="217" text-anchor="middle" font-size="9" font-weight="600" fill="#d6dae2">FX</text>
+<rect x="630" y="162" width="64" height="64" rx="9" fill="#2b4a8c" stroke="#6f93e0" stroke-width="2"/>
+<text x="662.0" y="185" text-anchor="middle" font-size="11.5" font-weight="700" fill="#ffffff">PITCH</text>
+<text x="662.0" y="199" text-anchor="middle" font-size="11.5" font-weight="700" fill="#ffffff">MOD</text>
+<text x="662.0" y="217" text-anchor="middle" font-size="9" font-weight="600" fill="#d6dae2">SEL</text>
+<rect x="698" y="162" width="64" height="64" rx="9" fill="#2b4a8c" stroke="#6f93e0" stroke-width="2"/>
+<text x="730.0" y="193" text-anchor="middle" font-size="8.8" font-weight="700" fill="#ffffff">OSCILLATOR</text>
+<text x="730.0" y="217" text-anchor="middle" font-size="9" font-weight="600" fill="#d6dae2">ENV</text>
+<rect x="766" y="162" width="64" height="64" rx="9" fill="#2b4a8c" stroke="#6f93e0" stroke-width="2"/>
+<text x="798.0" y="193" text-anchor="middle" font-size="11.5" font-weight="700" fill="#ffffff">NOISE</text>
+<text x="798.0" y="217" text-anchor="middle" font-size="9" font-weight="600" fill="#d6dae2">LFO</text>
+<rect x="834" y="162" width="64" height="64" rx="9" fill="#2b4a8c" stroke="#6f93e0" stroke-width="2"/>
+<text x="866.0" y="185" text-anchor="middle" font-size="11.5" font-weight="700" fill="#ffffff">NOISE</text>
+<text x="866.0" y="199" text-anchor="middle" font-size="11.5" font-weight="700" fill="#ffffff">ENV</text>
+<text x="866.0" y="217" text-anchor="middle" font-size="9" font-weight="600" fill="#d6dae2">EDIT</text>
+<rect x="902" y="162" width="64" height="64" rx="9" fill="#6a3a8c" stroke="#b080d8" stroke-width="2"/>
+<text x="934.0" y="185" text-anchor="middle" font-size="10.4" font-weight="700" fill="#ffffff">MASTER /</text>
+<text x="934.0" y="199" text-anchor="middle" font-size="10.4" font-weight="700" fill="#ffffff">MIXER</text>
+<text x="934.0" y="217" text-anchor="middle" font-size="9" font-weight="600" fill="#d6dae2">GLO</text>
+<rect x="562" y="240" width="64" height="64" rx="9" fill="#1d6b73" stroke="#45b3bd" stroke-width="2"/>
+<text x="594.0" y="263" text-anchor="middle" font-size="11.5" font-weight="700" fill="#ffffff">MIX 2 /</text>
+<text x="594.0" y="277" text-anchor="middle" font-size="11.5" font-weight="700" fill="#ffffff">SENDS</text>
+<text x="594.0" y="295" text-anchor="middle" font-size="9" font-weight="600" fill="#d6dae2">HOME</text>
+<rect x="630" y="240" width="64" height="64" rx="9" fill="#4a4f5c" stroke="#8a90a0" stroke-width="2"/>
+<text x="662.0" y="271" text-anchor="middle" font-size="11.5" font-weight="700" fill="#ffffff">SAVE</text>
+<text x="662.0" y="295" text-anchor="middle" font-size="9" font-weight="600" fill="#d6dae2">SAVE</text>
+<rect x="698" y="240" width="64" height="64" rx="9" fill="#8a5a12" stroke="#d9a040" stroke-width="2"/>
+<text x="730.0" y="271" text-anchor="middle" font-size="9.6" font-weight="700" fill="#ffffff">KEYBOARD</text>
+<text x="730.0" y="295" text-anchor="middle" font-size="9" font-weight="600" fill="#d6dae2">ARP</text>
+<rect x="766" y="240" width="64" height="64" rx="9" fill="#8a5a12" stroke="#d9a040" stroke-width="2"/>
+<text x="798.0" y="271" text-anchor="middle" font-size="11.5" font-weight="700" fill="#ffffff">STEPS</text>
+<text x="798.0" y="295" text-anchor="middle" font-size="9" font-weight="600" fill="#d6dae2">SEQ</text>
+<rect x="834" y="240" width="64" height="64" rx="9" fill="#2a7d32" stroke="#5cc464" stroke-width="2"/>
+<text x="866.0" y="263" text-anchor="middle" font-size="11.5" font-weight="700" fill="#ffffff">PLAY /</text>
+<text x="866.0" y="277" text-anchor="middle" font-size="11.5" font-weight="700" fill="#ffffff">STOP</text>
+<text x="866.0" y="295" text-anchor="middle" font-size="9" font-weight="600" fill="#d6dae2">PLAY</text>
+<rect x="902" y="240" width="64" height="64" rx="9" fill="#a32a24" stroke="#ff6a60" stroke-width="2"/>
+<text x="934.0" y="271" text-anchor="middle" font-size="11.5" font-weight="700" fill="#ffffff">RECORD</text>
+<text x="934.0" y="295" text-anchor="middle" font-size="9" font-weight="600" fill="#d6dae2">REC</text>
+<rect x="60" y="268" width="90" height="34" rx="8" fill="#2a2a2d" stroke="#5a5a60" stroke-width="1.5"/>
+<text x="105.0" y="283" text-anchor="middle" font-size="12.5" font-weight="700" fill="#ffffff">NO / DOWN</text>
+<text x="105.0" y="295" text-anchor="middle" font-size="9.5" font-weight="600" fill="#d6dae2">OCT-</text>
+<rect x="170" y="268" width="90" height="34" rx="8" fill="#2a2a2d" stroke="#5a5a60" stroke-width="1.5"/>
+<text x="215.0" y="283" text-anchor="middle" font-size="12.5" font-weight="700" fill="#ffffff">YES / UP</text>
+<text x="215.0" y="295" text-anchor="middle" font-size="9.5" font-weight="600" fill="#d6dae2">OCT+</text>
+<g font-size="14" font-weight="700" fill="#202020">
+<rect x="292" y="321" width="14" height="14" rx="3" fill="#2b4a8c"/><text x="312" y="334">SOUND OF THE TRACK</text>
+<rect x="501.4" y="321" width="14" height="14" rx="3" fill="#1d6b73"/><text x="521.4" y="334">MIX AND EFFECTS</text>
+<rect x="682.9" y="321" width="14" height="14" rx="3" fill="#6a3a8c"/><text x="702.9" y="334">GLOBAL</text>
+<rect x="780.7" y="321" width="14" height="14" rx="3" fill="#8a5a12"/><text x="800.7" y="334">SEQUENCER</text>
+</g>
+<rect x="36" y="372" width="928" height="256" rx="18" fill="#141415"/>
+<rect x="54.2" y="509.6" width="44.1" height="108.8" rx="22.0" fill="#2c2c30" stroke="#4a4a4e" stroke-width="1.5"/>
+<rect x="73.2" y="527.2" width="6" height="73.5" rx="3" fill="#5d86d6"/>
+<text x="76.25" y="640.4" text-anchor="middle" font-size="15" font-weight="700" fill="#202020">1</text>
+<rect x="110.7" y="509.6" width="44.1" height="108.8" rx="22.0" fill="#2c2c30" stroke="#4a4a4e" stroke-width="1.5"/>
+<rect x="129.8" y="527.2" width="6" height="73.5" rx="3" fill="#5d86d6"/>
+<text x="132.75" y="640.4" text-anchor="middle" font-size="15" font-weight="700" fill="#202020">2</text>
+<rect x="167.2" y="509.6" width="44.1" height="108.8" rx="22.0" fill="#2c2c30" stroke="#4a4a4e" stroke-width="1.5"/>
+<rect x="186.2" y="527.2" width="6" height="73.5" rx="3" fill="#5d86d6"/>
+<text x="189.25" y="640.4" text-anchor="middle" font-size="15" font-weight="700" fill="#202020">3</text>
+<rect x="223.7" y="509.6" width="44.1" height="108.8" rx="22.0" fill="#2c2c30" stroke="#4a4a4e" stroke-width="1.5"/>
+<rect x="242.8" y="527.2" width="6" height="73.5" rx="3" fill="#5d86d6"/>
+<text x="245.75" y="640.4" text-anchor="middle" font-size="15" font-weight="700" fill="#202020">4</text>
+<rect x="280.2" y="509.6" width="44.1" height="108.8" rx="22.0" fill="#2c2c30" stroke="#4a4a4e" stroke-width="1.5"/>
+<rect x="299.2" y="527.2" width="6" height="73.5" rx="3" fill="#5d86d6"/>
+<text x="302.25" y="640.4" text-anchor="middle" font-size="15" font-weight="700" fill="#202020">5</text>
+<rect x="336.7" y="509.6" width="44.1" height="108.8" rx="22.0" fill="#2c2c30" stroke="#4a4a4e" stroke-width="1.5"/>
+<rect x="355.8" y="527.2" width="6" height="73.5" rx="3" fill="#5d86d6"/>
+<text x="358.75" y="640.4" text-anchor="middle" font-size="15" font-weight="700" fill="#202020">6</text>
+<rect x="393.2" y="509.6" width="44.1" height="108.8" rx="22.0" fill="#2c2c30" stroke="#4a4a4e" stroke-width="1.5"/>
+<rect x="412.2" y="527.2" width="6" height="73.5" rx="3" fill="#5d86d6"/>
+<text x="415.25" y="640.4" text-anchor="middle" font-size="15" font-weight="700" fill="#202020">7</text>
+<rect x="449.7" y="509.6" width="44.1" height="108.8" rx="22.0" fill="#2c2c30" stroke="#4a4a4e" stroke-width="1.5"/>
+<rect x="468.8" y="527.2" width="6" height="73.5" rx="3" fill="#5d86d6"/>
+<text x="471.75" y="640.4" text-anchor="middle" font-size="15" font-weight="700" fill="#202020">8</text>
+<rect x="506.2" y="509.6" width="44.1" height="108.8" rx="22.0" fill="#2c2c30" stroke="#4a4a4e" stroke-width="1.5"/>
+<rect x="525.2" y="527.2" width="6" height="73.5" rx="3" fill="#5d86d6"/>
+<text x="528.25" y="640.4" text-anchor="middle" font-size="15" font-weight="700" fill="#202020">9</text>
+<rect x="562.7" y="509.6" width="44.1" height="108.8" rx="22.0" fill="#2c2c30" stroke="#4a4a4e" stroke-width="1.5"/>
+<rect x="581.8" y="527.2" width="6" height="73.5" rx="3" fill="#5d86d6"/>
+<text x="584.75" y="640.4" text-anchor="middle" font-size="15" font-weight="700" fill="#202020">10</text>
+<rect x="619.2" y="509.6" width="44.1" height="108.8" rx="22.0" fill="#2c2c30" stroke="#4a4a4e" stroke-width="1.5"/>
+<rect x="638.2" y="527.2" width="6" height="73.5" rx="3" fill="#5d86d6"/>
+<text x="641.25" y="640.4" text-anchor="middle" font-size="15" font-weight="700" fill="#202020">11</text>
+<rect x="675.7" y="509.6" width="44.1" height="108.8" rx="22.0" fill="#2c2c30" stroke="#4a4a4e" stroke-width="1.5"/>
+<rect x="694.8" y="527.2" width="6" height="73.5" rx="3" fill="#5d86d6"/>
+<text x="697.75" y="640.4" text-anchor="middle" font-size="15" font-weight="700" fill="#202020">12</text>
+<rect x="732.2" y="509.6" width="44.1" height="108.8" rx="22.0" fill="#2c2c30" stroke="#4a4a4e" stroke-width="1.5"/>
+<rect x="751.2" y="527.2" width="6" height="73.5" rx="3" fill="#5d86d6"/>
+<text x="754.25" y="640.4" text-anchor="middle" font-size="15" font-weight="700" fill="#202020">13</text>
+<rect x="788.7" y="509.6" width="44.1" height="108.8" rx="22.0" fill="#2c2c30" stroke="#4a4a4e" stroke-width="1.5"/>
+<rect x="807.8" y="527.2" width="6" height="73.5" rx="3" fill="#5d86d6"/>
+<text x="810.75" y="640.4" text-anchor="middle" font-size="15" font-weight="700" fill="#202020">14</text>
+<rect x="845.2" y="509.6" width="44.1" height="108.8" rx="22.0" fill="#2c2c30" stroke="#4a4a4e" stroke-width="1.5"/>
+<rect x="864.2" y="527.2" width="6" height="73.5" rx="3" fill="#5d86d6"/>
+<text x="867.25" y="640.4" text-anchor="middle" font-size="15" font-weight="700" fill="#202020">15</text>
+<rect x="901.7" y="509.6" width="44.1" height="108.8" rx="22.0" fill="#2c2c30" stroke="#4a4a4e" stroke-width="1.5"/>
+<rect x="920.8" y="527.2" width="6" height="73.5" rx="3" fill="#5d86d6"/>
+<text x="923.75" y="640.4" text-anchor="middle" font-size="15" font-weight="700" fill="#202020">16</text>
+<rect x="82.5" y="381.6" width="44.1" height="108.8" rx="22.0" fill="#3b82d6" stroke="#8dbcf0" stroke-width="1.5"/>
+<text x="104.55" y="418" text-anchor="middle" font-size="10.5" font-weight="700" fill="#ffffff">TRACK</text>
+<text x="104.55" y="446" text-anchor="middle" font-size="32" font-weight="700" fill="#ffffff">1</text>
+<rect x="139.0" y="381.6" width="44.1" height="108.8" rx="22.0" fill="#3b82d6" stroke="#8dbcf0" stroke-width="1.5"/>
+<text x="161.05" y="418" text-anchor="middle" font-size="10.5" font-weight="700" fill="#ffffff">TRACK</text>
+<text x="161.05" y="446" text-anchor="middle" font-size="32" font-weight="700" fill="#ffffff">2</text>
+<rect x="195.5" y="381.6" width="44.1" height="108.8" rx="22.0" fill="#3b82d6" stroke="#8dbcf0" stroke-width="1.5"/>
+<text x="217.55" y="418" text-anchor="middle" font-size="10.5" font-weight="700" fill="#ffffff">TRACK</text>
+<text x="217.55" y="446" text-anchor="middle" font-size="32" font-weight="700" fill="#ffffff">3</text>
+<rect x="308.5" y="381.6" width="44.1" height="108.8" rx="22.0" fill="#3b82d6" stroke="#8dbcf0" stroke-width="1.5"/>
+<text x="330.55" y="418" text-anchor="middle" font-size="10.5" font-weight="700" fill="#ffffff">TRACK</text>
+<text x="330.55" y="446" text-anchor="middle" font-size="32" font-weight="700" fill="#ffffff">4</text>
+<rect x="365.0" y="381.6" width="44.1" height="108.8" rx="22.0" fill="#3b82d6" stroke="#8dbcf0" stroke-width="1.5"/>
+<text x="387.05" y="418" text-anchor="middle" font-size="10.5" font-weight="700" fill="#ffffff">TRACK</text>
+<text x="387.05" y="446" text-anchor="middle" font-size="32" font-weight="700" fill="#ffffff">5</text>
+<rect x="478.0" y="381.6" width="44.1" height="108.8" rx="22.0" fill="#3b82d6" stroke="#8dbcf0" stroke-width="1.5"/>
+<text x="500.05" y="418" text-anchor="middle" font-size="10.5" font-weight="700" fill="#ffffff">TRACK</text>
+<text x="500.05" y="446" text-anchor="middle" font-size="32" font-weight="700" fill="#ffffff">6</text>
+<rect x="534.5" y="381.6" width="44.1" height="108.8" rx="22.0" fill="#3b82d6" stroke="#8dbcf0" stroke-width="1.5"/>
+<text x="556.55" y="418" text-anchor="middle" font-size="10.5" font-weight="700" fill="#ffffff">TRACK</text>
+<text x="556.55" y="446" text-anchor="middle" font-size="32" font-weight="700" fill="#ffffff">7</text>
+<rect x="591.0" y="381.6" width="44.1" height="108.8" rx="22.0" fill="#3b82d6" stroke="#8dbcf0" stroke-width="1.5"/>
+<text x="613.05" y="418" text-anchor="middle" font-size="10.5" font-weight="700" fill="#ffffff">TRACK</text>
+<text x="613.05" y="446" text-anchor="middle" font-size="32" font-weight="700" fill="#ffffff">8</text>
+<rect x="704.0" y="381.6" width="44.1" height="108.8" rx="22.0" fill="#1c3f9a" stroke="#6f8fe0" stroke-width="1.5"/>
+<text x="726.05" y="438" text-anchor="middle" font-size="9.2" font-weight="700" fill="#ffffff">ACCENT</text>
+<rect x="760.5" y="381.6" width="44.1" height="108.8" rx="22.0" fill="#e0b000" stroke="#ffe066" stroke-width="1.5"/>
+<text x="782.55" y="438" text-anchor="middle" font-size="12.5" font-weight="700" fill="#202020">FILL</text>
+<rect x="873.5" y="381.6" width="44.1" height="108.8" rx="22.0" fill="#c0281c" stroke="#ff8a80" stroke-width="1.5"/>
+<text x="895.55" y="438" text-anchor="middle" font-size="12.5" font-weight="700" fill="#ffffff">FUNC</text>
+<text x="500" y="680" text-anchor="middle" font-size="13" font-weight="700" fill="#3a3a3a">WHITE KEYS 1 TO 16 = STEPS 1 TO 16      FUNC + WHITE KEY = PATTERN 1 TO 16</text>
+<image x="300" y="52" width="240" height="240" href="data:image/png;base64,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"/>
+<text x="500" y="20" text-anchor="middle" font-size="15" font-weight="700" fill="#202020">FX BUTTON · 1st PRESS · MIX 1</text>
+<text x="500" y="35" text-anchor="middle" font-size="10.5" font-weight="700"><tspan fill="#202020">BLACK = ITSELF   </tspan><tspan fill="#cc1a1a">RED = WITH FUNC HELD   </tspan><tspan fill="#d96c00">ORANGE = WITH FILL HELD</tspan></text>
+<text x="610" y="146" text-anchor="middle" font-size="9" font-weight="600" fill="#202020">OSC &lt;&gt; NOISE</text>
+<text x="714" y="146" text-anchor="middle" font-size="9" font-weight="600" fill="#202020">20 Hz - 20 kHz</text>
+<text x="818" y="146" text-anchor="middle" font-size="9" font-weight="600" fill="#202020">AMOUNT</text>
+<text x="922" y="146" text-anchor="middle" font-size="9" font-weight="600" fill="#202020">64 = FLAT</text>
+<text x="358" y="442" text-anchor="middle" font-size="10.5" font-weight="700" fill="#202020">KEYS 1-8: SELECT + PLAY THE TRACK</text>
+<text x="358" y="455" text-anchor="middle" font-size="10.5" font-weight="700" fill="#cc1a1a">FUNC + KEY = MUTE</text>
+<text x="358" y="468" text-anchor="middle" font-size="10.5" font-weight="700" fill="#d96c00">FILL + KEY = SOLO</text>
+<text x="726.0" y="442" text-anchor="middle" font-size="9.5" font-weight="700" fill="#cc1a1a">+ COPY</text>
+<text x="726.0" y="454" text-anchor="middle" font-size="9.5" font-weight="700" fill="#cc1a1a">PATTERN</text>
+<text x="782.5" y="442" text-anchor="middle" font-size="9.5" font-weight="700" fill="#cc1a1a">+ PASTE</text>
+<text x="782.5" y="454" text-anchor="middle" font-size="9.5" font-weight="700" fill="#cc1a1a">PATTERN</text>
+<text x="895.5" y="442" text-anchor="middle" font-size="9.5" font-weight="700" fill="#cc1a1a">+ PLAY</text>
+<text x="895.5" y="454" text-anchor="middle" font-size="9.5" font-weight="700" fill="#cc1a1a">CLEARS IT</text>
+<text x="500" y="662" text-anchor="middle" font-size="11" font-weight="700" fill="#202020">WHITE KEY HELD + TURN K1-K4 = P-LOCK THAT STEP (SELECT = ITS CHANCE)</text>
+<text x="500" y="675" text-anchor="middle" font-size="11" font-weight="700" fill="#202020">ENV + TURN = DEFAULT    SAVE + TURN = FORGET MOTION    REC + PLAY + TURN = RECORD</text>
+<text x="500" y="688" text-anchor="middle" font-size="11" font-weight="700" fill="#cc1a1a">FUNC + WHITE KEY = CHANGE PATTERN</text>
+<rect x="576" y="168" width="62" height="54" rx="8" fill="none" stroke="#2146c8" stroke-width="3"/>
+</svg>

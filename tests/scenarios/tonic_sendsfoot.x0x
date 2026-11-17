@@ -1,0 +1,6 @@
+# wip373: SENDS (HOME 2nd press): the footer is only SIDECHAIN ALGORITHM, at the right, next to the blue triangle
+wait 300
+tap HOME
+tap HOME
+wait 300
+shot sends_footer.png

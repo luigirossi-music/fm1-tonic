@@ -1,0 +1,73 @@
+# wip376 / wip378: HIT FLASH: a track's black key blinks for each hit, on every page except ARP (the LED dumps on SEQ and PERFORM both show it)
+wait 300
+tap SEQ
+tapkey w0
+tapkey w2
+tapkey w4
+tapkey w6
+tapkey w8
+tapkey w10
+tapkey w12
+tapkey w14
+tapkey b1
+tapkey w0
+tapkey w4
+tapkey w8
+tapkey w12
+tapkey b0
+tap PLAY
+wait 100
+# SEQ page
+leds
+wait 40
+leds
+wait 40
+leds
+wait 40
+leds
+wait 40
+leds
+wait 40
+leds
+wait 40
+leds
+wait 40
+leds
+wait 40
+leds
+wait 40
+leds
+wait 40
+leds
+wait 40
+leds
+wait 40
+leds
+wait 40
+leds
+wait 40
+press FX
+wait 100
+release FX
+wait 100
+press FX
+wait 100
+release FX
+wait 100
+# PERFORM
+leds
+wait 40
+leds
+wait 40
+leds
+wait 40
+leds
+wait 40
+leds
+wait 40
+leds
+wait 40
+leds
+wait 40
+leds
+wait 40

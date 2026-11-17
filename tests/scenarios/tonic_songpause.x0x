@@ -1,0 +1,32 @@
+# SONG ON / OFF on the pattern page (SEQ 2nd press, K1; wip211): in song mode, SONG OFF does not leave song mode, it pauses
+# the advance: the current bar loops. SONG ON advances again. Song: 2 bars (patterns 1 and 2).
+wait 300
+key b10 down
+tap SEQ
+key b10 up
+tap OCT+
+tapkey w0
+tapkey w1
+tap OCT+
+expect songlen 2
+expect songmode 1
+expect chainon 1
+tap PLAY
+expect songpos 1
+tap SEQ
+tap SEQ
+expect seqpat 1
+turn K1 -1
+expect chainon 0
+expect songon 1
+expect songmode 1
+wait 7000
+expect songpos 1
+expect playing 1
+turn K1 1
+expect chainon 1
+wait 4500
+expect songpos 2
+tap PLAY
+wait 300
+expect songmode 1

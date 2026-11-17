@@ -1,0 +1,8 @@
+# The STARTING POINT: with a start preset built in (X0X_START_PRESET), a new unit begins with it (tempo, sound, patterns 1-8).
+# Run by tests/run_tests.sh on a host build made with build/test_fill.tnp as the start preset.
+wait 300
+expect tempo 120
+expect phit0.0.4 1
+expect vfill0.0.4 1
+expect vacc0.0.4 1
+expect phit8.0.0 0

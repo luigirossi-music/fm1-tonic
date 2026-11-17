@@ -1,0 +1,125 @@
+# P-locks on the Tonic (wip195): on a voice page (ENV, LFO, EDIT x2, SEL pitch mod, FX mix) hold a step and turn
+# a knob: that step gets its own value (one step of the knob's lane); a tap still toggles. SAVE + the knob,
+# holding the step, clears it. The SEQ page locks nothing. (Before 195 no page took a lock: V_PART is not
+# reached on the Tonic.)
+wait 300
+expect view 7
+expect part 0
+expect sound0.0.0 0
+expect sound0.0.11 0
+expect sound0.1.18 0
+# taps on empty steps: on at once (track 1 = the kick, steps 1 and 5)
+tapkey w0
+tapkey w4
+expect hit0.0.0 1
+expect hit0.0.4 1
+# ENV page (wave K1): hold step 5, turn K1: its own wave; the knob's stays; a lane is born
+tap ENV
+expect view 12
+key w4 down
+spin K1 1
+key w4 up
+expect hit0.0.4 1
+expect sound0.0.0 0
+expect lanes 1
+expect laneval0.0.0.4 1
+expect laneval0.0.0.0 255
+# a second knob of the same page: Pitch (K2): its own lane
+key w4 down
+spin K2 10
+key w4 up
+expect lanes 2
+expect sound0.0.1 60
+expect laneval0.0.1.0 255
+# LFO page: noise filter mode K1
+tap LFO
+expect view 13
+key w4 down
+spin K1 1
+key w4 up
+expect lanes 3
+expect laneval0.0.7.4 1
+# EDIT page: noise envelope mode K1; EDIT again: VEL page, K1 = osc velocity
+# (wip238: a track keeps at most 3 lanes: EDIT, VEL, SEL go on track 2, FX on track 3)
+tapkey b1
+tap EDIT
+expect view 14
+key w4 down
+spin K1 1
+key w4 up
+expect lanes 4
+expect laneval0.1.10.4 1
+tap GLO   # wip290: VEL is GLO 1st press
+expect view 15
+key w4 down
+spin K1 5
+key w4 up
+expect lanes 5
+expect sound0.0.18 0
+# SEL: pitch mod shape K1
+tap SEL
+expect view 11
+key w4 down
+spin K1 1
+key w4 up
+expect lanes 6
+expect laneval0.1.4.4 1
+# FX (1st press): mix 1, K1 = Mix
+tapkey b2
+tap FX
+expect view 9
+key w4 down
+spin K1 5
+key w4 up
+expect lanes 7
+expect sound0.2.13 0
+tapkey b0
+# held without a knob: the step stays; a tap takes it off, and back on
+tap ENV
+key w0 down
+wait 600
+key w0 up
+expect hit0.0.0 1
+tapkey w0
+expect hit0.0.0 0
+tapkey w0
+expect hit0.0.0 1
+# playing: the lock is stored at once and heard on the next pass: step 5 plays wave 1, step 1 the knob's 0
+tap PLAY
+wait 450
+expect playhead0 5
+expect motion0.0.0 1
+wait 160
+expect playhead0 6
+expect motion0.0.0 0
+# a lock turned while playing: stored at once (step 1, wave K1), heard on the next pass
+key w0 down
+spin K1 1
+key w0 up
+expect laneval0.0.0.0 1
+tap PLAY
+# SAVE + the knob, holding the step: the lock goes (and its lane, when it was the only one)
+key w4 down
+press SAVE
+spin K1 1
+release SAVE
+key w4 up
+expect laneval0.0.0.4 255
+expect lanes 7
+tap LFO
+key w4 down
+press SAVE
+spin K1 1
+release SAVE
+key w4 up
+expect laneval0.0.7.4 -1
+expect lanes 6
+expect hit0.0.4 1
+# SEQ: holding a drum step and turning a knob locks nothing new
+tap SEQ
+expect view 7
+key w4 down
+spin K1 5
+key w4 up
+expect laneval0.0.7.4 -1
+expect lanes 6

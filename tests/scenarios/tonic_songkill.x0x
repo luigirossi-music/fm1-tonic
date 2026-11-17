@@ -1,0 +1,38 @@
+# wip314: FUNC + ARP asks DELETE SONG? [OCT-] NO [OCT+] YES; yes: the song is gone and song mode is left
+wait 300
+# no song yet, not in song mode: nothing to ask
+key b10 down
+tap ARP
+key b10 up
+expect songask 0
+# make a song (chain 1 2) -> song mode
+key b10 down
+tap SEQ
+key b10 up
+tap OCT+
+tapkey w0
+tapkey w1
+tap OCT+
+expect songlen 2
+expect songmode 1
+# FUNC + ARP: the question; NO keeps everything
+key b10 down
+tap ARP
+key b10 up
+expect songask 3
+tap OCT-
+expect songask 0
+expect songlen 2
+expect songmode 1
+expect chainon 1
+# YES: the song is deleted and song mode is left
+key b10 down
+tap ARP
+key b10 up
+expect songask 3
+tap OCT+
+expect songask 0
+expect songlen 0
+expect songmode 0
+# wip359: SONG is OFF on the pattern page too (K1)
+expect chainon 0

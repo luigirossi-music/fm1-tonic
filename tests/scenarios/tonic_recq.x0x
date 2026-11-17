@@ -1,0 +1,35 @@
+# wip292: FUNC (black key 11) + REC cycles QUANTIZED REC / UNQUANTIZED REC (default quantized); a live-recorded hit goes to the
+# nearest step when quantized, to the step playing now when unquantized
+wait 300
+listen
+key b10 down
+tap REC
+key b10 up
+said UNQUANTIZED REC
+key b10 down
+tap REC
+key b10 up
+said QUANTIZED REC
+expect rec 0
+# (a tap takes ~80 ms: with a 125 ms step the hit comes in the second half of step 1)
+# quantized: it goes to step 2
+tap REC
+tap PLAY
+tapkey b0
+wait 100
+tap PLAY
+tap REC
+expect hit0.0.1 1
+expect hit0.0.0 0
+# unquantized: the same hit, at the same time, stays on the step playing (step 1)
+key b10 down
+tap REC
+key b10 up
+said UNQUANTIZED REC
+tap REC
+tap PLAY
+tapkey b0
+wait 100
+tap PLAY
+tap REC
+expect hit0.0.0 1

@@ -1,0 +1,42 @@
+# wip241: SEQ page (Tonic; it is the boot page), AUTOSCROLL off (the default): SELECT turns only the step pages the pattern length has (16 = no page change, 32 = 1-16 / 17-32, 64 = four pages) and round; AUTOSCROLL on: SELECT does nothing there.
+wait 300
+expect view 7
+expect seqpat 0
+expect autoscroll 0
+expect len0 16
+# length 16: one page, SELECT stays on it
+turn SELECT 1
+expect spage 0
+turn SELECT -1
+expect spage 0
+# K1: 16 -> 32: two pages
+turn K1 4 80
+expect len0 32
+turn SELECT 1
+expect spage 1
+turn SELECT 1
+expect spage 0
+turn SELECT -1
+expect spage 1
+wait 1000
+# K1: 32 -> 64: four pages
+turn K1 4 80
+expect len0 64
+turn SELECT 1
+expect spage 2
+turn SELECT 1
+expect spage 3
+turn SELECT 1
+expect spage 0
+turn SELECT -1
+expect spage 3
+turn SELECT -1
+expect spage 2
+# the white keys now edit steps 33-48
+tapkey w0
+expect hit0.0.32 1
+# AUTOSCROLL on (K2): SELECT leaves the page
+turn K2 1 80
+expect autoscroll 1
+turn SELECT 1
+expect spage 2

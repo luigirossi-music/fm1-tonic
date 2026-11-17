@@ -1,0 +1,22 @@
+# PERFORM (FX 2nd press): K4 = ALL FX on / off (reverb, delay, distortion, filter; never a compressor). Right = all effects active (default), left = all off (dry signal). Not saved, no SAVE mark.
+wait 300
+tap FX
+tap FX
+expect view 2
+expect fxpage 0
+expect fxoff 0
+shot fxall_on.png
+turn K4 -1 80
+expect fxoff 1
+shot fxall_off.png
+turn K4 1 80
+expect fxoff 0
+turn K4 -1 80
+tap FX
+expect fxoff 1
+tap SEQ
+expect fxoff 1
+# PERFORM footer (wip118): BLACK: MUTE / WHITE: NEXT PAT / AGAIN: NEXT PAGE
+tap FX
+tap FX
+shot perf_footer.png

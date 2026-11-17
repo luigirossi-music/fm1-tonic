@@ -1,0 +1,38 @@
+# FX (the Tonic): the PERFORM page shows the pattern information (the current pattern big, the NEXT one in a blinking purple box);
+# white keys 1-16 = the next pattern (stopped: at once; playing: at the end of the current one).
+# the reverb send (REVERB D/W, K1 of PERFORM) starts at 0 % (wip109)
+expect sound4.0.1 0
+tap FX
+tap FX
+expect view 2
+expect fxpage 0
+shot perfpat_1.png
+tapkey w2
+wait 200
+expect pattern 3
+shot perfpat_3.png
+tap PLAY
+wait 500
+tapkey w4
+expect cue 5
+expect pattern 3
+wait 10
+shot perfpat_cue.png
+wait 270
+shot perfpat_cue2.png
+wait 4000
+expect pattern 5
+tap PLAY
+wait 300
+expect view 2
+# PERFORM: black keys 1-8 = mute buttons (1st press mutes, 2nd unmutes)
+expect vmute 0
+tapkey b0
+expect vmute 1
+tapkey b2
+expect vmute 5
+tapkey b0
+expect vmute 4
+tapkey b2
+expect vmute 0
+shot perfpat_mute.png

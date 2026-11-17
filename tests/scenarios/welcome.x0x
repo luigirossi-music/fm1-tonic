@@ -1,0 +1,6 @@
+# The FM1 TONIC welcome screen (gfx.c welcome_draw, drawn at power-on): a screenshot to look at, and the screen is
+# the whole 240 x 240 (a later job can check the pixels). The device shows it for about 1.2 s, then the version big for 500 ms (welcomever, wip215).
+welcome
+shot welcome.png
+welcomever
+shot welcome_version.png

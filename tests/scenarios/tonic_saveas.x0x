@@ -1,0 +1,155 @@
+# SAVE opens SAVE AS: three screens (name, name, slot); the project goes into a user slot and the PRESETS knob finds it again.
+wait 300
+# something of our own in the project: track 2, step 9, with accent and fill
+tapkey b1
+key w8 down
+tapkey b8
+tapkey b9
+key w8 up
+expect vacc0.1.8 1
+expect vfill0.1.8 1
+# the same in pattern 5 (FUNC + white key 4): SAVE AS keeps patterns 1-8, not only the first (wip152)
+key b10 down
+tapkey w4
+key b10 up
+expect ppat0 5
+tapkey b1
+key w8 down
+tapkey b8
+tapkey b9
+key w8 up
+expect vacc4.1.8 1
+expect vfill4.1.8 1
+expect phit4.1.8 1
+# wip317: SAVE = SAVE HERE? when a place is loaded, else CHOOSE SLOT (stage 4); then the slot (2), then the name (1)
+# nothing loaded yet: SAVE opens CHOOSE SLOT, ALGORITHM does nothing there, OCT- = EXIT SAVE
+tap SAVE
+expect svstage 4
+shot saveas_choose.png
+turn ALGO 1
+expect svstage 4
+tap OCT-
+expect svstage -1
+# again: OCT+ to the slot screen, OCT+ to the name, OCT- back to the slot, OCT- back to CHOOSE SLOT, OCT+ to the slot again
+tap SAVE
+tap OCT+
+expect svstage 2
+tap OCT+
+expect svstage 1
+shot saveas_2.png
+turn ALGO 1
+tap OCT-
+expect svstage 2
+tap OCT-
+expect svstage 4
+tap OCT+
+expect svstage 2
+expect svslot 0
+expect svhere 9   # wip343: nothing loaded: the first empty place
+# ALGORITHM cycles the 32 slots, both ways
+turn ALGO 8
+expect svslot 8
+# wip343: the slot screen covers all 40 places (1-8 too) and cycles round: place 17 - 9 = 8 (factory), + 1 = 9, - 9 = 40 (round), + 9 = 9 again
+turn ALGO -9
+expect svhere 8
+turn ALGO 1
+expect svhere 9
+expect svslot 0
+turn ALGO -9
+expect svhere 40
+expect svslot 31
+turn ALGO 9
+expect svhere 9
+turn ALGO 8
+shot saveas_3.png
+# OCT+ to the name, OCT- back to the slot, OCT+ again, OCT+ saves
+tap OCT+
+expect svstage 1
+tap OCT-
+expect svstage 2
+expect svslot 8
+tap OCT+
+expect slotused8 0
+tap OCT+
+expect svstage -1
+expect slotused8 1
+expect presetcur 17
+# load another preset (the test bank's 03), then the knob finds our slot again (the knob goes through all 40 places: 14 up)
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+tap OCT+
+expect tempo 150
+expect vfill0.1.8 0
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+tap OCT+
+expect tempo 125
+expect vacc0.1.8 1
+expect vfill0.1.8 1
+expect presetcur 17
+# pattern 5 came back too (wip152: it was lost, only pattern 1 was saved)
+expect phit4.1.8 1
+expect vacc4.1.8 1
+expect vfill4.1.8 1
+# a save while playing goes through at once (no STOP FIRST any more): SAVE HERE? first (place 17 is loaded), OCT- = NO, then slot + name
+tap PLAY
+wait 200
+tap SAVE
+expect svstage 3
+shot saveas_here.png
+tap OCT-
+expect svstage 4
+tap OCT+
+# wip343: the slot screen starts at the NEXT EMPTY place after the loaded one (17 is loaded: 18), then 18 - 8 = place 10 = user slot 1
+expect svhere 18
+turn ALGO -8
+expect svhere 10
+tap OCT+
+expect svstage 1
+tap OCT+
+expect svstage -1
+expect slotused1 1
+expect playing 1
+tap PLAY
+wait 300
+# a user preset keeps the first pattern only: load a 12-pattern file (kicks in all 8 kept patterns), then our slot:
+# pattern 2 is empty again, pattern 1 is ours
+preset build/test_12.tnp
+expect preset_rc 0
+expect phit1.0.0 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+tap OCT+
+wait 100
+expect vfill0.1.8 1
+expect phit1.0.0 0
+expect phit7.0.0 0

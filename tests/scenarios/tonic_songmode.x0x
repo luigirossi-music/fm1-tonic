@@ -1,0 +1,90 @@
+# FUNC + SEQ asks "ENTER SONG MODE - PRESS [OCT+] CONFIRM - [OCT-] GO BACK". No chain yet: OCT+ opens the SONG screen.
+# A chain exists: OCT+ goes to the song page and plays the chain. In song mode FUNC + SEQ asks "EXIT SONG MODE?"
+# (OCT+ confirms: stops, back to the patterns; OCT- goes back). PLAY alone plays the pattern only.
+wait 300
+expect songlen 0
+expect songmode 0
+expect songask 0
+key b10 down
+tap SEQ
+key b10 up
+expect songask 1
+expect playing 0
+shot songmode_1.png
+# OCT- goes back
+tap OCT-
+expect songask 0
+expect chainn -1
+expect songmode 0
+# again, OCT+: no chain yet -> the CHAIN screen
+key b10 down
+tap SEQ
+key b10 up
+tap OCT+
+expect songask 0
+expect chainn 0
+tapkey w0
+tapkey w1
+tap OCT+
+expect songlen 2
+expect playing 0
+# the chain is made: song mode is on, PLAY plays the song
+expect songmode 1
+tap PLAY
+expect playing 1
+expect songon 1
+expect view 5
+tap PLAY
+wait 300
+expect playing 0
+# FUNC + SEQ in song mode: EXIT SONG MODE?
+key b10 down
+tap SEQ
+key b10 up
+expect songask 2
+shot songmode_2.png
+tap OCT-
+expect songask 0
+expect songmode 1
+key b10 down
+tap SEQ
+key b10 up
+expect songask 2
+tap OCT+
+expect songask 0
+expect songmode 0
+expect view 7
+expect chainon 0
+expect curpage 1
+expect playing 0
+# PLAY alone: the selected pattern only, no question
+tap PLAY
+expect songask 0
+expect songon 0
+expect playing 1
+tap PLAY
+wait 300
+# a chain exists, so FUNC + SEQ + OCT+ enters song mode again and plays it
+key b10 down
+tap SEQ
+key b10 up
+expect songask 1
+tap OCT+
+expect songmode 1
+expect playing 1
+expect songon 1
+expect view 5
+# FUNC + SEQ while playing: exit, which stops it
+key b10 down
+tap SEQ
+key b10 up
+tap OCT+
+expect songmode 0
+wait 1000
+expect playing 0
+# FUNC + HOME does nothing now (wip211)
+key b10 down
+tap HOME
+key b10 up
+expect songask 0
+expect songmode 0

@@ -1,0 +1,26 @@
+# wip253 ARP step 3: the sequencer plays a step at its stored note (semitones), a step without a note at the voice's own pitch.
+wait 300
+tap EDIT
+tapkey b0
+tapkey w0
+notepoke 0 0 0 7
+# the playing step 1 hits at +7 (seqnote = the note of the last hit the sequencer played)
+tap PLAY
+wait 2200
+expect seqnote 7
+tap PLAY
+# no note: the voice's own pitch (0)
+notepoke 0 0 0 0
+tap PLAY
+wait 2200
+expect seqnote 0
+tap PLAY
+# a recorded note plays back: ARP, REC + PLAY, key raw 19 (+12), then the pattern comes round again at +12
+tap ARP
+tap REC
+tap PLAY
+tapkey 19
+tap REC
+wait 4500
+expect seqnote 12
+tap PLAY

@@ -1,0 +1,62 @@
+# wip236: LIVE RECORDING works on every page but PERFORM: REC + PLAY, a black key (pad) writes a trig at the playing step.
+# (the pattern page keeps its black keys as mutes; PERFORM too)
+wait 300
+tap SEQ
+expect part 0
+tap REC
+tap PLAY
+wait 200
+# PERFORM (the first FX = MIX, the second = PERFORM): the black keys stay mutes, nothing is recorded
+tap FX
+tap FX
+expect view 2
+expect fxpage 0
+tapkey b0
+wait 100
+expect nhit0.0 0
+# the voice pages (they only played the sound before)
+tap ENV
+tapkey b1
+wait 100
+expect nhit0.1 >0
+tap EDIT
+tapkey b2
+wait 100
+expect nhit0.2 >0
+tap SEL
+tapkey b3
+wait 100
+expect nhit0.3 >0
+# the GLO mixer
+tap GLO   # wip290: 1st press = VEL
+expect view 15
+tap GLO
+expect view 3
+tapkey b4
+wait 100
+expect nhit0.4 >0
+# the effects pages: FX held = REVERB
+press FX
+wait 700
+release FX
+wait 100
+expect fxpage 1
+tapkey b5
+wait 100
+expect nhit0.5 >0
+# HOME: MIX PAGE 2, GLOBAL, PATTERNS, SONG
+tap HOME
+tap HOME
+tap HOME
+tap HOME
+expect view 0
+tapkey b6
+wait 100
+expect nhit0.6 >0
+tap HOME
+expect view 5
+tapkey b7
+wait 100
+expect nhit0.7 >0
+tap PLAY
+tap REC

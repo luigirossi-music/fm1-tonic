@@ -1,0 +1,121 @@
+# wip317: the normal SAVE: SAVE HERE? (place + name) OCT+ YES saves at once into the loaded place and keeps the name; OCT- NO -> CHOOSE SLOT -> slot -> name.
+wait 300
+# nothing loaded: starts at CHOOSE SLOT (4); HOME cancels
+tap SAVE
+expect svstage 4
+tap HOME
+expect svstage -1
+# SAVE AS into slot 1 (place 9): CHOOSE SLOT, slot, name
+tap SAVE
+tap OCT+
+tap OCT+
+tap OCT+
+expect presetcur 9
+expect slotused0 1
+# a change, then SAVE: SAVE HERE? with place 9
+tapkey b1
+key w8 down
+tapkey b8
+tapkey b9
+key w8 up
+expect vacc0.1.8 1
+tap SAVE
+expect svstage 3
+shot save_here.png
+# HOME cancels, nothing saved (dirty stays)
+tap HOME
+expect svstage -1
+expect dirty 1
+# OCT+ = YES: saved at once, same place, same name, no more screens
+tap SAVE
+tap OCT+
+expect svstage -1
+expect presetcur 9
+expect dirty 0
+turn PRESET 1
+tap OCT+
+wait 100
+expect presetcur 10
+expect vacc0.1.8 0
+turn PRESET -1
+tap OCT+
+wait 100
+expect presetcur 9
+expect vacc0.1.8 1
+# NO: CHOOSE SLOT; OCT+ the slot screen; OCT- back; OCT- EXIT SAVE
+tap SAVE
+tap OCT-
+expect svstage 4
+tap OCT+
+expect svstage 2
+tap OCT-
+expect svstage 4
+tap OCT-
+expect svstage -1
+# a factory place (1): SAVE HERE? YES saves over itself (override slot), the place stays 1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+tap OCT+
+wait 100
+expect presetcur 1
+expect vfill0.1.8 0
+tapkey b1
+key w8 down
+tapkey b9
+key w8 up
+expect vfill0.1.8 1
+tap SAVE
+expect svstage 3
+tap OCT+
+expect presetcur 1
+turn PRESET 1
+tap OCT+
+wait 100
+turn PRESET -1
+tap OCT+
+wait 100
+expect presetcur 1
+expect vfill0.1.8 1
+# while playing: YES works, the playing goes on
+tap PLAY
+wait 200
+tap SAVE
+expect svstage 3
+tap OCT+
+expect svstage -1
+expect playing 1
+tap PLAY
+wait 300
+# wip319: SAVE HERE? + ALGORITHM = another place (the loaded one is 1 now); YES saves there, that place is the loaded one after
+tap SAVE
+expect svstage 3
+expect svhere 1
+turn ALGO 1
+expect svhere 2
+expect svstage 3
+expect presetcur 1
+shot save_here_other.png
+turn ALGO -1
+turn ALGO -1
+expect svhere 40
+turn ALGO 1
+expect svhere 1
+turn ALGO 1
+tap OCT+
+expect svstage -1
+expect presetcur 2
+expect dirty 0
+# NO, EXIT: OCT- on SAVE HERE? goes to CHOOSE SLOT, OCT- again leaves
+tap SAVE
+turn ALGO 1
+tap OCT-
+expect svstage 4
+tap OCT-
+expect svstage -1
+expect presetcur 2

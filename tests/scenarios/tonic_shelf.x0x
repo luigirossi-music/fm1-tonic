@@ -1,0 +1,100 @@
+# wip289: HOME 1st press (MIX PAGE 2): K3 = the selected track's LOW SHELF (0 = off, 20 Hz .. 127 = 663 Hz), K4 = its HIGH SHELF (127 = off, 22 kHz .. 0 = 663 Hz).
+# Stored per track in the spare Tonic rows 8 (low) and 9 (high, stored as 127 - the knob), kept by the autosave and by SAVE (TFX3 trailer).
+wait 300
+expect sound0.8.0 0
+expect sound0.9.0 0
+tap HOME
+expect view 8
+turn K3 10 80
+expect sound0.8.0 10
+turn K4 -20 80
+expect sound0.9.0 20
+shot shelf_page.png
+# the corners
+turn K3 117 80
+expect sound0.8.0 127
+turn K4 -107 80
+expect sound0.9.0 127
+# the sound: the kick is quieter with the low shelf at 663 Hz than with none (a kick is lows) - measured with both knobs at their ends: -9 dB or more (wip295: 12 dB / octave cuts)
+turn K3 -127 80
+turn K4 127 80
+expect sound0.8.0 0
+expect sound0.9.0 0
+wait 100
+peakreset
+tapkey b0
+wait 600
+expect peak_db_max -30
+expect peak_db_min -32
+turn K3 127 80
+wait 100
+peakreset
+tapkey b0
+wait 600
+expect peak_db_max -35
+# another track has its own: b1 = track 2
+tapkey b1
+expect sound0.8.1 0
+turn K3 30 80
+expect sound0.8.1 30
+expect sound0.8.0 127
+# the autosave keeps them
+tapkey w0
+wait 6000
+reboot
+wait 3000
+expect sound0.8.0 127
+expect sound0.8.1 30
+expect sound0.9.0 0
+# (after a power-on the SEQ page shows: one HOME press = MIX PAGE 2)
+tap HOME
+expect view 8
+tapkey b1
+# SAVE keeps them with the preset: a user slot, then another preset, then back
+turn K3 -127 80
+turn K3 40 80
+expect sound0.8.1 40
+expect view 8
+tap SAVE
+tap OCT+
+tap OCT+
+tap OCT+
+expect svstage -1
+expect view 8
+turn K3 -127 80
+shot after_save.png
+expect sound0.8.1 0
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+tap OCT+
+expect sound0.8.1 0
+expect sound0.8.0 0
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+tap OCT+
+expect sound0.8.1 40
+expect sound0.8.0 127

@@ -1,0 +1,33 @@
+# wip429: ACCENT / FILL held: the trigs of the selected track that carry that flag blink on the white keys (the others stay lit).
+# The "leds" lines are printed, read them: white keys 1, 5, 9 = trigs; step 5 has FILL, step 9 has ACCENT.
+wait 300
+tap EDIT
+tapkey b0
+tapkey w0
+tapkey w4
+tapkey w8
+key b9 down
+tapkey w4
+key b9 up
+key b8 down
+tapkey w8
+key b8 up
+# nothing held: all three trigs steady
+leds
+# FILL held: only step 5 blinks (two phases)
+key b9 down
+leds
+wait 140
+leds
+wait 140
+leds
+key b9 up
+# ACCENT held: only step 9 blinks
+key b8 down
+leds
+wait 140
+leds
+wait 140
+leds
+key b8 up
+leds

@@ -1,0 +1,34 @@
+# wip430: ON THE ARP PAGE black key 11 (FUNC, a piano key there) held + PLAY = CLEAR PATTERN? (PLAY does not start / stop then).
+wait 300
+tap EDIT
+tapkey b0
+tapkey w0
+tapkey w4
+expect hit0.0.0 1
+tap ARP
+expect arp 1
+# PLAY alone on ARP still starts / stops the music
+tap PLAY
+wait 100
+expect playing 1
+tap PLAY
+wait 100
+expect playing 0
+# FUNC key held + PLAY: the question, no start
+key b10 down
+tap PLAY
+key b10 up
+wait 100
+expect playing 0
+expect clearask 1
+# OCT- = no: nothing cleared
+tap OCT-
+expect hit0.0.0 1
+# again, OCT+ = yes: the pattern is cleared
+key b10 down
+tap PLAY
+key b10 up
+expect clearask 1
+tap OCT+
+expect hit0.0.0 0
+expect hit0.0.4 0

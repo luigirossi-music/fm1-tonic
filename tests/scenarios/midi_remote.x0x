@@ -1,0 +1,43 @@
+# wip385 (MIDI step S2): the REMOTE PANEL. Notes on the remote channel are panel keys: note 53 + k = key k (F3 = 53).
+# Remote OFF (default): nothing. Channel 11 (status 9A / 8A): note on = key down, note off = key up; no voice plays.
+# A chord arriving in the "wrong" order (black key first, FILL second) still works: modifiers are applied first.
+wait 300
+midi 9A 35 64
+wait 100
+expect ukeys 0
+remch 11
+midi 9A 35 64
+wait 100
+expect ukeys 1
+midi 8A 35 00
+wait 100
+expect ukeys 0
+midi 9A 35 64
+wait 100
+midi 9A 35 00
+wait 100
+expect ukeys 0
+midi 99 35 64
+wait 100
+expect ukeys 0
+expect noteons 0
+midi 9A 35 64
+midi 9A 37 64
+wait 100
+expect ukeys 5
+midi BA 7B 00
+wait 100
+expect ukeys 0
+# MIDI chord on the MUTE / SOLO page: FILL (note 75) + black key 3 (note 58), black key sent FIRST: still a solo
+tap FX
+tap FX
+spin ALGO 1
+expect solo 0
+midi 9A 3A 64
+midi 9A 4B 64
+wait 100
+midi 8A 3A 00
+midi 8A 4B 00
+wait 100
+expect ukeys 0
+expect solo 3

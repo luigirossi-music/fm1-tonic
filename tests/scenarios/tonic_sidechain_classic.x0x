@@ -1,0 +1,69 @@
+# wip354: the sidechain follows the CLASSIC engine: knobs greyed (do not turn), DUCK keys refuse, values kept, all back with ENHANCED
+wait 300
+tap HOME
+tap HOME
+turn K4 50 80
+turn K3 2 80
+turn ALGO 1
+tapkey b0
+turn ALGO -1
+wait 100
+expect scint 50
+expect scin 2
+expect scmask 1
+# GLO x5 = the settings list, row 14 = TONIC ENGINE: CLASSIC
+tap GLO
+tap GLO
+tap GLO
+tap GLO
+tap GLO
+turn SELECT 17
+turn ALGO 1
+wait 100
+expect classic 1
+shot sidechain_classic_list.png
+# the values are kept
+expect scint 50
+expect scin 2
+expect scmask 1
+# wip354: the PAN (MIX PAGE 2, K2) is NOT greyed in CLASSIC
+tap HOME
+tap HOME
+turn K2 -200 80
+wait 100
+expect sound0.0.21 0
+shot classic_pan.png
+tap HOME
+# back to SENDS (HOME once more): the knobs do not turn, the DUCK keys refuse
+tap HOME
+tap HOME
+tap HOME
+turn K4 20 80
+turn K3 3 80
+wait 100
+expect scint 50
+expect scin 2
+shot sidechain_classic_sends.png
+turn ALGO 1
+tapkey b3
+expect scmask 1
+turn ALGO -1
+# ENHANCED again: everything works as before
+tap GLO
+tap GLO
+tap GLO
+tap GLO
+tap GLO
+turn SELECT 17
+turn ALGO -1
+wait 100
+expect classic 0
+expect scint 50
+tap HOME
+tap HOME
+tap HOME
+turn K4 -10 80
+expect scint 40
+turn ALGO 1
+tapkey b3
+expect scmask 9

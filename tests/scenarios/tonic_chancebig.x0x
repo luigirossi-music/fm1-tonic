@@ -1,0 +1,23 @@
+# wip433: the step chance (TRIG %) takes the whole screen, big, while you turn SELECT with a step held
+# (it was a small text in the header bar that nobody saw). The shots are to be looked at; the expects check the chance itself.
+wait 300
+expect part 0
+shot chance_before.png
+key w0 down
+turn SELECT -10
+wait 100
+shot chance_50.png
+turn SELECT -9
+wait 100
+shot chance_5.png
+turn SELECT 25
+wait 100
+shot chance_100.png
+turn SELECT -20
+wait 100
+shot chance_cond.png
+key w0 up
+wait 2000
+shot chance_gone.png
+welcomever
+shot welcome_ver.png

@@ -1,0 +1,70 @@
+# wip252 ARP step 2a: a note (semitones) per Tonic track per step, project_t.note, patterns 1-16.
+# The notes go with the trigs: a trig tapped off, FUNC + ACCENT / FILL (copy / paste), CLEAR TRACK and CLEAR PATTERN clear or copy them;
+# they are saved and come back after a power cycle. (Nothing records them yet: notepoke is the host's stand-in for step 2b.)
+wait 300
+tap EDIT
+expect view 14
+tapkey b0
+tapkey w0
+tapkey w8
+tapkey b2
+tapkey w4
+notepoke 0 0 0 7
+notepoke 0 0 8 -5
+notepoke 0 2 4 3
+expect note0.0.0 7
+expect note0.0.8 -5
+expect note0.2.4 3
+# copy pattern 1, paste into pattern 4: the notes come along, pattern 1 keeps its own
+key b10 down
+tapkey b8
+key b10 up
+key b10 down
+tapkey w3
+key b10 up
+expect pattern 4
+key b10 down
+tapkey b9
+key b10 up
+expect note3.0.0 7
+expect note3.0.8 -5
+expect note3.2.4 3
+expect note0.0.0 7
+# a paste over a pattern replaces its notes too (pattern 4 got a stray note, then pattern 1 is pasted again)
+notepoke 3 5 9 11
+key b10 down
+tapkey b9
+key b10 up
+expect note3.5.9 0
+# back on pattern 1: a trig tapped off takes its note with it
+key b10 down
+tapkey w0
+key b10 up
+expect pattern 1
+tapkey b0
+tapkey w8
+expect hit0.0.8 0
+expect note0.0.8 0
+expect note0.0.0 7
+# autosave, power cycle: the notes are still there
+wait 6000
+reboot
+expect note0.0.0 7
+expect note3.0.0 7
+expect note3.2.4 3
+# CLEAR TRACK 1 of pattern 1 (FUNC + black key 1 + PLAY, OCT+): its notes go, track 3's stay
+key b10 down
+key b0 down
+tap PLAY
+key b0 up
+key b10 up
+tap OCT+
+expect note0.0.0 0
+expect note0.2.4 3
+# CLEAR PATTERN (FUNC + PLAY, OCT+)
+key b10 down
+tap PLAY
+key b10 up
+tap OCT+
+expect note0.2.4 0
+expect note3.2.4 3

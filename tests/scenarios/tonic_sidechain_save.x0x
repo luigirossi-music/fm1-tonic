@@ -1,0 +1,41 @@
+# wip353: the SIDECHAIN is kept (1) by the autosave over a power-off and (2) by a saved preset (intensity + input in the trailer, ducked tracks in the voices' spare byte)
+wait 300
+tap HOME
+tap HOME
+turn K4 50 80
+turn K3 3 80
+turn ALGO 1
+tapkey b0
+tapkey b6
+turn ALGO -1
+wait 200
+expect scint 50
+expect scin 3
+expect scmask 65
+# (1) the autosave
+wait 6000
+reboot
+wait 500
+expect scint 50
+expect scin 3
+expect scmask 65
+# (2) the preset: SAVE AS into place 9, a new place 10 has no sidechain, back to 9 it is back
+tap SAVE
+tap OCT+
+tap OCT+
+tap OCT+
+expect presetcur 9
+turn PRESET 1
+tap OCT+
+wait 100
+expect presetcur 10
+expect scint 0
+expect scin 0
+expect scmask 0
+turn PRESET -1
+tap OCT+
+wait 100
+expect presetcur 9
+expect scint 50
+expect scin 3
+expect scmask 65

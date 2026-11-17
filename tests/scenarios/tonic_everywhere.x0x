@@ -1,0 +1,259 @@
+# wip389: the shortcuts the cheat sheet lists under WORKS ON EVERY PAGE: FUNC + black key = mute, FILL + black key = solo,
+# FUNC + white key = pattern change, on every button's first page.
+wait 300
+tap SEL
+wait 150
+key b10 down
+tapkey b1
+key b10 up
+wait 100
+expect vmute 2
+key b10 down
+tapkey b1
+key b10 up
+wait 100
+expect vmute 0
+key b9 down
+tapkey b2
+key b9 up
+wait 100
+expect solo 3
+key b9 down
+tapkey b2
+key b9 up
+wait 100
+expect solo 0
+key b10 down
+tapkey w2
+key b10 up
+wait 150
+expect pattern 3
+key b10 down
+tapkey w0
+key b10 up
+wait 150
+expect pattern 1
+tap ENV
+wait 150
+key b10 down
+tapkey b1
+key b10 up
+wait 100
+expect vmute 2
+key b10 down
+tapkey b1
+key b10 up
+wait 100
+expect vmute 0
+key b9 down
+tapkey b2
+key b9 up
+wait 100
+expect solo 3
+key b9 down
+tapkey b2
+key b9 up
+wait 100
+expect solo 0
+key b10 down
+tapkey w2
+key b10 up
+wait 150
+expect pattern 3
+key b10 down
+tapkey w0
+key b10 up
+wait 150
+expect pattern 1
+tap LFO
+wait 150
+key b10 down
+tapkey b1
+key b10 up
+wait 100
+expect vmute 2
+key b10 down
+tapkey b1
+key b10 up
+wait 100
+expect vmute 0
+key b9 down
+tapkey b2
+key b9 up
+wait 100
+expect solo 3
+key b9 down
+tapkey b2
+key b9 up
+wait 100
+expect solo 0
+key b10 down
+tapkey w2
+key b10 up
+wait 150
+expect pattern 3
+key b10 down
+tapkey w0
+key b10 up
+wait 150
+expect pattern 1
+tap EDIT
+wait 150
+key b10 down
+tapkey b1
+key b10 up
+wait 100
+expect vmute 2
+key b10 down
+tapkey b1
+key b10 up
+wait 100
+expect vmute 0
+key b9 down
+tapkey b2
+key b9 up
+wait 100
+expect solo 3
+key b9 down
+tapkey b2
+key b9 up
+wait 100
+expect solo 0
+key b10 down
+tapkey w2
+key b10 up
+wait 150
+expect pattern 3
+key b10 down
+tapkey w0
+key b10 up
+wait 150
+expect pattern 1
+tap FX
+wait 150
+key b10 down
+tapkey b1
+key b10 up
+wait 100
+expect vmute 2
+key b10 down
+tapkey b1
+key b10 up
+wait 100
+expect vmute 0
+key b9 down
+tapkey b2
+key b9 up
+wait 100
+expect solo 3
+key b9 down
+tapkey b2
+key b9 up
+wait 100
+expect solo 0
+key b10 down
+tapkey w2
+key b10 up
+wait 150
+expect pattern 3
+key b10 down
+tapkey w0
+key b10 up
+wait 150
+expect pattern 1
+tap HOME
+wait 150
+key b10 down
+tapkey b1
+key b10 up
+wait 100
+expect vmute 2
+key b10 down
+tapkey b1
+key b10 up
+wait 100
+expect vmute 0
+key b9 down
+tapkey b2
+key b9 up
+wait 100
+expect solo 3
+key b9 down
+tapkey b2
+key b9 up
+wait 100
+expect solo 0
+key b10 down
+tapkey w2
+key b10 up
+wait 150
+expect pattern 3
+key b10 down
+tapkey w0
+key b10 up
+wait 150
+expect pattern 1
+tap GLO
+wait 150
+key b10 down
+tapkey b1
+key b10 up
+wait 100
+expect vmute 2
+key b10 down
+tapkey b1
+key b10 up
+wait 100
+expect vmute 0
+key b9 down
+tapkey b2
+key b9 up
+wait 100
+expect solo 3
+key b9 down
+tapkey b2
+key b9 up
+wait 100
+expect solo 0
+key b10 down
+tapkey w2
+key b10 up
+wait 150
+expect pattern 3
+key b10 down
+tapkey w0
+key b10 up
+wait 150
+expect pattern 1
+tap SEQ
+wait 150
+key b10 down
+tapkey b1
+key b10 up
+wait 100
+expect vmute 2
+key b10 down
+tapkey b1
+key b10 up
+wait 100
+expect vmute 0
+key b9 down
+tapkey b2
+key b9 up
+wait 100
+expect solo 3
+key b9 down
+tapkey b2
+key b9 up
+wait 100
+expect solo 0
+key b10 down
+tapkey w2
+key b10 up
+wait 150
+expect pattern 3
+key b10 down
+tapkey w0
+key b10 up
+wait 150
+expect pattern 1

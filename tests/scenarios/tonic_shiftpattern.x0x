@@ -1,0 +1,43 @@
+# SHIFT (black key 11) + a white key 1-16 changes to that pattern, on any Tonic page: stopped = at once, playing = at the
+# end of the bar (cued). The SONG page and song mode: nothing (the song decides). Black key 9 and 10 are not touched.
+wait 300
+expect ppat0 1
+key b10 down
+tapkey w2
+key b10 up
+expect ppat0 3
+# no step was written by it (the white key only changed the pattern)
+tap EDIT
+key b10 down
+tapkey w5
+key b10 up
+expect ppat0 6
+shot shiftpat_1.png
+# playing: it is cued, then taken at the end of the bar
+tap PLAY
+wait 200
+key b10 down
+tapkey w8
+key b10 up
+expect cue 9
+expect ppat0 6
+wait 4000
+expect ppat0 9
+tap PLAY
+wait 200
+# the SONG page: nothing
+tap HOME
+tap HOME
+expect view 6
+key b10 down
+tapkey w3
+key b10 up
+expect ppat0 9
+# a plain white key still works as before on the HOME page (a pattern)
+# song mode: nothing
+songmode 1
+tap EDIT
+key b10 down
+tapkey w4
+key b10 up
+expect ppat0 9

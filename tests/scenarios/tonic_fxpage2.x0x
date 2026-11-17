@@ -1,0 +1,27 @@
+# wip270: REVERB / DELAY: turning ALGORITHM goes to the second page (REVERB 2 / DELAY 2) and back
+wait 300
+press FX
+wait 700
+release FX
+wait 200
+expect fxpage 1
+turn ALGO 1
+expect fxpage 3
+shot fx2_reverb2.png
+turn ALGO -1
+expect fxpage 1
+press HOME
+wait 700
+release HOME
+wait 200
+expect fxpage 2
+turn ALGO 1
+expect fxpage 4
+shot fx2_delay2.png
+# wip341: by direction: left = back
+turn ALGO -1
+expect fxpage 2
+# a knob on page 2 changes the right parameter: no crash, page stays
+turn ALGO 1
+turn K1 5
+expect fxpage 4

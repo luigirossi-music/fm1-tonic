@@ -1,0 +1,48 @@
+# The FX button (wip200, changed in wip223): a short press cycles MIX and PERFORM only; HOLDING FX (500 ms) opens REVERB,
+# HOLDING HOME opens DELAY; from another page FX comes back to the last page left.
+wait 300
+expect view 7
+# nothing visited yet: the first press = MIX (view 9)
+tap FX
+expect view 9
+# the second press = PERFORM (the first effects page, view 2, page 0)
+tap FX
+expect view 2
+expect fxpage 0
+# leave to another page (SEQ), FX again: PERFORM again, not MIX
+tap SEQ
+expect view 7
+tap FX
+expect view 2
+expect fxpage 0
+# wip271: a short press on PERFORM = the MUTE / SOLO page (still view 2, page 0); another short press = MIX; leave from MIX, FX: MIX
+tap FX
+expect view 2
+expect fxpage 0
+tap FX
+expect view 9
+tap SEQ
+tap FX
+expect view 9
+# HOLD FX = REVERB (the release does nothing more)
+press FX
+wait 700
+release FX
+wait 100
+expect view 2
+expect fxpage 1
+# leave (ENV), FX: REVERB where it was left; a short press from there = MIX
+tap ENV
+expect view 12
+tap FX
+expect view 2
+expect fxpage 1
+tap FX
+expect view 9
+# HOLD HOME = DELAY
+press HOME
+wait 700
+release HOME
+wait 100
+expect view 2
+expect fxpage 2

@@ -1,0 +1,40 @@
+# wip271: PERFORM, FX again = MUTE / SOLO page. FUNC (lit) = MUTE mode (default), FILL = SOLO mode.
+# FILL kept down + keys = many solos; a plain key = one solo; the same key again = no solo.
+wait 300
+expect solo 0
+# MIX -> PERFORM -> MUTE / SOLO
+tap FX
+tap FX
+# wip341: ALGORITHM right = the MUTE / SOLO page (FX no longer opens it)
+spin ALGO 1
+shot msp_mute.png
+# MUTE mode: black key 3 mutes (no solo)
+tapkey b2
+expect solo 0
+shot msp_muted.png
+tapkey b2
+# SOLO mode (FILL tapped): key 3 = solo 3, key 5 moves it, key 5 again = off
+tapkey b9
+tapkey b2
+expect solo 3
+tapkey b4
+expect solo 5
+shot msp_solo.png
+tapkey b4
+expect solo 0
+# FILL kept down: many solos (1 + 2); a plain press then replaces them
+key b9 down
+tapkey b0
+tapkey b1
+key b9 up
+expect solo 1
+shot msp_many.png
+tapkey b6
+expect solo 7
+# FUNC back to MUTE mode: a key mutes again and the solo is not touched
+tapkey b10
+tapkey b3
+expect solo 7
+tapkey b3
+# FX again = MIX
+tap FX

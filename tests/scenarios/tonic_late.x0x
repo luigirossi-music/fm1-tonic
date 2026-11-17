@@ -1,0 +1,30 @@
+# wip311: UNQUANTIZED REC keeps how late in the step a hit came (an offset); QUANTIZED REC and a manual trig keep none
+wait 300
+listen
+# (a tap takes ~80 ms: with a 125 ms step the hit comes in the second half of step 1)
+# unquantized: the hit stays on the step playing and gets an offset
+key b10 down
+tap REC
+key b10 up
+said UNQUANTIZED REC
+tap REC
+tap PLAY
+tapkey b0
+wait 100
+tap PLAY
+tap REC
+expect hit0.0.0 1
+expect latehas0.0.0 1
+# quantized, over the same step: the offset goes (the hit is on the beat)
+key b10 down
+tap REC
+key b10 up
+said QUANTIZED REC
+tap REC
+tap PLAY
+tapkey b0
+wait 100
+tap PLAY
+tap REC
+expect hit0.0.1 1
+expect latehas0.0.1 0

@@ -1,0 +1,87 @@
+# wip356: the SONG screen is ONE page (K1 bar, K2 pattern, K3 repeat): SELECT has no second page to turn to, no "(1/2)" tag.
+# FILL + SEQ brings the SONG screen back from any page (only in song mode). On the SONG screen, FILL (let go, nothing else used) asks DELETE BAR? and OCT+ deletes the bar on the cursor.
+wait 300
+# song mode with a 3-bar chain
+key b10 down
+tap SEQ
+key b10 up
+tap OCT+
+tapkey w0
+tapkey w1
+tapkey w2
+tap OCT+
+expect songmode 1
+expect view 5
+expect songlen 3
+expect curpage 1
+# SELECT turned: still page 1 (there is no page 2)
+turn SELECT 1 80
+wait 200
+expect curpage 1
+turn SELECT -1 80
+wait 200
+expect curpage 1
+shot songpage.png
+# K3 = the repeat of the bar on the cursor (bits 5-7 of the bar's mute byte)
+expect songbar1.5 0
+turn K3 1 80
+wait 200
+expect songbar1.5 >31
+# FILL + SEQ from another page: back to the SONG screen (and the SEQ page does not open)
+tap EDIT
+expect view 14
+key b9 down
+tap SEQ
+key b9 up
+wait 100
+expect view 5
+expect songmode 1
+# a white key with FILL held adds the pattern, it does not delete
+expect songlen 3
+key b9 down
+tapkey w5
+key b9 up
+wait 100
+expect songlen 3
+expect songbar1.1 6
+# FILL alone (pressed and let go) deletes the bar on the cursor AT ONCE: no question (wip361)
+expect songlen 3
+key b9 down
+key b9 up
+wait 100
+expect songask 0
+expect songlen 2
+# FILL + SEQ on the SONG screen itself: nothing is deleted
+key b9 down
+tap SEQ
+key b9 up
+wait 100
+expect songlen 2
+expect view 5
+# the cursor on END (past the last bar): FILL deletes the last bar
+turn K1 5 80
+wait 200
+key b9 down
+key b9 up
+wait 100
+expect songlen 1
+# FUNC + FILL is paste, not delete
+key b10 down
+key b9 down
+key b9 up
+key b10 up
+wait 100
+expect songlen 1
+# out of song mode, FILL + SEQ only warns: the view stays
+key b10 down
+tap SEQ
+key b10 up
+tap OCT+
+expect songmode 0
+expect view 7
+key b9 down
+tap SEQ
+key b9 up
+wait 100
+expect view 7
+expect songmode 0

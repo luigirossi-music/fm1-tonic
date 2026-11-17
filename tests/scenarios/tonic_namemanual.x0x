@@ -1,0 +1,72 @@
+# wip324: GLO > NAME PROJECTS (GENERATE default / MANUAL): MANUAL turns the name screen into a letter editor.
+# K4 cycles the blinking letter (A first), OCT+ accepts it, OCT- deletes the last accepted letter, SAVE saves from the first letter on.
+wait 300
+expect namemanual 0
+# the setting: GLO settings list, the row after AUTOSAVE
+tap GLO
+tap GLO
+tap GLO
+tap GLO
+tap GLO
+turn SELECT 14
+turn ALGO 1
+expect namemanual 1
+tap HOME
+wait 100
+# SAVE (nothing loaded yet): CHOOSE SLOT -> slot -> the letter editor
+tap SAVE
+expect svstage 4
+tap OCT+
+expect svstage 2
+tap OCT+
+expect svstage 1
+expect nmlen 0
+expect nmcand 65
+wait 200
+shot namemanual_1.png
+# SAVE with no letter: refused, still on the name screen
+tap SAVE
+expect svstage 1
+# ALGORITHM does not make a name any more
+turn ALGO 1
+expect svname0 0
+# K4: A -> B, OCT+ accepts it; the next letter starts at A
+turn K4 1
+expect nmcand 66
+tap OCT+
+expect nmlen 1
+expect svname0 66
+expect nmcand 65
+# K4 back from A: the last symbol; OCT+ accepts it; OCT- takes it back and it blinks again
+turn K4 -1
+expect nmcand 63
+tap OCT+
+expect nmlen 2
+expect svname1 63
+wait 2000
+shot namemanual_2.png
+tap OCT-
+expect nmlen 1
+expect nmcand 63
+expect svstage 1
+# a letter, then SAVE saves into the chosen slot (place 9)
+turn K4 1
+tap OCT+
+expect nmlen 2
+tap SAVE
+expect svstage -1
+expect presetcur 9
+# wip325: FUNC + HOME = RENAME in MANUAL: RENAME big on top, the letters normal size
+key b10 down
+tap HOME
+key b10 up
+expect svstage 1
+expect nmlen 0
+wait 200
+shot namemanual_rename.png
+tap OCT-
+expect svstage -1
+# the setting is kept
+wait 3000
+reboot
+expect namemanual 1

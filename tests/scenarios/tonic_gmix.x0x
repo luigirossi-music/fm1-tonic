@@ -1,0 +1,45 @@
+# GLO, 1st press: the 8-track mixer (view 3) = 8 sliders + 8 pan knobs. SELECT cycles G1 LEVELS, G2 LEVELS, G1 PANS, G2 PANS. K1-K4 = the four shown. Black keys 1-4 / 5-8 = group 1 / 2 (levels). GLO again: COMP, MEMORY, the settings list, back to the mixer
+wait 300
+tap GLO   # wip290: 1st press = VEL
+expect view 15
+tap GLO
+expect view 3
+shot gmix_a.png
+turn K1 -30 80
+turn K3 -60 80
+shot gmix_b.png
+turn SELECT 1
+turn K2 -40 80
+turn K4 -90 80
+shot gmix_c.png
+turn SELECT 1
+turn K1 20 80
+shot gmix_e.png
+turn SELECT 1
+turn K2 -30 80
+shot gmix_f.png
+tapkey b2
+expect sel 2
+shot gmix_d.png
+tap GLO
+expect view 4
+tap GLO
+expect view 4
+tap GLO
+expect view 4
+tap GLO
+expect view 15   # (wip290: back to the first GLO page, VEL)
+tap GLO
+expect view 3
+expect curpage 3
+turn SELECT 1
+expect curpage 4
+turn SELECT 1
+expect curpage 1
+shot gmix_levels.png
+turn SELECT -1
+expect curpage 4
+shot gmix_wrap_left.png
+turn SELECT -1
+expect curpage 3
+shot gmix_pans.png

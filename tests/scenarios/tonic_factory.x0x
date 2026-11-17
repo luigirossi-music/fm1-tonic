@@ -1,0 +1,23 @@
+# The real factory bank (presets/): preset 1 = Marchiav (Rostoma Hieroglycepha (121) renamed), also the starting point of a new unit.
+# Run on a host build made with X0X_PRESET_BANK=presets and X0X_START_PRESET=presets/01_Marchiav.tnp.
+wait 300
+expect tempo 121
+expect phit0.0.0 1
+expect vacc0.0.0 1
+expect vfill0.6.0 1
+expect phit8.0.4 0
+expect tn16_0.1 5645
+# the PRESETS knob offers it as 01
+turn PRESET 1
+wait 100
+shot factory_ask.png
+tap OCT-
+turn PRESET 1
+tap OCT+
+wait 100
+expect presetcur 1
+expect tempo 121
+# Rostoma: pattern c (3) is CHAINED into d, the others are not
+expect pchain2 1
+expect pchain0 0
+expect pchain3 0

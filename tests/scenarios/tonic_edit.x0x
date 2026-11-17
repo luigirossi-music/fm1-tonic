@@ -1,0 +1,22 @@
+# EDIT 1st press = NOISE ENVELOPE (view 14): K1 envelope mode icon (slow), K2 attack (bottom left), K3 decay (bottom right)
+wait 300
+tap EDIT
+expect view 14
+shot edit_idle.png
+turn K1 4 80
+wait 3000
+shot edit_lin.png
+turn K1 4 80
+wait 3000
+shot edit_clap.png
+turn K1 -8 80
+wait 3000
+turn K2 20 80
+shot edit_k2zoom.png
+wait 3000
+turn K3 20 80
+shot edit_k3zoom.png
+wait 3000
+shot edit_idle2.png
+tap EDIT
+expect view 14   # (wip290: a 2nd press stays on NOISE ENVELOPE; VEL is on GLO)

@@ -1,0 +1,25 @@
+# wip335: the CHOKE group is kept by the autosave (not only by a saved preset): set it, wait, power off / on, it is back
+wait 300
+tap EDIT
+expect view 14
+key b10 down
+turn K2 1 80
+wait 100
+key b10 up
+wait 200
+expect choke 1
+turn ALGO 1 80
+tapkey b3
+wait 200
+expect choke 9
+wait 6000
+reboot
+wait 500
+expect choke 9
+tap EDIT
+key b10 down
+turn K2 -1 80
+wait 100
+key b10 up
+wait 200
+expect choke 8

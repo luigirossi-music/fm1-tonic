@@ -1,0 +1,52 @@
+# Patterns: cue on the bar, copy, save, reboot, everything comes back. (Tonic keys: SHIFT = black key 11; SHIFT + SEQ copies,
+# SHIFT + REC + a white key pastes there, SHIFT + a white key changes the pattern. The old SAVE copy and the HOME page's
+# white-key pick and chain range are gone; the chain is the CHAIN screen: tonic_chain_screen.)
+wait 300
+tapkey b0
+tapkey w0
+tapkey w8
+# copy pattern 1 to pattern 2 (SHIFT + SEQ, then SHIFT + PLAY + white key 2), then make 2 different
+key b10 down
+tapkey b8
+key b9 down
+tapkey w1
+key b9 up
+key b10 up
+expect rec 0
+key b10 down
+tapkey w1
+key b10 up
+expect pattern 2
+expect hit0.0.0 1
+expect hit0.0.8 1
+tap EDIT
+tapkey b1
+tapkey w4
+expect hit0.1.4 1
+# play pattern 2, cue 1: it changes on the bar, not before
+press HOME
+turn SELECT -5
+release HOME
+expect tempo 120
+tap PLAY
+wait 1000
+key b10 down
+tapkey w0
+key b10 up
+expect cue 1
+expect pattern 2
+wait 1100
+expect pattern 1
+tap PLAY
+# save, scramble, reboot from the simulated flash
+savenow
+expect store_writes 6
+reboot
+wait 300
+expect pattern 1
+expect hit0.0.0 1
+expect hit0.0.8 1
+key b10 down
+tapkey w1
+key b10 up
+expect hit0.1.4 1

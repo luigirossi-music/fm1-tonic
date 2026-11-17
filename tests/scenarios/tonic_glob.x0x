@@ -1,0 +1,50 @@
+# HOME cycle: MIX PAGE 2 (view 8) -> GLOBAL PARAMETERS (view 10) -> PATTERNS (view 0) -> SONG (view 5) -> MIX PAGE 2
+# GLOBAL: K1 quantization (5 positions, SLOW: 4 clicks a step), K2 swing 0-100, K3 fill rate (3 positions, SLOW)
+# Defaults: grid RATE_16 (0), swing 0, fill code 0 (= 4x)
+wait 300
+tap HOME
+expect view 8
+tap HOME
+expect view 8
+# (wip288: the 2nd press is the SENDS page of MIX PAGE 2, the 3rd is GLOBAL)
+tap HOME
+expect view 10
+shot glob_idle.png
+expect grid 0
+expect fillcode 0
+# K1: 3 clicks do nothing yet, the 4th moves one position (1/16 -> 1/16T = RATE_16T = 1)
+turn K1 3 80
+expect grid 0
+turn K1 1 80
+expect grid 1
+shot glob_quantbox.png
+wait 1000
+# 4 clicks left: 1/16T -> 1/16, 4 more: 1/16 -> 1/8T (RATE_8T = 3), 4 more: -> 1/8 (RATE_8 = 4)
+turn K1 -4 80
+expect grid 0
+turn K1 -8 80
+expect grid 4
+# swing: normal steps
+turn K2 30 80
+expect swing 30
+shot glob_swingbox.png
+# fill rate: 4 clicks -> 8x (code 2); 8 clicks back -> 2x (code 1)
+wait 1000
+turn K3 4 80
+expect fillcode 2
+shot glob_fillbox.png
+wait 1000
+turn K3 -8 80
+expect fillcode 1
+# K4: the tempo slider (20..275 bpm)
+wait 1000
+turn K4 10 80
+shot glob_tempobox.png
+wait 3000
+shot glob_idle2.png
+tap HOME
+expect view 0
+tap HOME
+expect view 5
+tap HOME
+expect view 8

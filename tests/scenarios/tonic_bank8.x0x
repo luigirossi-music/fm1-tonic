@@ -1,0 +1,91 @@
+# The real factory bank (presets/): run with X0X_PRESET_BANK=presets. 1 Marchiav 121 (the Rostoma preset), 2 Omm e Night 79, 3 Stai bell 122,
+# 4 We Masanie 132, 5 Tiemp e Uerr 135, 6 Waie e not 114, 7 Robba bell 133, 8 Piccerill po po po 133; 9-40 EMPTY.
+wait 300
+turn PRESET 1
+wait 100
+shot bank_01.png
+tap OCT+
+wait 100
+expect tempo 121
+turn PRESET 1
+tap OCT+
+wait 100
+expect tempo 79
+turn PRESET 1
+tap OCT+
+wait 100
+expect tempo 122
+turn PRESET 1
+tap OCT+
+wait 100
+expect tempo 132
+turn PRESET 1
+tap OCT+
+wait 100
+expect tempo 135
+turn PRESET 1
+tap OCT+
+wait 100
+expect tempo 114
+turn PRESET 1
+tap OCT+
+wait 100
+expect tempo 133
+turn PRESET 1
+wait 100
+shot bank_08.png
+tap OCT+
+wait 100
+expect tempo 133
+turn PRESET 1
+wait 100
+shot bank_09_empty.png
+tap OCT+
+wait 100
+expect tempo 121
+expect presetcur 9
+expect hit0.0.0 0
+expect hit0.0.4 0
+expect hit0.0.8 0
+shot bank_09_blank.png
+# wip358: the next empty places take the sound of factory preset (place - 9) mod 8 + 1: 10 = like 2 ... 16 = like 8, 17 = like 1 again
+turn PRESET 1
+tap OCT+
+wait 100
+expect presetcur 10
+expect tempo 79
+expect hit0.0.0 0
+turn PRESET 1
+tap OCT+
+wait 100
+expect tempo 122
+turn PRESET 1
+tap OCT+
+wait 100
+expect tempo 132
+turn PRESET 1
+tap OCT+
+wait 100
+expect tempo 135
+turn PRESET 1
+tap OCT+
+wait 100
+expect tempo 114
+turn PRESET 1
+tap OCT+
+wait 100
+expect tempo 133
+turn PRESET 1
+tap OCT+
+wait 100
+expect presetcur 16
+expect tempo 133
+turn PRESET 1
+tap OCT+
+wait 100
+expect presetcur 17
+expect tempo 121
+expect hit0.0.0 0
+turn PRESET -1
+wait 100
+shot bank_back_to_08.png

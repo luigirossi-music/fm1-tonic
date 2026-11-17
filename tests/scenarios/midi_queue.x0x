@@ -1,0 +1,21 @@
+# wip386: CC MODE (OFF by default) is set to SELECTED first, as GLO > CC MODE would.
+# wip384 (MIDI step S1): control changes on the Tonic's channel (10 = 0xB9) reach the UI loop through the queue;
+# other channels, notes and clock do not.
+wait 300
+ccmode 1
+expect mq_n 0
+midi B9 07 64
+wait 100
+expect mq_n 1
+expect mq_cc 7
+expect mq_val 100
+midi B9 67 05
+wait 100
+expect mq_n 2
+expect mq_cc 103
+expect mq_val 5
+midi B0 07 20
+midi 99 24 40
+midi F8 00 00
+wait 100
+expect mq_n 2

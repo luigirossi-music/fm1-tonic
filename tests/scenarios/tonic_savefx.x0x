@@ -1,0 +1,112 @@
+# wip234: at every power-on the PERFORM page starts clean: reverb D/W 0, delay D/W 0, filter OFF (live values only; SAVE's values stay kept and come back with a preset load).
+# wip227: the compressor (MASTER pots THRESH 0 / MAKEUP 4), the reverb send (MIX .1) and the delay send (MIX .2) are kept ONLY by
+# the SAVE button: the autosave never keeps them; a preset always starts with the compressor at THRESHOLD 0.0 dB, MAKEUP 0.0 dB.
+wait 300
+# nothing saved yet: the defaults
+expect sound5.0.0 127
+expect sound5.0.4 0
+# turned, then an edit so the autosave has work, then it saves by itself (4 s quiet)
+param 5 0 0 95
+param 5 0 4 40
+param 4 0 1 60
+param 4 0 2 50
+tapkey b0
+tapkey w0
+wait 6000
+expect store_writes >0
+# power cycle: the steps came back (autosaved), the compressor, reverb and delay did not
+reboot
+expect hit0.0.0 1
+expect sound5.0.0 127
+expect sound5.0.4 0
+expect sound4.0.1 0   # wip234: reverb / delay D/W start at 0 at every power-on
+expect sound4.0.2 0   # wip234: reverb / delay D/W start at 0 at every power-on
+# turned again and kept by the SAVE button
+param 5 0 0 95
+param 5 0 4 40
+param 4 0 1 60
+param 4 0 2 50
+savenow
+wait 500
+reboot
+expect sound5.0.0 95
+expect sound5.0.4 40
+expect sound4.0.1 0   # wip234: reverb / delay D/W start at 0 at every power-on
+expect sound4.0.2 0   # wip234: reverb / delay D/W start at 0 at every power-on
+# turned further, only autosaved: the SAVE's values come back
+param 5 0 0 70
+param 4 0 1 10
+wait 21000
+tapkey w4
+wait 6000
+reboot
+expect sound5.0.0 95
+expect sound4.0.1 0   # wip234: reverb / delay D/W start at 0 at every power-on
+expect hit0.0.4 1
+# a preset WITHOUT saved compressor / reverb / delay (the factory ones, a Microtonic conversion) starts with the factory values:
+# compressor 0.0 dB / 0.0 dB, reverb and delay off
+param 5 0 0 70
+param 5 0 4 40
+param 4 0 1 60
+param 4 0 2 50
+preset presets/01_Marchiav.tnp
+expect preset_rc 0
+expect sound5.0.0 127
+expect sound5.0.4 0
+expect sound4.0.1 0
+expect sound4.0.2 0
+# the SAVE button (SAVE AS: OCT+ OCT+ OCT+ to a slot) keeps them too, as they are then
+param 5 0 0 80
+param 5 0 4 20
+param 4 0 1 30
+param 4 0 2 25
+tap SAVE
+tap OCT+
+expect svstage 2
+tap OCT+
+tap OCT+
+expect svstage -1
+wait 500
+reboot
+expect sound5.0.0 80
+expect sound5.0.4 20
+expect sound4.0.1 0   # wip234: reverb / delay D/W start at 0 at every power-on
+expect sound4.0.2 0   # wip234: reverb / delay D/W start at 0 at every power-on
+# SAVE AS stores them IN the preset: set them, save, load a plain preset (they go to the factory values), load the saved one again
+param 5 0 0 60
+param 5 0 4 33
+param 4 0 1 41
+param 4 0 2 37
+tap SAVE
+expect svstage 3
+tap OCT-
+tap OCT+
+tap OCT+
+tap OCT+
+expect svstage -1
+wait 500
+param 5 0 0 127
+param 5 0 4 0
+param 4 0 1 0
+param 4 0 2 0
+turn PRESET -1
+tap OCT+
+wait 300
+expect presetcur 9
+expect sound5.0.0 80
+expect sound4.0.1 30
+turn PRESET 1
+tap OCT+
+wait 300
+expect presetcur 10
+expect sound5.0.0 60
+expect sound5.0.4 33
+expect sound4.0.1 41
+expect sound4.0.2 37
+# a restart brings back the compressor (the preset load made it the project's saved state) but reverb / delay D/W start at 0 (wip234)
+wait 21000
+tapkey w9
+wait 6000
+reboot
+expect sound5.0.0 60
+expect sound4.0.1 0   # wip234: reverb / delay D/W start at 0 at every power-on

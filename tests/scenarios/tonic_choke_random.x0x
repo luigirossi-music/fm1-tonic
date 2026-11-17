@@ -1,0 +1,16 @@
+# wip337: RANDOM (FUNC + K4 on the VEL page) must not touch the CHOKE group
+wait 300
+tap EDIT
+key b10 down
+turn K2 1 80
+key b10 up
+wait 200
+expect choke 1
+tap GLO
+expect view 15
+key b10 down
+turn K4 1 80
+wait 300
+key b10 up
+wait 200
+expect choke 1

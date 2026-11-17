@@ -1,0 +1,23 @@
+# ENV = OSCILLATOR (view 12): K1 waveform icon (slow), K2 Osc Freq slider, K3 attack, K4 decay
+wait 300
+tap ENV
+expect view 12
+shot osc_idle.png
+turn K1 4 80
+wait 3000
+shot osc_tri.png
+turn K1 4 80
+wait 3000
+shot osc_saw.png
+turn K2 20 80
+shot osc_freqbox.png
+wait 3000
+turn K3 10 80
+wait 3000
+shot osc_idle2.png
+tap ENV
+expect view 12
+# wip82: K1 turned = NO zoom (the page stays, the icon shows the change at once)
+wait 3000
+turn K1 -8 80
+shot osc_k1_nozoom.png

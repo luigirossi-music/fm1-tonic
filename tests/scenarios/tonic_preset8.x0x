@@ -1,0 +1,12 @@
+# A preset file of 12 patterns loads patterns 1-8 only: 9-32 stay empty (no trigs, fills or accents).
+wait 300
+preset build/test_12.tnp
+expect preset_rc 0
+expect plen7 16
+expect phit0.0.0 1
+expect phit7.0.0 1
+expect phit8.0.0 0
+expect phit11.0.0 0
+expect vacc8.0.4 0
+expect vfill8.1.2 0
+expect pswing8 0

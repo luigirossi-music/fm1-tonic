@@ -1,0 +1,142 @@
+# wip362 / wip377: COPY-PASTE MODE: FUNC + ACCENT copies the pattern and the white keys wait.
+# wip377: ONE paste: the white key pastes there, that pattern becomes the current one and the mode ENDS.
+# FUNC pressed again (only FUNC) before choosing: the mode stays on, paste in many places; a button leaves.
+# wip415: in the KEPT mode, FUNC + ACCENT again leaves it (nothing is copied).
+wait 300
+tap EDIT
+tapkey b0
+tapkey w0
+tapkey w8
+# FUNC + ACCENT: copy pattern 1, the mode is on, not kept
+key b10 down
+tapkey b8
+key b10 up
+expect clip 1
+expect cpm 1
+expect cpsticky 0
+# one paste (pattern 4): the mode ends and pattern 4 is the current one (stopped: at once)
+tapkey w3
+expect cpm 0
+expect pattern 4
+expect hit0.0.0 1
+expect hit0.0.8 1
+# a white key now is a normal key again: no paste, mode off
+tapkey w5
+expect cpm 0
+# the same, then FUNC pressed alone: the mode stays for many pastes
+tap EDIT
+key b10 down
+tapkey w0
+key b10 up
+expect pattern 1
+key b10 down
+tapkey b8
+key b10 up
+expect cpm 1
+tapkey b10
+expect cpm 1
+expect cpsticky 1
+tapkey w3
+expect cpm 1
+expect pattern 1
+tapkey w5
+expect cpm 1
+expect pattern 1
+# a button leaves the mode
+tap EDIT
+expect cpm 0
+expect cpsticky 0
+# FUNC HELD + white key is still the pattern change (the mode is not touched, not kept)
+key b10 down
+tapkey b8
+key b10 up
+expect cpm 1
+key b10 down
+tapkey w6
+expect pattern 7
+expect cpsticky 0
+key b10 up
+expect cpsticky 0
+tap EDIT
+expect cpm 0
+# FUNC + ACCENT + white key 6 (still held): pattern 6 is the copy (clip 6), then key 2 pastes it there and the mode ends
+key b10 down
+key b8 down
+tapkey w5
+key b8 up
+key b10 up
+expect clip 6
+expect cpm 1
+tapkey w1
+expect cpm 0
+expect pattern 2
+# wip364: the blue hint and the lit key (screenshot); the playing pattern's key is the steady one
+tap EDIT
+key b10 down
+tapkey b8
+key b10 up
+wait 100
+shot cpmode.png
+tapkey b10
+wait 100
+shot cpmode_many.png
+tap EDIT
+expect cpm 0
+# wip415: the kept mode, then FUNC + ACCENT again = the mode ends, the copy is not changed
+tap EDIT
+key b10 down
+tapkey b8
+key b10 up
+expect cpm 1
+tapkey b10
+expect cpm 1
+expect cpsticky 1
+key b10 down
+tapkey b8
+key b10 up
+expect cpm 0
+expect cpsticky 0
+# a white key is a normal key again (no paste)
+tapkey w3
+expect cpm 0
+# not kept: FUNC + ACCENT again still copies again (the mode restarts, as before)
+key b10 down
+tapkey b8
+key b10 up
+expect cpm 1
+key b10 down
+tapkey b8
+key b10 up
+expect cpm 1
+expect cpsticky 0
+tap EDIT
+expect cpm 0
+# wip422: SEQ pressed in the mode leaves it and opens the SEQUENCER page (never the pattern page)
+# (a) started on the SEQ page itself (before: SEQ again = the pattern page)
+tap SEQ
+expect seqpat 0
+expect view 7
+key b10 down
+tapkey b8
+key b10 up
+expect cpm 1
+tap SEQ
+expect cpm 0
+expect seqpat 0
+expect view 7
+expect arp 0
+# (b) from another page: the mode is on, SEQ goes to the sequencer page
+tap EDIT
+key b10 down
+tapkey b8
+key b10 up
+expect cpm 1
+tap SEQ
+expect cpm 0
+expect seqpat 0
+expect view 7
+# (c) afterwards SEQ is normal again: 2nd press = the pattern page, 3rd = back
+tap SEQ
+expect seqpat 1
+tap SEQ
+expect seqpat 0

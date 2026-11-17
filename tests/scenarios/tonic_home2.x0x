@@ -1,0 +1,32 @@
+# HOME, 1st press: MIX PAGE 2 = the selected track's Level (K1) and Pan (K2); HOME again: GLOBAL PARAMETERS (10), patterns, song, then MIX PAGE 2 again.
+# Tonic BD: Level = sound0.0.17 (default 101), Pan = sound0.0.21 (default 64).
+wait 300
+expect sound0.0.17 101
+expect sound0.0.21 64
+tap HOME
+expect view 8
+turn K1 3 80
+expect sound0.0.17 104
+turn K2 -4 80
+expect sound0.0.21 60
+shot home2_track1.png
+# black key 2 = track 2: the knobs now set its own level and pan
+tapkey b1
+turn K1 -1 80
+shot home2_track2.png
+# HOME cycle: GLOBAL (10), patterns (0), song (5), MIX PAGE 2 (8)
+tap HOME
+expect view 8
+tap HOME
+expect view 10
+tap HOME
+expect view 0
+tap HOME
+expect view 5
+tap HOME
+expect view 8
+# from any other page, HOME goes to MIX PAGE 2
+tap EDIT
+expect view 14
+tap HOME
+expect view 8

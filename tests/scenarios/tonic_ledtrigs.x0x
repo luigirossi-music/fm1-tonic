@@ -1,0 +1,38 @@
+# The white keys show the selected track's trigs (and the playhead while playing) on the Tonic's sound pages too:
+# FX 1st press, SEL, ENV, LFO, EDIT, HOME 1st press. They were dark there (only the black keys lit).
+wait 300
+tap FX
+tap SEQ
+expect view 7
+tapkey w0
+tapkey w4
+expect hit0.0.0 1
+expect hit0.0.4 1
+leds
+tap FX
+leds
+shot ledtrigs_fx1.png
+tap SEL
+leds
+tap ENV
+leds
+tap LFO
+leds
+tap EDIT
+leds
+tap HOME
+leds
+shot ledtrigs_home1.png
+# while playing, the playhead runs over the white keys (the key under it is inverted)
+tap FX
+tap PLAY
+wait 200
+leds
+wait 200
+leds
+wait 200
+leds
+tap PLAY
+# the footer of the sound pages names the white keys (wip119)
+tap SEL
+shot ledtrigs_footer.png

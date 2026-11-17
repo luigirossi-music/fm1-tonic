@@ -1,0 +1,49 @@
+# Probability on the mixer and the effects pages after PERFORM (wip204): hold a step (a white key) and turn
+# SELECT: its chance, as on SEQ and the voice pages. Without a step held, SELECT still changes the page.
+# PERFORM keeps its own keys (mute pads): untouched.
+wait 300
+expect part 0
+tapkey w0
+tapkey w1
+expect hit0.0.0 1
+# the mixer (GLO, 1st press)
+tap GLO   # wip290: 1st press = VEL
+expect view 15
+tap GLO
+expect view 3
+key w0 down
+turn SELECT -10
+key w0 up
+expect laneval6.0.0.0 50
+expect view 3
+expect lanes 1
+# FX: MIX (first press), PERFORM, REVERB
+tap FX
+tap FX
+expect view 2
+expect fxpage 0
+# wip223: HOLD FX = REVERB
+press FX
+wait 700
+release FX
+wait 100
+expect fxpage 1
+key w1 down
+turn SELECT -19
+key w1 up
+expect laneval6.0.0.1 5
+expect fxpage 1
+expect lanes 1
+# no step held: SELECT moves the page as before
+turn SELECT 1
+expect fxpage 2
+# DELAY: back to 100 % on step 1 (still the same lane for step 2)
+key w0 down
+turn SELECT 20
+key w0 up
+expect laneval6.0.0.0 255
+expect fxpage 2
+key w1 down
+turn SELECT 30
+key w1 up
+expect lanes 0

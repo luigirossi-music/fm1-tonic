@@ -1,0 +1,45 @@
+# Tracks mute with SHIFT (black key 11) + a black key 1-8, on any page. HOME + black key and the part / bar mutes are gone.
+wait 300
+expect vmute 0
+key b10 down
+tapkey b1
+key b10 up
+expect vmute 2
+expect sel 0
+# SHIFT + the same key again: unmuted
+key b10 down
+tapkey b1
+tapkey b0
+key b10 up
+expect vmute 1
+# on the HOME page
+tap HOME
+key b10 down
+tapkey b2
+key b10 up
+expect vmute 5
+# plain black keys on HOME do not mute (no part mute any more)
+tapkey b0
+expect mute 0
+expect vmute 5
+# the song page: black keys do nothing, SHIFT + black mutes the track
+tap HOME
+expect view 6
+tapkey b3
+expect vmute 5
+key b10 down
+tapkey b3
+key b10 up
+expect vmute 13
+# the mixer page
+tap LFO
+key b10 down
+tapkey b0
+key b10 up
+expect vmute 12
+# HOME + black key does not mute any more
+tap EDIT
+press HOME
+tapkey b1
+release HOME
+expect vmute 12

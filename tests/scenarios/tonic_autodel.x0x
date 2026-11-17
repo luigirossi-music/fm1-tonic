@@ -1,0 +1,50 @@
+# wip367: FUNC (black key 11) + EDIT tapped alone = DELETE AUTOMATION? (the selected track's recorded knob motion / p-locks
+# in the playing pattern). OCT+ deletes, OCT- keeps. Holding EDIT and using ACCENT / FILL / PLAY (page copy / paste / reset) is NOT a delete.
+wait 300
+tapkey w0
+tap FX
+wait 100
+key w0 down
+spin K1 40
+wait 200
+key w0 up
+wait 200
+expect lanes 1
+# FUNC + EDIT with a page copy in between: no question, the lane stays
+key b10 down
+press EDIT
+tapkey b8
+release EDIT
+key b10 up
+wait 200
+expect autoask 0
+expect lanes 1
+# FUNC + EDIT alone, OCT- = keep
+key b10 down
+press EDIT
+release EDIT
+key b10 up
+wait 200
+expect autoask 1
+shot autodel_ask.png
+tap OCT-
+wait 200
+expect lanes 1
+# again, OCT+ = gone
+key b10 down
+press EDIT
+release EDIT
+key b10 up
+wait 200
+expect autoask 1
+tap OCT+
+wait 200
+expect lanes 0
+# nothing left: only a warning, no question
+key b10 down
+press EDIT
+release EDIT
+key b10 up
+wait 200
+expect autoask 0
+expect lanes 0

@@ -1,0 +1,100 @@
+# TONIC copy / paste of a track's sound and of a page (SHIFT = black key 11):
+#   SHIFT + black key 1-8 + SEQ = copy that track's sound (all knobs, level, pan and mute; no trigs);
+#   SHIFT + black key 1-8 + REC = paste it into that track (it is not muted by the key);
+#   SHIFT + SEL = copy the page on the screen; SHIFT + EDIT = paste it into the selected track (same page).
+wait 300
+tap EDIT
+expect view 14
+# track 1: its own sound, a trig on step 1, and muted
+param 0 0 3 100
+param 0 0 17 90
+param 0 0 21 20
+tapkey b0
+tapkey w0
+key b10 down
+tapkey b0
+key b10 up
+expect vmute 1
+# track 3 is different
+param 0 2 3 30
+param 0 2 17 50
+param 0 2 21 100
+# nothing copied yet: paste says so and changes nothing
+key b10 down
+key b2 down
+tapkey b9
+key b2 up
+key b10 up
+expect sound0.2.3 30
+# SHIFT + black key 1 + SEQ copies track 1: no mute, no page change
+key b10 down
+key b0 down
+tapkey b8
+key b0 up
+key b10 up
+expect vmute 1
+expect view 14
+expect tcsrc 1
+# SHIFT + black key 3 + REC pastes it into track 3 (REC does not record, the key does not mute)
+key b10 down
+key b2 down
+key b9 down
+key b9 up
+key b2 up
+key b10 up
+expect rec 0
+expect sound0.2.3 100
+expect sound0.2.17 90
+expect sound0.2.21 20
+expect vmute 5
+# the sequence of track 3 is untouched (no trig came with the sound), track 1 keeps its own
+expect hit0.2.0 0
+expect hit0.0.0 1
+expect sound0.0.3 100
+# a page: the screen is on the NOISE ENVELOPE page (knobs: NEMode, NEAtk, NEDcy = pots 10-12)
+expect curpage 1
+param 0 0 11 100
+tapkey b1
+param 0 1 11 10
+param 0 1 3 11
+expect sound0.1.11 10
+tapkey b0
+# a page is copied from the selected track (track 1) with FUNC + EDIT held + SEQ; the paste (PLAY) needs the same page
+key b10 down
+press EDIT
+tapkey b8
+release EDIT
+key b10 up
+expect view 14
+expect curpage 1
+expect pcpage 1
+tapkey b1
+key b10 down
+press EDIT
+tapkey b9
+release EDIT
+key b10 up
+expect playing 0
+expect sound0.1.11 100
+# only this page's knobs came: pot 3 of track 2 (another page) stays
+expect sound0.1.3 11
+# another page (SEL = PITCH MOD): nothing is pasted
+param 0 1 11 7
+tap SEL
+key b10 down
+press EDIT
+tapkey b9
+release EDIT
+key b10 up
+expect sound0.1.11 7
+tap EDIT
+expect view 14
+# FUNC + EDIT held + REC resets the page's knobs to their power-on values (NEAtk = 0); the other pages stay
+key b10 down
+press EDIT
+tap PLAY
+release EDIT
+key b10 up
+expect sound0.1.11 0
+expect sound0.1.3 11
+expect rec 0

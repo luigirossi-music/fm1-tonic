@@ -1,0 +1,71 @@
+# The PRESETS knob on the Tonic picks a factory preset; a question asks first (OCT+ = YES, OCT- = NO).
+# The test bank (tests/fixtures/bank): 01 SYNTH FILL TEST 120 BPM, 02 SYNTH SLOW 90, 03 SYNTH FAST 150.
+wait 300
+expect tempo 125
+# turn: a question, nothing changes yet
+turn PRESET 1
+wait 100
+shot preset_ask.png
+expect tempo 125
+# NO: nothing changed
+tap OCT-
+wait 100
+expect tempo 125
+# turn up to the second preset (from none: 1, then 2), YES
+turn PRESET 1
+turn PRESET 1
+tap OCT+
+wait 100
+expect tempo 90
+expect vfill0.0.4 1
+expect dirty 0   # wip310: a loaded place is written to the flash at once (so the place survives power-off)
+# the next one: 03
+turn PRESET 1
+tap OCT+
+wait 100
+expect tempo 150
+# turning twice while asking moves the choice (at the end it stays on the last: 03), then back down to 01
+turn PRESET -1
+turn PRESET -1
+turn PRESET 1
+turn PRESET -1
+tap OCT+
+wait 100
+expect tempo 120
+# (the test bank has only 3 factory places: 04 is a missing FACTORY place; empty USER places 9-40 are in tonic_bank8)
+# the knob goes round and round through all 40 places; an empty one is "04 EMPTY" and cannot be uploaded
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+wait 100
+shot preset_empty.png
+tap OCT+
+wait 100
+expect tempo 120
+expect presetcur 1
+# one turn down from 01 = 40 (the last place, empty): round the end
+turn PRESET -1
+wait 100
+shot preset_wrap.png
+tap OCT-
+# playing: turning works; UPLOAD asks "CHANGE PRESETS?" first; OCT- = NO keeps everything
+tap PLAY
+wait 200
+turn PRESET 1
+tap OCT+
+wait 100
+shot preset_playing_ask.png
+expect tempo 120
+expect playing 1
+tap OCT-
+wait 100
+expect playing 1
+expect tempo 120
+# OCT+ = YES: the playing stops and the preset is loaded
+turn PRESET 1
+tap OCT+
+tap OCT+
+wait 500
+expect playing 0
+expect tempo 90
+expect presetcur 2

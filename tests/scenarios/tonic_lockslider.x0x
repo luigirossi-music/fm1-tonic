@@ -1,0 +1,15 @@
+# wip249: a held step's p-lock moves the SLIDER on the screen (it used to draw the knob's own value, so the slider stayed
+# still while the lock changed). FX page (MIX): K1 = the Mix slider. Shots: before the lock, after turning the lock.
+wait 300
+tapkey w0
+tap FX
+wait 100
+shot lockslider_0.png
+key w0 down
+spin K1 40
+wait 200
+shot lockslider_1.png
+expect sound0.0.13 0
+key w0 up
+wait 200
+shot lockslider_2.png

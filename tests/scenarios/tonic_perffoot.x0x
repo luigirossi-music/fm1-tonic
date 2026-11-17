@@ -1,0 +1,11 @@
+# wip370: PERFORM footer: the word ALGORITHM right next to the blue triangle, no other word on its side
+wait 300
+press FX
+wait 100
+release FX
+wait 200
+press FX
+wait 100
+release FX
+wait 300
+shot perf_footer.png

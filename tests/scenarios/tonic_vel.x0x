@@ -1,0 +1,22 @@
+# wip290: GLO 1st press = VEL (view 15): K1 osc, K2 noise, K3 mod velocity; 2nd press = the mixer (view 3); EDIT is NOISE ENVELOPE only (view 14)
+wait 300
+tap EDIT
+expect view 14
+tap EDIT
+expect view 14
+tap GLO
+expect view 15
+shot vel_idle.png
+turn K1 20 80
+shot vel_k1zoom.png
+wait 3000
+turn K2 20 80
+wait 3000
+turn K3 20 80
+wait 3000
+shot vel_idle2.png
+expect sound0.0.18 20
+expect sound0.0.19 20
+expect sound0.0.20 20
+tap GLO
+expect view 3

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+<title>FM1 TONIC V0.9</title>
+<defs>
+<linearGradient id="b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cdcdcd"/><stop offset="1" stop-color="#a9a9a9"/></linearGradient>
+<radialGradient id="k" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#b4b4b4"/></radialGradient>
+<radialGradient id="on" cx=".5" cy=".4" r=".8"><stop offset="0" stop-color="#e3f1ff"/><stop offset="1" stop-color="#5aa2f5"/></radialGradient>
+<radialGradient id="off" cx=".4" cy=".3" r=".9"><stop offset="0" stop-color="#f4f4f4"/><stop offset="1" stop-color="#bdbdbd"/></radialGradient>
+</defs>
+<rect width="240" height="240" fill="#1d1d1f"/>
+<rect x="8" y="34" width="224" height="160" rx="14" fill="url(#b)" stroke="#6a6a6a" stroke-width="2"/>
+<text x="25" y="80" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-weight="500" font-size="36" fill="#4f84b0">FM1</text>
+<text x="102" y="80" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-weight="500" font-size="36" fill="#2f2f2f">TONIC</text>
+<circle cx="48" cy="120" r="22" fill="url(#k)" stroke="#7a7a7a" stroke-width="2"/>
+<line x1="48" y1="120" x2="39.0" y2="104.4" stroke="#2146c8" stroke-width="5" stroke-linecap="round"/>
+<circle cx="96" cy="120" r="22" fill="url(#k)" stroke="#7a7a7a" stroke-width="2"/>
+<line x1="96" y1="120" x2="103.6" y2="103.7" stroke="#2146c8" stroke-width="5" stroke-linecap="round"/>
+<circle cx="144" cy="120" r="22" fill="url(#k)" stroke="#7a7a7a" stroke-width="2"/>
+<line x1="144" y1="120" x2="127.1" y2="113.8" stroke="#2146c8" stroke-width="5" stroke-linecap="round"/>
+<circle cx="192" cy="120" r="22" fill="url(#k)" stroke="#7a7a7a" stroke-width="2"/>
+<line x1="192" y1="120" x2="204.7" y2="107.3" stroke="#2146c8" stroke-width="5" stroke-linecap="round"/>
+<circle cx="50" cy="170" r="7.5" fill="url(#on)" stroke="#3b78d0" stroke-width="1.5"/>
+<circle cx="70" cy="170" r="7.5" fill="url(#off)" stroke="#808080" stroke-width="1.5"/>
+<circle cx="90" cy="170" r="7.5" fill="url(#off)" stroke="#808080" stroke-width="1.5"/>
+<circle cx="110" cy="170" r="7.5" fill="url(#on)" stroke="#3b78d0" stroke-width="1.5"/>
+<circle cx="130" cy="170" r="7.5" fill="url(#off)" stroke="#808080" stroke-width="1.5"/>
+<circle cx="150" cy="170" r="7.5" fill="url(#on)" stroke="#3b78d0" stroke-width="1.5"/>
+<circle cx="170" cy="170" r="7.5" fill="url(#off)" stroke="#808080" stroke-width="1.5"/>
+<circle cx="190" cy="170" r="7.5" fill="url(#off)" stroke="#808080" stroke-width="1.5"/>
+<text x="120" y="224" text-anchor="middle" font-family="Menlo, Courier New, monospace" font-size="16" letter-spacing="3" fill="#bcc2c7">V0.9</text>
+</svg>

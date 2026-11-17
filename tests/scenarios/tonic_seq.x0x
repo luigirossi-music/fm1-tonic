@@ -1,0 +1,58 @@
+# SEQ button: big numbers only. K1 FIXED LENGTH 8/16/32/64 (slow: 4 clicks a value, copies the steps), K2 AUTOSCROLL, K3 FREE LENGTH 1-64, K4 SWING
+wait 300
+tap FX
+tap SEQ
+expect view 7
+tapkey w0
+tapkey w4
+expect hit0.0.0 1
+expect hit0.0.4 1
+shot seq_idle.png
+# K1: 16 -> 32: steps 1 and 5 are copied into 17 and 21 (0-based 16 and 20)
+turn K1 4 80
+expect len0 32
+expect hit0.0.16 1
+expect hit0.0.20 1
+expect hit0.0.17 0
+shot seq_k1_32.png
+wait 1000
+# 32 -> 64: 1-32 copied into 33-64
+turn K1 4 80
+expect len0 64
+expect hit0.0.32 1
+expect hit0.0.48 1
+expect hit0.0.52 1
+shot seq_k1_64.png
+wait 1000
+# back to 16
+turn K1 -8 80
+expect len0 16
+# 16 -> 8 -> 16: 1-8 are copied into 9-16
+turn K1 -4 80
+expect len0 8
+wait 1000
+turn K1 4 80
+expect len0 16
+expect hit0.0.8 1
+expect hit0.0.12 1
+wait 1000
+# K3 free length
+turn K3 4 80
+expect len0 20
+shot seq_k3.png
+# K2 autoscroll
+turn K2 1 80
+shot seq_k2.png
+# K4 swing
+turn K4 30 80
+expect swing 30
+shot seq_k4.png
+# AUTOSCROLL on + play: the step page follows the playhead (the header shows 17-32 in the second half of the bar)
+turn K1 4 80
+expect len0 64
+tap PLAY
+wait 4800
+shot seq_scroll_a.png
+wait 1500
+shot seq_scroll_b.png
+tap PLAY

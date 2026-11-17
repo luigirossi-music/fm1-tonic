@@ -1,0 +1,23 @@
+# LFO = NOISE (view 13): K1 filter mode icon (slow), K2 filter Q, K3 filter freq slider
+wait 300
+tap LFO
+expect view 13
+shot noise_idle.png
+turn K1 4 80
+wait 3000
+shot noise_bp.png
+turn K1 4 80
+wait 3000
+shot noise_hp.png
+turn K3 -20 80
+shot noise_freqbox.png
+wait 3000
+turn K2 10 80
+wait 3000
+shot noise_idle2.png
+tap LFO
+expect view 13
+# wip82: K1 turned = NO zoom (the page stays, the icon shows the change at once)
+wait 3000
+turn K1 -8 80
+shot noise_k1_nozoom.png
