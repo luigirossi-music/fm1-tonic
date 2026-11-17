@@ -1,6 +1,8 @@
 # wip242: every track has its own REVERB SEND and DELAY SEND (HOME 1st press = MIX PAGE 2: K1 level, K2 pan, K3 reverb send, K4 delay send;
 # engine pots 22 / 23 of the track). They add to the PERFORM D/W (T_MIX 4.0.1 / 4.0.2) and do NOT depend on it or on ALL FX (which mutes only the PERFORM sends).
 # They are saved in the preset (TFX2 trailer) and come back with it.
+outloud 0
+# wip437: the factory defaults are now AUTOSAVE OFF and OUTPUT LOUD; this scenario was written for the old ones
 wait 300
 expect sound0.0.22 0
 expect sound0.0.23 0

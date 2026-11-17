@@ -1,6 +1,8 @@
 # wip234: at every power-on the PERFORM page starts clean: reverb D/W 0, delay D/W 0, filter OFF (live values only; SAVE's values stay kept and come back with a preset load).
 # wip227: the compressor (MASTER pots THRESH 0 / MAKEUP 4), the reverb send (MIX .1) and the delay send (MIX .2) are kept ONLY by
 # the SAVE button: the autosave never keeps them; a preset always starts with the compressor at THRESHOLD 0.0 dB, MAKEUP 0.0 dB.
+autosave 1
+# wip437: the factory defaults are now AUTOSAVE OFF and OUTPUT LOUD; this scenario was written for the old ones
 wait 300
 # nothing saved yet: the defaults
 expect sound5.0.0 127

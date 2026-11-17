@@ -1022,6 +1022,18 @@ static int expect(const char *what, const char *val)
         got = (int)ui.keys;
     else if (!strcmp(what, "lastpot"))               /* wip386: the pot read by the last `potget V I` */
         got = last_pot;
+    else if (!strcmp(what, "d_autosaveoff")) got = proj.set.autosave_off;     /* wip437: the factory settings, read back as stored */
+    else if (!strcmp(what, "d_outloud")) got = proj.set.out_loud;
+    else if (!strcmp(what, "d_beatoff")) got = proj.set.beat_off;
+    else if (!strcmp(what, "d_clkout")) got = proj.set.clk_out;
+    else if (!strcmp(what, "d_notesout")) got = proj.set.notes_out;
+    else if (!strcmp(what, "d_usbfull")) got = proj.set.usb_full;
+    else if (!strcmp(what, "d_onecore")) got = proj.set.one_core;
+    else if (!strcmp(what, "d_zoomoff")) got = proj.set.zoom_off;
+    else if (!strcmp(what, "d_namemanual")) got = proj.set.name_manual;
+    else if (!strcmp(what, "d_palette")) got = proj.set.palette;
+    else if (!strcmp(what, "d_tonicch")) got = seq.ch[0] + 1;                /* the Tonic's MIDI channel as the screen shows it */
+    else if (!strcmp(what, "d_remch")) got = proj.set.midi_ch[4];            /* 0 = OFF */
     else if (!strcmp(what, "ccmode"))                /* wip386: CC MODE 0-3 and CC CH BASE 0-8 */
         got = proj.set.cc_mode;
     else if (!strcmp(what, "ccbase"))
@@ -1308,6 +1320,11 @@ int main(int argc, char **argv)
             proj.set.cc_mode = (uint8_t)atoi(a);
             proj.set.cc_base = (uint8_t)(b[0] ? atoi(b) : 0);
             engine_cc_cfg(proj.set.cc_mode, proj.set.cc_base);
+        } else if (!strcmp(cmd, "autosave")) {          /* wip437: autosave 1 = AUTOSAVE ON, 0 = OFF (as GLO > AUTOSAVE; the factory default is OFF since wip437, the older scenarios switch it on) */
+            proj.set.autosave_off = (uint8_t)!atoi(a);
+        } else if (!strcmp(cmd, "outloud")) {           /* wip437: outloud 1 = OUTPUT LOUD, 0 = NORMAL (as GLO > OUTPUT; the factory default is LOUD since wip437, the level tests use NORMAL) */
+            proj.set.out_loud = (uint8_t)(atoi(a) != 0);
+            engine_out_loud(proj.set.out_loud);
         } else if (!strcmp(cmd, "potget")) {           /* potget V I: the Tonic track V's pot I into `expect lastpot` (the shelving cuts: I = 24 low, 25 high, as the knob shows them) */
             int v = atoi(a), i = atoi(b);
             last_pot = i == 24 ? proj.sound.v[T_909][SH_LO_ROW][v & 7] : i == 25 ? 127 - proj.sound.v[T_909][SH_HI_ROW][v & 7] : proj.sound.v[T_909][v & 7][i];

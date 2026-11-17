@@ -54,15 +54,25 @@ void project_defaults(void)
     proj.set.palette = 5;                /* tonic */
     proj.set.keyled = 1;
     proj.set.keysound = 0;
-    proj.set.beat_off = 1;               /* wip234: the 4 / 4 beat lights are OFF by default (GLO > 4/4 LED) */
-    proj.set.autosave_off = 0;
+    proj.set.beat_off = 0;               /* wip437: the 4 / 4 beat lights are ON by default (GLO > 4/4 LED; wip234 had them off) */
+    proj.set.autosave_off = 1;           /* wip437: AUTOSAVE = OFF by default (the settings alone are still kept: wip321; SAVE keeps the rest) */
     proj.set.preset_cur = 0;
     proj.set.name_manual = 0;            /* wip324: GENERATE */
     proj.set.choke = 0;                  /* wip335 */
     proj.set.sc_int = 0; proj.set.sc_in = 0; proj.set.sc_mask = 0;   /* wip353: no sidechain */
     proj.set.cc_mode = 0; proj.set.cc_base = 0;      /* wip386: CC MODE = OFF, the channel block starts at channel 1 */
-    proj.set.clk_out = 1;
+    proj.set.clk_out = 0;                /* wip437: CLOCK OUT = OFF by default */
     proj.set.notes_out = 0;
+    /* wip437: the factory settings, written out so that a factory reset in a running unit also gives them all
+     * (TONIC MIDI CH 10 = the default of 0, REMOTE MIDI CH OFF, CC MODE OFF, CC CH BASE 1-8, OUTPUT LOUD,
+     * USB AUDIO FOLLOWS KNOB, ZOOM KNOB YES, NAME PROJECTS GENERATE, TONIC ENGINE ENHANCED, 2ND CORE ON, theme TONIC) */
+    { int k; for (k = 0; k < 5; k++) proj.set.midi_ch[k] = 0; }
+    proj.set.out_loud = 1;
+    proj.set.usb_full = 0;
+    proj.set.one_core = 0;
+    proj.set.autoscroll = 0;
+    proj.set.zoom_off = 0;
+    proj.set.classic = 0;
     proj.set.bpm_x10 = 1250;
     proj.set.accent_q7 = 88;
     proj.set.stereo = PROJ_STEREO;

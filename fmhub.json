@@ -1,0 +1,10 @@
+{
+  "what": "Eight-track drum synthesizer for the FM-1 with its own sound engine: 26 settings per track, step sequencer with p-locks and chance, patterns and song mode, reverb, delay, sidechain, MIDI and CC control. Try it in your browser first.",
+  "author": "Luigi Rossi",
+  "kinds": ["drums"],
+  "play": "https://luigirossi-music.github.io/fm1-tonic/emu/",
+  "cheat": "https://luigirossi-music.github.io/fm1-tonic/emu/downloads/FM1-Tonic-cheat-sheet.pdf",
+  "image": "docs/card.png",
+  "color": "#8fb8e0",
+  "sounds": "licensed: ER-99 cymbal samples (hh, ride, crash) by Matthew Cieplak, shipped by 9W9 by Charles Vestal, GPL-3.0"
+}

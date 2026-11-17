@@ -1,5 +1,8 @@
 # wip289: HOME 1st press (MIX PAGE 2): K3 = the selected track's LOW SHELF (0 = off, 20 Hz .. 127 = 663 Hz), K4 = its HIGH SHELF (127 = off, 22 kHz .. 0 = 663 Hz).
 # Stored per track in the spare Tonic rows 8 (low) and 9 (high, stored as 127 - the knob), kept by the autosave and by SAVE (TFX3 trailer).
+outloud 0
+autosave 1
+# wip437: the factory defaults are now AUTOSAVE OFF and OUTPUT LOUD; this scenario was written for the old ones
 wait 300
 expect sound0.8.0 0
 expect sound0.9.0 0

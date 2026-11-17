@@ -201,9 +201,9 @@ Settings are in the GLO list (SELECT moves up and down, ALGORITHM changes the va
 
 | Setting | Choices | What it does |
 |---|---|---|
-| **OUTPUT** | **NORMAL** / LOUD | LOUD makes the FM-1's outputs 6 dB hotter (the codec's full scale). NORMAL keeps 6 dB of headroom. Use LOUD only if the level is too low, and watch the compressor and the limiter. |
+| **OUTPUT** | NORMAL / **LOUD** | LOUD (the factory setting) makes the FM-1's outputs 6 dB hotter (the codec's full scale). NORMAL keeps 6 dB of headroom: use it if the sound is too loud, and watch the compressor and the limiter. |
 | **USB AUDIO** | **FOLLOWS KNOB** / FULL | FOLLOWS KNOB: the computer receives what the headphones hear, after the MASTER knob. FULL: the computer always receives the full level, and MASTER only changes the FM-1's own outputs (speaker, headphones, line out). Use FULL to record at full level and still monitor quietly. |
-| **4/4 LED** | **OFF** / ON | ON: white keys 1, 5, 9 and 13 glow faintly to mark the four beats of the bar (not on PERFORM). |
+| **4/4 LED** | OFF / **ON** | ON (the factory setting): white keys 1, 5, 9 and 13 glow faintly to mark the four beats of the bar (not on PERFORM). |
 | **ZOOM KNOB** | **YES** / NO | YES: the knob you turn is enlarged over the screen. NO: it is only highlighted, so the whole page stays visible. The SONG screen never zooms. |
 | **NAME PROJECTS** | **GENERATE** / MANUAL | GENERATE makes up the name of a saved project (ALGORITHM = another one). MANUAL: the name screen is a letter editor (see chapter 5). |
 | **TONIC ENGINE** | **ENHANCED** / CLASSIC | CLASSIC greys out and silences the FM1 Tonic extras (track cuts, sends, sidechain) so the sound uses only the settings a `.mtpreset` file can carry (chapters 2 and 8). |
@@ -345,7 +345,7 @@ Turn **PRESETS** through the 40 places: 01 to 08 are factory presets, 09 to 40 a
 - **SAVE** asks SAVE HERE? with the loaded place. OCT+ saves there and keeps the name. ALGORITHM picks another place (1 to 40; amber shows who would be replaced). OCT- goes to CHOOSE SLOT, then the slot screen, then the name screen (ALGORITHM = another made-up name; OCT+ saves). HOME leaves without saving. If nothing was loaded since power-on, SAVE starts at CHOOSE SLOT.
 - {r:FUNC + SAVE} quick-saves into the loaded place without asking for a slot, also while playing. An empty place saves at once as UNTITLED 01, 02 ...; a full one asks OVERWRITE SLOT? (OCT+ yes).
 - {r:FUNC + HOME} renames the loaded project (ALGORITHM = another name, OCT+ saves, OCT- or HOME cancels). With NAME PROJECTS set to MANUAL (GLO settings) the name screen becomes a letter editor: knob 4 cycles the characters, OCT+ (the screen says OK) takes the letter, OCT- deletes the last one, then press SAVE (8 letters at most; the screen shows PRESS SAVE and TURN KNOB 4 in big letters).
-- **What is saved.** Your working project is autosaved 4 seconds after you stop touching things, except the compressor, the reverb and the delay: those are kept only by SAVE, inside the preset. PERFORM always starts clean at power-on (D/W 0 %, master low cut 20 Hz, ALL FX on).
+- **What is saved.** With AUTOSAVE ON, your working project is saved 4 seconds after you stop touching things, except the compressor, the reverb and the delay: those are kept only by SAVE, inside the preset. PERFORM always starts clean at power-on (D/W 0 %, master low cut 20 Hz, ALL FX on). AUTOSAVE is OFF at the factory: press SAVE (or FUNC + SAVE) to keep your work. The settings are still kept by themselves. Turn AUTOSAVE ON in GLO > SETTINGS if you want the project kept by itself. Factory settings: clock out and notes out off, Tonic MIDI channel 10, remote MIDI channel off, CC mode off (CC CH BASE 1-8), output LOUD, USB audio follows knob, 4/4 LED on, theme TONIC, zoom knob yes, name projects GENERATE, Tonic Engine ENHANCED, 2nd core ON. A new unit or a FACTORY RESET gets them; a unit that already holds a saved project keeps its own settings.
 
 ## 6. Lights, MIDI and USB
 

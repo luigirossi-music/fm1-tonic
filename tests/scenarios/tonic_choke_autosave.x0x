@@ -1,4 +1,6 @@
 # wip335: the CHOKE group is kept by the autosave (not only by a saved preset): set it, wait, power off / on, it is back
+autosave 1
+# wip437: the factory defaults are now AUTOSAVE OFF and OUTPUT LOUD; this scenario was written for the old ones
 wait 300
 tap EDIT
 expect view 14

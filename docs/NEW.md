@@ -5,6 +5,7 @@ The newest version first. Install it with the [web installer](../install/); the
 
 ## FM1 Tonic wip307 · 13 November 2026
 
+- CHANGED (wip437): **new factory settings:** clock out off, notes out off, Tonic MIDI channel 10, remote MIDI channel off, CC mode off, CC CH BASE 1-8, output LOUD, USB audio follows knob, 4/4 LED on, theme TONIC, zoom knob yes, AUTOSAVE off (press SAVE to keep your work; the settings are still kept by themselves), name projects GENERATE, Tonic Engine ENHANCED, 2nd core ON. A new unit or a factory reset gets them; a unit with a saved project keeps its own settings.
 - CHANGED (wip434): **the project's address is now GitHub luigirossi-music/fm1-tonic:** the web page, installer, backup page, rescue script and manual links point there; the README is rewritten for 1.0; the screen reader's words link points to the new page. The credits to X0X and Felucca stay.
 - NEW (wip433): **FM1 Tonic 1.0.** The welcome screen now says **VER. 1.0** (it said 0.9). The release is no longer called "beta": the package, the file name and the About line say 1.0.
 - CHANGED (wip433): **trig chance (TRIG %) is big.** Hold a step and turn SELECT: the chance now fills the whole screen (TRIG %, the value, the step number), not the small text in the top bar that nobody saw. A 1:2 condition says TRIG CONDITION.
