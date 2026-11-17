@@ -117,19 +117,19 @@ def main(pkg, version, out):
     shutil.copy(pkg, out / "firmware" / name)
     # the installer
     page = (SRC / "web" / "x0x_installer.html").read_text(encoding="utf-8")
-    lib = strip_module((SRC / "web" / "fm1pkg.js").read_text(encoding="utf-8")) + "\n" + \
-        strip_module((SRC / "web" / "fm1ota.js").read_text(encoding="utf-8"))
+    ota_lib = strip_module((SRC / "web" / "fm1pkg.js").read_text(encoding="utf-8")) + "\n" + \
+        strip_module((SRC / "web" / "fm1ota.js").read_text(encoding="utf-8"))   # installer code: fm1pkg + fm1ota (Updater, productOf)
     meta = json.dumps({"version": version, "product": product, "pkg": "../firmware/" + name})
     for mark in ("/*LIB*/", "/*META*/"):
         if page.count(mark) != 1:
             raise SystemExit(f"x0x_installer.html must contain {mark} once")
-    (out / "install" / "index.html").write_text(page.replace("/*LIB*/", lib).replace("/*META*/", meta), encoding="utf-8")
+    (out / "install" / "index.html").write_text(page.replace("/*LIB*/", ota_lib).replace("/*META*/", meta), encoding="utf-8")
     # the break loop uploader
     page = (SRC / "web" / "x0x_breaks.html").read_text(encoding="utf-8")
     if page.count("/*LIB*/") != 1:
         raise SystemExit("x0x_breaks.html must contain /*LIB*/ once")
-    lib = strip_module((SRC / "web" / "x0x_breaks.js").read_text(encoding="utf-8"))
-    (out / "breaks" / "index.html").write_text(page.replace("/*LIB*/", lib), encoding="utf-8")
+    breaks_lib = strip_module((SRC / "web" / "x0x_breaks.js").read_text(encoding="utf-8"))
+    (out / "breaks" / "index.html").write_text(page.replace("/*LIB*/", breaks_lib), encoding="utf-8")
     # the backup page (self-contained)
     shutil.copy(SRC / "web" / "backup" / "index.html", out / "backup" / "index.html")
     # the manual (a complete page; its images beside it)
@@ -153,7 +153,7 @@ def main(pkg, version, out):
     emeta = json.dumps({"version": version, "product": product, "pkg": "../firmware/" + name})
     if page.count("/*LIB*/") != 1 or page.count("/*META*/null/*END*/") != 1:
         raise SystemExit("web/emu/index.html must contain /*LIB*/ and /*META*/null/*END*/ once")
-    ep.write_text(page.replace("/*LIB*/", lib).replace("/*META*/null/*END*/", emeta), encoding="utf-8")
+    ep.write_text(page.replace("/*LIB*/", ota_lib).replace("/*META*/null/*END*/", emeta), encoding="utf-8")
     # the screen reader's words files (fm1-reader): every one ever made, for the devices that point at them
     shutil.copytree(SRC / "web" / "words", out / "words")
     (out / "reader").mkdir()                     # (the screen reader's first test address: moved)
