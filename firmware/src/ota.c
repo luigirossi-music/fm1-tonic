@@ -40,6 +40,11 @@ static int ota_fread(uint32_t off, void *p, uint32_t n);
 static void ota_show(uint32_t step, int32_t code);
 static void ota_commit(const uint8_t *parm);
 
+/* wip443: what the head check found (read by ota_show after a -5): offset of the first differing byte, that
+ * byte in the device / in the package, how many bytes and 512-B blocks differ, CRC-16 of both 16 KB heads */
+static uint32_t ota_hd_first, ota_hd_nbad, ota_hd_blocks, ota_hd_crc_dev, ota_hd_crc_pkg;
+static uint8_t ota_hd_dev, ota_hd_pkg;
+
 static uint32_t ota_rd16(const uint8_t *p) { return (uint32_t)p[0] | (uint32_t)p[1] << 8; }
 static uint32_t ota_rd24(const uint8_t *p) { return ota_rd16(p) | (uint32_t)p[2] << 16; }
 static uint32_t ota_rd32(const uint8_t *p) { return ota_rd24(p) | (uint32_t)p[3] << 24; }
@@ -284,12 +289,30 @@ static int ota_stage(void)                       /* steps 1..6; 0 = host said su
         return -7;
     if (official) {                    /* the official loader writes the head: it must equal ours */
         ota_show(2, 0);
+        /* wip443: scan the WHOLE 16 KB (a refused update says where and how much differs, see ota_show) */
+        ota_hd_first = 0xFFFFFFFFu;
+        ota_hd_nbad = ota_hd_blocks = ota_hd_crc_dev = ota_hd_crc_pkg = 0;
         for (i = 0; i < 0x4000u; i += 512u) {
             if (ota_read(fl_off + i, b, 512) || ota_fread(i, mine, 512))
                 return -4;
-            if (!ota_memeq(b, mine, 512))
-                return -5;
+            ota_hd_crc_pkg = ota_crc16(b, 512, ota_hd_crc_pkg);
+            ota_hd_crc_dev = ota_crc16(mine, 512, ota_hd_crc_dev);
+            if (ota_memeq(b, mine, 512))
+                continue;
+            ota_hd_blocks++;
+            for (n = 0; n < 512u; n++) {
+                if (b[n] == mine[n])
+                    continue;
+                if (ota_hd_first == 0xFFFFFFFFu) {
+                    ota_hd_first = i + n;
+                    ota_hd_dev = mine[n];
+                    ota_hd_pkg = b[n];
+                }
+                ota_hd_nbad++;
+            }
         }
+        if (ota_hd_blocks)
+            return -5;
     }
     /* 4. stage the package's loader: erase, body, verify, head last */
     ota_show(3, 0);

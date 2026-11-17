@@ -218,6 +218,17 @@ int main(int argc, char **argv)
         bad += check("no 'success' -> -13, no commit, area clean", rc == -13 && !committed && area_erased());
     }
 
+    /* wip443: a device head that differs from the package's (3 bytes in 2 blocks) -> -5, nothing written, the details are kept */
+    reset_dev();
+    nor[0x1F40] ^= 0xFF;
+    nor[0x1F41] ^= 0x01;
+    nor[0x3000] ^= 0x80;
+    rc = ota_session();
+    bad += check("head differs -> -5, no commit, area clean", rc == -5 && last_code == -5 && !committed && area_erased());
+    bad += check("-5 details: first 0x1F40, 3 bytes, 2 blocks",
+                 ota_hd_first == 0x1F40 && ota_hd_nbad == 3 && ota_hd_blocks == 2 &&
+                 ota_hd_dev == nor[0x1F40] && ota_hd_pkg == logical[0x400 + 0x1F40] && ota_hd_crc_dev != ota_hd_crc_pkg);
+
     printf("%s\n", bad ? "OTA TEST FAILED" : "ota test passed");
     return bad != 0;
 }

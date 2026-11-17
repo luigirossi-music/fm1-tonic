@@ -58,7 +58,14 @@ a { color: var(--accent); }
 body.appmode { overflow: hidden; }
 .appx { display: none; position: absolute; top: 8px; right: 8px; z-index: 5; min-width: 44px; min-height: 44px; font: 700 1.2rem/1 system-ui, sans-serif; color: #ececee; background: rgba(40,40,44,.75); border: 1px solid #777; border-radius: 10px; cursor: pointer; }
 .devicebox.app .appx { display: block; }
-@media (orientation: portrait) and (max-width: 700px) { .turn { display: block; } }
+@media (orientation: portrait) and (max-width: 700px) { .turn { display: block; }
+  /* wip448: phone upright, not full screen: the panel goes from the left edge to the right edge of the screen */
+  .devicebox:not(.app) { margin-inline: -16px; border-radius: 0; box-shadow: none; }
+  .devicebox:not(.app) .device { min-width: 0; } }
+/* wip448b: full screen while the screen is still upright (iPhone cannot lock the orientation): the PANEL is turned a quarter turn
+   (not the box: the browser's own full screen style forbids a transform on the box) so it is horizontal and as big as a sideways
+   screen. When the phone is really turned sideways this rule stops by itself. */
+@media (orientation: portrait) { .devicebox.app .device { width: min(100vh, calc(100vw * 1.4286)); width: min(100dvh, calc(100dvw * 1.4286)); position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(90deg); } }
 .start button:disabled { opacity: .6; cursor: progress; }
 .bar { display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; align-items: center; margin: .9rem 0 0; color: var(--muted); font-size: .92rem; }
 .bar button { font: inherit; color: var(--ink); background: var(--card); border: 1px solid #777; border-radius: 2px; padding: .3em .8em; cursor: pointer; }
@@ -188,7 +195,7 @@ details.cheat .cheat-in { padding: 0 1rem 1rem; }
   </nav>
 </header>
 
-<p class="turn">Turn your phone sideways for bigger controls, then press Switch on: the panel fills the screen.</p>
+<p class="turn">Press Full screen under the panel: the phone turns sideways and the panel fills the screen.</p>
 <div class="devicebox" id="devicebox">
 <button class="appx" id="appx" type="button" aria-label="Exit full screen">&#x2715;</button>
 <div class="device" id="device" role="group" aria-label="The FM-1" tabindex="-1">
@@ -1487,17 +1494,19 @@ function turn(k, n) {
 }
 for (const k of Object.values(knobs)) {
   if (k.role === "master") { k.angle = -135 + 270 * master / 4096; drawKnob(k); masterValue(k); }
+  // wip448b: in the turned full screen (upright phone) panel-up is screen-right
+  const dragPos = (e) => (document.querySelector(".devicebox.app") && matchMedia("(orientation: portrait)").matches ? -e.clientX : e.clientY);
   let drag = null, wheel = 0;
   k.hit.addEventListener("pointerdown", (e) => {
     e.preventDefault();
     k.hit.focus({ preventScroll: true });
     k.hit.setPointerCapture(e.pointerId);
-    drag = { y: e.clientY, acc: 0 };
+    drag = { y: dragPos(e), acc: 0 };
   });
   k.hit.addEventListener("pointermove", (e) => {
     if (!drag) return;
-    drag.acc += drag.y - e.clientY;
-    drag.y = e.clientY;
+    drag.acc += drag.y - dragPos(e);
+    drag.y = dragPos(e);
     const step = k.role === "master" ? 3 : 7;
     const n = Math.trunc(drag.acc / step);
     if (n) { drag.acc -= n * step; turn(k, n); }
@@ -2030,27 +2039,26 @@ $("reset").addEventListener("click", () => {
   }
 });
 
-// ---- wip441: app mode (full screen). The panel fits the screen (CSS .devicebox.app); a phone turned sideways enters it at "Switch on".
+// ---- wip448: full screen only by the Full screen button (no auto start): native full screen + landscape lock, X / Esc / back leaves.
 (() => {
   const box = document.getElementById("devicebox"), fsBtn = document.getElementById("fs"), x = document.getElementById("appx");
-  const phoneSideways = matchMedia("(orientation: landscape) and (max-height: 520px) and (pointer: coarse)");
-  const phoneUpright = matchMedia("(orientation: portrait) and (pointer: coarse)");
   const on = () => box.classList.contains("app");
   const enter = () => {
     if (on()) return;
     box.classList.add("app"); document.body.classList.add("appmode"); fsBtn.textContent = "Exit full screen"; scrollTo(0, 0);
-    try { const r = box.requestFullscreen && box.requestFullscreen({ navigationUI: "hide" }); if (r && r.catch) r.catch(() => {}); } catch (e) {}   // iPhone Safari has no element full screen: the fixed layer alone still fills the screen
+    // like YouTube: native full screen, then lock landscape (Android Chrome). iPhone Safari has neither: the CSS quarter turn (wip448b) does the same
+    const lock = () => { try { const o = screen.orientation; if (o && o.lock) o.lock("landscape").catch(() => {}); } catch (e) {} };
+    try { const r = box.requestFullscreen && box.requestFullscreen({ navigationUI: "hide" }); if (r && r.then) r.then(lock, () => {}); else lock(); } catch (e) {}
   };
   const leave = () => {
     if (!on()) return;
     box.classList.remove("app"); document.body.classList.remove("appmode"); fsBtn.textContent = "Full screen";
+    try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) {}
     try { if (document.fullscreenElement) document.exitFullscreen().catch(() => {}); } catch (e) {}
   };
   fsBtn.addEventListener("click", () => (on() ? leave() : enter()));
   x.addEventListener("click", leave);
   document.addEventListener("fullscreenchange", () => { if (!document.fullscreenElement && on()) leave(); });   // the system back gesture / Esc leaves it too
-  document.getElementById("go").addEventListener("click", () => { if (phoneSideways.matches) enter(); });   // the same tap that switches on
-  phoneUpright.addEventListener("change", () => { if (phoneUpright.matches) leave(); });                    // turned upright: back to the page
 })();
 </script>
 </body>

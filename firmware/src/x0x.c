@@ -102,17 +102,106 @@ static int ota_prog(uint32_t off, const void *p, uint32_t n)
     return fl_write(off, p, n);
 }
 static int ota_fread(uint32_t off, void *p, uint32_t n) { return st_read(off, p, n); }
+static uint32_t ota_last_step;                          /* wip442: the step that was running when it failed */
+static uint32_t ota_put(char *l, uint32_t n, const char *w)     /* append w to l (max 30 chars) */
+{
+    uint32_t i;
+    for (i = 0; w[i] && n < 30u; i++)
+        l[n++] = w[i];
+    return n;
+}
+static uint32_t ota_puthex(char *l, uint32_t n, uint32_t v, uint32_t digits)
+{
+    while (digits-- && n < 30u)
+        l[n++] = "0123456789ABCDEF"[(v >> (digits * 4u)) & 15u];
+    return n;
+}
+static uint32_t ota_putdec(char *l, uint32_t n, uint32_t v)
+{
+    char t[10];
+    uint32_t k = 0;
+    do {
+        t[k++] = (char)('0' + v % 10u);
+        v /= 10u;
+    } while (v && k < 10u);
+    while (k && n < 30u)
+        l[n++] = t[--k];
+    return n;
+}
 static void ota_show(uint32_t step, int32_t code)
 {
     static const char *const STEP[] = {"", "PACKAGE", "CHECK HEAD", "LOADER", "CONFIRM", "RESTART"};
+    /* wip442: why the update was refused (the numbers of ota.c ota_stage / ota_session) */
+    static const char *const WHY[] = {"", "PACKAGE READ", "PACKAGE HEADER", "PACKAGE PARTS", "HEAD READ", "HEAD DIFFERS",
+                                      "LOADER READ", "LOADER UNKNOWN", "ERASE", "LOADER READ", "LOADER WRITE",
+                                      "LOADER CRC", "LOADER HEAD", "NO CONFIRM", "SAVE RECORD"};
+    char line[32];
+    uint32_t i, n, v, y, secs;
     lcd_fill(0, 0, 240, 240, C_BLACK);
-    draw_text_box(0, 92, 240, &FONT_S, "UPDATE", C_WHITE, 1);
     if (step < 9u) {
+        draw_text_box(0, 92, 240, &FONT_S, "UPDATE", C_WHITE, 1);
+        ota_last_step = step;
         draw_text_box(0, 124, 240, &FONT_S, STEP[step < 6u ? step : 0], C_HI, 1);
         return;
     }
-    draw_text_box(0, 124, 240, &FONT_S, code == 1 ? "DRY RUN OK" : "FAILED", C_HI, 1);
-    fm1_delay_ms(1500);
+    if (code == 1) {
+        draw_text_box(0, 92, 240, &FONT_S, "UPDATE", C_WHITE, 1);
+        draw_text_box(0, 124, 240, &FONT_S, "DRY RUN OK", C_HI, 1);
+        fm1_delay_ms(1500);
+        return;
+    }
+    /* wip443: for -5 the screen starts higher: four more lines say what differs in the head */
+    y = code == -5 ? 20u : 92u;
+    draw_text_box(0, y, 240, &FONT_S, "UPDATE", C_WHITE, 1);
+    draw_text_box(0, y + 32u, 240, &FONT_S, "FAILED", C_HI, 1);
+    /* wip442: "ERROR -5 HEAD DIFFERS" and "AT CHECK HEAD", shown for 8 seconds */
+    v = code < 0 ? (uint32_t)(-code) : (uint32_t)code;
+    n = ota_put(line, 0, "ERROR ");
+    if (code < 0)
+        line[n++] = '-';
+    n = ota_putdec(line, n, v);
+    if (v < 15u) {
+        line[n++] = ' ';
+        n = ota_put(line, n, WHY[v]);
+    }
+    line[n] = 0;
+    draw_text_box(0, y + 56u, 240, &FONT_S, line, C_WHITE, 1);
+    n = ota_put(line, 0, "AT ");
+    n = ota_put(line, n, STEP[ota_last_step < 6u ? ota_last_step : 0]);
+    line[n] = 0;
+    if (ota_last_step)
+        draw_text_box(0, y + 80u, 240, &FONT_S, line, C_GRAY, 1);
+    secs = 8;
+    if (code == -5 && ota_hd_first != 0xFFFFFFFFu) {
+        /* wip443: first differing byte (offset, device value, package value), how many bytes / blocks, both CRCs */
+        n = ota_put(line, 0, "FIRST 0X");
+        n = ota_puthex(line, n, ota_hd_first, 4);
+        n = ota_put(line, n, " DEV ");
+        n = ota_puthex(line, n, ota_hd_dev, 2);
+        n = ota_put(line, n, " PKG ");
+        n = ota_puthex(line, n, ota_hd_pkg, 2);
+        line[n] = 0;
+        draw_text_box(0, y + 112u, 240, &FONT_S, line, C_WHITE, 1);
+        n = ota_putdec(line, 0, ota_hd_nbad);
+        n = ota_put(line, n, " BYTES IN ");
+        n = ota_putdec(line, n, ota_hd_blocks);
+        n = ota_put(line, n, " OF 32 BLK");
+        line[n] = 0;
+        draw_text_box(0, y + 136u, 240, &FONT_S, line, C_WHITE, 1);
+        n = ota_put(line, 0, "CRC DEV ");
+        n = ota_puthex(line, n, ota_hd_crc_dev, 4);
+        line[n] = 0;
+        draw_text_box(0, y + 160u, 240, &FONT_S, line, C_WHITE, 1);
+        n = ota_put(line, 0, "CRC PKG ");
+        n = ota_puthex(line, n, ota_hd_crc_pkg, 4);
+        line[n] = 0;
+        draw_text_box(0, y + 184u, 240, &FONT_S, line, C_WHITE, 1);
+        secs = 40;                                      /* time to read it and take a photo */
+    }
+    for (i = 0; i < secs; i++) {
+        fm1_delay_ms(1000);
+        fm1_wdt_feed();
+    }
 }
 static void ota_commit(const uint8_t *parm)
 {

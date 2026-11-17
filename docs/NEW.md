@@ -5,6 +5,8 @@ The newest version first. Install it with the [web installer](../install/); the
 
 ## FM1 Tonic wip307 · 13 November 2026
 
+- CHANGED (wip443): **FM1 Tonic 1.3: a refused return to the official firmware says what differs.** If the head check refuses an update (ERROR -5 HEAD DIFFERS), the screen now also shows the first differing byte, how many bytes differ and both head checksums, for 40 seconds. Nothing else changes.
+- CHANGED (wip442): **FM1 Tonic 1.2: a failed update says why.** If an update to another firmware is refused, the update screen now shows FAILED, the error number with a short reason (for example ERROR -5 HEAD DIFFERS) and the step it stopped at, for 8 seconds. Nothing else changes.
 - CHANGED (wip439): **FM1 Tonic 1.1: newer FM-1 units.** Some newer FM-1s have another flash chip (ID B36014 instead of 856014). 1.1 accepts both, so saving, presets, backup and restore work on them too (1.0 treated that chip as "no flash").
 - CHANGED (wip437): **new factory settings:** clock out off, notes out off, Tonic MIDI channel 10, remote MIDI channel off, CC mode off, CC CH BASE 1-8, output LOUD, USB audio follows knob, 4/4 LED on, theme TONIC, zoom knob yes, AUTOSAVE off (press SAVE to keep your work; the settings are still kept by themselves), name projects GENERATE, Tonic Engine ENHANCED, 2nd core ON. A new unit or a factory reset gets them; a unit with a saved project keeps its own settings.
 - CHANGED (wip434): **the project's address is now GitHub luigirossi-music/fm1-tonic:** the web page, installer, backup page, rescue script and manual links point there; the README is rewritten for 1.0; the screen reader's words link points to the new page. The credits to X0X and Felucca stay.
