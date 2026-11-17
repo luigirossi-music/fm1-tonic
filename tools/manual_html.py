@@ -14,6 +14,7 @@ code, rules, and the contents list (linked to the sections by number). An image 
 ![what it shows](src "caption"): the alt text says what the picture shows (a screen: its text), the
 caption what it is for; without a caption, the alt text is both."""
 import base64
+import datetime
 import html
 import re
 import sys
@@ -117,6 +118,8 @@ html { scroll-padding-top: calc(var(--barh, 72px) + 10px); }
 .search .count { font: 600 .85rem "Barlow Semi Condensed", "Barlow", sans-serif; color: var(--muted); white-space: nowrap; min-width: 3.2rem; }
 .search button { padding: .35rem .7rem; }
 .langbar { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; }
+.topbar .ver { margin-left: auto; font: 700 .85rem "Barlow Semi Condensed", "Barlow", sans-serif; letter-spacing: .03em; color: var(--accent); border: 2px solid var(--accent); border-radius: 999px; padding: .2rem .7rem; white-space: nowrap; }
+.docver { margin: .2rem 0 1rem; color: var(--muted); font-size: .92rem; }
 .langbar a[aria-current="true"] { background: var(--accent); border-color: var(--accent); color: var(--sheet); }
 .topbar button:focus-visible, .langbar a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .tocpanel { position: fixed; z-index: 25; left: 0; top: var(--barh, 72px); bottom: 0; width: min(24rem, 92vw); overflow-y: auto; background: var(--sheet);
@@ -493,10 +496,24 @@ LANGS = [("en", "English", "MANUAL.md"), ("es", "Español", "MANUAL.es.md"), ("i
          ("fr", "Français", "MANUAL.fr.md"), ("pt", "Português", "MANUAL.pt.md"), ("de", "Deutsch", "MANUAL.de.md")]
 
 
+VERSION_LABEL = {"en": "Manual version", "es": "Versión del manual", "it": "Versione del manuale", "fr": "Version du manuel",
+                 "pt": "Versão do manual", "de": "Handbuch-Version"}
+FIRMWARE_LABEL = {"en": "firmware", "es": "firmware", "it": "firmware", "fr": "firmware", "pt": "firmware", "de": "Firmware"}
+
+
+def manual_version():
+    """wip438: the manual's own number (docs/MANUAL_VERSION, raised at every manual change: 1.44, 1.45 ...), the firmware version
+    (VERSION) and the build date, so a person who downloads it again can see whether it is newer"""
+    mv = (SRC / "docs" / "MANUAL_VERSION").read_text().strip()
+    fw = (SRC / "VERSION").read_text().strip()
+    return mv, fw, datetime.date.today().strftime("%-d %b %Y")
+
+
 def build_multi(dst):
     """one page, every language that has a source file; ids of the other languages get a code- prefix (a link to a part
     not translated yet keeps pointing at the English one)"""
     have, parts = [], []
+    mver, fwver, mdate = manual_version()
     for code, name, fn in LANGS:
         f = SRC / "docs" / fn
         if not f.exists():
@@ -513,6 +530,8 @@ def build_multi(dst):
             ids = set(re.findall(r'id="([^"]+)"', body))
             body = re.sub(r'id="([^"]+)"', lambda m: f'id="{code}-{m.group(1)}"', body)
             body = re.sub(r'href="#([^"]+)"', lambda m: f'href="#{code}-{m.group(1)}"' if m.group(1) in ids else m.group(0), body)
+        verline = (f'<p class="docver"><b>{VERSION_LABEL.get(code, "Manual version")} {mver}</b> · FM1 Tonic {FIRMWARE_LABEL.get(code, "firmware")} {fwver} · {mdate}</p>')
+        body = body.replace("</h1>", "</h1>\n" + verline, 1)
         have.append((code, name))
         parts.append(f'<div class="lang" id="lang-{code}" lang="{code}">\n{body}\n</div>')
     bar = ('<header class="topbar"><button type="button" id="tocbtn" aria-expanded="false" aria-controls="tocpanel"><span aria-hidden="true">☰</span><span class="lbl">Contents</span></button>'
@@ -521,10 +540,11 @@ def build_multi(dst):
            '<div class="search" role="search"><input type="search" id="q" placeholder="Search" aria-label="Search" autocomplete="off" enterkeyhint="search">'
            '<span class="count" id="qcount" aria-live="polite"></span>'
            '<button type="button" id="qprev" aria-label="Previous result" disabled>↑</button><button type="button" id="qnext" aria-label="Next result" disabled>↓</button></div>'
+           f'<span class="ver" title="Manual version {mver}">v{mver}</span>'
            '</header>\n<aside class="tocpanel" id="tocpanel" hidden aria-label="Contents"><div id="tocbody"></div><div id="tocsearch"></div></aside>')
     page = ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
             '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-            '<title>FM1 Tonic manual</title>\n'
+            f'<title>FM1 Tonic manual {mver}</title>\n'
             '<meta name="description" content="The manual for FM1 Tonic, drum machine firmware for the M-VAVE FM-1. English, Español.">\n'
             '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
             '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600&'

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FM1 Tonic manual</title>
+<title>FM1 Tonic manual 1.44</title>
 <meta name="description" content="The manual for FM1 Tonic, drum machine firmware for the M-VAVE FM-1. English, Español.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -103,6 +103,8 @@ html { scroll-padding-top: calc(var(--barh, 72px) + 10px); }
 .search .count { font: 600 .85rem "Barlow Semi Condensed", "Barlow", sans-serif; color: var(--muted); white-space: nowrap; min-width: 3.2rem; }
 .search button { padding: .35rem .7rem; }
 .langbar { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; }
+.topbar .ver { margin-left: auto; font: 700 .85rem "Barlow Semi Condensed", "Barlow", sans-serif; letter-spacing: .03em; color: var(--accent); border: 2px solid var(--accent); border-radius: 999px; padding: .2rem .7rem; white-space: nowrap; }
+.docver { margin: .2rem 0 1rem; color: var(--muted); font-size: .92rem; }
 .langbar a[aria-current="true"] { background: var(--accent); border-color: var(--accent); color: var(--sheet); }
 .topbar button:focus-visible, .langbar a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .tocpanel { position: fixed; z-index: 25; left: 0; top: var(--barh, 72px); bottom: 0; width: min(24rem, 92vw); overflow-y: auto; background: var(--sheet);
@@ -154,13 +156,14 @@ mark.hit.cur { background: #8fb8e0; outline: 2px solid #3d6f9e; }
 </style>
 </head>
 <body>
-<header class="topbar"><button type="button" id="tocbtn" aria-expanded="false" aria-controls="tocpanel"><span aria-hidden="true">☰</span><span class="lbl">Contents</span></button><nav class="langbar" aria-label="Language"><a href="#lang-en" data-lang="en" lang="en" hreflang="en"><span class="full">English</span><span class="short" aria-hidden="true">EN</span></a><a href="#lang-es" data-lang="es" lang="es" hreflang="es"><span class="full">Español</span><span class="short" aria-hidden="true">ES</span></a><a href="#lang-it" data-lang="it" lang="it" hreflang="it"><span class="full">Italiano</span><span class="short" aria-hidden="true">IT</span></a><a href="#lang-fr" data-lang="fr" lang="fr" hreflang="fr"><span class="full">Français</span><span class="short" aria-hidden="true">FR</span></a><a href="#lang-pt" data-lang="pt" lang="pt" hreflang="pt"><span class="full">Português</span><span class="short" aria-hidden="true">PT</span></a><a href="#lang-de" data-lang="de" lang="de" hreflang="de"><span class="full">Deutsch</span><span class="short" aria-hidden="true">DE</span></a></nav><div class="search" role="search"><input type="search" id="q" placeholder="Search" aria-label="Search" autocomplete="off" enterkeyhint="search"><span class="count" id="qcount" aria-live="polite"></span><button type="button" id="qprev" aria-label="Previous result" disabled>↑</button><button type="button" id="qnext" aria-label="Next result" disabled>↓</button></div></header>
+<header class="topbar"><button type="button" id="tocbtn" aria-expanded="false" aria-controls="tocpanel"><span aria-hidden="true">☰</span><span class="lbl">Contents</span></button><nav class="langbar" aria-label="Language"><a href="#lang-en" data-lang="en" lang="en" hreflang="en"><span class="full">English</span><span class="short" aria-hidden="true">EN</span></a><a href="#lang-es" data-lang="es" lang="es" hreflang="es"><span class="full">Español</span><span class="short" aria-hidden="true">ES</span></a><a href="#lang-it" data-lang="it" lang="it" hreflang="it"><span class="full">Italiano</span><span class="short" aria-hidden="true">IT</span></a><a href="#lang-fr" data-lang="fr" lang="fr" hreflang="fr"><span class="full">Français</span><span class="short" aria-hidden="true">FR</span></a><a href="#lang-pt" data-lang="pt" lang="pt" hreflang="pt"><span class="full">Português</span><span class="short" aria-hidden="true">PT</span></a><a href="#lang-de" data-lang="de" lang="de" hreflang="de"><span class="full">Deutsch</span><span class="short" aria-hidden="true">DE</span></a></nav><div class="search" role="search"><input type="search" id="q" placeholder="Search" aria-label="Search" autocomplete="off" enterkeyhint="search"><span class="count" id="qcount" aria-live="polite"></span><button type="button" id="qprev" aria-label="Previous result" disabled>↑</button><button type="button" id="qnext" aria-label="Next result" disabled>↓</button></div><span class="ver" title="Manual version 1.44">v1.44</span></header>
 <aside class="tocpanel" id="tocpanel" hidden aria-label="Contents"><div id="tocbody"></div><div id="tocsearch"></div></aside>
 <a class="skip" href="#content">Skip to content</a>
 <main id="content">
 <div class="lang" id="lang-en" lang="en">
 <a class="home" href="../">FM1 Tonic</a>
 <h1>FM1 Tonic</h1>
+<p class="docver"><b>Manual version 1.44</b> · FM1 Tonic firmware 1.0 · 17 Nov 2026</p>
 <p>FM1 Tonic turns the M-VAVE FM-1 into an <strong>8-track drum synthesizer</strong> inspired by Microtonic, a trademark of Sonic Charge. The sound comes from FM1 Tonic's own engine: it acts in a similar way, but it is not the same engine, and FM1 Tonic is not connected with Sonic Charge. Eight drum voices, each synthesised from scratch (nothing is sampled), a sequencer with accents and fills (patterns of 1 to 64 steps, 16 patterns per project), a mixer, reverb, delay and a master compressor. <strong>40 project slots</strong> keep your work: 8 factory presets and 32 of your own.</p>
 <h2 id="features">Features</h2>
 <p><strong>Sound</strong></p>
@@ -344,6 +347,7 @@ NOISE ─► filter ─► env ──┘                               │
 <div class="lang" id="lang-es" lang="es">
 <a class="home" href="../">FM1 Tonic</a>
 <h1>FM1 Tonic</h1>
+<p class="docver"><b>Versión del manual 1.44</b> · FM1 Tonic firmware 1.0 · 17 Nov 2026</p>
 <p>FM1 Tonic convierte el M-VAVE FM-1 en un <strong>sintetizador de batería de 8 pistas</strong> inspirado en Microtonic, marca de Sonic Charge. El sonido sale del engine propio de FM1 Tonic: actúa de forma parecida, pero no es el mismo engine, y FM1 Tonic no tiene ninguna relación con Sonic Charge. Ocho voces de batería, cada una sintetizada desde cero (no hay ningún sample), un secuenciador con accents y fills (patterns de 1 a 64 steps, 16 patterns por proyecto), un mixer, reverb, delay y un compresor master. <strong>40 project slots</strong> guardan tu trabajo: 8 presets de fábrica y 32 tuyos.</p>
 <h2 id="es-caracter-sticas">Características</h2>
 <p><strong>Sonido</strong></p>
@@ -527,6 +531,7 @@ NOISE ─► filter ─► env ──┘                               │
 <div class="lang" id="lang-it" lang="it">
 <a class="home" href="../">FM1 Tonic</a>
 <h1>FM1 Tonic</h1>
+<p class="docver"><b>Versione del manuale 1.44</b> · FM1 Tonic firmware 1.0 · 17 Nov 2026</p>
 <p>FM1 Tonic trasforma l'M-VAVE FM-1 in un <strong>sintetizzatore di batteria a 8 tracce</strong> ispirato a Microtonic, marchio di Sonic Charge. Il suono nasce dall'engine proprio di FM1 Tonic: si comporta in modo simile, ma non è lo stesso engine, e FM1 Tonic non ha alcun legame con Sonic Charge. Otto voci di batteria, ognuna sintetizzata da zero (nessun sample), un sequencer con accent e fill (pattern da 1 a 64 step, 16 pattern per progetto), un mixer, reverb, delay e un compressore master. <strong>40 project slots</strong> conservano il tuo lavoro: 8 preset di fabbrica e 32 tuoi.</p>
 <h2 id="it-caratteristiche">Caratteristiche</h2>
 <p><strong>Suono</strong></p>
@@ -710,6 +715,7 @@ NOISE ─► filter ─► env ──┘                               │
 <div class="lang" id="lang-fr" lang="fr">
 <a class="home" href="../">FM1 Tonic</a>
 <h1>FM1 Tonic</h1>
+<p class="docver"><b>Version du manuel 1.44</b> · FM1 Tonic firmware 1.0 · 17 Nov 2026</p>
 <p>FM1 Tonic transforme le M-VAVE FM-1 en un <strong>synthétiseur de batterie à 8 pistes</strong> inspiré de Microtonic, marque de Sonic Charge. Le son vient de l'engine propre à FM1 Tonic : il se comporte de façon similaire, mais ce n'est pas le même engine, et FM1 Tonic n'a aucun lien avec Sonic Charge. Huit voix de batterie, chacune synthétisée de zéro (rien n'est échantillonné), un séquenceur avec accents et fills (patterns de 1 à 64 steps, 16 patterns par projet), une table de mixage, de la reverb, du delay et un compresseur master. <strong>40 project slots</strong> conservent votre travail : 8 presets d'usine et 32 à vous.</p>
 <h2 id="fr-caract-ristiques">Caractéristiques</h2>
 <p><strong>Son</strong></p>
@@ -893,6 +899,7 @@ NOISE ─► filter ─► env ──┘                               │
 <div class="lang" id="lang-pt" lang="pt">
 <a class="home" href="../">FM1 Tonic</a>
 <h1>FM1 Tonic</h1>
+<p class="docver"><b>Versão do manual 1.44</b> · FM1 Tonic firmware 1.0 · 17 Nov 2026</p>
 <p>O FM1 Tonic transforma o M-VAVE FM-1 em um <strong>sintetizador de bateria de 8 faixas</strong> inspirado no Microtonic, marca da Sonic Charge. O som vem do engine próprio do FM1 Tonic: ele age de forma parecida, mas não é o mesmo engine, e o FM1 Tonic não tem nenhuma ligação com a Sonic Charge. Oito vozes de bateria, cada uma sintetizada do zero (nenhum sample), um sequencer com accents e fills (patterns de 1 a 64 steps, 16 patterns por projeto), um mixer, reverb, delay e um compressor master. <strong>40 project slots</strong> guardam o seu trabalho: 8 presets de fábrica e 32 seus.</p>
 <h2 id="pt-caracter-sticas">Características</h2>
 <p><strong>Som</strong></p>
@@ -1084,6 +1091,7 @@ NOISE ─► filter ─► env ──┘                               │
 <div class="lang" id="lang-de" lang="de">
 <a class="home" href="../">FM1 Tonic</a>
 <h1>FM1 Tonic</h1>
+<p class="docver"><b>Handbuch-Version 1.44</b> · FM1 Tonic Firmware 1.0 · 17 Nov 2026</p>
 <p>FM1 Tonic macht aus dem M-VAVE FM-1 einen <strong>Drum-Synthesizer mit 8 Tracks</strong> nach dem Vorbild von Microtonic, einer Marke von Sonic Charge. Der Klang kommt von der eigenen Engine des FM1 Tonic: Sie verhält sich ähnlich, ist aber nicht dieselbe Engine, und FM1 Tonic hat keine Verbindung zu Sonic Charge. Acht Drum-Stimmen, jede von Grund auf synthetisiert (nichts ist gesampelt), ein Sequencer mit accents und fills (Patterns mit 1 bis 64 steps, 16 Patterns pro Projekt), ein Mixer, Reverb, Delay und ein Master-Kompressor. <strong>40 project slots</strong> speichern deine Arbeit: 8 Werks-Presets und 32 eigene.</p>
 <h2 id="de-merkmale">Merkmale</h2>
 <p><strong>Sound</strong></p>

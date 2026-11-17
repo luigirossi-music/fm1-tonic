@@ -161,6 +161,12 @@ details.cheat[open] > summary::before { transform: rotate(90deg); }
 details.cheat > summary:hover { text-decoration: underline; }
 details.cheat .cheat-in { padding: 0 1rem 1rem; }
 @media (prefers-reduced-motion: reduce) { details.cheat > summary::before { transition: none; } }
+
+/* wip438: the blinking note under the panel (preset 9 = no trigs); still when the person asks for less motion */
+.canvas { margin: .9rem 0 0; padding: .55rem .9rem; border: 1px solid var(--accent); border-radius: 12px; color: var(--ink); background: var(--part); font-size: .95rem; text-align: center; animation: canvasblink 1.8s ease-in-out infinite; }
+.canvas b { color: var(--accent); }
+@keyframes canvasblink { 0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(143,184,224,.55); } 50% { opacity: .45; box-shadow: 0 0 0 4px rgba(143,184,224,0); } }
+@media (prefers-reduced-motion: reduce) { .canvas { animation: none; } }
 </style>
 </head>
 <body>
@@ -170,8 +176,8 @@ details.cheat .cheat-in { padding: 0 1rem 1rem; }
   <p>Drum machine firmware for the M-VAVE FM-1, inspired by Microtonic (a trademark of Sonic Charge) but with its own engine, not the same one. This is the same code the FM-1 runs, in your browser.</p>
   <nav aria-label="Downloads">
     <a href="downloads/FM1-Tonic-cheat-sheet.pdf" download>Cheat sheet (PDF)</a>
-    <a href="downloads/FM1-Tonic-manual.pdf" download>User manual (PDF)</a>
-    <a href="downloads/FM1-Tonic-manual.html" download>User manual (HTML, all languages)</a>
+    <a href="downloads/FM1-Tonic-manual.html" target="_blank" rel="noopener">User manual <!--mv-->1.44<!--/mv--> (all languages)</a>
+    <a href="downloads/FM1-Tonic-manual.html" download="FM1-Tonic-manual-1.44.html">Download the manual <!--mv-->1.44<!--/mv--></a>
   </nav>
 </header>
 
@@ -185,6 +191,8 @@ details.cheat .cheat-in { padding: 0 1rem 1rem; }
   <div hidden id="descs"></div>
 </div>
 </div>
+
+<p class="canvas" id="canvas-note"><b>Preset 9 = blank canvas.</b> Turn PRESETS to 09 and press YES / UP: you get the sounds with no trigs at all, to try and build your own beat.</p>
 
 <div class="bar">
   <span id="status" role="status">Off. Sound starts when you switch it on.</span>
@@ -230,7 +238,7 @@ details.cheat .cheat-in { padding: 0 1rem 1rem; }
 
 <section class="credits" aria-labelledby="credits-h">
   <h2 id="credits-h">Credits</h2>
-  <p class="note big"><b>FM1 Tonic is made by Luigi Rossi</b>, the developer and creative mind behind this firmware: the Tonic drum machine, its sequencer, screens, presets and the web tools (emulator, installer, backup). It is free software under the GNU General Public License, version 3; if you share the firmware you must share its source code. <a class="dl" href="downloads/FM1-Tonic-manual.pdf" download>User manual (PDF)</a> <a class="dl" href="downloads/FM1-Tonic-manual.html" download>User manual (HTML, all languages)</a></p>
+  <p class="note big"><b>FM1 Tonic is made by Luigi Rossi</b>, the developer and creative mind behind this firmware: the Tonic drum machine, its sequencer, screens, presets and the web tools (emulator, installer, backup). It is free software under the GNU General Public License, version 3; if you share the firmware you must share its source code. <a class="dl" href="downloads/FM1-Tonic-manual.html" target="_blank" rel="noopener">User manual <!--mv-->1.44<!--/mv--> (all languages)</a> <a class="dl" href="downloads/FM1-Tonic-manual.html" download="FM1-Tonic-manual-1.44.html">Download the manual <!--mv-->1.44<!--/mv--></a></p>
   <p class="note"><b>Luigi Rossi online:</b> <a href="https://linktr.ee/luigirossi" target="_blank" rel="noopener">linktr.ee/luigirossi</a></p>
   <details class="cheat" id="cheat">
     <summary>Read more: the cheat sheet</summary>

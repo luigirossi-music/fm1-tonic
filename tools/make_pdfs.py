@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-only
-"""The two PDFs the emulator page offers: the cheat sheet and the user manual.
+"""What the emulator page offers for download: the cheat sheet (PDF) and the multilingual user manual (HTML; wip438: no PDF manual any more).
 
   python3 tools/make_pdfs.py
 
@@ -50,17 +50,19 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True)
     # wip399: the same multilingual manual as the standalone file (images inside), so the web page offers exactly it
     subprocess.run([sys.executable, str(ROOT / "tools" / "manual_html.py"), "--multi", str(OUT / "FM1-Tonic-manual.html"), "--embed"], check=True)
+    # wip438: the manual's number (docs/MANUAL_VERSION) goes into the page's links and into the saved file's name
+    mv = (ROOT / "docs" / "MANUAL_VERSION").read_text().strip()
+    ip = ROOT / "web" / "emu" / "index.html"
+    t = ip.read_text(encoding="utf-8")
+    t = re.sub(r"(<!--mv-->)[\d.]+(<!--/mv-->)", rf"\g<1>{mv}\g<2>", t)
+    t = re.sub(r"FM1-Tonic-manual-[\d.]+\.html", f"FM1-Tonic-manual-{mv}.html", t)
+    ip.write_text(t, encoding="utf-8")
     with sync_playwright() as p:
         b = p.chromium.launch()
         pg = b.new_page()
         pg.set_content(cheat_html())
         pg.pdf(path=str(OUT / "FM1-Tonic-cheat-sheet.pdf"), format="A4", print_background=True, display_header_footer=True,
                header_template="<span></span>", footer_template=FOOT, margin={"top": "12mm", "bottom": "14mm", "left": "12mm", "right": "12mm"})
-        pg.goto((ROOT / "docs" / "manual.html").as_uri())
-        pg.emulate_media(media="print")
-        pg.add_style_tag(content=":root{color-scheme:light} body{background:#fff!important;color:#111!important} a.skip,nav.toc a.skip{display:none}")
-        pg.pdf(path=str(OUT / "FM1-Tonic-manual.pdf"), format="A4", print_background=True, display_header_footer=True,
-               header_template="<span></span>", footer_template=FOOT, margin={"top": "16mm", "bottom": "16mm", "left": "16mm", "right": "16mm"})
         b.close()
     for f in sorted(OUT.glob("*.pdf")):
         print(f, f.stat().st_size, "bytes")

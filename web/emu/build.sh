@@ -22,6 +22,6 @@ emcc -O2 -ffp-contract=off -std=gnu99 -Wall -Wno-unused-function -Wno-unused-par
     --no-entry -sSTANDALONE_WASM -sSTACK_SIZE=1048576 -sINITIAL_MEMORY=33554432 -sFILESYSTEM=0 \
     -o build/emu/x0x.wasm web/emu/x0x_web.c $U
 cp web/emu/index.html web/emu/worklet.js build/emu/
-mkdir -p build/emu/downloads && cp web/emu/downloads/*.pdf build/emu/downloads/   # the cheat sheet and the manual as PDF (tools/make_pdfs.py makes them)
+mkdir -p build/emu/downloads && cp web/emu/downloads/*.pdf web/emu/downloads/*.html build/emu/downloads/   # the cheat sheet (PDF) and the multilingual manual (HTML): tools/make_pdfs.py makes them. wip438: the .html was NOT copied before, so the manual link on the site was a 404
 mkdir -p build/emu/fonts && cp web/emu/fonts/DotGothic16-subset.woff web/emu/fonts/OFL.txt build/emu/fonts/   # the panel labels: the webapp's font (SIL OFL)
 echo "emu: build/emu ($(wc -c < build/emu/x0x.wasm) B wasm)"
