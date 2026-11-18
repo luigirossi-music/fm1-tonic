@@ -423,7 +423,7 @@ def convert(md):
             if t == "X0X":
                 out.append('<h1><a class="home" href="../">X0X</a></h1>')
             else:
-                out.append(f'<a class="home" href="../">FM1 Tonic</a>\n<h1>{inline(t)}</h1>')
+                out.append(f'<a class="home" href="../">FM1 TONIC</a>\n<h1>{inline(t)}</h1>')
         elif ln.startswith("## "):
             t = ln[3:].strip()
             m = re.match(r"(\d+)\. (.+)", t)
@@ -533,7 +533,7 @@ def build_multi(dst):
             ids = set(re.findall(r'id="([^"]+)"', body))
             body = re.sub(r'id="([^"]+)"', lambda m: f'id="{code}-{m.group(1)}"', body)
             body = re.sub(r'href="#([^"]+)"', lambda m: f'href="#{code}-{m.group(1)}"' if m.group(1) in ids else m.group(0), body)
-        verline = (f'<p class="docver"><b>{VERSION_LABEL.get(code, "Manual version")} {mver}</b> · FM1 Tonic {FIRMWARE_LABEL.get(code, "firmware")} {fwver} · {mdate}</p>')
+        verline = (f'<p class="docver"><b>{VERSION_LABEL.get(code, "Manual version")} {mver}</b> · FM1 TONIC {FIRMWARE_LABEL.get(code, "firmware")} {fwver} · {mdate}</p>')
         body = body.replace("</h1>", "</h1>\n" + verline, 1)
         have.append((code, name))
         parts.append(f'<div class="lang" id="lang-{code}" lang="{code}">\n{body}\n</div>')
@@ -547,8 +547,8 @@ def build_multi(dst):
            '</header>\n<aside class="tocpanel" id="tocpanel" hidden aria-label="Contents"><div id="tocbody"></div><div id="tocsearch"></div></aside>')
     page = ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
             '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-            f'<title>FM1 Tonic manual {mver}</title>\n'
-            '<meta name="description" content="The manual for FM1 Tonic, drum machine firmware for the M-VAVE FM-1. English, Español.">\n'
+            f'<title>FM1 TONIC manual {mver}</title>\n'
+            '<meta name="description" content="The manual for FM1 TONIC, drum machine firmware for the M-VAVE FM-1. English, Español.">\n'
             '<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
             '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600&'
             'family=Barlow+Semi+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400&display=swap">\n'
@@ -571,10 +571,10 @@ def main():
     dst = Path(args[1]) if len(args) > 1 else SRC / "docs" / "manual.html"
     md = src.read_text()
     h1 = re.search(r"^# (.+)$", md, re.M)
-    title, what = ("Manual · FM1 Tonic", "The manual") if not h1 or h1.group(1) == "X0X" else ((f"{h1.group(1)} manual" if h1.group(1).startswith("FM1") else f"{h1.group(1)} · FM1 Tonic"), h1.group(1))
+    title, what = ("Manual · FM1 TONIC", "The manual") if not h1 or h1.group(1) == "X0X" else ((f"{h1.group(1)} manual" if h1.group(1).startswith("FM1") else f"{h1.group(1)} · FM1 TONIC"), h1.group(1))
     body = convert(md)
     page = (f"<title>{html.escape(title)}</title>\n"
-            f'<meta name="description" content="{html.escape(what)} for FM1 Tonic, drum machine firmware for the M-VAVE FM-1.">\n'
+            f'<meta name="description" content="{html.escape(what)} for FM1 TONIC, drum machine firmware for the M-VAVE FM-1.">\n'
             '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
             '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
             '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600&'

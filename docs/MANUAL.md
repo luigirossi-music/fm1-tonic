@@ -1,6 +1,6 @@
-# FM1 Tonic
+# FM1 TONIC
 
-FM1 Tonic turns the M-VAVE FM-1 into an **8-track drum synthesizer** inspired by Microtonic, a trademark of Sonic Charge. The sound comes from FM1 Tonic's own engine: it acts in a similar way, but it is not the same engine, and FM1 Tonic is not connected with Sonic Charge. Eight drum voices, each synthesised from scratch (nothing is sampled), a sequencer with accents and fills (patterns of 1 to 64 steps, 16 patterns per project), a mixer, reverb, delay and a master compressor. **40 project slots** keep your work: 8 factory presets and 32 of your own.
+FM1 TONIC turns the M-VAVE FM-1 into an **8-track drum synthesizer** inspired by Microtonic, a trademark of Sonic Charge. The sound comes from FM1 TONIC's own engine: it acts in a similar way, but it is not the same engine, and FM1 TONIC is not connected with Sonic Charge. Eight drum voices, each synthesised from scratch (nothing is sampled), a sequencer with accents and fills (patterns of 1 to 64 steps, 16 patterns per project), a mixer, reverb, delay and a master compressor. **40 project slots** keep your work: 8 factory presets and 32 of your own.
 
 ## Features
 
@@ -8,7 +8,7 @@ FM1 Tonic turns the M-VAVE FM-1 into an **8-track drum synthesizer** inspired by
 
 - 8-voice drum synthesizer: every track has its own oscillator, pitch mod, noise, mix, EQ and distortion.
 - Per-track level and pan, and per-track reverb send and delay send (plus low cut and high cut in the Enhanced engine).
-- Enhanced or Classic engine (Classic = only the core sound settings, without the FM1 Tonic extras).
+- Enhanced or Classic engine (Classic = only the core sound settings, without the FM1 TONIC extras).
 - Track randomizer: a new random sound for the selected track.
 - Choke groups (for example closed and open hat).
 - Sidechain compressor: any track can duck the others.
@@ -54,7 +54,7 @@ FM1 Tonic turns the M-VAVE FM-1 into an **8-track drum synthesizer** inspired by
 
 ## 1. The panel
 
-![The FM1 Tonic panel: knobs MASTER, SELECT, PRESETS, ALGORITHM and KNOB 1 to 4; buttons FX, SEL, ENV, LFO, EDIT, GLO, HOME, SAVE, ARP, SEQ, PLAY, REC, OCT- and OCT+; black keys TRACK 1 to 8, ACCENT, FILL, FUNC; white keys 1 to 16](img/fm1-tonic-panel.svg "")
+![The FM1 TONIC panel: knobs MASTER, SELECT, PRESETS, ALGORITHM and KNOB 1 to 4; buttons FX, SEL, ENV, LFO, EDIT, GLO, HOME, SAVE, ARP, SEQ, PLAY, REC, OCT- and OCT+; black keys TRACK 1 to 8, ACCENT, FILL, FUNC; white keys 1 to 16](img/fm1-tonic-panel.svg "")
 
 - **Knobs.** MASTER is the volume. SELECT turns pages (in a list: up and down). PRESETS picks one of the 40 presets. KNOB 1 to 4 set the four values of the page on the screen (the one you turn is enlarged). ALGORITHM turns to a second page or picks a voice, depending on the page (the page tables say which). A small blue triangle in a bottom corner of the screen means there is a second page behind ALGORITHM: right triangle = turn ALGORITHM right, left triangle = turn it left to go back.
 - **Black keys.** 1 to 8 are TRACK 1 to 8, 9 is ACCENT, 10 is FILL, 11 is FUNC.
@@ -130,11 +130,11 @@ Exceptions: on PERFORM, MUTE / SOLO and the pattern page the black keys are mute
 
 ## 2. Signal path
 
-![The FM1 Tonic engine: each of the 8 tracks has a pitch modulator and oscillator, a noise filter and noise envelope, a mix, a distortion and an EQ, then cuts, level and pan; the 8 tracks go through the sidechain, the master low cut and the compressor to the master volume; reverb and delay are send effects](img/fm1-engine.svg "The whole signal path. The small word in each box is the button that opens that page.")
+![The FM1 TONIC engine: each of the 8 tracks has a pitch modulator and oscillator, a noise filter and noise envelope, a mix, a distortion and an EQ, then cuts, level and pan; the 8 tracks go through the sidechain, the master low cut and the compressor to the master volume; reverb and delay are send effects](img/fm1-engine.svg "The whole signal path. The small word in each box is the button that opens that page.")
 
-Every track makes its sound from scratch with the FM1 Tonic drum engine: a pitch modulator and oscillator, a noise filter and envelope, a mix, a distortion and an EQ, then the track's cuts, level and pan; the 8 tracks go through the sidechain, the master low cut and the compressor to MASTER, with reverb and delay as send effects. Chapter 8 explains every setting.
+Every track makes its sound from scratch with the FM1 TONIC drum engine: a pitch modulator and oscillator, a noise filter and envelope, a mix, a distortion and an EQ, then the track's cuts, level and pan; the 8 tracks go through the sidechain, the master low cut and the compressor to MASTER, with reverb and delay as send effects. Chapter 8 explains every setting.
 
-**Enhanced and classic.** GLO > settings > Tonic Engine is **enhanced** by default. In **classic** the FM1 Tonic extras (the track cuts, the sends, the sidechain) are greyed out and do nothing, so the sound uses only the settings a `.mtpreset` file can carry. Their values are kept and come back with enhanced. Level and pan stay available in classic. The mode is global, not saved in a preset.
+**Enhanced and classic.** GLO > settings > Tonic Engine is **enhanced** by default. In **classic** the FM1 TONIC extras (the track cuts, the sends, the sidechain) are greyed out and do nothing, so the sound uses only the settings a `.mtpreset` file can carry. Their values are kept and come back with enhanced. Level and pan stay available in classic. The mode is global, not saved in a preset.
 
 ## 3. Pages, button by button
 
@@ -206,7 +206,7 @@ Settings are in the GLO list (SELECT moves up and down, ALGORITHM changes the va
 | **4/4 LED** | OFF / **ON** | ON (the factory setting): white keys 1, 5, 9 and 13 glow faintly to mark the four beats of the bar (not on PERFORM). |
 | **ZOOM KNOB** | **YES** / NO | YES: the knob you turn is enlarged over the screen. NO: it is only highlighted, so the whole page stays visible. The SONG screen never zooms. |
 | **NAME PROJECTS** | **GENERATE** / MANUAL | GENERATE makes up the name of a saved project (ALGORITHM = another one). MANUAL: the name screen is a letter editor (see chapter 5). |
-| **TONIC ENGINE** | **ENHANCED** / CLASSIC | CLASSIC greys out and silences the FM1 Tonic extras (track cuts, sends, sidechain) so the sound uses only the settings a `.mtpreset` file can carry (chapters 2 and 8). |
+| **TONIC ENGINE** | **ENHANCED** / CLASSIC | CLASSIC greys out and silences the FM1 TONIC extras (track cuts, sends, sidechain) so the sound uses only the settings a `.mtpreset` file can carry (chapters 2 and 8). |
 | **2ND CORE** | **ON** / OFF | The FM-1's chip has two cores and Tonic shares the sound rendering between them. It takes effect at the next power-on. If the FM-1 ever crashes with two cores it switches itself to OFF; turn it back ON here. |
 
 ### SEQ and ARP
@@ -413,11 +413,14 @@ The FM-1 cannot be the host of a USB keyboard. Use a keyboard with a 5-pin MIDI 
 - **Install or update:** open the [web installer](https://luigirossi-music.github.io/fm1-tonic/install/) in Chrome or Edge, connect the FM-1 with a USB data cable, press Install and do not unplug it while it writes. Another firmware does not keep your project: save it to a file first. "Back to the stock firmware" at the bottom of the same page puts M-VAVE's firmware back. Installing other firmware is at your own risk.
 - **Back up:** the [backup page](https://luigirossi-music.github.io/fm1-tonic/backup/) saves the project to an `.x0b` file (Back up), loads it back (Restore: stop the FM-1, then answer RESTORE FROM USB? with SEL), exports presets as `.mtpreset` files, and backs up / restores slots 9 to 40 as `.tnp` files. Command line: `python3 tools/x0x_backup.py backup my-song.x0b` (also `restore`, `info`).
 - **If something goes wrong:** hold OCT- and OCT+ for five seconds = update mode; hold them while switching on = hardware calibration. After a crash a red CRASH screen restarts the FM-1; if it crashes twice at start it enters SAFE MODE (no sound, USB works: reinstall from the installer; PLAY tries a normal start). If even that fails, the Mac rescue script in `tools/fm1_rescue.sh` puts M-VAVE's firmware back (it checks every file it writes; running it again is safe).
+- **If an update is refused.** If the FM-1 will not change firmware (for example with "Back to the stock firmware"), its update screen shows FAILED, an error number with a short reason (for example ERROR -5 HEAD DIFFERS) and the step where it stopped, for 8 seconds, and then the FM-1 starts FM1 TONIC again. ERROR -5 means the start area (the "head") of your FM-1 is not the one of the firmware you are going to. For this error the screen also shows the first byte that differs, how many bytes differ and both checksums (CRC), for 40 seconds. Note these numbers if you ask for help.
+- **A custom bootloader.** If you put a custom bootloader on the FM-1 (for example m-bootloader, with M-Flasher), going back to M-VAVE's official firmware from the web page can be refused with ERROR -5 HEAD DIFFERS. Put M-VAVE's stock bootloader back first (in M-Flasher: FLASH BOOTLOADER, then STOCK (FROM .FWSC) with the official package), then go back to the stock firmware. On the author's FM-1 this made everything work again.
+- **Newer FM-1 units.** Some newer FM-1s have another flash chip (ID B36014 instead of 856014). FM1 TONIC accepts both, so saving, presets, backup and restore work on them too (not yet tested on a unit with the new chip).
 - **Full text** of the install, backup, rescue and parameter chapters: `docs/reference/MANUAL_full_wip381.md`.
 
 ## 8. The engine
 
-Each of the 8 tracks is a complete drum synthesizer: the FM1 Tonic engine, nothing sampled. The 8 tracks are identical and each has the same **26 settings**, kept per track and saved with the preset. This chapter is the reference for all of them. Where a setting lives is written as button · knob.
+Each of the 8 tracks is a complete drum synthesizer: the FM1 TONIC engine, nothing sampled. The 8 tracks are identical and each has the same **26 settings**, kept per track and saved with the preset. This chapter is the reference for all of them. Where a setting lives is written as button · knob.
 
 ```
 pitch mod ─► OSCILLATOR ─┐
@@ -517,7 +520,7 @@ Shared by all the tracks:
 
 ### Enhanced and classic
 
-22 of the 26 settings are what a Patternarium preset carries (the 21 sound settings, level included, plus pan). Four are **extras of the FM1 Tonic**: LOW CUT, HIGH CUT, REVERB SEND and DELAY SEND, as are the choke group, the sidechain, the master section, p-locks, chance and microtiming. In **classic** (GLO > settings > TONIC ENGINE) the four extras are greyed and silent, and the sidechain too, so what you build uses only the settings a `.mtpreset` file carries; the values come back in enhanced. A loaded Patternarium preset keeps its exact values until you turn that knob.
+22 of the 26 settings are what a Patternarium preset carries (the 21 sound settings, level included, plus pan). Four are **extras of the FM1 TONIC**: LOW CUT, HIGH CUT, REVERB SEND and DELAY SEND, as are the choke group, the sidechain, the master section, p-locks, chance and microtiming. In **classic** (GLO > settings > TONIC ENGINE) the four extras are greyed and silent, and the sidechain too, so what you build uses only the settings a `.mtpreset` file carries; the values come back in enhanced. A loaded Patternarium preset keeps its exact values until you turn that knob.
 
 ### Sound Recipes
 
@@ -674,16 +677,16 @@ A dry, high tone of about 50 ms with no pitch movement (AMOUNT 0.00 sm). Change 
 
 ## 9. Credits
 
-**FM1 Tonic is made by Luigi Rossi**, the developer and creative mind behind this firmware: the Tonic drum machine, its sequencer, screens, presets and the web tools (emulator, installer, backup). It is free software under the GNU General Public License, version 3; if you share the firmware you must share its source code.
+**FM1 TONIC is made by Luigi Rossi**, the developer and creative mind behind this firmware: the Tonic drum machine, its sequencer, screens, presets and the web tools (emulator, installer, backup). It is free software under the GNU General Public License, version 3; if you share the firmware you must share its source code.
 
 **Luigi Rossi online:** [linktr.ee/luigirossi](https://linktr.ee/luigirossi)
 
 LICENSING.md lists every file's origin and licence. It stands on the work of:
 
-- **libpo32** by Eric Lewis (MIT): the starting point of the FM1 Tonic drum synthesis code. Nothing is sampled.
-- **X0X** by Charles Vestal, the firmware FM1 Tonic grew from, and the web pages (emulator, installer, backup); X0X is a fork of **Felucca** by Leo Kuroshita (@kurogedelic), Hügelton Instruments: the platform (hardware layer, USB, update loader, installer, storage) and the recovery board FM-1-transporter.
+- **libpo32** by Eric Lewis (MIT): the starting point of the FM1 TONIC drum synthesis code. Nothing is sampled.
+- **X0X** by Charles Vestal, the firmware FM1 TONIC grew from, and the web pages (emulator, installer, backup); X0X is a fork of **Felucca** by Leo Kuroshita (@kurogedelic), Hügelton Instruments: the platform (hardware layer, USB, update loader, installer, storage) and the recovery board FM-1-transporter.
 - The reverb and delay are ported from **9W9** by athousanddetails, based on **ER-99** by Matthew Cieplak (GPL-3.0). The master compressor follows Giannoulis, Massberg and Reiss; the master filter is Vadim Zavalishin's TPT state-variable filter.
 - **Melodee** by keremimo and **Jangada** by zednaked: what they found about the FM-1's second core.
 - Fonts: **Barlow Semi Condensed** (The Barlow Project Authors), **Terminus** (Dimitar Toshkov Zhekov), **DotGothic16** (The DotGothic16 Project Authors), all SIL Open Font License.
 
-M-VAVE and FM-1 are trademarks of their owners. FM1 Tonic is not connected with, or endorsed by, M-VAVE, Sonic Charge or Luigi Rossi.
+M-VAVE and FM-1 are trademarks of their owners. FM1 TONIC is not connected with, or endorsed by, M-VAVE, Sonic Charge or Luigi Rossi.

@@ -1,9 +1,9 @@
-# FM1 Tonic for the M-VAVE FM-1
+# FM1 TONIC for the M-VAVE FM-1
 
 **FM1 Tonic** turns the M-VAVE FM-1 into a drum machine: **eight synthesised drum voices**, a
 sequencer with accents, fills and up to 64 steps per pattern, 16 patterns per preset that can be
 chained into a song, an 8-track mixer, reverb, delay and a master compressor. Over USB the FM-1 is
-both a MIDI device and an audio input, with no driver needed. Version **1.0**, by Luigi Rossi.
+both a MIDI device and an audio input, with no driver needed. Version **1.4**, by Luigi Rossi.
 
 FM1 Tonic is inspired by Microtonic (a trademark of Sonic Charge). The sound comes from FM1 Tonic's
 own engine: it acts in a similar way, but it is not the same engine, and FM1 Tonic is not connected

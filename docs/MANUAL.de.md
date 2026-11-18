@@ -1,6 +1,6 @@
-# FM1 Tonic
+# FM1 TONIC
 
-FM1 Tonic macht aus dem M-VAVE FM-1 einen **Drum-Synthesizer mit 8 Tracks** nach dem Vorbild von Microtonic, einer Marke von Sonic Charge. Der Klang kommt von der eigenen Engine des FM1 Tonic: Sie verhält sich ähnlich, ist aber nicht dieselbe Engine, und FM1 Tonic hat keine Verbindung zu Sonic Charge. Acht Drum-Stimmen, jede von Grund auf synthetisiert (nichts ist gesampelt), ein Sequencer mit accents und fills (Patterns mit 1 bis 64 steps, 16 Patterns pro Projekt), ein Mixer, Reverb, Delay und ein Master-Kompressor. **40 project slots** speichern deine Arbeit: 8 Werks-Presets und 32 eigene.
+FM1 TONIC macht aus dem M-VAVE FM-1 einen **Drum-Synthesizer mit 8 Tracks** nach dem Vorbild von Microtonic, einer Marke von Sonic Charge. Der Klang kommt von der eigenen Engine des FM1 TONIC: Sie verhält sich ähnlich, ist aber nicht dieselbe Engine, und FM1 TONIC hat keine Verbindung zu Sonic Charge. Acht Drum-Stimmen, jede von Grund auf synthetisiert (nichts ist gesampelt), ein Sequencer mit accents und fills (Patterns mit 1 bis 64 steps, 16 Patterns pro Projekt), ein Mixer, Reverb, Delay und ein Master-Kompressor. **40 project slots** speichern deine Arbeit: 8 Werks-Presets und 32 eigene.
 
 ## Merkmale
 
@@ -8,7 +8,7 @@ FM1 Tonic macht aus dem M-VAVE FM-1 einen **Drum-Synthesizer mit 8 Tracks** nach
 
 - Drum-Synthesizer mit 8 Stimmen: Jeder Track hat seinen eigenen oscillator, pitch mod, noise, mix, EQ und seine eigene Verzerrung.
 - Level und pan pro Track sowie reverb send und delay send pro Track (im Enhanced-Engine zusätzlich low cut und high cut).
-- Enhanced- oder Classic-Engine (Classic = nur die grundlegenden Klangeinstellungen, ohne die Extras des FM1 Tonic).
+- Enhanced- oder Classic-Engine (Classic = nur die grundlegenden Klangeinstellungen, ohne die Extras des FM1 TONIC).
 - Track-Randomizer: ein neuer Zufallssound für den gewählten Track.
 - Choke groups (zum Beispiel geschlossene und offene Hi-Hat).
 - Sidechain-Kompressor: Jeder Track kann die anderen ducken.
@@ -54,7 +54,7 @@ FM1 Tonic macht aus dem M-VAVE FM-1 einen **Drum-Synthesizer mit 8 Tracks** nach
 
 ## 1. Das Panel
 
-![Das Panel des FM1 Tonic: knobs MASTER, SELECT, PRESETS, ALGORITHM und KNOB 1 bis 4; Buttons FX, SEL, ENV, LFO, EDIT, GLO, HOME, SAVE, ARP, SEQ, PLAY, REC, OCT- und OCT+; schwarze Tasten TRACK 1 bis 8, ACCENT, FILL, FUNC; weiße Tasten 1 bis 16](img/fm1-tonic-panel.svg "")
+![Das Panel des FM1 TONIC: knobs MASTER, SELECT, PRESETS, ALGORITHM und KNOB 1 bis 4; Buttons FX, SEL, ENV, LFO, EDIT, GLO, HOME, SAVE, ARP, SEQ, PLAY, REC, OCT- und OCT+; schwarze Tasten TRACK 1 bis 8, ACCENT, FILL, FUNC; weiße Tasten 1 bis 16](img/fm1-tonic-panel.svg "")
 
 - **Knobs.** MASTER ist die Lautstärke. SELECT wechselt die Seite (in einer Liste: rauf und runter). PRESETS wählt eines der 40 Presets. KNOB 1 bis 4 stellen die vier Werte der Seite ein, die auf dem Display zu sehen ist (der gedrehte wird größer angezeigt). ALGORITHM wechselt zu einer zweiten Seite oder wählt eine Stimme, je nach Seite (die Seitentabellen sagen es). Ein kleines blaues Dreieck in einer unteren Ecke des Displays bedeutet, dass hinter ALGORITHM eine zweite Seite liegt: Dreieck rechts = ALGORITHM nach rechts drehen, Dreieck links = nach links drehen, um zurückzukehren.
 - **Schwarze Tasten.** 1 bis 8 sind TRACK 1 bis 8, 9 ist ACCENT, 10 ist FILL, 11 ist FUNC.

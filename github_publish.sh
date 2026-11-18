@@ -37,7 +37,7 @@ if [ -z "$SKIPGH" ]; then
         say "1/4 The repository $OWNER/$REPO exists"
     else
         say "1/4 Making the public repository $OWNER/$REPO"
-        gh repo create "$OWNER/$REPO" --public --description "FM1 Tonic: drum machine firmware for the M-VAVE FM-1 (version $VER)" \
+        gh repo create "$OWNER/$REPO" --public --description "FM1 TONIC: drum machine firmware for the M-VAVE FM-1 (version $VER)" \
             || die "could not create the repository. Make it by hand on github.com (Public, no README, no licence) and run this again."
     fi
 fi
@@ -93,7 +93,7 @@ if [ -f "$PKG" ]; then
             say "4/4 The release v$VER exists (to replace the file: gh release delete v$VER -R $OWNER/$REPO --yes  and run this again)"
         else
             say "4/4 Making the release v$VER with the firmware file"
-            gh release create "v$VER" "$PKG" -R "$OWNER/$REPO" --title "FM1 Tonic $VER" \
+            gh release create "v$VER" "$PKG" -R "$OWNER/$REPO" --title "FM1 TONIC $VER" \
                 --notes "FM1 Tonic $VER for the M-VAVE FM-1. Install it with the web installer: https://$OWNER.github.io/$REPO/install/ (Chrome or Edge, the FM-1 plugged in by USB). Use it at your own risk: custom firmware, not made by M-VAVE." \
                 || echo "(the release was not made: read the line above)"
         fi

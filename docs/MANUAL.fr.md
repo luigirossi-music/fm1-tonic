@@ -1,6 +1,6 @@
-# FM1 Tonic
+# FM1 TONIC
 
-FM1 Tonic transforme le M-VAVE FM-1 en un **synthétiseur de batterie à 8 pistes** inspiré de Microtonic, marque de Sonic Charge. Le son vient de l'engine propre à FM1 Tonic : il se comporte de façon similaire, mais ce n'est pas le même engine, et FM1 Tonic n'a aucun lien avec Sonic Charge. Huit voix de batterie, chacune synthétisée de zéro (rien n'est échantillonné), un séquenceur avec accents et fills (patterns de 1 à 64 steps, 16 patterns par projet), une table de mixage, de la reverb, du delay et un compresseur master. **40 project slots** conservent votre travail : 8 presets d'usine et 32 à vous.
+FM1 TONIC transforme le M-VAVE FM-1 en un **synthétiseur de batterie à 8 pistes** inspiré de Microtonic, marque de Sonic Charge. Le son vient de l'engine propre à FM1 TONIC : il se comporte de façon similaire, mais ce n'est pas le même engine, et FM1 TONIC n'a aucun lien avec Sonic Charge. Huit voix de batterie, chacune synthétisée de zéro (rien n'est échantillonné), un séquenceur avec accents et fills (patterns de 1 à 64 steps, 16 patterns par projet), une table de mixage, de la reverb, du delay et un compresseur master. **40 project slots** conservent votre travail : 8 presets d'usine et 32 à vous.
 
 ## Caractéristiques
 
@@ -8,7 +8,7 @@ FM1 Tonic transforme le M-VAVE FM-1 en un **synthétiseur de batterie à 8 piste
 
 - Synthétiseur de batterie à 8 voix : chaque track a son propre oscillator, pitch mod, noise, mix, EQ et sa propre distorsion.
 - Level et pan par track, et reverb send et delay send par track (plus low cut et high cut dans l'engine Enhanced).
-- Engine Enhanced ou Classic (Classic = uniquement les réglages de base du son, sans les extras du FM1 Tonic).
+- Engine Enhanced ou Classic (Classic = uniquement les réglages de base du son, sans les extras du FM1 TONIC).
 - Randomizer de track : un nouveau son aléatoire pour la track sélectionnée.
 - Choke groups (par exemple charleston fermée et ouverte).
 - Compresseur sidechain : n'importe quelle track peut faire duck les autres.
@@ -54,7 +54,7 @@ FM1 Tonic transforme le M-VAVE FM-1 en un **synthétiseur de batterie à 8 piste
 
 ## 1. Le panneau
 
-![Le panneau du FM1 Tonic : knobs MASTER, SELECT, PRESETS, ALGORITHM et KNOB 1 à 4 ; boutons FX, SEL, ENV, LFO, EDIT, GLO, HOME, SAVE, ARP, SEQ, PLAY, REC, OCT- et OCT+ ; touches noires TRACK 1 à 8, ACCENT, FILL, FUNC ; touches blanches 1 à 16](img/fm1-tonic-panel.svg "")
+![Le panneau du FM1 TONIC : knobs MASTER, SELECT, PRESETS, ALGORITHM et KNOB 1 à 4 ; boutons FX, SEL, ENV, LFO, EDIT, GLO, HOME, SAVE, ARP, SEQ, PLAY, REC, OCT- et OCT+ ; touches noires TRACK 1 à 8, ACCENT, FILL, FUNC ; touches blanches 1 à 16](img/fm1-tonic-panel.svg "")
 
 - **Knobs.** MASTER est le volume. SELECT change de page (dans une liste : haut et bas). PRESETS choisit l'un des 40 presets. KNOB 1 à 4 règlent les quatre valeurs de la page affichée à l'écran (celui que l'on tourne s'affiche plus grand). ALGORITHM passe à une seconde page ou choisit une voix, selon la page (les tableaux de pages l'indiquent). Un petit triangle bleu dans un coin inférieur de l'écran signale qu'une seconde page se trouve derrière ALGORITHM : triangle à droite = tournez ALGORITHM vers la droite, triangle à gauche = tournez-le vers la gauche pour revenir.
 - **Touches noires.** 1 à 8 sont TRACK 1 à 8, 9 est ACCENT, 10 est FILL, 11 est FUNC.
@@ -129,11 +129,11 @@ Exceptions : sur PERFORM, MUTE / SOLO et la page des patterns, les touches noire
 
 ## 2. Chemin du signal
 
-![L'engine du FM1 Tonic : chacune des 8 tracks a un modulateur de pitch et un oscillator, un filtre de noise et un envelope de noise, un mix, une distorsion et un EQ, puis les cuts, le level et le pan ; les 8 tracks passent par le sidechain, le low cut master et le compresseur jusqu'au volume master ; reverb et delay sont des effets en send](img/fm1-engine.svg "Tout le chemin du signal. Le petit mot dans chaque case est le bouton qui ouvre cette page.")
+![L'engine du FM1 TONIC : chacune des 8 tracks a un modulateur de pitch et un oscillator, un filtre de noise et un envelope de noise, un mix, une distorsion et un EQ, puis les cuts, le level et le pan ; les 8 tracks passent par le sidechain, le low cut master et le compresseur jusqu'au volume master ; reverb et delay sont des effets en send](img/fm1-engine.svg "Tout le chemin du signal. Le petit mot dans chaque case est le bouton qui ouvre cette page.")
 
-Chaque track fabrique son son de zéro avec l'engine de batterie du FM1 Tonic : un modulateur de pitch et un oscillator, un filtre et un envelope de noise, un mix, une distorsion et un EQ, puis les cuts, le level et le pan de la track ; les 8 tracks passent par le sidechain, le low cut master et le compresseur jusqu'à MASTER, avec reverb et delay en effets de send. Le chapitre 8 explique chaque réglage.
+Chaque track fabrique son son de zéro avec l'engine de batterie du FM1 TONIC : un modulateur de pitch et un oscillator, un filtre et un envelope de noise, un mix, une distorsion et un EQ, puis les cuts, le level et le pan de la track ; les 8 tracks passent par le sidechain, le low cut master et le compresseur jusqu'à MASTER, avec reverb et delay en effets de send. Le chapitre 8 explique chaque réglage.
 
-**Enhanced et classic.** GLO > settings > Tonic Engine est sur **enhanced** par défaut. En **classic**, les extras du FM1 Tonic (les cuts de track, les sends, le sidechain) sont grisés et ne font rien, si bien que le son n'utilise que les réglages qu'un fichier `.mtpreset` peut porter. Leurs valeurs sont conservées et reviennent avec enhanced. Level et pan restent disponibles en classic. Le mode est global, il n'est pas enregistré dans un preset.
+**Enhanced et classic.** GLO > settings > Tonic Engine est sur **enhanced** par défaut. En **classic**, les extras du FM1 TONIC (les cuts de track, les sends, le sidechain) sont grisés et ne font rien, si bien que le son n'utilise que les réglages qu'un fichier `.mtpreset` peut porter. Leurs valeurs sont conservées et reviennent avec enhanced. Level et pan restent disponibles en classic. Le mode est global, il n'est pas enregistré dans un preset.
 
 ## 3. Les pages, bouton par bouton
 
@@ -205,7 +205,7 @@ Les réglages sont dans la liste GLO (SELECT monte et descend, ALGORITHM change 
 | **4/4 LED** | OFF / **ON** | ON (le réglage d'usine) : les touches blanches 1, 5, 9 et 13 brillent faiblement pour marquer les quatre temps de la mesure (pas sur PERFORM). |
 | **ZOOM KNOB** | **YES** / NO | YES : le knob que vous tournez est agrandi sur l'écran. NO : il est seulement mis en évidence, donc toute la page reste visible. L'écran SONG ne zoome jamais. |
 | **NAME PROJECTS** | **GENERATE** / MANUAL | GENERATE invente le nom d'un projet enregistré (ALGORITHM = un autre). MANUAL : l'écran de nom est un éditeur de lettres (voir chapitre 5). |
-| **TONIC ENGINE** | **ENHANCED** / CLASSIC | CLASSIC grise et rend silencieux les extras du FM1 Tonic (cuts de track, sends, sidechain) pour que le son n'utilise que les réglages qu'un fichier `.mtpreset` peut porter (chapitres 2 et 8). |
+| **TONIC ENGINE** | **ENHANCED** / CLASSIC | CLASSIC grise et rend silencieux les extras du FM1 TONIC (cuts de track, sends, sidechain) pour que le son n'utilise que les réglages qu'un fichier `.mtpreset` peut porter (chapitres 2 et 8). |
 | **2ND CORE** | **ON** / OFF | La puce du FM-1 a deux cores et Tonic se partage entre eux le rendu du son. Effet au prochain allumage. Si le FM-1 plante un jour avec deux cores, il se met tout seul sur OFF ; remettez ON ici. |
 
 ### SEQ et ARP
@@ -228,104 +228,104 @@ Allonger un pattern copie ce qui s'y trouve dans la nouvelle partie (de 8 à 16 
 
 ### Combinaisons de boutons
 
-Toutes les combinaisons de boutons et de touches, groupées par le bouton que vous maintenez en premier (le tableau est en anglais en attendant la traduction). Touche noire 9 = ACCENT, 10 = FILL, 11 = FUNC. {r:Rouge} = FUNC maintenu, {o:orange} = FILL maintenu. La dernière colonne dit où cela marche : « Every page » = toutes les pages sauf ARP et les deux pages PERFORM.
+Toutes les combinaisons de boutons et de touches, groupées par le bouton que vous maintenez en premier. Touche noire 9 = ACCENT, 10 = FILL, 11 = FUNC. {r:Rouge} = FUNC maintenu, {o:orange} = FILL maintenu. La dernière colonne dit où cela marche : « Toutes les pages » = toutes les pages sauf ARP et les deux pages PERFORM.
 
-**FUNC held (black key 11)**
+**FUNC maintenu (touche noire 11)**
 
-| Keys | What it does | Where |
+| Touches | Ce qu'elles font | Où |
 |---|---|---|
-| {r:FUNC + black key 1 to 8} | Mutes the track (again = unmute). It acts when you let the key go. | Every page |
-| {r:FUNC + white key 1 to 16} | Changes to that pattern (while playing: at the end of the bar). | Every page; not on the SONG screen or in song mode (the song decides) |
-| {r:FUNC + ACCENT} | Copies the pattern. The screen says PRESS PATTERN TO PASTE / PRESS SEQ TO EXIT, every pattern key blinks (an empty pattern dimmer) and SEQ blinks: press a pattern key and the copy lands there, that pattern becomes the current one. Tap FUNC alone before choosing to stay in the mode for many pastes. SEQ leaves the mode and opens the sequencer page; {r:FUNC + ACCENT} again or any other button leaves it too. | Every page |
-| {r:FUNC + FILL} | Pastes the copied pattern when you let FILL go. It asks PASTE PATTERN? (OCT+ = yes, OCT- = no). | Every page |
-| {r:FUNC + FILL held + white key} | Pastes the copied pattern into that slot at once (no question). | Every page |
-| {r:FUNC + PLAY} | Clears the pattern (it asks CLEAR PATTERN?). It does not start the music. | Every page, ARP too (there hold black key 11, a piano key on ARP: PLAY does not start / stop while it is held) |
-| {r:FUNC + black key 1 to 8 held, then ACCENT} | Copies that track's sound (not its steps). | Every page |
-| {r:FUNC + black key 1 to 8 held, then FILL} | Pastes the copied sound into that track (mute, volume and pan too; the track is not muted by it). No question. | Every page |
-| {r:FUNC + black key 1 to 8 held, then PLAY} | Clears that track's pattern (it asks CLEAR TRACK PATTERN?). | Every page |
-| {r:FUNC + EDIT or LFO held, then ACCENT} | Copies this page of the selected track (only its parameters). | Pages that have track parameters (not GLO, HOME, SEQ) |
-| {r:FUNC + EDIT or LFO held, then FILL} | Pastes it into the selected track, on the same page. | Pages that have track parameters (not GLO, HOME, SEQ) |
-| {r:FUNC + EDIT or LFO held, then PLAY} | Resets this page of the track to its power-on values. No question; undo takes it back. | Pages that have track parameters (not GLO, HOME, SEQ) |
-| {r:FUNC + EDIT}, tapped alone | DELETE AUTOMATION?: removes the selected track's p-locks and recorded motion in the playing pattern (it asks). | Every page |
-| {r:FUNC + SEQ} | Song mode on / off (it asks: OCT+ = yes). | Every page |
-| {r:FUNC + ARP} | DELETE SONG?: deletes the whole song and leaves song mode (it asks). | Every page |
-| {r:FUNC + HOME} | Renames the project and saves it in the same place. | Every page |
-| {r:FUNC + SAVE} | Quick save into the loaded place. No question. | Every page |
-| {r:FUNC + REC} | Cycles QUANTIZED REC / UNQUANTIZED REC. While playing it also switches recording on. | Every page |
-| {r:FUNC + OCT- / OCT+} | Nothing. | |
-| {r:FUNC + knob 2 (turn right / left)} | The selected track joins / leaves the choke group. | Only EDIT, NOISE ENVELOPE page |
-| {r:FUNC + knob 4} | A new random sound for the selected track. | Only GLO > VEL |
+| {r:FUNC + touche noire 1 à 8} | Coupe la track (encore une fois = retour). Agit quand vous relâchez la touche. | Toutes les pages |
+| {r:FUNC + touche blanche 1 à 16} | Change de pattern (pendant la lecture : à la fin de la mesure). | Toutes les pages ; pas sur l'écran SONG ni en song mode (le morceau décide) |
+| {r:FUNC + ACCENT} | Copie le pattern. L'écran affiche PRESS PATTERN TO PASTE / PRESS SEQ TO EXIT, chaque touche de pattern clignote (un pattern vide plus faiblement) et SEQ clignote : appuyez sur une touche de pattern et la copie y est collée, ce pattern devient le pattern courant. Tapez FUNC seul avant de choisir pour rester dans le mode et coller plusieurs fois. SEQ quitte le mode et ouvre la page du sequencer ; {r:FUNC + ACCENT} encore une fois ou tout autre bouton le quitte aussi. | Toutes les pages |
+| {r:FUNC + FILL} | Colle le pattern copié quand vous relâchez FILL. Demande PASTE PATTERN? (OCT+ = oui, OCT- = non). | Toutes les pages |
+| {r:FUNC + FILL maintenu + touche blanche} | Colle aussitôt le pattern copié dans cet emplacement (sans question). | Toutes les pages |
+| {r:FUNC + PLAY} | Efface le pattern (demande CLEAR PATTERN?). Ne lance pas la musique. | Toutes les pages, ARP aussi (là, maintenez la touche noire 11, une touche de piano sur ARP : PLAY ne lance / n'arrête rien tant qu'elle est maintenue) |
+| {r:FUNC + touche noire 1 à 8 maintenue, puis ACCENT} | Copie le son de cette track (pas ses steps). | Toutes les pages |
+| {r:FUNC + touche noire 1 à 8 maintenue, puis FILL} | Colle le son copié dans cette track (mute, volume et pan aussi ; la track n'est pas coupée pour autant). Pas de question. | Toutes les pages |
+| {r:FUNC + touche noire 1 à 8 maintenue, puis PLAY} | Efface le pattern de cette track (demande CLEAR TRACK PATTERN?). | Toutes les pages |
+| {r:FUNC + EDIT ou LFO maintenu, puis ACCENT} | Copie cette page de la track sélectionnée (seulement ses paramètres). | Pages qui ont des paramètres de track (pas GLO, HOME, SEQ) |
+| {r:FUNC + EDIT ou LFO maintenu, puis FILL} | La colle dans la track sélectionnée, sur la même page. | Pages qui ont des paramètres de track (pas GLO, HOME, SEQ) |
+| {r:FUNC + EDIT ou LFO maintenu, puis PLAY} | Remet cette page de la track à ses valeurs d'allumage. Pas de question ; l'undo l'annule. | Pages qui ont des paramètres de track (pas GLO, HOME, SEQ) |
+| {r:FUNC + EDIT}, tapé seul | DELETE AUTOMATION? : supprime les p-locks et le motion enregistré de la track sélectionnée dans le pattern en cours de lecture (demande confirmation). | Toutes les pages |
+| {r:FUNC + SEQ} | Song mode activé / désactivé (demande confirmation : OCT+ = oui). | Toutes les pages |
+| {r:FUNC + ARP} | DELETE SONG? : supprime tout le morceau et quitte le song mode (demande confirmation). | Toutes les pages |
+| {r:FUNC + HOME} | Renomme le projet et le sauvegarde au même endroit. | Toutes les pages |
+| {r:FUNC + SAVE} | Quick save dans l'emplacement chargé. Pas de question. | Toutes les pages |
+| {r:FUNC + REC} | Alterne QUANTIZED REC / UNQUANTIZED REC. Pendant la lecture, il active aussi l'enregistrement. | Toutes les pages |
+| {r:FUNC + OCT- / OCT+} | Rien. | |
+| {r:FUNC + knob 2 (tourné à droite / à gauche)} | La track sélectionnée rejoint / quitte le choke group. | Seulement EDIT, page NOISE ENVELOPE |
+| {r:FUNC + knob 4} | Un nouveau son aléatoire pour la track sélectionnée. | Seulement GLO > VEL |
 
-**FILL held (black key 10)**
+**FILL maintenu (touche noire 10)**
 
-| Keys | What it does | Where |
+| Touches | Ce qu'elles font | Où |
 |---|---|---|
-| {o:FILL + black key 1 to 8} | Solos that track (another key moves the solo, the same key ends it). | Every page |
-| {o:FILL + SEQ} | Back to the SONG screen from any page (in song mode; otherwise NOT IN SONG MODE). | Every page |
-| {o:FILL}, pressed and let go alone | Deletes the bar on the cursor (no question). | Only the SONG screen |
-| {o:FILL} + a white key held (or FILL first, then white keys) | That step gets a fill (the track plays 2x, 4x or 8x over it); again = off. | Pages where white keys are steps |
-| {o:FILL} held | The trigs of the selected track that carry a fill blink on the white keys (the other trigs stay lit). | Pages where white keys are steps |
-| {r:FUNC + FILL} | Paste. See the FUNC list above. | |
+| {o:FILL + touche noire 1 à 8} | Met cette track seule (solo) (une autre touche déplace le solo, la même touche le termine). | Toutes les pages |
+| {o:FILL + SEQ} | Retour à l'écran SONG depuis n'importe quelle page (en song mode ; sinon NOT IN SONG MODE). | Toutes les pages |
+| {o:FILL}, appuyé puis relâché seul | Efface la mesure sous le curseur (sans question). | Seulement l'écran SONG |
+| {o:FILL} + une touche blanche maintenue (ou FILL d'abord, puis les touches blanches) | Ce step reçoit un fill (la track joue 2x, 4x ou 8x dessus) ; encore une fois = désactivé. | Pages où les touches blanches sont des steps |
+| {o:FILL} maintenu | Les trigs de la track sélectionnée qui portent un fill clignotent sur les touches blanches (les autres trigs restent allumés). | Pages où les touches blanches sont des steps |
+| {r:FUNC + FILL} | Coller. Voir la liste FUNC ci-dessus. | |
 
-**ACCENT held (black key 9)**
+**ACCENT maintenu (touche noire 9)**
 
-| Keys | What it does | Where |
+| Touches | Ce qu'elles font | Où |
 |---|---|---|
-| White key held + ACCENT (or ACCENT first, then white keys) | That step gets an accent (loud); again = off. | Pages where white keys are steps |
-| ACCENT held | The trigs of the selected track that carry an accent blink on the white keys (the other trigs stay lit). | Pages where white keys are steps |
-| {r:FUNC + ACCENT} | Copy. See the FUNC list above. | |
+| Touche blanche maintenue + ACCENT (ou ACCENT d'abord, puis les touches blanches) | Ce step reçoit un accent (fort) ; encore une fois = désactivé. | Pages où les touches blanches sont des steps |
+| ACCENT maintenu | Les trigs de la track sélectionnée qui portent un accent clignotent sur les touches blanches (les autres trigs restent allumés). | Pages où les touches blanches sont des steps |
+| {r:FUNC + ACCENT} | Copier. Voir la liste FUNC ci-dessus. | |
 
-**GLO held**
+**GLO maintenu**
 
-| Keys | What it does | Where |
+| Touches | Ce qu'elles font | Où |
 |---|---|---|
-| GLO + ACCENT | Undo. | Every page, ARP too |
-| GLO + FILL | Redo. | Every page, ARP too |
+| GLO + ACCENT | Undo. | Toutes les pages, ARP aussi |
+| GLO + FILL | Redo. | Toutes les pages, ARP aussi |
 
-**HOME held**
+**HOME maintenu**
 
-| Keys | What it does | Where |
+| Touches | Ce qu'elles font | Où |
 |---|---|---|
-| HOME + SELECT | The tempo. | Every page |
-| HOME held alone (half a second) | The DELAY page. | Every page |
-| HOME + white key | Nothing. | |
+| HOME + SELECT | Le tempo. | Toutes les pages |
+| HOME maintenu seul (une demi-seconde) | La page DELAY. | Toutes les pages |
+| HOME + touche blanche | Rien. | |
 
-**FX held**
+**FX maintenu**
 
-| Keys | What it does | Where |
+| Touches | Ce qu'elles font | Où |
 |---|---|---|
-| FX held alone (half a second) | The REVERB page. | Every page |
+| FX maintenu seul (une demi-seconde) | La page REVERB. | Toutes les pages |
 
-**ENV held**
+**ENV maintenu**
 
-| Keys | What it does | Where |
+| Touches | Ce qu'elles font | Où |
 |---|---|---|
-| ENV + a knob | That knob goes back to its power-on value. | Pages with knobs |
-| ENV + white key | The accent of that step on / off. | Pages where white keys are steps |
-| ENV + black key 1 to 8 | Plays that track loud. Recording: the step gets an accent. | Every page |
+| ENV + un knob | Ce knob revient à sa valeur d'allumage. | Pages avec des knobs |
+| ENV + touche blanche | L'accent de ce step activé / désactivé. | Pages où les touches blanches sont des steps |
+| ENV + touche noire 1 à 8 | Joue cette track fort. En enregistrement : le step reçoit un accent. | Toutes les pages |
 
-**SAVE held**
+**SAVE maintenu**
 
-| Keys | What it does | Where |
+| Touches | Ce qu'elles font | Où |
 |---|---|---|
-| SAVE + a knob | That knob's recorded motion is forgotten. | Pages with knobs |
-| White key held + SAVE + the same knob | Removes that step's p-lock of the knob. | Sound pages |
+| SAVE + un knob | Le motion enregistré de ce knob est oublié. | Pages avec des knobs |
+| Touche blanche maintenue + SAVE + le même knob | Retire le p-lock de ce knob pour ce step. | Pages de son |
 
-**A white key held (a step)**
+**Une touche blanche maintenue (un step)**
 
-| Keys | What it does | Where |
+| Touches | Ce qu'elles font | Où |
 |---|---|---|
-| White key held + knob 1 to 4 | **P-lock**: that step gets its own value of the knob (3 locked knobs per track and pattern). | Sound pages: MIX 1, SEL, ENV, LFO, EDIT, VEL |
-| White key held + SELECT | That step's chance: 5 to 100 %, then 1:2, 2:2, 1:3 ... 8:8. | Every page but PERFORM, HOME, SONG, COMP and the lists |
-| White key held + ACCENT / FILL | Accent / fill flag. | See ACCENT and FILL above |
+| Touche blanche maintenue + knob 1 à 4 | **P-lock** : ce step reçoit sa propre valeur du knob (3 knobs verrouillés par track et par pattern). | Pages de son : MIX 1, SEL, ENV, LFO, EDIT, VEL |
+| Touche blanche maintenue + SELECT | La chance de ce step : de 5 à 100 %, puis 1:2, 2:2, 1:3 ... 8:8. | Toutes les pages sauf PERFORM, HOME, SONG, COMP et les listes |
+| Touche blanche maintenue + ACCENT / FILL | Flag d'accent / de fill. | Voir ACCENT et FILL ci-dessus |
 
-**Transport and others**
+**Transport et divers**
 
-| Keys | What it does | Where |
+| Touches | Ce qu'elles font | Où |
 |---|---|---|
-| REC + PLAY, then keys and knobs | Live recording: black keys 1 to 8 write trigs, the knobs write automation. | Not on PERFORM and the pattern page |
-| OCT- / OCT+ | The selected track's pitch one octave down / up. In a question: NO / YES. On ARP: the keyboard's octave. | Every page |
-| A button held alone (about a second) | A card says what the button does on this page, its combinations included. | Every button except FX and HOME |
+| REC + PLAY, puis touches et knobs | Enregistrement en direct : les touches noires 1 à 8 écrivent des trigs, les knobs écrivent de l'automation. | Pas sur PERFORM ni sur la page pattern |
+| OCT- / OCT+ | La hauteur de la track sélectionnée une octave plus bas / plus haut. Dans une question : NO / YES. Sur ARP : l'octave du clavier. | Toutes les pages |
+| Un bouton maintenu seul (environ une seconde) | Une carte dit ce que fait le bouton sur cette page, combinaisons comprises. | Tous les boutons sauf FX et HOME |
 
 ## 4. Jouer
 
@@ -412,11 +412,14 @@ Le FM-1 ne peut pas être l'hôte d'un clavier USB. Utilisez un clavier avec un 
 - **Installer ou mettre à jour :** ouvrez l'[installateur web](https://luigirossi-music.github.io/fm1-tonic/install/) dans Chrome ou Edge, branchez le FM-1 avec un câble USB de données, appuyez sur Install et ne le débranchez pas pendant l'écriture. Un autre firmware ne conserve pas votre projet : enregistrez-le d'abord dans un fichier. « Back to the stock firmware » en bas de la même page remet le firmware de M-VAVE. Installer un autre firmware se fait à vos risques.
 - **Sauvegarder :** la [page de backup](https://luigirossi-music.github.io/fm1-tonic/backup/) enregistre le projet dans un fichier `.x0b` (Back up), le recharge (Restore : arrêtez le FM-1, puis répondez à RESTORE FROM USB? avec SEL), exporte les presets en fichiers `.mtpreset`, et sauvegarde / restaure les emplacements 9 à 40 en fichiers `.tnp`. En ligne de commande : `python3 tools/x0x_backup.py backup my-song.x0b` (aussi `restore`, `info`).
 - **Si quelque chose tourne mal :** maintenez OCT- et OCT+ cinq secondes = mode mise à jour ; maintenez-les en allumant = calibration du matériel. Après un crash, un écran rouge CRASH redémarre le FM-1 ; s'il plante deux fois au démarrage, il entre en SAFE MODE (pas de son, l'USB fonctionne : réinstallez depuis l'installateur ; PLAY tente un démarrage normal). Si même cela échoue, le script de secours pour Mac `tools/fm1_rescue.sh` remet le firmware de M-VAVE (il vérifie chaque fichier qu'il écrit ; le relancer ne présente aucun risque).
+- **Si une mise à jour est refusée.** Si le FM-1 refuse de changer de firmware (par exemple avec « Back to the stock firmware »), son écran de mise à jour affiche FAILED, un numéro d'erreur avec une courte raison (par exemple ERROR -5 HEAD DIFFERS) et l'étape où il s'est arrêté, pendant 8 secondes, puis le FM-1 redémarre FM1 TONIC. ERROR -5 signifie que la zone de démarrage (le « head ») de votre FM-1 n'est pas celle du firmware vers lequel vous allez. Pour cette erreur l'écran montre aussi le premier octet différent, combien d'octets diffèrent et les deux checksums (CRC), pendant 40 secondes. Notez ces chiffres si vous demandez de l'aide.
+- **Un bootloader personnalisé.** Si vous avez mis un bootloader personnalisé sur le FM-1 (par exemple m-bootloader, avec M-Flasher), revenir au firmware officiel de M-VAVE depuis la page web peut être refusé avec ERROR -5 HEAD DIFFERS. Remettez d'abord le bootloader d'origine de M-VAVE (dans M-Flasher : FLASH BOOTLOADER, puis STOCK (FROM .FWSC) avec le paquet officiel), puis revenez au firmware d'origine. Sur le FM-1 de l'auteur, tout a de nouveau fonctionné ainsi.
+- **FM-1 plus récents.** Certains FM-1 récents ont une autre puce flash (ID B36014 au lieu de 856014). FM1 TONIC accepte les deux : la sauvegarde, les presets, le backup et la restauration fonctionnent donc aussi dessus (pas encore testé sur une unité avec la nouvelle puce).
 - **Texte complet** des chapitres installation, backup, rescue et paramètres : `docs/reference/MANUAL_full_wip381.md`.
 
 ## 8. L'engine
 
-Chacune des 8 tracks est un synthétiseur de batterie complet : l'engine du FM1 Tonic, rien n'est échantillonné. Les 8 tracks sont identiques et chacune a les mêmes **26 réglages**, conservés par track et enregistrés avec le preset. Ce chapitre est la référence pour tous. L'endroit où se trouve un réglage s'écrit bouton · knob.
+Chacune des 8 tracks est un synthétiseur de batterie complet : l'engine du FM1 TONIC, rien n'est échantillonné. Les 8 tracks sont identiques et chacune a les mêmes **26 réglages**, conservés par track et enregistrés avec le preset. Ce chapitre est la référence pour tous. L'endroit où se trouve un réglage s'écrit bouton · knob.
 
 ```
 pitch mod ─► OSCILLATOR ─┐
@@ -516,7 +519,7 @@ Commun à toutes les tracks :
 
 ### Enhanced et classic
 
-22 des 26 réglages sont ce que porte un preset Patternarium (les 21 réglages de son, level compris, plus le pan). Quatre sont des **extras de FM1 Tonic** : LOW CUT, HIGH CUT, REVERB SEND et DELAY SEND, comme le choke group, le sidechain, la section master, les p-locks, la chance et le microtiming. En **classic** (GLO > settings > TONIC ENGINE) les quatre extras sont grisés et silencieux, ainsi que le sidechain, si bien que ce que vous construisez n'utilise que les réglages qu'un fichier `.mtpreset` porte ; les valeurs reviennent avec enhanced. Un preset Patternarium chargé garde ses valeurs exactes jusqu'à ce que vous tourniez ce knob.
+22 des 26 réglages sont ce que porte un preset Patternarium (les 21 réglages de son, level compris, plus le pan). Quatre sont des **extras de FM1 TONIC** : LOW CUT, HIGH CUT, REVERB SEND et DELAY SEND, comme le choke group, le sidechain, la section master, les p-locks, la chance et le microtiming. En **classic** (GLO > settings > TONIC ENGINE) les quatre extras sont grisés et silencieux, ainsi que le sidechain, si bien que ce que vous construisez n'utilise que les réglages qu'un fichier `.mtpreset` porte ; les valeurs reviennent avec enhanced. Un preset Patternarium chargé garde ses valeurs exactes jusqu'à ce que vous tourniez ce knob.
 
 ### Recettes de sons
 
@@ -674,16 +677,16 @@ Un ton aigu et sec d'environ 50 ms, sans mouvement de pitch (AMOUNT 0.00 sm). Ch
 
 ## 9. Crédits
 
-**FM1 Tonic est fait par Luigi Rossi**, le développeur et l'esprit créatif de ce firmware : la drum machine Tonic, son sequencer, les écrans, les presets et les outils web (émulateur, installateur, backup). C'est un logiciel libre sous la GNU General Public License, version 3 ; si vous partagez le firmware, vous devez partager son code source.
+**FM1 TONIC est fait par Luigi Rossi**, le développeur et l'esprit créatif de ce firmware : la drum machine Tonic, son sequencer, les écrans, les presets et les outils web (émulateur, installateur, backup). C'est un logiciel libre sous la GNU General Public License, version 3 ; si vous partagez le firmware, vous devez partager son code source.
 
 **Luigi Rossi en ligne :** [linktr.ee/luigirossi](https://linktr.ee/luigirossi)
 
 LICENSING.md indique l'origine et la licence de chaque fichier. Il s'appuie sur le travail de :
 
-- **libpo32** d'Eric Lewis (MIT) : le point de départ du code de synthèse de batterie du FM1 Tonic. Rien n'est échantillonné.
-- **X0X** de Charles Vestal, le firmware dont FM1 Tonic est issu, et les pages web (émulateur, installateur, backup) ; X0X est un fork de **Felucca** de Leo Kuroshita (@kurogedelic), Hügelton Instruments : la plateforme (couche matérielle, USB, chargeur de mise à jour, installateur, stockage) et la carte de récupération FM-1-transporter.
+- **libpo32** d'Eric Lewis (MIT) : le point de départ du code de synthèse de batterie du FM1 TONIC. Rien n'est échantillonné.
+- **X0X** de Charles Vestal, le firmware dont FM1 TONIC est issu, et les pages web (émulateur, installateur, backup) ; X0X est un fork de **Felucca** de Leo Kuroshita (@kurogedelic), Hügelton Instruments : la plateforme (couche matérielle, USB, chargeur de mise à jour, installateur, stockage) et la carte de récupération FM-1-transporter.
 - Le reverb et le delay sont portés depuis **9W9** de athousanddetails, basé sur **ER-99** de Matthew Cieplak (GPL-3.0). Le compresseur master suit Giannoulis, Massberg et Reiss ; le filtre master est le filtre à variables d'état TPT de Vadim Zavalishin.
 - **Melodee** de keremimo et **Jangada** de zednaked : ce qu'ils ont découvert sur le second cœur du FM-1.
 - Polices : **Barlow Semi Condensed** (The Barlow Project Authors), **Terminus** (Dimitar Toshkov Zhekov), **DotGothic16** (The DotGothic16 Project Authors), toutes sous SIL Open Font License.
 
-M-VAVE et FM-1 sont des marques de leurs propriétaires respectifs. FM1 Tonic n'est pas affilié à M-VAVE, Sonic Charge ou Luigi Rossi, ni approuvé par eux.
+M-VAVE et FM-1 sont des marques de leurs propriétaires respectifs. FM1 TONIC n'est pas affilié à M-VAVE, Sonic Charge ou Luigi Rossi, ni approuvé par eux.

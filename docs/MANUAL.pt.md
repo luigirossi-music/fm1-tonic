@@ -1,6 +1,6 @@
-# FM1 Tonic
+# FM1 TONIC
 
-O FM1 Tonic transforma o M-VAVE FM-1 em um **sintetizador de bateria de 8 faixas** inspirado no Microtonic, marca da Sonic Charge. O som vem do engine próprio do FM1 Tonic: ele age de forma parecida, mas não é o mesmo engine, e o FM1 Tonic não tem nenhuma ligação com a Sonic Charge. Oito vozes de bateria, cada uma sintetizada do zero (nenhum sample), um sequencer com accents e fills (patterns de 1 a 64 steps, 16 patterns por projeto), um mixer, reverb, delay e um compressor master. **40 project slots** guardam o seu trabalho: 8 presets de fábrica e 32 seus.
+O FM1 TONIC transforma o M-VAVE FM-1 em um **sintetizador de bateria de 8 faixas** inspirado no Microtonic, marca da Sonic Charge. O som vem do engine próprio do FM1 TONIC: ele age de forma parecida, mas não é o mesmo engine, e o FM1 TONIC não tem nenhuma ligação com a Sonic Charge. Oito vozes de bateria, cada uma sintetizada do zero (nenhum sample), um sequencer com accents e fills (patterns de 1 a 64 steps, 16 patterns por projeto), um mixer, reverb, delay e um compressor master. **40 project slots** guardam o seu trabalho: 8 presets de fábrica e 32 seus.
 
 ## Características
 
@@ -8,7 +8,7 @@ O FM1 Tonic transforma o M-VAVE FM-1 em um **sintetizador de bateria de 8 faixas
 
 - Sintetizador de bateria de 8 vozes: cada track tem o seu próprio oscillator, pitch mod, noise, mix, EQ e distorção.
 - Level e pan por track, e reverb send e delay send por track (mais low cut e high cut no engine Enhanced).
-- Engine Enhanced ou Classic (Classic = só os ajustes básicos de som, sem os extras do FM1 Tonic).
+- Engine Enhanced ou Classic (Classic = só os ajustes básicos de som, sem os extras do FM1 TONIC).
 - Randomizer de track: um som novo aleatório para a track selecionada.
 - Choke groups (por exemplo hi-hat fechado e aberto).
 - Compressor sidechain: qualquer track pode fazer duck nas outras.
@@ -54,7 +54,7 @@ O FM1 Tonic transforma o M-VAVE FM-1 em um **sintetizador de bateria de 8 faixas
 
 ## 1. O painel
 
-![O painel do FM1 Tonic: knobs MASTER, SELECT, PRESETS, ALGORITHM e KNOB 1 a 4; botões FX, SEL, ENV, LFO, EDIT, GLO, HOME, SAVE, ARP, SEQ, PLAY, REC, OCT- e OCT+; teclas pretas TRACK 1 a 8, ACCENT, FILL, FUNC; teclas brancas 1 a 16](img/fm1-tonic-panel.svg "")
+![O painel do FM1 TONIC: knobs MASTER, SELECT, PRESETS, ALGORITHM e KNOB 1 a 4; botões FX, SEL, ENV, LFO, EDIT, GLO, HOME, SAVE, ARP, SEQ, PLAY, REC, OCT- e OCT+; teclas pretas TRACK 1 a 8, ACCENT, FILL, FUNC; teclas brancas 1 a 16](img/fm1-tonic-panel.svg "")
 
 - **Knobs.** MASTER é o volume. SELECT muda de página (em uma lista: para cima e para baixo). PRESETS escolhe um dos 40 presets. KNOB 1 a 4 ajustam os quatro valores da página que aparece na tela (o que você gira é ampliado). ALGORITHM passa para uma segunda página ou escolhe uma voz, conforme a página (as tabelas de páginas indicam). Um pequeno triângulo azul em um canto inferior da tela significa que existe uma segunda página atrás de ALGORITHM: triângulo direito = gire ALGORITHM para a direita, triângulo esquerdo = gire-o para a esquerda para voltar.
 - **Teclas pretas.** De 1 a 8 são TRACK 1 a 8, 9 é ACCENT, 10 é FILL, 11 é FUNC.
