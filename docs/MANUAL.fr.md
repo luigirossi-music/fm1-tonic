@@ -1,6 +1,6 @@
 # FM1 TONIC
 
-FM1 TONIC transforme le M-VAVE FM-1 en un **synthétiseur de batterie à 8 pistes** inspiré de Microtonic, marque de Sonic Charge. Le son vient de l'engine propre à FM1 TONIC : il se comporte de façon similaire, mais ce n'est pas le même engine, et FM1 TONIC n'a aucun lien avec Sonic Charge. Huit voix de batterie, chacune synthétisée de zéro (rien n'est échantillonné), un séquenceur avec accents et fills (patterns de 1 à 64 steps, 16 patterns par projet), une table de mixage, de la reverb, du delay et un compresseur master. **40 project slots** conservent votre travail : 8 presets d'usine et 32 à vous.
+Inspiré de Microtonic VST de Sonic Charge, FM1 TONIC est un synthétiseur de batterie à 8 voix où chaque son est synthétisé de zéro. Il associe un moteur de percussion profond à un séquenceur de 1 à 64 steps (avec accents, fills et 16 patterns par projet), une table de mixage intégrée avec level et pan, de la reverb, du delay et un compresseur master. Avec 40 project slots (8 presets d'usine + 32 slots utilisateur) et un workflow pensé pour le live, il passe sans effort de beats rythmiques percutants à des textures ambient évolutives.
 
 ## Caractéristiques
 

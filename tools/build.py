@@ -52,7 +52,7 @@ SDK_SHA256 = {
     "cfg/eq_cfg_hw.bin": "41167491bffed4651750719c973d2758adeb9021a5670d02d6a53c85ed80ea7d",
 }
 
-PRODUCT = "FM-1_900"                # package identity; release builds are FM-1_7714XXYYZZ (see main)
+PRODUCT = "FM-1_900"                # package identity; release builds are FM-1_77XXYYZZ (see main)
 VERSION = None                      # FELUCCA_VERSION for release builds (default: firmware/src/ui.c)
 
 
@@ -384,7 +384,7 @@ def mmio_check():
 def main():
     global PRODUCT, VERSION
     ap = argparse.ArgumentParser()
-    ap.add_argument("--release", metavar="X.Y[.Z]", help="release build: identity FM-1_7714XXYYZZ, version string X.Y[.Z]")
+    ap.add_argument("--release", metavar="X.Y[.Z]", help="release build: identity FM-1_77XXYYZZ, version string X.Y[.Z]")
     ap.add_argument("--sdk", type=Path, help="JieLi AC79 SDK checkout (default: $AC79_SDK)")
     a = ap.parse_args()
     name = "fm1-tonic.fwsc"
@@ -396,7 +396,7 @@ def main():
         m = re.fullmatch(r"(\d{1,2})\.(\d{1,2})(?:\.(\d{1,2}))?(-[A-Za-z0-9]+)?", a.release)
         if not m:
             raise SystemExit(f"--release {a.release}: use X.Y[.Z][-suffix], up to two digits each")
-        PRODUCT = "FM-1_7714%02d%02d%02d" % (int(m[1]), int(m[2]), int(m[3] or 0))   # wip468: own prefix 7714 (1.0-1.4 were FM-1_9XXYYZZ, the same scheme as X0X)
+        PRODUCT = "FM-1_77%02d%02d%02d" % (int(m[1]), int(m[2]), int(m[3] or 0))   # wip468: own prefix 77, 8 digits as the hub asks (1.0-1.4 were FM-1_9XXYYZZ, the same scheme as X0X)
         VERSION = a.release.upper()                 # wip433: 1.0 is no beta any more: "1.0" stays "1.0" (a suffix such as -beta is still shown)
         name = f"fm1-tonic-{a.release}.fwsc"
     fm1pkg_make.SDK = a.sdk

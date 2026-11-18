@@ -1,6 +1,6 @@
 # FM1 TONIC
 
-FM1 TONIC macht aus dem M-VAVE FM-1 einen **Drum-Synthesizer mit 8 Tracks** nach dem Vorbild von Microtonic, einer Marke von Sonic Charge. Der Klang kommt von der eigenen Engine des FM1 TONIC: Sie verhält sich ähnlich, ist aber nicht dieselbe Engine, und FM1 TONIC hat keine Verbindung zu Sonic Charge. Acht Drum-Stimmen, jede von Grund auf synthetisiert (nichts ist gesampelt), ein Sequencer mit accents und fills (Patterns mit 1 bis 64 steps, 16 Patterns pro Projekt), ein Mixer, Reverb, Delay und ein Master-Kompressor. **40 project slots** speichern deine Arbeit: 8 Werks-Presets und 32 eigene.
+Nach dem Vorbild von Microtonic VST von Sonic Charge ist FM1 TONIC ein Drum-Synthesizer mit 8 Stimmen, in dem jeder Klang von Grund auf synthetisiert wird. Er verbindet eine tiefe Percussion-Engine mit einem Sequencer von 1 bis 64 steps (mit accents, fills und 16 Patterns pro Projekt), einem integrierten Mixer mit level und pan, Reverb, Delay und einem Master-Kompressor. Mit 40 project slots (8 Werks-Presets + 32 eigene Slots) und einem Workflow für den Live-Einsatz geht er mühelos von knackigen, rhythmischen Beats zu sich entwickelnden Ambient-Texturen.
 
 ## Merkmale
 

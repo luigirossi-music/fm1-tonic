@@ -21,6 +21,7 @@ or file, 3 FM-1 not found, 4 connection lost or the FM-1 stopped answering, 5 pl
 """
 import argparse
 import os
+import re
 import struct
 import sys
 import time
@@ -41,7 +42,9 @@ ERRORS = {1: "the file's size", 2: "the transfer (a read request unanswered)", 3
           7: "a flash erase", 8: "a flash write", 9: "the read-back (the flash does not hold what was written)",
           10: "X0X is playing: STOP FIRST, then restore", 11: "answered HOME (no) on the FM-1",
           12: "writing the headers (the FM-1 finishes it when switched on again)"}
-X0X = ("FM-1_7714", "FM-1_9")      # FM1 Tonic's package identity (tools/build.py PRODUCT; 1.0-1.4 and X0X: FM-1_9...)
+X0X = "FM-1_9"                    # X0X and FM1 Tonic 1.0-1.4 package identity; FM1 Tonic 1.5 on: FM-1_77XXYYZZ (see is_tonic)
+def is_tonic(ident):
+    return bool(re.fullmatch(r"FM-1_77\d{6}", ident)) or ident.startswith(X0X)
 DELAY = {"poll": 0.5, "idle": 10.0, "ask": 75.0, "first": 3.0}
 EXIT = dict(I.EXIT, playing=5)
 
@@ -127,7 +130,7 @@ def find(backend, port):
     dev = up.find(only_port=bool(port))           # ports named "Tonic" first, then any FM-1
     if not dev:
         raise I.not_found(up)
-    if not dev.id.text.startswith(X0X):
+    if not is_tonic(dev.id.text):
         dev.link.close()
         raise I.InstallError("model", f"the FM-1 runs {dev.id.text}, not X0X ({X0X}xx)")
     return dev

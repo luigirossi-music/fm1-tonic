@@ -187,11 +187,11 @@ details.cheat .cheat-in { padding: 0 1rem 1rem; }
 <main>
 <header>
   <h1><span class="fm">FM1</span> <span class="tn">TONIC</span></h1>
-  <p>Drum machine firmware for the M-VAVE FM-1, inspired by Microtonic (a trademark of Sonic Charge) but with its own engine, not the same one. This is the same code the FM-1 runs, in your browser.</p>
+  <p>Inspired by Microtonic VST by Sonic Charge, FM1 TONIC is an 8-voice drum synthesizer.</p>
   <nav aria-label="Downloads">
     <a href="downloads/FM1-Tonic-cheat-sheet.pdf" download>Cheat sheet (PDF)</a>
-    <a href="downloads/FM1-Tonic-manual.html" target="_blank" rel="noopener">User manual <!--mv-->1.54<!--/mv--> (all languages)</a>
-    <a href="downloads/FM1-Tonic-manual.html" download="FM1-Tonic-manual-1.54.html">Download the manual <!--mv-->1.54<!--/mv--></a>
+    <a href="downloads/FM1-Tonic-manual.html" target="_blank" rel="noopener">User manual <!--mv-->1.55<!--/mv--> (all languages)</a>
+    <a href="downloads/FM1-Tonic-manual.html" download="FM1-Tonic-manual-1.55.html">Download the manual <!--mv-->1.55<!--/mv--></a>
   </nav>
 </header>
 
@@ -254,7 +254,7 @@ details.cheat .cheat-in { padding: 0 1rem 1rem; }
 
 <section class="credits" aria-labelledby="credits-h">
   <h2 id="credits-h">Credits</h2>
-  <p class="note big"><b>FM1 Tonic is made by Luigi Rossi</b>, the developer and creative mind behind this firmware: the Tonic drum machine, its sequencer, screens, presets and the web tools (emulator, installer, backup). It is free software under the GNU General Public License, version 3; if you share the firmware you must share its source code. <a class="dl" href="downloads/FM1-Tonic-manual.html" target="_blank" rel="noopener">User manual <!--mv-->1.54<!--/mv--> (all languages)</a> <a class="dl" href="downloads/FM1-Tonic-manual.html" download="FM1-Tonic-manual-1.54.html">Download the manual <!--mv-->1.54<!--/mv--></a></p>
+  <p class="note big"><b>FM1 Tonic is made by Luigi Rossi</b>, the developer and creative mind behind this firmware: the Tonic drum machine, its sequencer, screens, presets and the web tools (emulator, installer, backup). It is free software under the GNU General Public License, version 3; if you share the firmware you must share its source code. <a class="dl" href="downloads/FM1-Tonic-manual.html" target="_blank" rel="noopener">User manual <!--mv-->1.55<!--/mv--> (all languages)</a> <a class="dl" href="downloads/FM1-Tonic-manual.html" download="FM1-Tonic-manual-1.55.html">Download the manual <!--mv-->1.55<!--/mv--></a></p>
   <p class="note"><b>Luigi Rossi online:</b> <a href="https://linktr.ee/luigirossi" target="_blank" rel="noopener">linktr.ee/luigirossi</a></p>
   <details class="cheat" id="cheat">
     <summary>Read more: the cheat sheet</summary>
@@ -389,7 +389,7 @@ const PB = (() => {
   const MAGIC = [0x58, 0x30, 0x58, 0x42], VERSION = 1, NOBJ = 6, HEAD = 16, REC = 8, PAYLOAD_MAX = 3840, MAXDATA = 512;   // "X0XB"
   const OBJ_IDS = [0, 1, 2, 3, 5, 6];       // OBJ_SET, OBJ_SOUND, OBJ_PAT0, OBJ_PAT1, OBJ_SONG, OBJ_MOTION (not OBJ_PANEL)
   const PLAYING = 10, DECLINED = 11;
-  const X0X = ["FM-1_7714", "FM-1_9"];                              // FM1 Tonic's package identity (from 1.5; 1.0-1.4 and X0X: FM-1_9...)
+  const isTonic = (id) => /^FM-1_77\d{6}$/.test(id) || id.startsWith("FM-1_9");   // FM1 Tonic's package identity (from 1.5: FM-1_77XXYYZZ; 1.0-1.4 and X0X: FM-1_9...)
   const DELAY = { poll: 500, idle: 10000, ask: 75000, first: 3000, hs: 1000 };   // ms, as x0x_backup.py
   const ERRORS = {
     1: "the file's size", 2: "the transfer (a piece of the file did not arrive)", 3: "the file's head",
@@ -533,7 +533,7 @@ const PB = (() => {
       try { await input.open(); await output.open(); } catch (_) { continue; }
       const link = makeLink(input, output);
       const id = await handshake(link);
-      if (id && X0X.some((p) => id.startsWith(p))) return { link, id, name: input.name };
+      if (id && isTonic(id)) return { link, id, name: input.name };
       if (id) other = other || id;
       link.close();
     }
