@@ -1,6 +1,6 @@
 # FM1 TONIC
 
-Inspiré de Microtonic VST de Sonic Charge, FM1 TONIC est un synthétiseur de batterie à 8 voix où chaque son est synthétisé de zéro. Il associe un moteur de percussion profond à un séquenceur de 1 à 64 steps (avec accents, fills et 16 patterns par projet), une table de mixage intégrée avec level et pan, de la reverb, du delay et un compresseur master. Avec 40 project slots (8 presets d'usine + 32 slots utilisateur) et un workflow pensé pour le live, il passe sans effort de beats rythmiques percutants à des textures ambient évolutives.
+Inspiré de Microtonic VST de Sonic Charge, FM1 TONIC est un synthétiseur de batterie à 8 voix où chaque son est synthétisé de zéro, sans aucun sample. Il associe un moteur de percussion profond à un séquenceur de 1 à 64 steps (avec accents, fills et 16 patterns par projet), une table de mixage intégrée avec level et pan, de la reverb, du delay et un compresseur master. Avec 40 project slots (8 presets d'usine + 32 slots utilisateur) et un workflow pensé pour le live, il passe sans effort de beats rythmiques percutants à des textures ambient évolutives.
 
 ## Caractéristiques
 

@@ -11,8 +11,7 @@ recipients its complete corresponding source under the same licence.
 | --- | --- | --- |
 | Platform: `firmware/hal/`, `firmware/loader/`, `firmware/src/{libc,lcd,gfx,usb,storage,ota}.c`, `tools/` (build, package, install, upload), `web/` (installer) | [Felucca](https://github.com/hugelton/Felucca), Copyright (C) 2026 Leo Kuroshita (@kurogedelic), Hügelton Instruments; `usb.c` and `storage.c` changed for X0X | GPL-3.0-only |
 | `firmware/src/app/{slots,editor,panel,main_fm1}.c` | adapted from Felucca's `eng_sample.c`, `editor.c`, `panel.c`, `main.c` / `audio.c` | GPL-3.0-only |
-| 909 (`dsp/drum909*`, `dsp/fxbus*`) | ported from [9W9](https://github.com/athousanddetails/schwung-9W9) (athousanddetails), itself after [ER-99](https://github.com/matthewcieplak/er-99) (Matthew Cieplak) | GPL-3.0 |
-| 909 hi-hat, ride and crash samples (`assets/909/`) | ER-99 via 9W9 | GPL-3.0 |
+| reverb, delay and master stage (`dsp/fxbus*`, `dsp/drum909_dsp.h`) | ported from [9W9](https://github.com/athousanddetails/schwung-9W9) (athousanddetails), itself after [ER-99](https://github.com/matthewcieplak/er-99) (Matthew Cieplak) | GPL-3.0 |
 | Break generator (`dsp/breaks*`) | ported from [schwung-breakbeat](https://github.com/mestela/schwung-breakbeat) (BB Gen) by mestela, **used with the author's permission** (that repository carries no licence file) | GPL-3.0-only here, by permission |
 | The second core's start-up and job hand-off (`firmware/hal/fm1_cpu1.*`) | X0X, after what [Melodee](https://github.com/keremimo/melodee) (keremimo)'s dual-core audio found, with [Jangada](https://github.com/zednaked/jangada) (zednaked)'s measurements and mailbox layout | GPL-3.0-only |
 | The idea of a browser emulator for FM-1 firmware (`web/emu/`) | [Groove OS](https://www.groove-os.com/) by Peter Gombos, whose site runs its firmware in the browser; no code from it | credit only |
@@ -27,10 +26,7 @@ recipients its complete corresponding source under the same licence.
 | `tests/host/bta_crypto_test.c`, `bt_crypto_vectors.h` (the pairing maths against the Bluetooth Core Specification's sample data) | fm1-base's `tests/bt/` (include paths changed), Optimist / Henri David | `GPL-3.0-only OR MPL-2.0` (the vectors: the specification's data) |
 | Everything else in `firmware/src/{app,dsp,seq}`, `host/`, `tests/` | X0X | GPL-3.0-only |
 
-No recorded breaks are in this tree or in the default firmware: the built-in break loops are
-generated at build time by X0X's own 909 code. `tools/import_breaks.py`,
-`tools/gen_break_bank.py` (`X0X_BREAK_BANK`) and `tools/upload_breaks.py` can put recordings
-of your choosing into a build or onto a device; those recordings keep their own copyright.
+No recordings and no samples are in this tree or in the firmware (wip474: the built-in break loops, which were rendered from the ER-99 cymbals, are gone). `tools/import_breaks.py` and `tools/upload_breaks.py` can put recordings of your choosing onto a device; those recordings keep their own copyright.
 
 ## Felucca Assets
 

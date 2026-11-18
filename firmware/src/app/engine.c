@@ -857,20 +857,15 @@ static uint8_t loop_bars(uint32_t ns, uint32_t rate)
     return bars;
 }
 
-#include "x0x_break_bank.h"              /* tools/gen_break_bank.py: the built-in loops */
+/* No built-in loops (wip474): the BREAK part only plays loops of the user sample slots; nothing is
+ * sampled in the firmware itself. */
+#define X0X_NBREAKS 0
+#define X0X_BREAK_RATE 22050u
 
 static const brk_loop_t *brk_builtin(int k)
 {
-    static brk_loop_t L[2];
-    static int which;
-    brk_loop_t *l = &L[which ^= 1];      /* two: A and B are set one after the other */
-    if (k < 0 || k >= X0X_NBREAKS)
-        return 0;
-    l->adpcm = X0X_BREAKS[k].adpcm;
-    l->nsamples = X0X_BREAKS[k].n;
-    l->rate = X0X_BREAK_RATE;
-    l->bars = X0X_BREAKS[k].bars;
-    return l;
+    (void)k;
+    return 0;                            /* an empty loop: the part stays silent */
 }
 
 /* the LOOP choices: the built-in bank, then every loop (zone) of the user slots, in order.
@@ -885,8 +880,6 @@ static void scan_loops(void)
 {
     int i, k, z, u = 0;
     nloops = 0;
-    for (i = 0; i < X0X_NBREAKS; i++)
-        loop_names[nloops++] = X0X_BREAKS[i].name;
     for (k = 0; k < PLAT_NSLOTS; k++) {                 /* yours: BR1, BR2 ... in order, whatever slot */
         int nz = plat_slot_zones(k);                    /* holds them (the break page packs the list) */
         for (z = 0; z < nz && z < PLAT_SLOT_ZONES; z++) {

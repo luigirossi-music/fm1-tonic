@@ -7,9 +7,8 @@ set -e
 cd "$(dirname "$0")/../.."
 mkdir -p build/gen build/emu
 [ -f build/gen/felucca_font.h ] || python3 tools/gen_font.py build/gen/felucca_font.h >/dev/null
-[ -f build/gen/x0x_drum_samples.h ] || python3 tools/gen_drum_samples.py build/gen/x0x_drum_samples.h >/dev/null
+[ -f build/gen/x0x_drum_tables.h ] || python3 tools/gen_drum_tables.py build/gen/x0x_drum_tables.h >/dev/null
 python3 tools/gen_words.py firmware/words.tsv web/words build/gen/ann_words.h >/dev/null
-sh tools/gen_builtin_break.sh build/gen >/dev/null
 python3 tools/gen_preset_bank.py build/gen/tonic_bank.h "${X0X_PRESET_BANK:-presets}" >/dev/null   # the factory bank: presets/*.tnp (X0X_PRESET_BANK=other folder)
 START="${X0X_START_PRESET:-$(ls presets/01_*.tnp 2>/dev/null | head -n 1)}"   # the starting project: presets/01_*.tnp
 python3 tools/gen_preset_bank.py --start build/gen/tonic_start.h $START >/dev/null

@@ -34,3 +34,6 @@ Goal: the FM1 Tonic only (PART_909 = the Tonic, Microtonic-style: dsp/tonic.c + 
  - Is the sampler (break loops + user slots) gone for good, or only hidden for now?
  - Old projects / backups that contain 808 or BREAK data: must they still load (just ignoring that part)? Probably yes.
  - Should the web tools (x0x_breaks, sample upload) disappear too?
+
+## wip474 (18 Nov 2026): the ER-99 samples and the break loop bank are GONE (firmware 1.6)
+Done: engine.c has no built-in loops (X0X_NBREAKS 0, brk_builtin returns an empty loop), no x0x_break_bank.h, tools/gen_builtin_break.*, gen_break_bank.py, gen_drum_samples.py (-> gen_drum_tables.py: tables only), assets/909, dsp/drum909.c/.h and their tests deleted. NOT done (later steps of this plan): breaks.c and the break part in engine.c / sequencer.c / ui.c / project.c, the user sample slots, the format job. tools/import_breaks.py still mentions the removed opt-in X0X_BREAK_BANK in its comments.

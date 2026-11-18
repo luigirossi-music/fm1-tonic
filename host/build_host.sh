@@ -7,10 +7,8 @@ cd "$(dirname "$0")/.."
 CC="${CC:-cc}"
 mkdir -p build/gen build/host
 [ -f build/gen/felucca_font.h ] || python3 tools/gen_font.py build/gen/felucca_font.h >/dev/null
-[ -f build/gen/x0x_drum_samples.h ] || python3 tools/gen_drum_samples.py build/gen/x0x_drum_samples.h >/dev/null
+[ -f build/gen/x0x_drum_tables.h ] || python3 tools/gen_drum_tables.py build/gen/x0x_drum_tables.h >/dev/null
 python3 tools/gen_words.py firmware/words.tsv web/words build/gen/ann_words.h >/dev/null
-if [ -n "${X0X_BREAK_BANK:-}" ]; then python3 tools/gen_break_bank.py "$X0X_BREAK_BANK" build/gen/x0x_break_bank.h >/dev/null
-else sh tools/gen_builtin_break.sh build/gen >/dev/null; fi
 python3 tools/gen_preset_bank.py build/gen/tonic_bank.h ${X0X_PRESET_BANK:-tests/fixtures/bank}   # the host's factory bank: the test presets
 python3 tools/gen_preset_bank.py --start build/gen/tonic_start.h ${X0X_START_PRESET:-}   # the starting project (default: none)
 U="firmware/src/dsp/tonic.c firmware/src/dsp/po32/po32_synth.c firmware/src/dsp/drum_tables.c firmware/src/dsp/breaks.c

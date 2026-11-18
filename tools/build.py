@@ -126,11 +126,11 @@ def tc_all(*cmds):
 
 
 def generate():
-    """generated headers: the font (Felucca's), the 909's samples and tables, the break bank"""
+    """generated headers: the font (Felucca's), the spoken words, the factory presets"""
     GEN.mkdir(parents=True, exist_ok=True)
     tools = SRC / "tools"
     cmds = [[tools / "gen_font.py", GEN / "felucca_font.h"],
-            [tools / "gen_drum_samples.py", GEN / "x0x_drum_samples.h"],
+            [tools / "gen_drum_tables.py", GEN / "x0x_drum_tables.h"],
             [tools / "gen_words.py", SRC / "firmware" / "words.tsv", SRC / "web" / "words", GEN / "ann_words.h"]]
     procs = [subprocess.Popen([sys.executable, *map(str, c)], stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                               text=True) for c in cmds]
@@ -141,16 +141,6 @@ def generate():
             failed.append(c[0].name)
     if failed:
         raise SystemExit(f"build: {', '.join(failed)} failed")
-    # the BREAK part's built-in bank: the 909-rendered loops (no recordings), or, opt-in,
-    # one-bar WAVs from X0X_BREAK_BANK (made by tools/import_breaks.py; not in this tree)
-    bank = os.environ.get("X0X_BREAK_BANK")
-    cmd = ([sys.executable, str(tools / "gen_break_bank.py"), bank, str(GEN / "x0x_break_bank.h")] if bank
-           else ["sh", str(tools / "gen_builtin_break.sh"), str(GEN)])
-    r = subprocess.run(cmd, capture_output=True, text=True)
-    sys.stdout.write(r.stdout)
-    if r.returncode:
-        sys.stderr.write(r.stderr)
-        raise SystemExit("build: break bank failed")
     # the factory Tonic presets: the .tnp files in X0X_PRESET_BANK (up to 16, name order), or an empty bank
     pb = os.environ.get("X0X_PRESET_BANK") or (str(SRC / "presets") if (SRC / "presets").is_dir() else None)
     r = subprocess.run([sys.executable, str(tools / "gen_preset_bank.py"), str(GEN / "tonic_bank.h")] + ([pb] if pb else []),

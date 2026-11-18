@@ -1,6 +1,6 @@
 # FM1 TONIC
 
-Nach dem Vorbild von Microtonic VST von Sonic Charge ist FM1 TONIC ein Drum-Synthesizer mit 8 Stimmen, in dem jeder Klang von Grund auf synthetisiert wird. Er verbindet eine tiefe Percussion-Engine mit einem Sequencer von 1 bis 64 steps (mit accents, fills und 16 Patterns pro Projekt), einem integrierten Mixer mit level und pan, Reverb, Delay und einem Master-Kompressor. Mit 40 project slots (8 Werks-Presets + 32 eigene Slots) und einem Workflow für den Live-Einsatz geht er mühelos von knackigen, rhythmischen Beats zu sich entwickelnden Ambient-Texturen.
+Nach dem Vorbild von Microtonic VST von Sonic Charge ist FM1 TONIC ein Drum-Synthesizer mit 8 Stimmen, in dem jeder Klang von Grund auf synthetisiert wird, ganz ohne Samples. Er verbindet eine tiefe Percussion-Engine mit einem Sequencer von 1 bis 64 steps (mit accents, fills und 16 Patterns pro Projekt), einem integrierten Mixer mit level und pan, Reverb, Delay und einem Master-Kompressor. Mit 40 project slots (8 Werks-Presets + 32 eigene Slots) und einem Workflow für den Live-Einsatz geht er mühelos von knackigen, rhythmischen Beats zu sich entwickelnden Ambient-Texturen.
 
 ## Merkmale
 
