@@ -2,8 +2,7 @@
   "what": "A Microtonic-style drum synthesizer for the FM-1: eight tracks with their own sound engine, step sequencer with p-locks and chance, patterns, song mode, reverb, delay, sidechain, MIDI and CC. Try it in your browser first, then install it.",
   "author": "Luigi Rossi",
   "kinds": [
-    "drum synthesizer",
-    "groovebox"
+    "drums"
   ],
   "play": "https://luigirossi-music.github.io/fm1-tonic/emu/",
   "cheat": "https://luigirossi-music.github.io/fm1-tonic/emu/downloads/FM1-Tonic-cheat-sheet.pdf",
