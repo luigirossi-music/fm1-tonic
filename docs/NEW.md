@@ -3,6 +3,10 @@
 The newest version first. Install it with the [web installer](../install/); the
 [manual](../manual/) covers everything in detail.
 
+## FM1 Tonic 1.7 · 18 November 2026
+
+- CHANGED (wip489): **FM1 Tonic 1.7: the first build of the 1.7 line.** The instrument itself is the same as 1.6; what changed is the version number (the welcome screen, the package and the release say 1.7), the manual (1.57, it names firmware 1.7 in all six languages) and the project's card file for The FM-1 Firmware Hub, which now asks to be listed as a groovebox.
+
 ## FM1 Tonic wip307 · 13 November 2026
 
 - CHANGED (wip474): **FM1 TONIC 1.6: zero samples.** The ER-99 cymbal samples (hi-hat, ride, crash) are gone from the firmware and the repository: they only fed the BREAK sampler's built-in loops, which no longer exist (the break part is not reachable from the panel and plays only loops of user sample slots, none by default). Deleted: assets/909, drum909.c/.h, the break-bank and sample generators and their tests; the drum lookup tables now come from tools/gen_drum_tables.py (same values, checked identical). The identity becomes FM-1_77010600. The manual (1.56) says every sound is synthesized with zero samples involved; fmhub.json has no 'sounds' line any more. Host tests give the same results as before. NOT built for the FM-1 yet (his PC does it).
