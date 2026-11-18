@@ -1,5 +1,5 @@
 {
-  "what": "Eight-track drum synthesizer for the FM-1 with its own sound engine: 26 settings per track, step sequencer with p-locks and chance, patterns and song mode, reverb, delay, sidechain, MIDI and CC control. Try it in your browser first.",
+  "what": "A Microtonic-style drum synthesizer for the FM-1: eight tracks with their own sound engine, step sequencer with p-locks and chance, patterns, song mode, reverb, delay, sidechain, MIDI and CC. Try it in your browser first, then install it.",
   "author": "Luigi Rossi",
   "kinds": ["drums"],
   "play": "https://luigirossi-music.github.io/fm1-tonic/emu/",

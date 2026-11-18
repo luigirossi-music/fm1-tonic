@@ -41,7 +41,7 @@ ERRORS = {1: "the file's size", 2: "the transfer (a read request unanswered)", 3
           7: "a flash erase", 8: "a flash write", 9: "the read-back (the flash does not hold what was written)",
           10: "X0X is playing: STOP FIRST, then restore", 11: "answered HOME (no) on the FM-1",
           12: "writing the headers (the FM-1 finishes it when switched on again)"}
-X0X = "FM-1_9"                    # X0X's package identity (tools/build.py PRODUCT)
+X0X = ("FM-1_7714", "FM-1_9")      # FM1 Tonic's package identity (tools/build.py PRODUCT; 1.0-1.4 and X0X: FM-1_9...)
 DELAY = {"poll": 0.5, "idle": 10.0, "ask": 75.0, "first": 3.0}
 EXIT = dict(I.EXIT, playing=5)
 
