@@ -5,6 +5,7 @@ The newest version first. Install it with the [web installer](../install/); the
 
 ## FM1 Tonic wip307 · 13 November 2026
 
+- CHANGED (wip462): **FM1 Tonic 1.4: out of beta.** The instrument, the files and the installer all work, so the pages no longer say the firmware may be unstable (the sentence that the author accepts no responsibility stays). The web page's installer on the emulator page works again (it said "The installer is on the published page"). The firmware itself does not change.
 - CHANGED (wip443): **FM1 Tonic 1.3: a refused return to the official firmware says what differs.** If the head check refuses an update (ERROR -5 HEAD DIFFERS), the screen now also shows the first differing byte, how many bytes differ and both head checksums, for 40 seconds. Nothing else changes.
 - CHANGED (wip442): **FM1 Tonic 1.2: a failed update says why.** If an update to another firmware is refused, the update screen now shows FAILED, the error number with a short reason (for example ERROR -5 HEAD DIFFERS) and the step it stopped at, for 8 seconds. Nothing else changes.
 - CHANGED (wip439): **FM1 Tonic 1.1: newer FM-1 units.** Some newer FM-1s have another flash chip (ID B36014 instead of 856014). 1.1 accepts both, so saving, presets, backup and restore work on them too (1.0 treated that chip as "no flash").
