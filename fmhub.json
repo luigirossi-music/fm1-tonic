@@ -1,5 +1,5 @@
 {
-  "what": "A Microtonic-style drum synthesizer for the FM-1: eight tracks with their own sound engine, step sequencer with p-locks and chance, patterns, song mode, reverb, delay, sidechain, MIDI and CC. Try it in your browser first, then install it.",
+  "what": "A Microtonic-style drum machine for the FM-1, nothing sampled: eight tracks with their own sound engine, step sequencer with p-locks and chance, patterns, song mode, reverb, delay, sidechain, MIDI and CC. Try it in your browser first.",
   "author": "Luigi Rossi",
   "kinds": [
     "groove"

@@ -40,8 +40,8 @@ table.g tr.gs td { border-top: .6pt solid #999; }
 def cheat_html():
     s = (ROOT / "web" / "emu" / "index.html").read_text(encoding="utf-8")
     m = re.search(r'<div class="cheat-body">(.*?)</div>\n    </div>\n  </details>', s[s.index('<details class="cheat"'):], re.S)
-    return ('<!doctype html><meta charset="utf-8"><title>FM1 Tonic cheat sheet</title><style>' + CHEAT_CSS + '</style>'
-            '<h1><b>FM1</b> Tonic cheat sheet</h1><p class="sub">How the firmware works today, for the M-VAVE FM-1. The user manual has the details.</p>'
+    return ('<!doctype html><meta charset="utf-8"><title>FM1 Tonic button combinations</title><style>' + CHEAT_CSS + '</style>'
+            '<h1><b>FM1</b> Tonic button combinations</h1><p class="sub">Cheat sheet: only the keys and buttons you press together, for the M-VAVE FM-1. The user manual has the rest.</p>'
             + m.group(1))
 
 
