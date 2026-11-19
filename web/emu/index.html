@@ -180,6 +180,12 @@ details.cheat .cheat-in { padding: 0 1rem 1rem; }
 .canvas { margin: .9rem 0 0; padding: .55rem .9rem; border: 1px solid var(--accent); border-radius: 12px; color: var(--ink); background: var(--part); font-size: .95rem; text-align: center; animation: canvasblink 1.8s ease-in-out infinite; }
 .canvas b { color: var(--accent); }
 @keyframes canvasblink { 0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(143,184,224,.55); } 50% { opacity: .45; box-shadow: 0 0 0 4px rgba(143,184,224,0); } }
+/* wip515: Clear pattern button between PLAY and the keys: hidden until PLAY is pressed the first time, then blinks until clicked */
+.clrpat { position: absolute; left: 78.8%; top: 45.4%; width: 17.6%; height: 6.6%; z-index: 3; display: none; font: 700 clamp(.7rem, 1.9vw, 1.05rem)/1.1 -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; color: #fff; background: linear-gradient(#e0483e, #a32a24); border: 2px solid #ff8a80; border-radius: 10px; cursor: pointer; padding: 0 .3em; touch-action: manipulation; }
+.clrpat.on { display: block; }
+.clrpat.blink { animation: clrblink .9s ease-in-out infinite; }
+@keyframes clrblink { 0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255,106,96,.9); } 50% { opacity: .55; box-shadow: 0 0 0 7px rgba(255,106,96,0); } }
+@media (prefers-reduced-motion: reduce) { .clrpat.blink { animation: none; } }
 @media (prefers-reduced-motion: reduce) { .canvas { animation: none; } }
 
 /* wip505: downloads moved down; a pop-up window in their old place */
@@ -211,10 +217,20 @@ nav.downloads a:hover { border-color: var(--accent); color: var(--accent); }
 header p.insp { font-size: 1.15rem; }
 .hbtns { display: flex; flex-wrap: wrap; gap: .5rem; }
 a.upbtn { text-decoration: none; display: inline-block; }
+
+/* wip513: bigger pop-up, each update = a title line + one long line */
+.uover .upop { max-width: 52rem; }
+.uover .upop-bar { padding: .5rem .8rem .5rem 1.2rem; font-size: .85rem; }
+.uover .upop-body { padding: 1.3rem 1.6rem 1.5rem; font-size: 1.1rem; }
+.uover .upop-body > p { font-size: 1.25rem; margin-bottom: 1rem; }
+.uover .upop-body ul { list-style: none; padding: 0; margin: 0; }
+.uover .upop-body li { margin: 0 0 1.1rem; line-height: 1.5; }
+.uover .ut { display: block; color: var(--accent); font-size: 1.12rem; }
+.uover .ud { display: block; color: var(--ink); }
 </style>
 </head>
 <body>
-<div class="uover" id="uover" hidden><div class="upop" role="dialog" aria-modal="true" aria-labelledby="uptitle"><div class="upop-bar"><span id="uptitle">FUTURE UPDATES</span><button type="button" id="upopx" aria-label="Back to the panel">&#x2715;</button></div><div class="upop-body"><p><b>Coming in future updates</b></p><ul><li><b>Grigiotonic:</b> a new skin with horizontal knobs, for those who prefer them.</li><li><b>Random all voices:</b> one press gives every voice a new random sound.</li><li><b>Safer random sounds:</b> random voices will never reach the maximum distortion, to protect your speakers and ears. You can still turn it up yourself.</li><li><b>Battery indicator:</b> the battery level on the screen, top right.</li><li><b>Mixer solo mode:</b> solo one or several tracks in the mixer to hear them alone.</li><li><b>Accent volume:</b> a setting for how strong the accent is: turn it up for more.</li><li><b>Bug fixes:</b> random voices that sometimes sound too loud.</li></ul><button type="button" class="uback" id="uback">Back to the panel</button></div></div></div>
+<div class="uover" id="uover" hidden><div class="upop" role="dialog" aria-modal="true" aria-labelledby="uptitle"><div class="upop-bar"><span id="uptitle">FUTURE UPDATES</span><button type="button" id="upopx" aria-label="Back to the panel">&#x2715;</button></div><div class="upop-body"><p><b>Coming in future updates</b></p><ul><li><b class="ut">Grigiotonic</b><span class="ud">a new skin with horizontal knobs, for those who prefer them.</span></li><li><b class="ut">Random all voices</b><span class="ud">one press gives every voice a new random sound.</span></li><li><b class="ut">Safer random sounds</b><span class="ud">random voices will never reach the maximum distortion, to protect your speakers and ears. You can still turn it up yourself.</span></li><li><b class="ut">Battery indicator</b><span class="ud">the battery level on the screen, top right.</span></li><li><b class="ut">Mixer solo mode</b><span class="ud">solo one or several tracks in the mixer to hear them alone.</span></li><li><b class="ut">Accent volume</b><span class="ud">a setting for how strong the accent is: turn it up for more.</span></li><li><b class="ut">Bug fixes</b><span class="ud">random voices that sometimes sound too loud.</span></li></ul><button type="button" class="uback" id="uback">Back to the panel</button></div></div></div>
 <main>
 <header>
   <h1><span class="fm">FM1</span> <span class="tn">TONIC</span></h1>
@@ -230,6 +246,7 @@ a.upbtn { text-decoration: none; display: inline-block; }
   <svg id="panel" viewBox="0 0 1000 700" aria-hidden="true" focusable="false"></svg>
   <canvas id="screen" width="240" height="240" role="img" aria-label="The FM-1's screen."></canvas>
   <div class="controls" id="controls" inert></div>
+  <button type="button" class="clrpat" id="clrpat">Clear pattern</button>
   <div class="start" id="start"><button id="go" type="button">Switch on</button></div>
   <div hidden id="descs"></div>
 </div>
@@ -290,6 +307,8 @@ a.upbtn { text-decoration: none; display: inline-block; }
   <h2 id="credits-h">Credits</h2>
   <p class="note big"><b>FM1 Tonic is made by Luigi Rossi</b>, the developer and creative mind behind this firmware: the Tonic drum machine, its sequencer, screens, presets and the web tools (emulator, installer, backup). It is free software under the GNU General Public License, version 3; if you share the firmware you must share its source code. <a class="dl" href="downloads/FM1-Tonic-manual.html" target="_blank" rel="noopener">User manual <!--mv-->1.68<!--/mv--> (all languages)</a> <a class="dl" href="downloads/FM1-Tonic-manual.html" download="FM1-Tonic-manual-1.68.html">Download the manual <!--mv-->1.68<!--/mv--></a></p>
   <p class="note"><b>Luigi Rossi online:</b> <a href="https://linktr.ee/luigirossi" target="_blank" rel="noopener">linktr.ee/luigirossi</a></p>
+  <p class="note"><b>With thanks.</b> FM1 Tonic was inspired by <b>Microtonic</b> by <b>Sonic Charge</b>, a drum synthesizer we admire: thank you for the inspiration.</p>
+  <p class="note">Presets from <b>Patternarium</b> and Microtonic (.mtpreset) work on the FM-1, and FM1 Tonic presets can be exported back to .mtpreset. Thanks to the Patternarium community for the many presets.</p>
   <details class="cheat" id="cheat">
     <summary>Read more: the button combinations (cheat sheet)</summary>
     <div class="cheat-in">
@@ -387,6 +406,7 @@ a.upbtn { text-decoration: none; display: inline-block; }
     into which slot. Each preset in the list has a slot menu (1-40): choose where it goes. A number 9-40 at the start of the file name
     (<code>09_name.mtpreset</code>) is chosen for you; "first empty" puts it into the first empty slot of the FM-1. Slots 1-8 are the factory presets and cannot be written yet. You confirm, then it sends them to the FM-1 (USB data cable, Chrome or Edge). Each slot it writes replaces what is in that slot now; other
     slots stay. Press STOP on the FM-1 first: it refuses while playing. A Patternarium preset keeps its 8 sounds, tempo, swing and the first 8 patterns.</p>
+  <p><label>Or paste a preset: press <b>Copy</b> on Patternarium, then paste it here (Ctrl+V or Cmd+V)<br><textarea id="prs-paste" rows="3" spellcheck="false" aria-label="Paste a Patternarium or Microtonic preset here" placeholder="Paste here, then press Restore to the FM-1: it goes into the first empty slot." style="width:100%;max-width:46rem;box-sizing:border-box;font:.8rem ui-monospace,Menlo,monospace"></textarea></label></p>
   <p><label>Files (zip, .tnp, .mtpreset) <input id="prs-file" type="file" multiple accept=".zip,.tnp,.mtpreset" aria-label="Zip, .tnp or .mtpreset files"></label></p>
   <p><label>or a folder <input id="prs-dir" type="file" webkitdirectory multiple aria-label="A folder of .mtpreset or .tnp files"></label></p>
   <div id="prs-list" hidden aria-label="Presets to upload and their slots"></div>
@@ -1128,7 +1148,7 @@ const PB = (() => {
     return { items, skipped };
   }
 
-  return { HS_QUERY, RS_REQ, BU_REQ, BU_END, OK_ADDR, ASK_ADDR, FAIL_ADDR, MAGIC, VERSION, NOBJ, PLAYING, DECLINED, X0X, DELAY, ERRORS,
+  return { HS_QUERY, RS_REQ, BU_REQ, BU_END, OK_ADDR, ASK_ADDR, FAIL_ADDR, MAGIC, VERSION, NOBJ, PLAYING, DECLINED, DELAY, ERRORS,
            pack7, unpack7, crc32, frame, parseFrame, response, parseRequest, parseIdentity, parse, summary, find, backup, restore, presetList, presetGet, presetName, presets, tnpOk, mtpresetToTnp, tnpToMtpreset, presetPut, presetErase, unzip, presetFiles, PUT_ERRORS };
 })();
 // --- backup protocol: end
@@ -1328,9 +1348,9 @@ for (const [n, x, top] of [["OCT-", 60, "NO / DOWN"], ["OCT+", 170, "YES / UP"]]
 }
 // the colour key under the buttons
 const leg = el("g", { "font-family": "Arial, Helvetica, sans-serif", "font-size": 14, "font-weight": 700, fill: "#202020" });
-for (const [x, c, t] of [[292, "#2b4a8c", "SOUND OF THE TRACK"], [501.4, "#1d6b73", "MIX AND EFFECTS"], [682.9, "#6a3a8c", "GLOBAL"], [780.7, "#8a5a12", "SEQUENCER"]]) {
-  el("rect", { x, y: 321, width: 14, height: 14, rx: 3, fill: c }, leg);
-  const t2 = el("text", { x: x + 20, y: 334 }, leg); t2.textContent = t;
+for (const [x, y, c, t] of [[292, 322, "#2b4a8c", "SOUND OF THE TRACK"], [540, 322, "#1d6b73", "MIX AND EFFECTS"], [292, 344, "#6a3a8c", "GLOBAL"], [540, 344, "#8a5a12", "SEQUENCER"]]) {   // wip515: a 2 x 2 block (PLAY's Clear pattern button takes the right side)
+  el("rect", { x, y, width: 14, height: 14, rx: 3, fill: c }, leg);
+  const t2 = el("text", { x: x + 20, y: y + 13 }, leg); t2.textContent = t;
 }
 
 const keys = [];
@@ -1423,10 +1443,12 @@ let ac0 = null, node = null, gain = null, btnMask = 0, keyMask = 0, latched = 0,
 const btnHeldBy = new Map(), keyHeldBy = new Map();      // pointer / key id -> bit
 function send(m) { if (node) node.port.postMessage(m); }
 let litButtons = 0;
+let clrSeen = false;
 function syncButtons() {
   let m = latched;
   for (const b of btnHeldBy.values()) m |= 1 << b;
   if (m !== btnMask) { btnMask = m; send({ type: "buttons", mask: m }); }
+  if (!clrSeen && (m & (1 << BTN.PLAY))) { clrSeen = true; const c = $("clrpat"); if (c) { c.classList.add("on", "blink"); } }   // wip515: first PLAY press shows Clear pattern
   for (const b of Object.values(buttons)) {
     b.g.classList.toggle("held", !!(m & (1 << b.bit)));
     b.g.classList.toggle("latched", !!(latched & (1 << b.bit)));
@@ -1487,6 +1509,22 @@ keys.forEach((k, i) => {
     tap(keyHeldBy, "c" + i, i, syncKeys);
   });
 });
+// wip515: Clear pattern = FUNC + PLAY (the firmware then asks CLEAR PATTERN? on its screen: OCT+ = YES / UP, OCT- = NO / DOWN)
+(function clearPatternButton() {
+  const b = $("clrpat"); if (!b) return;
+  const FUNC_KEY = BLACK_K[10];
+  let back = 0;
+  b.addEventListener("click", () => {
+    b.classList.remove("blink");
+    keyHeldBy.set("clrF", FUNC_KEY); syncKeys();
+    setTimeout(() => { btnHeldBy.set("clrP", BTN.PLAY); syncButtons(); }, 80);
+    setTimeout(() => { btnHeldBy.delete("clrP"); syncButtons(); }, 260);
+    setTimeout(() => { keyHeldBy.delete("clrF"); syncKeys(); }, 340);
+    b.textContent = "Now press YES / UP";
+    clearTimeout(back); back = setTimeout(() => { b.textContent = "Clear pattern"; }, 6000);
+  });
+})();
+
 function pointerUp(e) {
   const id = "p" + e.pointerId;
   if (btnHeldBy.delete(id)) syncButtons();
@@ -1994,6 +2032,17 @@ async function prsLoad(files, other) {
   } catch (e) { st.textContent = (e && e.message) || String(e); }
   prsRender(); prsRefresh();
 }
+// wip517: a preset pasted from Patternarium (its Copy button gives the same text as a .mtpreset file) is loaded like a dropped file: first empty slot
+let pasteTimer = 0;
+$("prs-paste").addEventListener("input", () => {
+  clearTimeout(pasteTimer);
+  pasteTimer = setTimeout(() => {
+    const t = $("prs-paste").value;
+    if (!t.trim()) { prsLoad([], $("prs-dir")); return; }
+    $("prs-file").value = "";
+    prsLoad([new File([t], "pasted.mtpreset", { type: "text/plain" })], $("prs-dir"));
+  }, 150);
+});
 $("prs-file").addEventListener("change", () => prsLoad([...$("prs-file").files], $("prs-dir")));
 $("prs-dir").addEventListener("change", () => prsLoad([...$("prs-dir").files].filter((f) => !/^\./.test(f.name)), $("prs-file")));
 $("prs-go").addEventListener("click", async () => {
