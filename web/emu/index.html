@@ -202,6 +202,15 @@ nav.downloads a:hover { border-color: var(--accent); color: var(--accent); }
 .uover[hidden] { display: none; }
 .uover .upop { width: 100%; max-width: 24rem; max-height: 90vh; overflow: auto; }
 .uback { display: block; margin: .8rem auto 0; font: 600 .88rem -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; color: #111; background: var(--accent); border: 0; border-radius: 999px; padding: .45em 1.2em; cursor: pointer; }
+
+/* wip512: Microtonic & Patternarium Compatible title (soft blink like the canvas hint), grey text, manual link beside Future updates, bigger Inspired line */
+.mtp { flex: 1 1 100%; max-width: none; margin: .3rem 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .9rem; }
+.mtp-t { display: inline-block; padding: .35rem .9rem; border: 1px solid var(--accent); border-radius: 12px; color: var(--accent); font-weight: 700; font-size: 1.05rem; animation: canvasblink 1.8s ease-in-out infinite; }
+.mtp-d { flex: 1 1 22rem; max-width: 46rem; color: var(--muted); font-size: .85rem; line-height: 1.4; }
+@media (prefers-reduced-motion: reduce) { .mtp-t { animation: none; } }
+header p.insp { font-size: 1.15rem; }
+.hbtns { display: flex; flex-wrap: wrap; gap: .5rem; }
+a.upbtn { text-decoration: none; display: inline-block; }
 </style>
 </head>
 <body>
@@ -209,9 +218,9 @@ nav.downloads a:hover { border-color: var(--accent); color: var(--accent); }
 <main>
 <header>
   <h1><span class="fm">FM1</span> <span class="tn">TONIC</span></h1>
-  <p>Inspired by Microtonic VST by Sonic Charge, FM1 TONIC is an 8-voice drum synthesizer.</p>
-  <p class="mtp"><b>Upload your own Microtonic presets (.mtpreset) to the FM-1, and download more from Patternarium. It works both ways: what you make on the FM1 Tonic can be exported and used in Microtonic too. The sound can be slightly different between the two.</b></p>
-  <button type="button" class="upbtn" id="upbtn" aria-haspopup="dialog">Future updates</button>
+  <p class="insp">Inspired by Microtonic VST by Sonic Charge, FM1 TONIC is an 8-voice drum synthesizer.</p>
+  <div class="mtp"><span class="mtp-t">Microtonic &amp; Patternarium Compatible</span><span class="mtp-d">Upload your own Microtonic presets (.mtpreset) to the FM-1, and download more from Patternarium. It works both ways: what you make on the FM1 Tonic can be exported and used in Microtonic too. The sound can be slightly different between the two.</span></div>
+  <div class="hbtns"><button type="button" class="upbtn" id="upbtn" aria-haspopup="dialog">Future updates</button><a class="upbtn" href="downloads/FM1-Tonic-manual.html" target="_blank" rel="noopener">User manual <!--mv-->1.68<!--/mv--></a></div>
 </header>
 
 <p class="turn">Press Full screen under the panel: the phone turns sideways and the panel fills the screen.</p>
