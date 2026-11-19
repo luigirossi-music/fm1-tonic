@@ -39,6 +39,7 @@ Ispirato a Microtonic VST di Sonic Charge, FM1 TONIC è un sintetizzatore di bat
 - Autosave e quick save.
 - Nome del progetto: GENERATE o MANUAL. Rinomina del progetto.
 - Backup e ripristino dalla pagina web. Esportazione e importazione di preset `.mtpreset`.
+- I preset funzionano nei due sensi: carica preset `.mtpreset` da Patternarium e Microtonic, ed esporta i tuoi di nuovo per il Microtonic VST (provato; il suono è molto simile, non identico).
 
 **Schermo, luci e impostazioni**
 
@@ -338,6 +339,8 @@ Tutte le combinazioni di pulsanti e tasti, raggruppate per il pulsante che tieni
 - **Modo song.** {r:FUNC + SEQ}, conferma con OCT+ (OCT- = indietro). Se non c'è ancora una song, si apre la schermata PATTERNS: i tasti bianchi da 1 a 16 aggiungono pattern, OCT- (oppure FUNC + un tasto bianco) toglie l'ultimo, OCT+ è OK. PLAY suona una battuta per pattern, in loop. Lo stesso gesto esce dal modo song. Nella **schermata SONG** (una riga per battuta) knob 1 = la battuta, knob 2 = il suo pattern, knob 3 = le ripetizioni (da x1 a x8); i tasti bianchi scrivono un pattern nella battuta sul cursore e avanzano; FILL, premuto e lasciato, cancella subito la battuta (cancellata l'ultima battuta = la song è cancellata e il modo song finisce). {r:FUNC + ARP} cancella l'intera song.
 
 ## 5. Preset e salvataggio
+
+**I preset funzionano nei due sensi.** L'FM-1 carica preset `.mtpreset` da **Patternarium** e da **Microtonic**, e i preset che crei sull'FM1 TONIC si possono esportare di nuovo in `.mtpreset` e usare nel **Microtonic VST**. È stato provato: i preset esportati si aprono e suonano in Microtonic. Il suono è molto, molto vicino all'originale, non identico. Importazione ed esportazione sono nella pagina web (la pagina di backup: "Restore my presets" e "Export my presets as .mtpreset"). Gli slot da 1 a 8 non si possono esportare. Ciò che FM1 TONIC ha aggiunto (note ARP, colpi in ritardo, cut e send di traccia, compressore, reverb, delay, mute) non ha posto in un `.mtpreset` e viene lasciato fuori.
 
 Gira **PRESETS** tra i 40 posti: da 01 a 08 sono preset di fabbrica, da 09 a 40 sono tuoi (un posto vuoto si carica con i suoni di un preset di fabbrica e senza pattern: 09 suona come 01, 10 come 02, e così via a rotazione). Prima viene una domanda: OCT+ lo carica, OCT- tiene il tuo suono. Il caricamento viene rifiutato durante la riproduzione.
 

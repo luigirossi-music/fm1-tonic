@@ -39,6 +39,7 @@ Inspired by Microtonic VST by Sonic Charge, FM1 TONIC is an 8-voice drum synthes
 - Autosave and quick save.
 - Name project: GENERATE or MANUAL. Rename project.
 - Back up and restore from the web page. Export and import of `.mtpreset` presets.
+- Presets work both ways: load `.mtpreset` presets from Patternarium and Microtonic, and export yours back for the Microtonic VST (tested; the sound is very close, not identical).
 
 **Screen, lights and settings**
 
@@ -339,6 +340,8 @@ Every combination of buttons and keys, grouped by the button you hold first. Bla
 - **Song mode.** {r:FUNC + SEQ}, confirm with OCT+ (OCT- = back). With no song yet, the PATTERNS screen opens: white keys 1 to 16 add patterns, OCT- (or FUNC + a white key) takes the last off, OCT+ is OK. PLAY plays one bar per pattern, looping. The same gesture leaves song mode. On the **SONG screen** (one row per bar) knob 1 = the bar, knob 2 = its pattern, knob 3 = repeats (x1 to x8); white keys write a pattern into the bar on the cursor and move on; FILL, pressed and let go, deletes the bar at once (the last bar deleted = the song is deleted and song mode ends). {r:FUNC + ARP} deletes the whole song.
 
 ## 5. Presets and saving
+
+**Presets work both ways.** The FM-1 loads `.mtpreset` presets from **Patternarium** and from **Microtonic**, and the presets you make on the FM1 TONIC can be exported back to `.mtpreset` and used in the **Microtonic VST**. This was tested: the exported presets open and play in Microtonic. The sound is very, very close to the original, not identical. Import and export are on the web page (the backup page: "Restore my presets" and "Export my presets as .mtpreset"). Slots 1 to 8 cannot be exported. What the FM1 TONIC added (ARP notes, late hits, track cuts and sends, compressor, reverb, delay, mute) has no place in a `.mtpreset` and is left out.
 
 Turn **PRESETS** through the 40 places: 01 to 08 are factory presets, 09 to 40 are yours (an empty place loads with the sounds of a factory preset and no pattern: 09 sounds like 01, 10 like 02, and so on in rotation). A question asks first: OCT+ loads it, OCT- keeps your sound. Loading is refused while playing.
 

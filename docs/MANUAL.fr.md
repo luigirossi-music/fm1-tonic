@@ -39,6 +39,7 @@ Inspiré de Microtonic VST de Sonic Charge, FM1 TONIC est un synthétiseur de ba
 - Autosave et quick save.
 - Nom du projet : GENERATE ou MANUAL. Renommer le projet.
 - Sauvegarde et restauration depuis la page web. Export et import de presets `.mtpreset`.
+- Les presets fonctionnent dans les deux sens : chargez des presets `.mtpreset` de Patternarium et de Microtonic, et exportez les vôtres pour le Microtonic VST (testé ; le son est très proche, pas identique).
 
 **Écran, lumières et réglages**
 
@@ -338,6 +339,8 @@ Toutes les combinaisons de boutons et de touches, groupées par le bouton que vo
 - **Mode song.** {r:FUNC + SEQ}, confirmez avec OCT+ (OCT- = retour). S'il n'y a pas encore de song, l'écran PATTERNS s'ouvre : les touches blanches 1 à 16 ajoutent des patterns, OCT- (ou FUNC + une touche blanche) enlève le dernier, OCT+ est OK. PLAY joue une mesure par pattern, en boucle. Le même geste quitte le mode song. Sur l'**écran SONG** (une ligne par mesure) knob 1 = la mesure, knob 2 = son pattern, knob 3 = répétitions (x1 à x8) ; les touches blanches écrivent un pattern dans la mesure sous le curseur et avancent ; FILL, pressé et relâché, supprime aussitôt la mesure (la dernière mesure supprimée = la song est supprimée et le mode song se termine). {r:FUNC + ARP} supprime toute la song.
 
 ## 5. Presets et sauvegarde
+
+**Les presets fonctionnent dans les deux sens.** Le FM-1 charge des presets `.mtpreset` de **Patternarium** et de **Microtonic**, et les presets que vous faites sur le FM1 TONIC peuvent être exportés en `.mtpreset` et utilisés dans le **Microtonic VST**. C'est testé : les presets exportés s'ouvrent et jouent dans Microtonic. Le son est très, très proche de l'original, pas identique. L'import et l'export se font sur la page web (la page de sauvegarde : « Restore my presets » et « Export my presets as .mtpreset »). Les slots 1 à 8 ne peuvent pas être exportés. Ce que FM1 TONIC a ajouté (notes ARP, coups en retard, cuts et sends de track, compresseur, reverb, delay, mute) n'a pas de place dans un `.mtpreset` et est laissé de côté.
 
 Tournez **PRESETS** parmi les 40 emplacements : 01 à 08 sont des presets d'usine, 09 à 40 sont les vôtres (un emplacement vide se charge avec les sons d'un preset d'usine et sans pattern : 09 sonne comme 01, 10 comme 02, et ainsi de suite en rotation). Une question est posée d'abord : OCT+ le charge, OCT- garde votre son. Le chargement est refusé pendant la lecture.
 

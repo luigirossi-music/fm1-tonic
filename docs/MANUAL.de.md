@@ -39,6 +39,7 @@ Nach dem Vorbild von Microtonic VST von Sonic Charge ist FM1 TONIC ein Drum-Synt
 - Autosave und quick save.
 - Projektname: GENERATE oder MANUAL. Projekt umbenennen.
 - Backup und Wiederherstellung über die Webseite. Export und Import von `.mtpreset`-Presets.
+- Presets funktionieren in beide Richtungen: lade `.mtpreset`-Presets von Patternarium und Microtonic und exportiere deine zurück für das Microtonic VST (getestet; der Klang ist sehr ähnlich, nicht identisch).
 
 **Display, Lichter und Einstellungen**
 
@@ -336,6 +337,8 @@ Jede Kombination aus Buttons und Tasten, gruppiert nach dem Button, den du zuers
 - **Song mode.** {r:FUNC + SEQ}, mit OCT+ bestätigen (OCT- = zurück). Wenn es noch keinen Song gibt, öffnet sich der PATTERNS-Bildschirm: Weiße Tasten 1 bis 16 fügen Patterns hinzu, OCT- (oder FUNC + eine weiße Taste) nimmt das letzte weg, OCT+ ist OK. PLAY spielt einen Takt pro Pattern, in der Schleife. Dieselbe Geste verlässt den Song mode. Auf dem **SONG-Bildschirm** (eine Zeile pro Takt) ist knob 1 = der Takt, knob 2 = sein Pattern, knob 3 = Wiederholungen (x1 bis x8); weiße Tasten schreiben ein Pattern in den Takt unter dem Cursor und rücken weiter; FILL, gedrückt und losgelassen, löscht den Takt sofort (der zuletzt gelöschte Takt = der Song wird gelöscht und der Song mode endet). {r:FUNC + ARP} löscht den ganzen Song.
 
 ## 5. Presets und Speichern
+
+**Presets funktionieren in beide Richtungen.** Der FM-1 lädt `.mtpreset`-Presets von **Patternarium** und von **Microtonic**, und die Presets, die du auf dem FM1 TONIC machst, lassen sich zurück nach `.mtpreset` exportieren und im **Microtonic VST** verwenden. Das wurde getestet: Die exportierten Presets öffnen sich und spielen in Microtonic. Der Klang ist sehr, sehr nah am Original, nicht identisch. Import und Export laufen über die Webseite (die Backup-Seite: „Restore my presets“ und „Export my presets as .mtpreset“). Die Slots 1 bis 8 lassen sich nicht exportieren. Was der FM1 TONIC hinzugefügt hat (ARP-Noten, späte Treffer, Track-cuts und -sends, Kompressor, reverb, delay, mute), hat in einer `.mtpreset` keinen Platz und bleibt draußen.
 
 Drehe **PRESETS** durch die 40 Plätze: 01 bis 08 sind Werks-Presets, 09 bis 40 gehören dir (ein leerer Platz lädt mit den Sounds eines Werks-Presets und ohne Pattern: 09 klingt wie 01, 10 wie 02, und so weiter im Kreis). Eine Frage kommt zuerst: OCT+ lädt es, OCT- behält deinen Sound. Das Laden wird während der Wiedergabe abgelehnt.
 

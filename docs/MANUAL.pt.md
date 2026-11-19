@@ -39,6 +39,7 @@ Inspirado no Microtonic VST da Sonic Charge, o FM1 TONIC é um sintetizador de b
 - Autosave e quick save.
 - Nome do projeto: GENERATE ou MANUAL. Renomear o projeto.
 - Backup e restauração pela página web. Exportação e importação de presets `.mtpreset`.
+- Os presets funcionam nos dois sentidos: carregue presets `.mtpreset` do Patternarium e do Microtonic, e exporte os seus de volta para o Microtonic VST (testado; o som é muito parecido, não idêntico).
 
 **Tela, luzes e ajustes**
 
@@ -336,6 +337,8 @@ Todas as combinações de botões e teclas, agrupadas pelo botão que você mant
 - **Modo song.** {r:FUNC + SEQ}, confirme com OCT+ (OCT- = volta). Sem song ainda, abre a tela PATTERNS: as teclas brancas de 1 a 16 adicionam patterns, OCT- (ou FUNC + uma tecla branca) tira o último, OCT+ é OK. PLAY toca um compasso por pattern, em loop. O mesmo gesto sai do modo song. Na **tela SONG** (uma linha por compasso) o knob 1 = o compasso, o knob 2 = o seu pattern, o knob 3 = repetições (x1 a x8); as teclas brancas escrevem um pattern no compasso sob o cursor e avançam; FILL, apertado e solto, apaga o compasso na hora (o último compasso apagado = a song é apagada e o modo song termina). {r:FUNC + ARP} apaga a song inteira.
 
 ## 5. Presets e salvamento
+
+**Os presets funcionam nos dois sentidos.** O FM-1 carrega presets `.mtpreset` do **Patternarium** e do **Microtonic**, e os presets que você faz no FM1 TONIC podem ser exportados de volta para `.mtpreset` e usados no **Microtonic VST**. Foi testado: os presets exportados abrem e tocam no Microtonic. O som é muito, muito parecido com o original, não idêntico. Importar e exportar é feito na página web (a página de backup: "Restore my presets" e "Export my presets as .mtpreset"). Os slots 1 a 8 não podem ser exportados. O que o FM1 TONIC acrescentou (notas ARP, batidas atrasadas, cuts e sends de faixa, compressor, reverb, delay, mute) não tem lugar num `.mtpreset` e fica de fora.
 
 Gire **PRESETS** pelos 40 lugares: de 01 a 08 são presets de fábrica, de 09 a 40 são seus (um lugar vazio carrega com os sons de um preset de fábrica e sem pattern: 09 soa como 01, 10 como 02, e assim em rotação). Uma pergunta vem antes: OCT+ carrega, OCT- mantém o seu som. Carregar é recusado durante a reprodução.
 
