@@ -194,15 +194,24 @@ details.cheat .cheat-in { padding: 0 1rem 1rem; }
 nav.downloads { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1.2rem 0; }
 nav.downloads a { text-decoration: none; font-weight: 600; font-size: .88rem; color: var(--ink); background: var(--part); border: 1px solid var(--edge); border-radius: 999px; padding: .4em 1em; }
 nav.downloads a:hover { border-color: var(--accent); color: var(--accent); }
+
+/* wip510: the pop-up is closed; the button opens it over the page, click outside / X / Back / Esc close it */
+.upbtn { font: 600 .88rem -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; color: var(--ink); background: var(--part); border: 1px solid var(--accent); border-radius: 999px; padding: .4em 1em; cursor: pointer; }
+.upbtn:hover { color: var(--accent); }
+.uover { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1rem; background: rgba(0,0,0,.6); }
+.uover[hidden] { display: none; }
+.uover .upop { width: 100%; max-width: 24rem; max-height: 90vh; overflow: auto; }
+.uback { display: block; margin: .8rem auto 0; font: 600 .88rem -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; color: #111; background: var(--accent); border: 0; border-radius: 999px; padding: .45em 1.2em; cursor: pointer; }
 </style>
 </head>
 <body>
+<div class="uover" id="uover" hidden><div class="upop" role="dialog" aria-modal="true" aria-labelledby="uptitle"><div class="upop-bar"><span id="uptitle">FUTURE UPDATES</span><button type="button" id="upopx" aria-label="Back to the panel">&#x2715;</button></div><div class="upop-body"><p><b>Coming in future updates</b></p><ul><li><b>Grigiotonic:</b> a new skin with horizontal knobs, for those who prefer them.</li><li><b>Random all voices:</b> one press gives every voice a new random sound.</li><li><b>Safer random sounds:</b> random voices will never reach the maximum distortion, to protect your speakers and ears. You can still turn it up yourself.</li><li><b>Battery indicator:</b> the battery level on the screen, top right.</li><li><b>Mixer solo mode:</b> solo one or several tracks in the mixer to hear them alone.</li><li><b>Accent volume:</b> a setting for how strong the accent is: turn it up for more.</li><li><b>Bug fixes:</b> random voices that sometimes sound too loud.</li></ul><button type="button" class="uback" id="uback">Back to the panel</button></div></div></div>
 <main>
 <header>
   <h1><span class="fm">FM1</span> <span class="tn">TONIC</span></h1>
   <p>Inspired by Microtonic VST by Sonic Charge, FM1 TONIC is an 8-voice drum synthesizer.</p>
-  <p class="mtp"><b>It works both ways: presets from Patternarium and Microtonic (.mtpreset) load straight into the FM-1, and what you make on the FM1 Tonic can be exported back to .mtpreset and used in the Microtonic VST. Tested: the exported presets open and play in Microtonic. The sound is very, very close to the original, not identical.</b></p>
-  <div class="upop" id="upop" role="status"><div class="upop-bar"><span>FUTURE UPDATES</span><button type="button" id="upopx" aria-label="Close">&#x2715;</button></div><div class="upop-body"><p><b>Coming in future updates</b></p><ul><li><b>Grigiotonic:</b> a new skin with horizontal knobs, for those who prefer them.</li><li><b>Random all voices:</b> one press gives every voice a new random sound.</li><li><b>Safer random sounds:</b> random voices will never reach the maximum distortion, to protect your speakers and ears. You can still turn it up yourself.</li><li><b>Battery indicator:</b> the battery level on the screen, top right.</li><li><b>Mixer solo mode:</b> solo one or several tracks in the mixer to hear them alone.</li><li><b>Accent volume:</b> a setting for how strong the accent is: turn it up for more.</li><li><b>Bug fixes:</b> a random voice sometimes made the sound too loud; this is fixed.</li></ul></div></div>
+  <p class="mtp"><b>Upload your own Microtonic presets (.mtpreset) to the FM-1, and download more from Patternarium. It works both ways: what you make on the FM1 Tonic can be exported and used in Microtonic too. The sound can be slightly different between the two.</b></p>
+  <button type="button" class="upbtn" id="upbtn" aria-haspopup="dialog">Future updates</button>
 </header>
 
 <p class="turn">Press Full screen under the panel: the phone turns sideways and the panel fills the screen.</p>
@@ -383,7 +392,7 @@ nav.downloads a:hover { border-color: var(--accent); color: var(--accent); }
 </section>
 
 </main>
-<script>document.getElementById("upopx").addEventListener("click",function(){document.getElementById("upop").hidden=true;});</script>
+<script>(function(){var o=document.getElementById("uover"),b=document.getElementById("upbtn");function op(){o.hidden=false;document.getElementById("uback").focus();}function cl(){o.hidden=true;b.focus();}b.addEventListener("click",op);document.getElementById("upopx").addEventListener("click",cl);document.getElementById("uback").addEventListener("click",cl);o.addEventListener("click",function(e){if(e.target===o)cl();});document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!o.hidden)cl();});})();</script>
 
 <script>
 "use strict";
