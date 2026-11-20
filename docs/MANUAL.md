@@ -343,8 +343,6 @@ Every combination of buttons and keys, grouped by the button you hold first. Bla
 
 **Presets work both ways.** The FM-1 loads `.mtpreset` presets from **Patternarium** and from **Microtonic**, and the presets you make on the FM1 TONIC can be exported back to `.mtpreset` and used in the **Microtonic VST**. This was tested: the exported presets open and play in Microtonic. The sound is very, very close to the original, not identical. Import and export are on the web page (the backup page: "Restore my presets" and "Export my presets as .mtpreset"). Slots 1 to 8 cannot be exported. What the FM1 TONIC added (ARP notes, late hits, track cuts and sends, compressor, reverb, delay, mute) has no place in a `.mtpreset` and is left out.
 
-To try a Patternarium preset on the emulator page, copy it in Patternarium, then press Ctrl+V (Cmd+V on Mac) anywhere on the page.
-
 Turn **PRESETS** through the 40 places: 01 to 08 are factory presets, 09 to 40 are yours (an empty place loads with the sounds of a factory preset and no pattern: 09 sounds like 01, 10 like 02, and so on in rotation). A question asks first: OCT+ loads it, OCT- keeps your sound. Loading is refused while playing.
 
 - **SAVE** asks SAVE HERE? with the loaded place. OCT+ saves there and keeps the name. ALGORITHM picks another place (1 to 40; amber shows who would be replaced). OCT- goes to CHOOSE SLOT, then the slot screen, then the name screen (ALGORITHM = another made-up name; OCT+ saves). HOME leaves without saving. If nothing was loaded since power-on, SAVE starts at CHOOSE SLOT.
