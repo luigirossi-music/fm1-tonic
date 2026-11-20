@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FM1 TONIC manual</title>
+<meta name="description" content="FM1 TONIC for FM1 TONIC, drum machine firmware for the M-VAVE FM-1.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600&family=Barlow+Semi+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400&display=swap">
+<style>
+:root {
+  --ground: #f4f5f6; --sheet: #ffffff; --ink: #1c1f23; --muted: #5b626a; --rule: #d9dde1;
+  --accent: #3d6f9e; --code-bg: #eef0f2; --swatch-ring: rgba(0,0,0,.18);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #131518; --sheet: #1a1d21; --ink: #e6e8eb; --muted: #9aa1a9; --rule: #2d3137;
+    --accent: #8fb8e0; --code-bg: #24282d; --swatch-ring: rgba(255,255,255,.22);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #131518; --sheet: #1a1d21; --ink: #e6e8eb; --muted: #9aa1a9; --rule: #2d3137;
+  --accent: #8fb8e0; --code-bg: #24282d; --swatch-ring: rgba(255,255,255,.22);
+  color-scheme: dark;
+}
+body {
+  background: var(--ground); color: var(--ink); margin: 0;
+  font: 400 17px/1.6 "Barlow", "Helvetica Neue", Arial, sans-serif;
+  padding-inline: 16px; padding-block: 32px 64px;
+}
+main { max-width: 46rem; margin: 0 auto; }
+h1, h2, h3 { font-family: "Barlow Semi Condensed", "Barlow", "Arial Narrow", sans-serif; text-wrap: balance; line-height: 1.15; }
+h1 { font-size: 2.3rem; font-weight: 700; margin: 0 0 .3rem; letter-spacing: -.01em; }
+h2 { font-size: 1.55rem; font-weight: 600; margin: 3rem 0 .8rem; padding-top: 1rem; border-top: 1px solid var(--rule); }
+h2 .num { color: var(--accent); margin-right: .35em; font-variant-numeric: tabular-nums; }
+h3 { font-size: 1.2rem; font-weight: 600; margin: 2rem 0 .5rem; }
+h4 { font-family: "Barlow Semi Condensed", "Barlow", "Arial Narrow", sans-serif; font-size: 1.05rem; font-weight: 600; margin: 1.6rem 0 .4rem; color: var(--accent); }
+p, li { max-width: 65ch; }
+p { margin: 0 0 1rem; }
+ul, ol { padding-left: 1.3rem; margin: 0 0 1rem; }
+li { margin: .2rem 0; }
+strong { font-weight: 600; }
+.r { color: #c0281c; font-weight: 600; } .o { color: #a85a00; font-weight: 600; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .r { color: #ff7a70; } :root:not([data-theme="light"]) .o { color: #f0a043; } }
+:root[data-theme="dark"] .r { color: #ff7a70; } :root[data-theme="dark"] .o { color: #f0a043; }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+code, pre { font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace; font-size: .86em; }
+code { background: var(--code-bg); padding: .08em .35em; border-radius: 4px; }
+pre { background: var(--code-bg); padding: 14px 16px; border-radius: 8px; overflow-x: auto; line-height: 1.45; margin: 0 0 1.2rem; }
+pre code { background: none; padding: 0; font-size: inherit; }
+hr { display: none; }
+.table { overflow-x: auto; margin: 0 0 1.3rem; }
+table { border-collapse: collapse; width: 100%; font-size: .95rem; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; vertical-align: top; padding: .45rem .7rem .45rem 0; border-bottom: 1px solid var(--rule); }
+th { font-family: "Barlow Semi Condensed", "Barlow", sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; font-size: .82rem; color: var(--muted); }
+td:first-child { white-space: nowrap; }
+.lede { color: var(--muted); margin-bottom: 1.6rem; }
+.status { background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; padding: 12px 16px; }
+.status p { margin: 0; }
+a.home { color: inherit; text-decoration: none; }
+main > a.home { display: inline-block; font: 700 1rem "Barlow Semi Condensed", "Barlow", sans-serif; letter-spacing: .03em; color: var(--muted); margin: 0 0 .4rem; }
+a.home:hover { color: var(--accent); }
+pre:focus-visible, .table:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+.skip { position: absolute; left: 16px; top: -100px; background: var(--sheet); color: var(--accent); padding: 8px 14px;
+        border: 2px solid var(--accent); border-radius: 8px; font-weight: 600; z-index: 10; }
+.skip:focus { top: 12px; }
+.callout { border-left: 3px solid var(--accent); background: var(--sheet); border-radius: 0 8px 8px 0; padding: 10px 16px; margin: 0 0 1.2rem; max-width: 65ch; }
+.callout p { margin: 0; }
+details { border: 1px solid var(--rule); border-radius: 8px; padding: 0 16px; margin: 0 0 1.2rem; }
+details > summary { cursor: pointer; padding: 10px 0; font-weight: 600; color: var(--muted); }
+details[open] > summary { margin-bottom: .4rem; }
+details > :last-child { margin-bottom: 1rem; }
+.swatch { display: inline-block; width: .7em; height: .7em; border-radius: 3px; margin-right: .4em; vertical-align: .02em; box-shadow: 0 0 0 1px var(--swatch-ring); }
+nav.contents ol { columns: 2 14rem; column-gap: 2rem; padding-left: 1.3rem; }
+.figs { display: flex; flex-wrap: wrap; gap: 20px; margin: .4rem 0 1.6rem; }
+figure { margin: 0; flex: 0 1 auto; }
+figure img { display: block; max-width: 100%; height: auto; border-radius: 10px; }
+figure.shot img { width: 300px; image-rendering: pixelated; box-shadow: 0 0 0 1px var(--rule); }
+figure.wide { flex-basis: 100%; }
+figure.wide img { width: 100%; }
+figcaption { color: var(--muted); font-size: .88rem; margin-top: .4rem; max-width: 300px; }
+figure.wide figcaption { max-width: none; }
+nav.contents li { break-inside: avoid; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+/* the top bar (multi-language page): contents button at the left, search, languages; stays in view */
+html { scroll-padding-top: calc(var(--barh, 72px) + 10px); }
+.topbar { position: sticky; top: 0; z-index: 30; display: flex; flex-wrap: wrap; gap: .5rem .8rem; align-items: center;
+          background: var(--sheet); border-bottom: 2px solid var(--accent); padding: .5rem 16px; margin: -32px -16px 28px; }
+.topbar button, .langbar a { font: 700 .95rem "Barlow Semi Condensed", "Barlow", sans-serif; letter-spacing: .02em; color: var(--ink); background: var(--ground);
+             border: 2px solid var(--rule); border-radius: 999px; padding: .35rem 1rem; min-height: 44px; box-sizing: border-box; display: inline-flex; align-items: center; gap: .4rem; cursor: pointer; text-decoration: none; }
+.topbar button:hover, .langbar a:hover { border-color: var(--accent); }
+.topbar button[aria-expanded="true"] { background: var(--accent); border-color: var(--accent); color: var(--sheet); }
+.topbar button:disabled { opacity: .45; cursor: default; }
+.search { display: flex; align-items: center; gap: .35rem; flex: 1 1 14rem; min-width: 0; max-width: 26rem; }
+.search input { flex: 1 1 6rem; min-width: 0; min-height: 44px; box-sizing: border-box; font: 400 1rem "Barlow", Arial, sans-serif; color: var(--ink); background: var(--ground);
+                border: 2px solid var(--rule); border-radius: 999px; padding: .3rem 1rem; }
+.search input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-color: var(--accent); }
+.search .count { font: 600 .85rem "Barlow Semi Condensed", "Barlow", sans-serif; color: var(--muted); white-space: nowrap; min-width: 3.2rem; }
+.search button { padding: .35rem .7rem; }
+.langbar { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; }
+.topbar .ver { margin-left: auto; font: 700 .85rem "Barlow Semi Condensed", "Barlow", sans-serif; letter-spacing: .03em; color: var(--accent); border: 2px solid var(--accent); border-radius: 999px; padding: .2rem .7rem; white-space: nowrap; }
+.docver { margin: .2rem 0 1rem; color: var(--muted); font-size: .92rem; }
+.langbar a[aria-current="true"] { background: var(--accent); border-color: var(--accent); color: var(--sheet); }
+.topbar button:focus-visible, .langbar a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tocpanel { position: fixed; z-index: 25; left: 0; top: var(--barh, 72px); bottom: 0; width: min(24rem, 92vw); overflow-y: auto; background: var(--sheet);
+            border-right: 2px solid var(--accent); box-shadow: 4px 0 16px rgba(0,0,0,.18); padding: 1rem 1.1rem 3rem; }
+.tocpanel[hidden] { display: none; }
+.tocpanel ol { columns: 1; padding-left: 1.2rem; margin: 0; }
+.tocpanel li { margin: .35rem 0; }
+.tocpanel h3 { margin: 0 0 .6rem; font-size: 1.1rem; }
+.langbar .short { display: none; }
+/* wip440: the same compact one-row bar on a phone turned sideways (the two-row bar ate the whole screen, little was left for the contents) */
+@media (max-width: 640px), (orientation: landscape) and (max-height: 520px) {
+  .topbar { gap: .4rem; padding: .4rem 12px; margin-inline: -16px; }
+  .topbar button, .langbar a { min-height: 40px; padding: .25rem .8rem; }
+  #tocbtn .lbl { display: none; }
+  .langbar { gap: .25rem; }
+  .langbar a { padding: .2rem .45rem; font-size: .85rem; border-width: 1px; }
+  #tocbtn { padding: .2rem .7rem; }
+  .langbar .full { display: none; } .langbar .short { display: inline; }
+  .search { flex-basis: 100%; max-width: none; }
+  .search input { min-height: 40px; }
+}
+/* wip424: on a wide screen the contents is a permanent column at the left (never closes); the drawer stays on narrow screens */
+.tocpanel a { text-decoration: none; display: block; padding: .12rem .45rem; border-radius: 6px; }
+.tocpanel a:hover { text-decoration: underline; }
+.tocpanel a.cur { color: var(--accent); font-weight: 600; background: var(--ground); box-shadow: inset 3px 0 0 var(--accent); }
+@media (min-width: 1000px) {
+  :root { --side: 20rem; }
+  body { padding-left: calc(var(--side) + 16px); }
+  .topbar { margin-left: calc(-1 * (var(--side) + 16px)); padding-left: 16px; }
+  #tocbtn { display: none; }
+  .tocpanel { width: var(--side); box-shadow: none; font-size: .95rem; line-height: 1.35; }
+  #tocbody { padding: 1rem .8rem .8rem; }
+  .tocpanel[hidden] { display: flex; }
+  .tocpanel ol { padding-left: 1.1rem; }
+}
+mark.hit { background: #cfe3f7; color: #1c1f23; border-radius: 3px; padding: 0 .08em; }
+mark.hit.cur { background: #8fb8e0; outline: 2px solid #3d6f9e; }
+/* wip428: no second contents list in the middle of the page on screen (the left column has it); print / PDF keep it. The search sits under the contents in the left column */
+@media screen { .lang nav.contents, .lang nav.contents + hr { display: none; } }
+.tocpanel { display: flex; flex-direction: column; padding: 0; }
+.tocpanel[hidden] { display: none; }
+#tocbody { flex: 1 1 auto; overflow-y: auto; padding: 1rem 1.1rem .8rem; min-height: 0; }
+#tocsearch { flex: 0 0 auto; border-top: 2px solid var(--accent); padding: .6rem .8rem; background: var(--sheet); }
+#tocsearch:empty { display: none; }
+#tocsearch .search { max-width: none; flex-wrap: nowrap; gap: .25rem; }
+#tocsearch .search input { flex: 1 1 auto; min-width: 0; padding: .3rem .8rem; }
+#tocsearch .search .count { min-width: 2.4rem; font-size: .8rem; text-align: center; }
+#tocsearch .search button { padding: .2rem .5rem; min-width: 36px; min-height: 40px; }
+@media print { .topbar, .tocpanel { display: none; } mark.hit { background: none; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<main id="content">
+<a class="home" href="../">FM1 TONIC</a>
+<h1>FM1 TONIC</h1>
+<p>Inspired by Microtonic VST by Sonic Charge, FM1 TONIC is an 8-voice drum synthesizer where every sound is synthesized from scratch, with zero samples involved. It pairs a deep percussion engine with a 1-to-64 step sequencer (featuring accents, fills, and 16 patterns per project), a built-in mixer with level and pan, reverb, delay, and a master compressor. With 40 project slots (8 factory presets + 32 user slots) and a workflow built for live performance, it goes effortlessly from punchy, rhythmic beats to evolving ambient textures.</p>
+<h2 id="features">Features</h2>
+<p><strong>Sound</strong></p>
+<ul><li>8-voice drum synthesizer: every track has its own oscillator, pitch mod, noise, mix, EQ and distortion.</li><li>Per-track level and pan, and per-track reverb send and delay send (plus low cut and high cut in the Enhanced engine).</li><li>Enhanced or Classic engine (Classic = only the core sound settings, without the FM1 TONIC extras).</li><li>Track randomizer: a new random sound for the selected track.</li><li>Choke groups (for example closed and open hat).</li><li>Sidechain compressor: any track can duck the others.</li></ul>
+<p><strong>Sequencer</strong></p>
+<ul><li>64-step sequencer, 16 patterns per project. Fixed length 8, 16, 32 or 64 steps, or a free length of 1 to 64.</li><li>Song mode.</li><li>Global accent and per-track accent, fill with retrig (2x, 4x, 8x), and trig % (chance) on every step.</li><li>Parameter lock (limited: 3 knobs per track in each pattern).</li><li>Record automation (limited: 3 knobs per track).</li><li>Live recording, quantized or unquantized. Swing, quantization and tempo.</li><li>Keyboard (ARP): play a track like a keyboard and record the notes into the steps (a piano roll).</li><li>Copy and paste of a pattern, of a track, and of a pattern on the fly while the song plays.</li><li>Mute and solo.</li><li>Undo and redo.</li></ul>
+<p><strong>Mixing and performance</strong></p>
+<ul><li>Master mixer: level and pan of every track (the red dot marks the centre).</li><li>Master compressor.</li><li>Performance page: 2 master effects (reverb and delay), a low cut and ALL FX OFF.</li><li>Memory page: how full the project memory is.</li></ul>
+<p><strong>Projects and saving</strong></p>
+<ul><li>40 project slots: 8 factory presets and 32 of your own.</li><li>Autosave and quick save.</li><li>Name project: GENERATE or MANUAL. Rename project.</li><li>Back up and restore from the web page. Export and import of <code>.mtpreset</code> presets.</li><li>Presets work both ways: load <code>.mtpreset</code> presets from Patternarium and Microtonic, and export yours back for the Microtonic VST (tested; the sound is very close, not identical).</li></ul>
+<p><strong>Screen, lights and settings</strong></p>
+<ul><li>4/4 LED indicator (white keys 1, 5, 9 and 13), key light on or off.</li><li>Zoom knobs (the big dial when a knob turns), colour theme.</li><li>Output volume NORMAL or LOUD. USB audio.</li></ul>
+<p><strong>MIDI</strong></p>
+<ul><li>MIDI channel selector, notes out on or off, clock out on or off.</li><li>Control changes (CC): 26 sound parameters, per selected track or per MIDI channel.</li><li>Remote panel: play the FM-1's own keys from an external keyboard or a Digitakt.</li></ul>
+<h2 id="s1"><span class="num">1</span>The panel</h2>
+<div class="figs"><figure class="wide"><img src="img/fm1-tonic-panel.svg" alt="The FM1 TONIC panel: knobs MASTER, SELECT, PRESETS, ALGORITHM and KNOB 1 to 4; buttons FX, SEL, ENV, LFO, EDIT, GLO, HOME, SAVE, ARP, SEQ, PLAY, REC, OCT- and OCT+; black keys TRACK 1 to 8, ACCENT, FILL, FUNC; white keys 1 to 16" loading="lazy"></figure></div>
+<ul><li><strong>Knobs.</strong> MASTER is the volume. SELECT turns pages (in a list: up and down). PRESETS picks one of the 40 presets. KNOB 1 to 4 set the four values of the page on the screen (the one you turn is enlarged). ALGORITHM turns to a second page or picks a voice, depending on the page (the page tables say which). A small blue triangle in a bottom corner of the screen means there is a second page behind ALGORITHM: right triangle = turn ALGORITHM right, left triangle = turn it left to go back.</li><li><strong>Black keys.</strong> 1 to 8 are TRACK 1 to 8, 9 is ACCENT, 10 is FILL, 11 is FUNC.</li><li><strong>White keys 1 to 16</strong> are the 16 steps of the selected track. A pattern can have up to 64 steps, shown 16 at a time (see SEQ).</li><li><strong>OCT- / OCT+</strong> move the selected track's pitch one octave (on ARP: the keyboard's octave). In a question OCT+ = YES, OCT- = NO.</li></ul>
+<nav class="contents" aria-label="Contents"><h3 id="contents">Contents</h3>
+<ol><li><a href="#s1">The panel</a></li><li><a href="#s2">Signal path</a></li><li><a href="#s3">Pages, button by button</a><ul><li><a href="#button-combinations">Button combinations</a></li></ul></li><li><a href="#s4">Playing</a></li><li><a href="#s5">Presets and saving</a></li><li><a href="#s6">Lights, MIDI and USB</a></li><li><a href="#s7">Install, back up, recover</a></li><li><a href="#s8">The engine</a><ul><li><a href="#sound-recipes">Sound Recipes</a></li></ul></li><li><a href="#s9">Credits</a></li></ol>
+</nav>
+<hr>
+<p><strong>Reading the page tables.</strong> Each button has one table, one row per page. Plain text is what the control does by itself. <span class="r">Red</span> is what it does with <strong>FUNC</strong> held, <span class="o">orange</span> is what it does with <strong>FILL</strong> held (the Digitakt way).</p>
+<p><strong>What works on every page</strong> (the tables below do not repeat it):</p>
+<div class="table"><table><thead><tr><th>Keys</th><th>What it does</th></tr></thead><tbody><tr><td>Black key 1 to 8</td><td>Selects the track and plays it (also while playing).</td></tr><tr><td>White key 1 to 16</td><td>The steps: tap = trig on, tap again = off. A pattern has up to 64 steps, shown 16 at a time.</td></tr><tr><td>White key held + ACCENT / FILL</td><td>That step gets an accent / a fill (again = off).</td></tr><tr><td>ACCENT or FILL held</td><td>The trigs of the track that carry that accent / fill blink on the white keys (the other trigs stay lit).</td></tr><tr><td><span class="r">FUNC + black key 1 to 8</span> / <span class="o">FILL + black key 1 to 8</span></td><td>Mutes the track / solos it (again = back).</td></tr><tr><td><span class="r">FUNC + white key</span></td><td>Changes the pattern (while playing: at the end of the bar).</td></tr><tr><td><span class="r">FUNC + ACCENT</span> / <span class="r">FUNC + FILL</span> / <span class="r">FUNC + PLAY</span></td><td>Copies the pattern / pastes it (it asks PASTE PATTERN?) / clears it (it asks CLEAR PATTERN?). OCT+ = yes, OCT- = no.</td></tr><tr><td><span class="r">FUNC + black key 1 to 8 held, then ACCENT / FILL / PLAY</span></td><td>Copies that track's sound / pastes it / clears that track's pattern (it asks).</td></tr><tr><td><span class="r">FUNC + SEQ</span></td><td>Song mode on / off (it asks).</td></tr><tr><td><span class="r">FUNC + ARP</span></td><td>Deletes the song (it asks).</td></tr><tr><td><span class="r">FUNC + SAVE</span> / <span class="r">FUNC + HOME</span></td><td>Quick save into the loaded place / renames the project.</td></tr><tr><td><span class="r">FUNC + REC</span></td><td>QUANTIZED REC / UNQUANTIZED REC.</td></tr><tr><td>ENV + a knob</td><td>That knob back to its default.</td></tr><tr><td>GLO + ACCENT / GLO + FILL</td><td>Undo / redo (on every page).</td></tr><tr><td>REC + PLAY, then keys and knobs</td><td>Live recording: black keys 1 to 8 write trigs, the knobs write automation (3 knobs per track).</td></tr><tr><td>PLAY</td><td>Starts and stops the pattern.</td></tr><tr><td>OCT- / OCT+</td><td>The track's pitch one octave down / up. In a question: NO / YES.</td></tr></tbody></table></div>
+<p>Exceptions: on PERFORM, MUTE / SOLO and the pattern page the black keys are mute buttons; on ARP every key is a keyboard key. They are all in the next list.</p>
+<p><strong>Where the keys do something else.</strong> The keys of the panel (black keys 1 to 8 = tracks, ACCENT, FILL, FUNC, white keys 1 to 16 = steps) and the shortcuts above are true on every page of this manual, except on the pages in this list, where the keys have another job:</p>
+<div class="table"><table><thead><tr><th>Page</th><th>What the keys do there</th></tr></thead><tbody><tr><td><strong>ARP</strong></td><td>Every key, white and black, is a keyboard key that plays the selected voice.</td></tr><tr><td><strong>PERFORM, MUTE / SOLO, PATTERN</strong> (SEQ, 2nd press)</td><td>Black keys 1 to 8 are mute buttons (solo buttons in SOLO mode), not track select. White keys 1 to 16 pick the next pattern. FUNC and FILL, tapped, switch between MUTE and SOLO mode.</td></tr><tr><td><strong>DUCK</strong> (SENDS, ALGORITHM right)</td><td>Black keys 1 to 8 choose which tracks are ducked.</td></tr><tr><td><strong>CHOKE</strong> (EDIT, ALGORITHM right)</td><td>Black keys 1 to 8 choose which tracks are in the choke group.</td></tr><tr><td><strong>SONG and PATTERNS screens</strong> (song mode)</td><td>White keys 1 to 16 write a pattern into the bar. FILL deletes the bar.</td></tr><tr><td><strong>Copy-paste mode</strong> (after FUNC + ACCENT)</td><td>White keys 1 to 16 are the places to paste into.</td></tr><tr><td><strong>FUNC held</strong></td><td>White keys 1 to 16 are patterns 1 to 16; the keys light where a pattern or a track has notes.</td></tr></tbody></table></div>
+<p><strong>Things that exist only on some pages.</strong></p>
+<div class="table"><table><thead><tr><th>Page</th><th>Keys</th><th>What it does</th></tr></thead><tbody><tr><td>Sound pages: MIX 1, SEL, ENV, LFO, EDIT, VEL</td><td>White key held + knob 1 to 4</td><td><strong>P-lock</strong>: that step gets its own value of the knob. White key held + SAVE + the same knob removes it. A track holds 3 locked knobs per pattern.</td></tr><tr><td>Every page but PERFORM, HOME, SONG, COMP and the lists</td><td>White key held + SELECT</td><td>That step's <strong>chance</strong>: 5 to 100 %, then 1:2, 2:2, 1:3 ... 8:8.</td></tr><tr><td>ENV</td><td>OCT- / OCT+</td><td>The oscillator frequency one octave down / up.</td></tr><tr><td>EDIT</td><td><span class="r">FUNC + knob 2</span>, <span class="r">FUNC, tap EDIT</span>, EDIT or LFO held + <span class="r">FUNC + ACCENT / FILL / PLAY</span></td><td>Joins / leaves the choke group; DELETE AUTOMATION?; copies / pastes / resets this page of the track.</td></tr><tr><td>SEQ</td><td>Knobs, SELECT, ALGORITHM, <span class="o">FILL + SEQ</span></td><td>See the SEQ table in chapter 3.</td></tr><tr><td>GLO &gt; VEL</td><td><span class="r">FUNC + knob 4</span></td><td>A new random sound for the selected track.</td></tr><tr><td>GLOBAL (HOME, 3rd press)</td><td>Knob 4 (or HOME held + SELECT)</td><td>The tempo.</td></tr></tbody></table></div>
+<h2 id="s2"><span class="num">2</span>Signal path</h2>
+<div class="figs"><figure class="wide"><img src="img/fm1-engine.svg" alt="The FM1 TONIC engine: each of the 8 tracks has a pitch modulator and oscillator, a noise filter and noise envelope, a mix, a distortion and an EQ, then cuts, level and pan; the 8 tracks go through the sidechain, the master low cut and the compressor to the master volume; reverb and delay are send effects" loading="lazy"><figcaption>The whole signal path. The small word in each box is the button that opens that page.</figcaption></figure></div>
+<p>Every track makes its sound from scratch with the FM1 TONIC drum engine: a pitch modulator and oscillator, a noise filter and envelope, a mix, a distortion and an EQ, then the track's cuts, level and pan; the 8 tracks go through the sidechain, the master low cut and the compressor to MASTER, with reverb and delay as send effects. Chapter 8 explains every setting.</p>
+<p><strong>Enhanced and classic.</strong> GLO &gt; settings &gt; Tonic Engine is <strong>enhanced</strong> by default. In <strong>classic</strong> the FM1 TONIC extras (the track cuts, the sends, the sidechain) are greyed out and do nothing, so the sound uses only the settings a <code>.mtpreset</code> file can carry. Their values are kept and come back with enhanced. Level and pan stay available in classic. The mode is global, not saved in a preset.</p>
+<h2 id="s3"><span class="num">3</span>Pages, button by button</h2>
+<p>A page with <strong>track</strong> values (knobs 1 to 4 of the sound pages) belongs to the selected track: change track with a black key 1 to 8 and the values change. EDIT or LFO held + <span class="r">FUNC + ACCENT / FILL / PLAY</span> copies, pastes and resets <strong>this page</strong> of the track (track pages only).</p>
+<h3 id="fx">FX</h3>
+<p>Press = MIX 1 → PERFORM → MIX 1. Hold (half a second) = REVERB. From another button's page, FX returns to the last FX page you left.</p>
+<div class="table"><table><thead><tr><th>Page</th><th>Knob 1 · 2 · 3 · 4</th><th>Also on this page</th></tr></thead><tbody><tr><td><strong>MIX 1</strong> (1st press)</td><td>OSC / NOISE mix · EQ FREQ (20 Hz-20 kHz) · DIST · EQ GAIN (64 = flat)</td><td>White key held + knob: p-lock. SAVE + knob: forgets that lock or motion.</td></tr><tr><td><strong>PERFORM</strong> (2nd press)</td><td>REVERB D/W · DELAY D/W (0-100 %, 0 at power-on) · MASTER LOW CUT (20-663 Hz) · ALL FX (right on, left off)</td><td>The big number is the playing pattern. SELECT: next FX pages (stops at the ends). ALGORITHM right: MUTE / SOLO. Black keys 1 to 8: mute. White keys 1 to 16: next pattern. <span class="r">FUNC tap</span>: MUTE mode, or unmute all. <span class="o">FILL tap</span>: SOLO mode, or clear all solos. No p-locks.</td></tr><tr><td><strong>MUTE / SOLO</strong> (PERFORM, ALGORITHM right)</td><td>same as PERFORM</td><td>Eight boxes instead of the number: blue = the track plays. Black keys 1 to 8 mute (MUTE mode) or add / remove a solo (SOLO mode, several at once). ALGORITHM left: back.</td></tr><tr><td><strong>REVERB</strong> (hold FX)</td><td>DECAY · TONE</td><td>ALGORITHM right: REVERB 2.</td></tr><tr><td><strong>REVERB 2</strong></td><td>LOW CUT (of what enters the reverb) · RETURN (level in the mix)</td><td>ALGORITHM left: back.</td></tr><tr><td><strong>DELAY</strong> (hold HOME too)</td><td>TIME (1/32 ... 1/2, with T and dotted values) · FEEDBACK · TONE · TAPE (first eighth = clean digital, then tape with more wear)</td><td>ALGORITHM right: DELAY 2.</td></tr><tr><td><strong>DELAY 2</strong></td><td>LOW CUT · RETURN · PING-PONG (off / on)</td><td>ALGORITHM left: back.</td></tr></tbody></table></div>
+<p>ALL FX off silences PERFORM's two D/W sends and the master low cut; the tracks' own sends keep working. Mutes and solos are shared by PERFORM and MUTE / SOLO; solos are not saved and end when a preset loads. The effects pages are global (all tracks share them): SELECT walks PERFORM, REVERB, DELAY, REVERB 2, DELAY 2.</p>
+<h3 id="home">HOME</h3>
+<p>Press = MIX 2 → SENDS → GLOBAL → MIX 2. Hold = DELAY.</p>
+<div class="table"><table><thead><tr><th>Page</th><th>Knob 1 · 2 · 3 · 4</th><th>Also on this page</th></tr></thead><tbody><tr><td><strong>MIX 2</strong></td><td>LEVEL · PAN · LOW CUT (20-663 Hz, never off) · HIGH CUT (20 kHz down to 1 kHz)</td><td>The two cuts are greyed in classic.</td></tr><tr><td><strong>SENDS</strong></td><td>REVERB SEND · DELAY SEND · SIDECHAIN INPUT (track 1 to 8, big number) · SIDECHAIN THRESHOLD (0-100 %, 0 = nothing ducks)</td><td>ALGORITHM right: the DUCK screen (below). Sends work whatever PERFORM's D/W and ALL FX say.</td></tr><tr><td><strong>DUCK</strong> (SENDS, ALGORITHM right)</td><td>-</td><td>Black keys 1 to 8: blue = ducked, grey = not, purple = the input. The input cannot be ducked. Nothing is ducked until you choose. ALGORITHM left or HOME: back.</td></tr><tr><td><strong>GLOBAL</strong></td><td>QUANTIZATION (1/8 ... 1/32) · SWING · FILL RATE (2x, 4x, 8x) · TEMPO</td><td>-</td></tr></tbody></table></div>
+<p>The duck follows the input track's sound (a long kick ducks for long; a muted input does not duck) and also ducks the tracks' sends. A red dot shows a ducked track, a purple dot the input; the dot pulses each time the input ducks. One sidechain for all tracks, saved with the preset.</p>
+<h3 id="sel-env-lfo-edit-the-voice-pages">SEL, ENV, LFO, EDIT (the voice pages)</h3>
+<p>All four are track pages: p-locks and chance work on them.</p>
+<div class="table"><table><thead><tr><th>Button</th><th>Knob 1 · 2 · 3 · 4</th><th>Also on this page</th></tr></thead><tbody><tr><td><strong>SEL</strong> PITCH MOD</td><td>SHAPE (DECAY, SINE, RANDOM) · AMOUNT (64 = none) · RATE · -</td><td></td></tr><tr><td><strong>ENV</strong> OSCILLATOR</td><td>WAVE (SINE, TRI, SAW) · FREQUENCY (20 Hz-20 kHz) · ATTACK · DECAY</td><td>OCT- / OCT+ move the frequency by an octave.</td></tr><tr><td><strong>LFO</strong> NOISE FILTER</td><td>MODE (LP, BP, HP) · Q · FREQUENCY · -</td><td></td></tr><tr><td><strong>EDIT</strong> NOISE ENVELOPE</td><td>MODE (EXP, LIN, CLAP) · CHOKE button · ATTACK · DECAY</td><td><span class="r">FUNC + knob 2 right</span>: the track joins the choke group; left: leaves. Knob 2 alone only shows a message. ALGORITHM right: the CHOKE screen. <span class="r">FUNC, tap EDIT</span>: DELETE AUTOMATION? (OCT+ yes, OCT- no).</td></tr><tr><td><strong>CHOKE</strong> (EDIT, ALGORITHM right)</td><td>-</td><td>Black keys 1 to 8: blue = in the group. A hit of one track of the group stops the others at once, like a closed hat stops an open one. ALGORITHM left: back. Saved with the preset.</td></tr></tbody></table></div>
+<p>DELETE AUTOMATION removes the selected track's p-locks and recorded motion in the playing pattern (other tracks, other patterns and chances stay; undo works). Holding FUNC + EDIT and then pressing ACCENT, FILL or PLAY is the page copy, not a delete.</p>
+<h3 id="glo">GLO</h3>
+<p>Press = VEL → MIXER → COMP → MEMORY → SETTINGS → VEL.</p>
+<div class="table"><table><thead><tr><th>Page</th><th>Knob 1 · 2 · 3 · 4</th><th>Also on this page</th></tr></thead><tbody><tr><td><strong>VEL</strong></td><td>OSC · NOISE · PITCH MOD (how much velocity moves each) · RANDOM</td><td><span class="r">FUNC + knob 4</span>: the selected track gets a new random sound (the 21 sound settings only; the random never reaches the maximum distortion, by hand you can still turn it all the way). Knob 4 alone only shows a reminder. Track page: p-locks work.</td></tr><tr><td><strong>MIXER</strong></td><td>LEVEL of the four tracks shown</td><td>Eight tall sliders; SELECT switches tracks 1 to 4 / 5 to 8 and, as the blue hint on the screen says, cycles level / pan (pan centre = red). Black keys 1 to 8 pick a track and its group. A hit lights its slider. <span class="r">FUNC + black key 1 to 8</span>: mute. A red dot under a slider = ducked, purple = sidechain input. Chance works here.</td></tr><tr><td><strong>COMP</strong></td><td>ATTACK · RELEASE · THRESHOLD · MAKE-UP</td><td>Master compressor, ratio 4:1, a needle shows gain reduction. Default: nothing compressed (0.0 dB / 0.0 dB). Kept only by SAVE.</td></tr><tr><td><strong>MEMORY</strong></td><td>-</td><td>A battery shows how full the project memory is (patterns, song, motion, ARP notes). Purple from 90 %, FULL at 100 %: a save is then refused.</td></tr><tr><td><strong>SETTINGS</strong></td><td>list (SELECT moves)</td><td>Rows: clock out, notes out, Tonic MIDI channel, output level, USB audio, key light, 4/4 LED, colour theme, zoom knob (yes / no), Tonic Engine, name projects, save, autosave, clear pattern, factory reset, performance, cores, about, battery. The non-obvious ones are explained just below. Changes are kept by themselves about a second and a half after you stop touching things (the sequencer must be stopped).</td></tr></tbody></table></div>
+<h4 id="glo-settings-the-ones-that-are-not-obvious">GLO settings: the ones that are not obvious</h4>
+<p>Settings are in the GLO list (SELECT moves up and down, ALGORITHM changes the value). The defaults are in bold.</p>
+<div class="table"><table><thead><tr><th>Setting</th><th>Choices</th><th>What it does</th></tr></thead><tbody><tr><td><strong>OUTPUT</strong></td><td>NORMAL / <strong>LOUD</strong></td><td>LOUD (the factory setting) makes the FM-1's outputs 6 dB hotter (the codec's full scale). NORMAL keeps 6 dB of headroom: use it if the sound is too loud, and watch the compressor and the limiter.</td></tr><tr><td><strong>USB AUDIO</strong></td><td><strong>FOLLOWS KNOB</strong> / FULL</td><td>FOLLOWS KNOB: the computer receives what the headphones hear, after the MASTER knob. FULL: the computer always receives the full level, and MASTER only changes the FM-1's own outputs (speaker, headphones, line out). Use FULL to record at full level and still monitor quietly.</td></tr><tr><td><strong>4/4 LED</strong></td><td>OFF / <strong>ON</strong></td><td>ON (the factory setting): white keys 1, 5, 9 and 13 glow faintly to mark the four beats of the bar (not on PERFORM).</td></tr><tr><td><strong>ZOOM KNOB</strong></td><td><strong>YES</strong> / NO</td><td>YES: the knob you turn is enlarged over the screen. NO: it is only highlighted, so the whole page stays visible. The SONG screen never zooms.</td></tr><tr><td><strong>NAME PROJECTS</strong></td><td><strong>GENERATE</strong> / MANUAL</td><td>GENERATE makes up the name of a saved project (ALGORITHM = another one). MANUAL: the name screen is a letter editor (see chapter 5).</td></tr><tr><td><strong>TONIC ENGINE</strong></td><td><strong>ENHANCED</strong> / CLASSIC</td><td>CLASSIC greys out and silences the FM1 TONIC extras (track cuts, sends, sidechain) so the sound uses only the settings a <code>.mtpreset</code> file can carry (chapters 2 and 8).</td></tr><tr><td><strong>2ND CORE</strong></td><td><strong>ON</strong> / OFF</td><td>The FM-1's chip has two cores and Tonic shares the sound rendering between them. It takes effect at the next power-on. If the FM-1 ever crashes with two cores it switches itself to OFF; turn it back ON here.</td></tr></tbody></table></div>
+<h3 id="seq-and-arp">SEQ and ARP</h3>
+<div class="table"><table><thead><tr><th>Page</th><th>Knob 1 · 2 · 3 · 4</th><th>Also on this page</th></tr></thead><tbody><tr><td><strong>SEQ</strong> (1st press)</td><td>FIXED LEN (8, 16, 32, 64) · AUTOSCROLL · FREE LEN (1 to 64) · SWING</td><td>White keys: the steps. SELECT: the step pages (16 at a time; AUTOSCROLL off). ALGORITHM: the voice (1 to 8, then AC = the global accent). Hold a step + ACCENT / FILL: flags (accent = dark blue, fill = yellow, both = green). <span class="r">FUNC + SEQ</span>: song mode on / off (confirm with OCT+). <span class="o">FILL + SEQ</span>: the SONG screen.</td></tr><tr><td><strong>PATTERN</strong> (SEQ, 2nd press)</td><td>SONG ON / OFF</td><td>Black keys 1 to 8 mute, white keys 1 to 16 pick the next pattern. A dark key = empty pattern, low light = has notes, slow blink = the current one, fast blink = the next one (cued). <span class="r">FUNC tap</span> and <span class="o">FILL tap</span> as on PERFORM. SEQ again: back.</td></tr><tr><td><strong>ARP</strong></td><td>FIXED LEN · OCTAVE (also OCT- / OCT+, -3 to +3) · - · -</td><td>The SEQ screen, but every key (white and black) plays the selected voice like a keyboard. The C keys (dim) play the voice's own pitch at octave 0. ALGORITHM: the voice. Nothing is recorded. SEQ: back. <span class="r">FUNC + ARP</span>: delete the song (DELETE SONG?).</td></tr></tbody></table></div>
+<p>Making a pattern longer copies what is there into the new part (8 to 16 copies steps 1 to 8 into 9 to 16); making it shorter only shortens it.</p>
+<h3 id="play-rec-save">PLAY, REC, SAVE</h3>
+<div class="table"><table><thead><tr><th>Button</th><th>What it does</th></tr></thead><tbody><tr><td><strong>PLAY</strong></td><td>Play and stop. <span class="r">FUNC + PLAY</span>: clear the pattern (it asks).</td></tr><tr><td><strong>REC</strong></td><td>REC then PLAY: live recording. Every black key 1 to 8 writes a trig of its track at the nearest step; every sound knob you turn is recorded as automation. Not on PERFORM and the pattern page. <span class="r">FUNC + REC</span>: QUANTIZED REC (default) / UNQUANTIZED REC (the hit keeps its exact timing, inside the step); while playing it also switches recording on.</td></tr><tr><td><strong>SAVE</strong></td><td>See chapter 5. <span class="r">FUNC + SAVE</span>: quick save. <span class="r">FUNC + HOME</span>: rename.</td></tr></tbody></table></div>
+<h3 id="button-combinations">Button combinations</h3>
+<p>Every combination of buttons and keys, grouped by the button you hold first. Black key 9 is ACCENT, 10 is FILL, 11 is FUNC. <span class="r">Red</span> = FUNC held, <span class="o">orange</span> = FILL held. The last column says where it works. <strong>"Every page" means every page except ARP and the two PERFORM pages</strong>: on ARP, FUNC, ACCENT and FILL are keyboard keys, and on PERFORM FUNC and FILL are the MUTE and SOLO mode keys, so their combinations do not work there. The one exception is FUNC + PLAY (clear the pattern), which also works on ARP with black key 11 held. GLO + ACCENT / FILL and the combinations made only of buttons and knobs (HOME + SELECT, ENV + a knob ...) do.</p>
+<p><strong>FUNC held (black key 11)</strong></p>
+<div class="table"><table><thead><tr><th>Keys</th><th>What it does</th><th>Where</th></tr></thead><tbody><tr><td><span class="r">FUNC + black key 1 to 8</span></td><td>Mutes the track (again = unmute). It acts when you let the key go.</td><td>Every page</td></tr><tr><td><span class="r">FUNC + white key 1 to 16</span></td><td>Changes to that pattern (while playing: at the end of the bar).</td><td>Every page; not on the SONG screen or in song mode (the song decides)</td></tr><tr><td><span class="r">FUNC + ACCENT</span></td><td>Copies the pattern. The screen says PRESS PATTERN TO PASTE / PRESS SEQ TO EXIT, every pattern key blinks (an empty pattern dimmer) and SEQ blinks: press a pattern key and the copy lands there, that pattern becomes the current one. Tap FUNC alone before choosing to stay in the mode for many pastes. SEQ leaves the mode and opens the sequencer page; <span class="r">FUNC + ACCENT</span> again or any other button leaves it too.</td><td>Every page</td></tr><tr><td><span class="r">FUNC + FILL</span></td><td>Pastes the copied pattern when you let FILL go. It asks PASTE PATTERN? (OCT+ = yes, OCT- = no).</td><td>Every page</td></tr><tr><td><span class="r">FUNC + FILL held + white key</span></td><td>Pastes the copied pattern into that slot at once (no question).</td><td>Every page</td></tr><tr><td><span class="r">FUNC + PLAY</span></td><td>Clears the pattern (it asks CLEAR PATTERN?). It does not start the music.</td><td>Every page, ARP too (there hold black key 11, a piano key on ARP: PLAY does not start / stop while it is held)</td></tr><tr><td><span class="r">FUNC + black key 1 to 8 held, then ACCENT</span></td><td>Copies that track's sound (not its steps).</td><td>Every page</td></tr><tr><td><span class="r">FUNC + black key 1 to 8 held, then FILL</span></td><td>Pastes the copied sound into that track (mute, volume and pan too; the track is not muted by it). No question.</td><td>Every page</td></tr><tr><td><span class="r">FUNC + black key 1 to 8 held, then PLAY</span></td><td>Clears that track's pattern (it asks CLEAR TRACK PATTERN?).</td><td>Every page</td></tr><tr><td><span class="r">FUNC + EDIT or LFO held, then ACCENT</span></td><td>Copies this page of the selected track (only its parameters).</td><td>Pages that have track parameters (not GLO, HOME, SEQ)</td></tr><tr><td><span class="r">FUNC + EDIT or LFO held, then FILL</span></td><td>Pastes it into the selected track, on the same page.</td><td>Pages that have track parameters (not GLO, HOME, SEQ)</td></tr><tr><td><span class="r">FUNC + EDIT or LFO held, then PLAY</span></td><td>Resets this page of the track to its power-on values. No question; undo takes it back.</td><td>Pages that have track parameters (not GLO, HOME, SEQ)</td></tr><tr><td><span class="r">FUNC + EDIT</span>, tapped alone</td><td>DELETE AUTOMATION?: removes the selected track's p-locks and recorded motion in the playing pattern (it asks).</td><td>Every page</td></tr><tr><td><span class="r">FUNC + SEQ</span></td><td>Song mode on / off (it asks: OCT+ = yes).</td><td>Every page</td></tr><tr><td><span class="r">FUNC + ARP</span></td><td>DELETE SONG?: deletes the whole song and leaves song mode (it asks).</td><td>Every page</td></tr><tr><td><span class="r">FUNC + HOME</span></td><td>Renames the project and saves it in the same place.</td><td>Every page</td></tr><tr><td><span class="r">FUNC + SAVE</span></td><td>Quick save into the loaded place. No question.</td><td>Every page</td></tr><tr><td><span class="r">FUNC + REC</span></td><td>Cycles QUANTIZED REC / UNQUANTIZED REC. While playing it also switches recording on.</td><td>Every page</td></tr><tr><td><span class="r">FUNC + OCT- / OCT+</span></td><td>Nothing.</td><td></td></tr><tr><td><span class="r">FUNC + knob 2 (turn right / left)</span></td><td>The selected track joins / leaves the choke group.</td><td>Only EDIT, NOISE ENVELOPE page</td></tr><tr><td><span class="r">FUNC + knob 4</span></td><td>A new random sound for the selected track.</td><td>Only GLO &gt; VEL</td></tr></tbody></table></div>
+<p><strong>FILL held (black key 10)</strong></p>
+<div class="table"><table><thead><tr><th>Keys</th><th>What it does</th><th>Where</th></tr></thead><tbody><tr><td><span class="o">FILL + black key 1 to 8</span></td><td>Solos that track (another key moves the solo, the same key ends it).</td><td>Every page</td></tr><tr><td><span class="o">FILL + SEQ</span></td><td>Back to the SONG screen from any page (in song mode; otherwise NOT IN SONG MODE).</td><td>Every page</td></tr><tr><td><span class="o">FILL</span>, pressed and let go alone</td><td>Deletes the bar on the cursor (no question).</td><td>Only the SONG screen</td></tr><tr><td><span class="o">FILL</span> + a white key held (or FILL first, then white keys)</td><td>That step gets a fill (the track plays 2x, 4x or 8x over it); again = off.</td><td>Pages where white keys are steps</td></tr><tr><td><span class="o">FILL</span> held</td><td>The trigs of the selected track that carry a fill blink on the white keys (the other trigs stay lit).</td><td>Pages where white keys are steps</td></tr><tr><td><span class="r">FUNC + FILL</span></td><td>Paste. See the FUNC list above.</td><td></td></tr></tbody></table></div>
+<p><strong>ACCENT held (black key 9)</strong></p>
+<div class="table"><table><thead><tr><th>Keys</th><th>What it does</th><th>Where</th></tr></thead><tbody><tr><td>White key held + ACCENT (or ACCENT first, then white keys)</td><td>That step gets an accent (loud); again = off.</td><td>Pages where white keys are steps</td></tr><tr><td>ACCENT held</td><td>The trigs of the selected track that carry an accent blink on the white keys (the other trigs stay lit).</td><td>Pages where white keys are steps</td></tr><tr><td><span class="r">FUNC + ACCENT</span></td><td>Copy. See the FUNC list above.</td><td></td></tr></tbody></table></div>
+<p><strong>GLO held</strong></p>
+<div class="table"><table><thead><tr><th>Keys</th><th>What it does</th><th>Where</th></tr></thead><tbody><tr><td>GLO + ACCENT</td><td>Undo.</td><td>Every page, ARP too</td></tr><tr><td>GLO + FILL</td><td>Redo.</td><td>Every page, ARP too</td></tr></tbody></table></div>
+<p><strong>HOME held</strong></p>
+<div class="table"><table><thead><tr><th>Keys</th><th>What it does</th><th>Where</th></tr></thead><tbody><tr><td>HOME + SELECT</td><td>The tempo.</td><td>Every page</td></tr><tr><td>HOME held alone (half a second)</td><td>The DELAY page.</td><td>Every page</td></tr><tr><td>HOME + white key</td><td>Nothing.</td><td></td></tr></tbody></table></div>
+<p><strong>FX held</strong></p>
+<div class="table"><table><thead><tr><th>Keys</th><th>What it does</th><th>Where</th></tr></thead><tbody><tr><td>FX held alone (half a second)</td><td>The REVERB page.</td><td>Every page</td></tr></tbody></table></div>
+<p><strong>ENV held</strong></p>
+<div class="table"><table><thead><tr><th>Keys</th><th>What it does</th><th>Where</th></tr></thead><tbody><tr><td>ENV + a knob</td><td>That knob goes back to its power-on value.</td><td>Pages with knobs</td></tr><tr><td>ENV + white key</td><td>The accent of that step on / off.</td><td>Pages where white keys are steps</td></tr><tr><td>ENV + black key 1 to 8</td><td>Plays that track loud. Recording: the step gets an accent.</td><td>Every page</td></tr></tbody></table></div>
+<p><strong>SAVE held</strong></p>
+<div class="table"><table><thead><tr><th>Keys</th><th>What it does</th><th>Where</th></tr></thead><tbody><tr><td>SAVE + a knob</td><td>That knob's recorded motion is forgotten.</td><td>Pages with knobs</td></tr><tr><td>White key held + SAVE + the same knob</td><td>Removes that step's p-lock of the knob.</td><td>Sound pages</td></tr></tbody></table></div>
+<p><strong>A white key held (a step)</strong></p>
+<div class="table"><table><thead><tr><th>Keys</th><th>What it does</th><th>Where</th></tr></thead><tbody><tr><td>White key held + knob 1 to 4</td><td><strong>P-lock</strong>: that step gets its own value of the knob (3 locked knobs per track and pattern).</td><td>Sound pages: MIX 1, SEL, ENV, LFO, EDIT, VEL</td></tr><tr><td>White key held + SELECT</td><td>That step's chance: 5 to 100 %, then 1:2, 2:2, 1:3 ... 8:8.</td><td>Every page but PERFORM, HOME, SONG, COMP and the lists</td></tr><tr><td>White key held + ACCENT / FILL</td><td>Accent / fill flag.</td><td>See ACCENT and FILL above</td></tr></tbody></table></div>
+<p><strong>Transport and others</strong></p>
+<div class="table"><table><thead><tr><th>Keys</th><th>What it does</th><th>Where</th></tr></thead><tbody><tr><td>REC + PLAY, then keys and knobs</td><td>Live recording: black keys 1 to 8 write trigs, the knobs write automation.</td><td>Not on PERFORM and the pattern page</td></tr><tr><td>OCT- / OCT+</td><td>The selected track's pitch one octave down / up. In a question: NO / YES. On ARP: the keyboard's octave.</td><td>Every page</td></tr><tr><td>A button held alone (about a second)</td><td>A card says what the button does on this page, its combinations included.</td><td>Every button except FX and HOME</td></tr></tbody></table></div>
+<h2 id="s4"><span class="num">4</span>Playing</h2>
+<ul><li><strong>Steps.</strong> Select a track, press a white key to put a step on, press it again to take it off. <strong>Accent</strong> (loud) and <strong>fill</strong> (the track plays four times over that step): hold the white key and press ACCENT and / or FILL (again = flag off), or hold ACCENT / FILL first and press white keys.</li><li><strong>Patterns.</strong> <span class="r">FUNC + white key</span> changes the pattern. <span class="r">FUNC + ACCENT</span> copies, <span class="r">FUNC + FILL</span> pastes (hold FILL and press a white key to paste into that slot), <span class="r">FUNC + PLAY</span> clears. Pasting the pattern asks <strong>PASTE PATTERN?</strong> (OCT+ = yes, OCT- = no) and clearing asks CLEAR PATTERN?. With a black key 1 to 8 held as well, they copy, paste and clear that track only; pasting a track's sound or a page, pasting with FILL and a white key, and the copy-paste mode paste at once, with no question.</li><li><strong>Copy-paste on the fly.</strong> After <span class="r">FUNC + ACCENT</span> the whole screen says <strong>PRESS PATTERN TO PASTE</strong> and <strong>PRESS SEQ TO EXIT</strong> in big blue letters. Every pattern key blinks (a pattern with notes blinks bright, an EMPTY pattern blinks dimmer, the copied one stays lit) and the <strong>SEQ</strong> button blinks too. Press a pattern key and the copy lands there, that pattern becomes the current one, and the mode ends. To paste in many places, <strong>tap FUNC alone</strong> before choosing: the mode stays and the current pattern does not change. To leave the mode press <strong>SEQ</strong>: it opens the <strong>sequencer page</strong>, not the pattern page (the next SEQ press is normal again). Any other button leaves it too, and so does <span class="r">FUNC + ACCENT</span> again (the screen says COPY MODE OFF). Hold <span class="r">FUNC + ACCENT</span> and press a white key = that pattern is the copy. Not available on PERFORM and the pattern page, where FUNC is MUTE mode.</li><li><strong>Mute and solo.</strong> <span class="r">FUNC + black key 1 to 8</span> mutes (again = unmute). <span class="o">FILL + black key 1 to 8</span> solos that track (another key moves the solo, the same key ends it). Solos are not saved and end when a preset loads. Not on ARP.</li><li><strong>P-locks and chance.</strong> Hold a white key and turn a knob on a voice page: that step gets its own value, every other step keeps the sound. While playing, you hear it next time the step comes round. To remove one: hold the step, hold SAVE, turn the same knob. A track holds 3 locked knobs per pattern (the screen says MAX 3 PER TRACK, MOTION FULL when no room is left). Hold a step and turn SELECT: its chance, down from 100 % in 5 % steps, then 1:2, 2:2, 1:3 ... 8:8. While you turn, the chance fills the whole screen (TRIG % and the step), big, so you can read it at once.</li><li><strong>Chains.</strong> A pattern can be flagged to run into the next one when it ends (after pattern 8 comes 1). A flag only counts on a pattern with notes. A preset with chains loads playing through them (SONG ON); SEQ's pattern page knob 1 turns it off and the pattern loops.</li><li><strong>Song mode.</strong> <span class="r">FUNC + SEQ</span>, confirm with OCT+ (OCT- = back). With no song yet, the PATTERNS screen opens: white keys 1 to 16 add patterns, OCT- (or FUNC + a white key) takes the last off, OCT+ is OK. PLAY plays one bar per pattern, looping. The same gesture leaves song mode. On the <strong>SONG screen</strong> (one row per bar) knob 1 = the bar, knob 2 = its pattern, knob 3 = repeats (x1 to x8); white keys write a pattern into the bar on the cursor and move on; FILL, pressed and let go, deletes the bar at once (the last bar deleted = the song is deleted and song mode ends). <span class="r">FUNC + ARP</span> deletes the whole song.</li></ul>
+<h2 id="s5"><span class="num">5</span>Presets and saving</h2>
+<p><strong>Presets work both ways.</strong> The FM-1 loads <code>.mtpreset</code> presets from <strong>Patternarium</strong> and from <strong>Microtonic</strong>, and the presets you make on the FM1 TONIC can be exported back to <code>.mtpreset</code> and used in the <strong>Microtonic VST</strong>. This was tested: the exported presets open and play in Microtonic. The sound is very, very close to the original, not identical. Import and export are on the web page (the backup page: "Restore my presets" and "Export my presets as .mtpreset"). Slots 1 to 8 cannot be exported. What the FM1 TONIC added (ARP notes, late hits, track cuts and sends, compressor, reverb, delay, mute) has no place in a <code>.mtpreset</code> and is left out.</p>
+<p>Turn <strong>PRESETS</strong> through the 40 places: 01 to 08 are factory presets, 09 to 40 are yours (an empty place loads with the sounds of a factory preset and no pattern: 09 sounds like 01, 10 like 02, and so on in rotation). A question asks first: OCT+ loads it, OCT- keeps your sound. Loading is refused while playing.</p>
+<ul><li><strong>SAVE</strong> asks SAVE HERE? with the loaded place. OCT+ saves there and keeps the name. ALGORITHM picks another place (1 to 40; amber shows who would be replaced). OCT- goes to CHOOSE SLOT, then the slot screen, then the name screen (ALGORITHM = another made-up name; OCT+ saves). HOME leaves without saving. If nothing was loaded since power-on, SAVE starts at CHOOSE SLOT.</li><li><span class="r">FUNC + SAVE</span> quick-saves into the loaded place without asking for a slot, also while playing. An empty place saves at once as UNTITLED 01, 02 ...; a full one asks OVERWRITE SLOT? (OCT+ yes).</li><li><span class="r">FUNC + HOME</span> renames the loaded project (ALGORITHM = another name, OCT+ saves, OCT- or HOME cancels). With NAME PROJECTS set to MANUAL (GLO settings) the name screen becomes a letter editor: knob 4 cycles the characters, OCT+ (the screen says OK) takes the letter, OCT- deletes the last one, then press SAVE (8 letters at most; the screen shows PRESS SAVE and TURN KNOB 4 in big letters).</li><li><strong>What is saved.</strong> With AUTOSAVE ON, your working project is saved 4 seconds after you stop touching things, except the compressor, the reverb and the delay: those are kept only by SAVE, inside the preset. PERFORM always starts clean at power-on (D/W 0 %, master low cut 20 Hz, ALL FX on). AUTOSAVE is OFF at the factory: press SAVE (or FUNC + SAVE) to keep your work. The settings are still kept by themselves. Turn AUTOSAVE ON in GLO &gt; SETTINGS if you want the project kept by itself. Factory settings: clock out and notes out off, Tonic MIDI channel 10, remote MIDI channel off, CC mode off (CC CH BASE 1-8), output LOUD, USB audio follows knob, 4/4 LED on, theme TONIC, zoom knob yes, name projects GENERATE, Tonic Engine ENHANCED, 2nd core ON. A new unit or a FACTORY RESET gets them; a unit that already holds a saved project keeps its own settings.</li></ul>
+<h2 id="s6"><span class="num">6</span>Lights, MIDI and USB</h2>
+<ul><li><strong>Lights.</strong> PLAY lights on every 4th step (red while recording). REC: off when not recording; steady while stopped (quantized) and blinking with the beat while playing; two fast and one slow blinks for unquantized. The button of the current page is lit. White keys show the selected track's steps (the playing step flips); 1, 5, 9 and 13 can glow faintly (GLO &gt; 4/4 LED). Black keys 1 to 8: the selected track bright (blinking when muted), tracks with notes dim, and while playing a track's key blinks for each of its hits (not on ARP). With FUNC held the keys show which patterns and tracks have notes.</li><li><strong>MIDI.</strong> Over USB or the TRS MIDI IN, channel 10 by default plays the voices with General MIDI drum notes in voice order: 36, 38, 41, 45, 50, 37, 39, 42, 46, 49, 51 (velocity = loudness). An incoming clock is followed; Start, Stop and Continue control the pattern. GLO settings: TONIC MIDI CH (or OFF), REMOTE MIDI CH (or OFF, see below), CC MODE and CC CH BASE (control changes, see below), CLOCK OUT (clock and start / stop), NOTES OUT (the pattern as notes).</li><li><strong>Remote panel.</strong> GLO &gt; REMOTE MIDI CH (OFF by default) makes a second MIDI channel play the FM-1's own keys. The 27 keys of the panel are the 27 notes from F3 to G5 (MIDI notes 53 to 79, middle C = 60), laid out like a piano keyboard: the first key, F3, is note 53, the last, G5, is note 79. A note on presses the key, a note off lets it go, so a long note holds the key down. Everything a key does on the panel works the same: black keys 1 to 8 select or mute the tracks, white keys 1 to 16 are the steps or the patterns, and the black keys 9, 10 and 11 are ACCENT (note 73), FILL (note 75) and FUNC (note 78). A chord is fine in any note order: ACCENT, FILL and FUNC are always applied first, so FUNC + ACCENT + a white key works when the three notes arrive together. All Notes Off (controller 123) lets every key go. Notes on the remote channel do not play the voices; give it a channel different from TONIC MIDI CH. Notes outside 53 to 79 are ignored.</li></ul>
+<div class="table"><table><thead><tr><th>Key</th><th>Notes</th></tr></thead><tbody><tr><td>White keys 1 to 16</td><td>53, 55, 57, 59, 60, 62, 64, 65, 67, 69, 71, 72, 74, 76, 77, 79</td></tr><tr><td>Black keys 1 to 8 (tracks)</td><td>54, 56, 58, 61, 63, 66, 68, 70</td></tr><tr><td>Black key 9 = ACCENT, 10 = FILL, 11 = FUNC</td><td>73, 75, 78</td></tr></tbody></table></div>
+<h3 id="control-changes-cc">Control changes (CC)</h3>
+<p>A control change turns a knob from outside: the CC number is the <strong>parameter</strong> (the same numbers for every track) and the <strong>track</strong> is picked in one of two ways. GLO &gt; <strong>CC MODE</strong> chooses (OFF by default: nothing reacts to CC until you switch it on):</p>
+<div class="table"><table><thead><tr><th>CC MODE</th><th>What it does</th></tr></thead><tbody><tr><td>OFF</td><td>Every control change is ignored.</td></tr><tr><td>SELECTED</td><td>A CC on the Tonic's channel (TONIC MIDI CH) moves the parameter of the <strong>selected</strong> track.</td></tr><tr><td>CHANNELS</td><td>A block of 8 channels, one per track: the first channel of GLO &gt; <strong>CC CH BASE</strong> is track 1, the next track 2, and so on (base 1 = channels 1-8). Any track can be moved at any time, with no need to select it first.</td></tr><tr><td>BOTH</td><td>Both together. If the Tonic's channel is inside the block, the block wins on that channel.</td></tr></tbody></table></div>
+<p>Notes still play the voices on TONIC MIDI CH and the remote panel keeps its own channel, so give the block channels that those two do not use (the default block 1-8 leaves 10 and 11 free). A CC moves the value as the knob does, so the screen, SAVE and the autosave follow; it does not open the big dial, it does not lock a step and it is not recorded. A CC 0-127 is the knob's 0-127; a three-way switch (waveform, filter mode, envelope mode) splits the range in three. In the CLASSIC engine the extras (low cut, high cut, reverb send, delay send) ignore CC like their greyed knobs.</p>
+<div class="table"><table><thead><tr><th>CC</th><th>Parameter</th><th>CC</th><th>Parameter</th></tr></thead><tbody><tr><td>7</td><td>LEVEL</td><td>29</td><td>NOISE FILTER FREQ</td></tr><tr><td>10</td><td>PAN</td><td>30</td><td>NOISE ENV MODE</td></tr><tr><td>20</td><td>OSC WAVE</td><td>31</td><td>NOISE ENV ATTACK</td></tr><tr><td>21</td><td>OSC FREQ</td><td>102</td><td>NOISE ENV DECAY</td></tr><tr><td>22</td><td>OSC ATTACK</td><td>103</td><td>MIX</td></tr><tr><td>23</td><td>OSC DECAY</td><td>104</td><td>DIST</td></tr><tr><td>24</td><td>PITCH MOD SHAPE</td><td>105</td><td>EQ FREQ</td></tr><tr><td>25</td><td>PITCH MOD AMOUNT</td><td>106</td><td>EQ GAIN</td></tr><tr><td>26</td><td>PITCH MOD RATE</td><td>107</td><td>VELOCITY OSC</td></tr><tr><td>27</td><td>NOISE FILTER MODE</td><td>108</td><td>VELOCITY NOISE</td></tr><tr><td>28</td><td>NOISE FILTER Q</td><td>109</td><td>VELOCITY PITCH MOD</td></tr><tr><td>110</td><td>LOW CUT</td><td>112</td><td>REVERB SEND</td></tr><tr><td>111</td><td>HIGH CUT</td><td>113</td><td>DELAY SEND</td></tr></tbody></table></div>
+<h3 id="connect-a-digitakt-or-digitone">Connect a Digitakt or Digitone</h3>
+<p>The USB socket of the FM-1 and the one of the Digitakt or Digitone are both "device" sockets, so they cannot talk to each other. Use the MIDI OUT (5-pin) of the Digitakt or Digitone into the TRS MIDI IN of the FM-1, with a 5-pin to 3.5 mm TRS MIDI adapter (type A or B: if nothing arrives, try the other type).</p>
+<ol><li>On the FM-1: GLO settings, TONIC MIDI CH = 10 (the voices) and REMOTE MIDI CH = 11 (the panel), or any two different channels.</li><li>On the Digitakt or Digitone: use two MIDI tracks and set their channels to those two numbers. The first plays the voices with the drum notes (36, 38, 41, 45, 50, 37, 39, 42, 46, 49, 51). The second is the remote panel: draw the notes of the table above in its step grid or piano roll.</li><li>A MIDI track plays up to 4 notes in one step, with one length for all of them: the note length is how long the keys are held, so a long note for FUNC with other notes on later steps is FUNC + those keys, and a chord of FUNC + ACCENT + a white key is one step.</li><li>To move the sound from the Digitakt's or Digitone's CC lanes: set GLO &gt; CC MODE = CHANNELS, make one MIDI track per Tonic track on channels 1 to 8 (or from CC CH BASE) and assign its CC lanes to the numbers of the table above; each MIDI track has only so many CC lanes (16 on the Digitakt II, fewer on the first Digitakt), so pick the parameters you want to automate on each track.</li><li>To follow the Digitakt's or Digitone's tempo and start / stop, switch on its MIDI clock and transport out; the FM-1 follows an incoming clock.</li></ol>
+<h3 id="connect-a-midi-keyboard">Connect a MIDI keyboard</h3>
+<p>The FM-1 cannot be the host of a USB keyboard. Use a keyboard with a 5-pin MIDI OUT (with a 5-pin to TRS adapter into the TRS MIDI IN), or send a USB keyboard through a computer or a USB MIDI host box to the FM-1's USB socket.</p>
+<ol><li>On the FM-1: GLO settings, REMOTE MIDI CH = the channel the keyboard sends on (1 is the usual one).</li><li>Play the notes F3 to G5 (53 to 79). Hold one key for FUNC (note 78, F#5), ACCENT (note 73, C#5) or FILL (note 75, D#5) and press the others: copy, paste, pattern change, mute and solo work as on the panel. A 49-key keyboard covers the whole panel; on a smaller one, move it with the octave buttons.</li></ol>
+<ul><li><strong>USB audio.</strong> The same cable carries what the headphones hear, after MASTER, as a 2-channel 44.1 kHz input, with no driver (GLO &gt; USB AUDIO = FULL sends the full level whatever MASTER says). The first moment after an app opens it can click.</li></ul>
+<h2 id="s7"><span class="num">7</span>Install, back up, recover</h2>
+<ul><li><strong>Try it:</strong> the <a href="https://luigirossi-music.github.io/fm1-tonic/emu/">emulator</a> runs the same code in the browser.</li><li><strong>Install or update:</strong> open the <a href="https://luigirossi-music.github.io/fm1-tonic/install/">web installer</a> in Chrome or Edge, connect the FM-1 with a USB data cable, press Install and do not unplug it while it writes. Another firmware does not keep your project: save it to a file first. "Back to the stock firmware" at the bottom of the same page puts M-VAVE's firmware back. Installing other firmware is at your own risk.</li><li><strong>Back up:</strong> the <a href="https://luigirossi-music.github.io/fm1-tonic/backup/">backup page</a> saves the project to an <code>.x0b</code> file (Back up), loads it back (Restore: stop the FM-1, then answer RESTORE FROM USB? with SEL), exports presets as <code>.mtpreset</code> files, and backs up / restores slots 9 to 40 as <code>.tnp</code> files. Command line: <code>python3 tools/x0x_backup.py backup my-song.x0b</code> (also <code>restore</code>, <code>info</code>).</li><li><strong>If something goes wrong:</strong> hold OCT- and OCT+ for five seconds = update mode; hold them while switching on = hardware calibration. After a crash a red CRASH screen restarts the FM-1; if it crashes twice at start it enters SAFE MODE (no sound, USB works: reinstall from the installer; PLAY tries a normal start). If even that fails, the Mac rescue script in <code>tools/fm1_rescue.sh</code> puts M-VAVE's firmware back (it checks every file it writes; running it again is safe).</li><li><strong>If an update is refused.</strong> If the FM-1 will not change firmware (for example with "Back to the stock firmware"), its update screen shows FAILED, an error number with a short reason (for example ERROR -5 HEAD DIFFERS) and the step where it stopped, for 8 seconds, and then the FM-1 starts FM1 TONIC again. ERROR -5 means the start area (the "head") of your FM-1 is not the one of the firmware you are going to. For this error the screen also shows the first byte that differs, how many bytes differ and both checksums (CRC), for 40 seconds. Note these numbers if you ask for help.</li><li><strong>A custom bootloader.</strong> If you put a custom bootloader on the FM-1 (for example m-bootloader, with M-Flasher), going back to M-VAVE's official firmware from the web page can be refused with ERROR -5 HEAD DIFFERS. Put M-VAVE's stock bootloader back first (in M-Flasher: FLASH BOOTLOADER, then STOCK (FROM .FWSC) with the official package), then go back to the stock firmware. On the author's FM-1 this made everything work again.</li><li><strong>Newer FM-1 units.</strong> Some newer FM-1s have another flash chip (ID B36014 instead of 856014). FM1 TONIC accepts both, so saving, presets, backup and restore work on them too (not yet tested on a unit with the new chip).</li><li><strong>Full text</strong> of the install, backup, rescue and parameter chapters: <code>docs/reference/MANUAL_full_wip381.md</code>.</li></ul>
+<h2 id="s8"><span class="num">8</span>The engine</h2>
+<p>Each of the 8 tracks is a complete drum synthesizer: the FM1 TONIC engine, nothing sampled. The 8 tracks are identical and each has the same <strong>26 settings</strong>, kept per track and saved with the preset. This chapter is the reference for all of them. Where a setting lives is written as button · knob.</p>
+<pre tabindex="0" aria-label="Commands"><code>pitch mod ─► OSCILLATOR ─┐
+                         ├─► MIX ─► EQ ─► DIST ─► LEVEL ─┐
+NOISE ─► filter ─► env ──┘                               │
+          ┌──────────────────────────────────────────────┘
+          └─► LOW CUT ─► HIGH CUT ─┬─► PAN ─► master
+                                   └─► REVERB / DELAY SEND</code></pre>
+<p>A hit rings until its envelopes die away. A new hit on the same track cuts the one still ringing (drums are monophonic), and a track in the choke group is cut by the others (3 ms fade).</p>
+<p><strong>The knobs are curves, not straight lines.</strong> Frequencies, times and Q are exponential: the middle of the knob is not the middle of the value. On the screen frequencies show in Hz or kHz, the pitch mod AMOUNT in semitones (sm) and pan as L / C / R, the OSC/NOISE MIX as two percentages (100.00/00.00 = oscillator only, 00.00/100.00 = noise only); every other knob shows a plain number 0 to 127. Use this table to see what those numbers mean.</p>
+<div class="table"><table><thead><tr><th>Knob</th><th>0</th><th>32</th><th>64</th><th>96</th><th>127</th></tr></thead><tbody><tr><td><strong>Frequency</strong> (oscillator, noise filter, EQ)</td><td>20 Hz</td><td>114 Hz</td><td>650 Hz</td><td>3.7 kHz</td><td>20 kHz</td></tr><tr><td><strong>Decay</strong> (oscillator, noise, pitch-mod drop)</td><td>10 ms</td><td>57 ms</td><td>0.33 s</td><td>1.8 s</td><td>10 s</td></tr><tr><td><strong>Attack</strong> (oscillator, noise)</td><td>0</td><td>20 ms</td><td>0.16 s</td><td>1 s</td><td>5 s</td></tr><tr><td><strong>Filter Q</strong></td><td>0.1</td><td>1.8</td><td>33</td><td>600</td><td>10000</td></tr></tbody></table></div>
+<p>A decay is the time the sound takes to fall to silence (60 dB down).</p>
+<h3 id="oscillator-the-tone">Oscillator: the tone</h3>
+<div class="table"><table><thead><tr><th>Setting</th><th>Where</th><th>Range</th><th>What it does</th></tr></thead><tbody><tr><td><strong>WAVE</strong></td><td>ENV · knob 1</td><td>SINE, TRI, SAW</td><td>SINE is pure and soft, TRI hollow, SAW bright and buzzy.</td></tr><tr><td><strong>FREQUENCY</strong></td><td>ENV · knob 2</td><td>20 Hz to 20 kHz</td><td>The pitch. Kick about 40 to 70 Hz, toms 80 to 250 Hz, snare body 150 to 250 Hz. OCT- / OCT+ move it an octave.</td></tr><tr><td><strong>ATTACK</strong></td><td>ENV · knob 3</td><td>0 to 5 s</td><td>0 starts at once. Raise it for a swell. The first quarter of the knob is under 20 ms.</td></tr><tr><td><strong>DECAY</strong></td><td>ENV · knob 4</td><td>10 ms to 10 s</td><td>How long it rings: short = click or tick, long = boom.</td></tr></tbody></table></div>
+<h3 id="pitch-mod-the-pitch-moves-while-the-sound-plays">Pitch mod: the pitch moves while the sound plays</h3>
+<div class="table"><table><thead><tr><th>Setting</th><th>Where</th><th>Range</th><th>What it does</th></tr></thead><tbody><tr><td><strong>SHAPE</strong></td><td>SEL · knob 1</td><td>DECAY, SINE, RANDOM</td><td>The kind of movement (below).</td></tr><tr><td><strong>AMOUNT</strong></td><td>SEL · knob 2</td><td>64 = none; up to 8 octaves each way</td><td>Above 64 the pitch goes up, below 64 down. With DECAY the sound starts that far away and glides to the set pitch.</td></tr><tr><td><strong>RATE</strong></td><td>SEL · knob 3</td><td>depends on SHAPE</td><td>DECAY: how long the glide takes, 10 ms to 10 s (kick drop = short, laser = long). SINE: the speed of the wobble, 0 to 2000 Hz; only the first few steps are a vibrato, higher is FM (bells, zaps), and a higher rate also lets it last longer. RANDOM: how fast the pitch wanders at random, 20 Hz to 20 kHz; slow drifts, fast turns metallic.</td></tr></tbody></table></div>
+<h3 id="noise-the-snap-and-the-hiss">Noise: the snap and the hiss</h3>
+<p>The noise is white noise through a filter and an envelope. The oscillator and the noise are separate: the MIX decides how much of each you hear.</p>
+<div class="table"><table><thead><tr><th>Setting</th><th>Where</th><th>Range</th><th>What it does</th></tr></thead><tbody><tr><td><strong>FILTER MODE</strong></td><td>LFO · knob 1</td><td>LP, BP, HP</td><td>LP keeps the lows (thud, dark), HP the highs (hat, sizzle), BP a band around the frequency.</td></tr><tr><td><strong>FILTER Q</strong></td><td>LFO · knob 2</td><td>0.1 to 10000</td><td>Resonance. Low = gentle, around knob 64 = a strong peak, high = the filter rings as a pitched tone: BP with a high Q and a short envelope is a tuned ping (tom, cowbell, block).</td></tr><tr><td><strong>FILTER FREQUENCY</strong></td><td>LFO · knob 3</td><td>20 Hz to 20 kHz</td><td>Where the filter works.</td></tr><tr><td><strong>ENVELOPE MODE</strong></td><td>EDIT · knob 1</td><td>EXP, LIN, CLAP</td><td>EXP: a quick rise and a natural fall, like the oscillator. LIN: a straight-line rise and fall. CLAP: a few short bursts, like hands.</td></tr><tr><td><strong>ENVELOPE ATTACK</strong></td><td>EDIT · knob 3</td><td>0 to 5 s</td><td>EXP and LIN: the rise. CLAP: how long the noise stays at full level before the bursts start.</td></tr><tr><td><strong>ENVELOPE DECAY</strong></td><td>EDIT · knob 4</td><td>10 ms to 10 s</td><td>The fall. In CLAP it also sets the gap between the bursts: short = a fast buzz, long = separate claps.</td></tr></tbody></table></div>
+<h3 id="mix-eq-distortion">Mix, EQ, distortion</h3>
+<div class="table"><table><thead><tr><th>Setting</th><th>Where</th><th>Range</th><th>What it does</th></tr></thead><tbody><tr><td><strong>OSC/NOISE MIX</strong></td><td>FX · knob 1</td><td>100.00/00.00 to 00.00/100.00</td><td>The screen shows the oscillator share and the noise share in percent. 100.00/00.00 = oscillator only, 49.61/50.39 (the middle of the knob) = both at full level, 00.00/100.00 = noise only. A new track starts at 100.00/00.00: no noise until you move it.</td></tr><tr><td><strong>EQ FREQUENCY</strong></td><td>FX · knob 2</td><td>20 Hz to 20 kHz</td><td>The centre of the one EQ band.</td></tr><tr><td><strong>DIST</strong></td><td>FX · knob 3</td><td>0 to 127</td><td>Distortion, very steep: the first quarter is a gentle warmth, past the middle it is heavy, at the top a fuzz. It is lopsided, so it adds loudness and grit.</td></tr><tr><td><strong>EQ GAIN</strong></td><td>FX · knob 4</td><td>64 = flat; 40 dB each way</td><td>Boost or cut of the band (wide, one bell). The EQ comes <strong>before</strong> the distortion, so boosting then distorting gives a heavier sound than the reverse.</td></tr></tbody></table></div>
+<h3 id="velocity-accents-that-change-the-sound">Velocity: accents that change the sound</h3>
+<p>The sequencer plays a normal step at about a third of full velocity and an accented step at full. The three VELOCITY knobs (GLO · VEL, knobs 1 to 3) say how much a part follows it.</p>
+<div class="table"><table><thead><tr><th>Setting</th><th>Where</th><th>What it does</th></tr></thead><tbody><tr><td><strong>OSC</strong></td><td>GLO · knob 1</td><td>0 = the oscillator ignores velocity. Higher = on normal steps it gets quieter, accents stay full.</td></tr><tr><td><strong>NOISE</strong></td><td>GLO · knob 2</td><td>The same for the noise.</td></tr><tr><td><strong>PITCH MOD</strong></td><td>GLO · knob 3</td><td>The same for the pitch-mod amount: on normal steps the movement shrinks.</td></tr></tbody></table></div>
+<p>It is steep: a small value already cuts a normal step a lot, and from about knob 95 a normal step loses that part completely. With all three at 0, an accent sounds exactly like a normal step: the accent is only heard through these knobs. For example, a snare with VELOCITY OSC high has its tone only on accents, and plays noise alone on normal steps.</p>
+<h3 id="output-level-pan-cuts-sends">Output: level, pan, cuts, sends</h3>
+<div class="table"><table><thead><tr><th>Setting</th><th>Where</th><th>Range</th><th>What it does</th></tr></thead><tbody><tr><td><strong>LEVEL</strong></td><td>HOME · knob 1</td><td>silence to about +10 dB (default 101 = about -2.5 dB)</td><td>The track's volume. The voice clips at full scale: if it crackles, lower it.</td></tr><tr><td><strong>PAN</strong></td><td>HOME · knob 2</td><td>0 left, 64 centre, 127 right</td><td>Position in the stereo field.</td></tr><tr><td><strong>LOW CUT</strong></td><td>HOME · knob 3</td><td>20 to 663 Hz</td><td>Takes out the lows (12 dB per octave). At 20 Hz it does nothing audible.</td></tr><tr><td><strong>HIGH CUT</strong></td><td>HOME · knob 4</td><td>20 kHz down to 1 kHz</td><td>Takes out the highs (12 dB per octave). Fully right = open.</td></tr><tr><td><strong>REVERB SEND</strong></td><td>HOME, 2nd press · knob 1</td><td>0 to 127</td><td>How much of the track goes to the reverb.</td></tr><tr><td><strong>DELAY SEND</strong></td><td>HOME, 2nd press · knob 2</td><td>0 to 127</td><td>The same for the delay.</td></tr></tbody></table></div>
+<p>The sends leave after the cuts and the sidechain, before the pan, and work whatever PERFORM's D/W and ALL FX say.</p>
+<h3 id="around-the-voice">Around the voice</h3>
+<p>Shared by all the tracks:</p>
+<ul><li><strong>Choke group</strong> (EDIT, ALGORITHM right): a hit of one track in the group stops the others at once (closed hat stops open hat).</li><li><strong>Sidechain</strong> (HOME, 2nd press): one input track makes the tracks you choose on the DUCK screen duck while it sounds; the threshold knob sets how deep (0 = off).</li><li><strong>Master low cut</strong> (PERFORM · knob 3, 20 to 663 Hz): a low cut on the whole mix, before the compressor.</li><li><strong>Compressor</strong> (GLO · COMP): 4:1, soft knee, attack 0.1 to 100 ms, release 10 to 1500 ms, threshold -48 to 0 dB, make-up 0 to 24 dB. A limiter after it keeps the output below full scale.</li><li><strong>Reverb</strong> (hold FX): decay, tone, low cut, return level; a grainy, early-digital room. <strong>Delay</strong> (hold HOME): tempo-synced time (1/32 to 1/2), feedback, tone, TAPE (clean digital to worn tape), low cut, return, ping-pong.</li></ul>
+<h3 id="enhanced-and-classic">Enhanced and classic</h3>
+<p>22 of the 26 settings are what a Patternarium preset carries (the 21 sound settings, level included, plus pan). Four are <strong>extras of the FM1 TONIC</strong>: LOW CUT, HIGH CUT, REVERB SEND and DELAY SEND, as are the choke group, the sidechain, the master section, p-locks, chance and microtiming. In <strong>classic</strong> (GLO &gt; settings &gt; TONIC ENGINE) the four extras are greyed and silent, and the sidechain too, so what you build uses only the settings a <code>.mtpreset</code> file carries; the values come back in enhanced. A loaded Patternarium preset keeps its exact values until you turn that knob.</p>
+<h3 id="sound-recipes">Sound Recipes</h3>
+<p>These are starting points: change one value at a time and listen.</p>
+<h4 id="kick">Kick</h4>
+<div class="table"><table><thead><tr><th>Button</th><th>Knob 1</th><th>Knob 2</th><th>Knob 3</th><th>Knob 4</th></tr></thead><tbody><tr><td><strong>FX</strong></td><td>OSC/NOISE MIX 100.00/00.00</td><td>EQ FREQ 20 Hz</td><td>DIST 20</td><td>EQ GAIN 64</td></tr><tr><td><strong>SEL</strong></td><td>SHAPE DECAY</td><td>AMOUNT +37.04 sm</td><td>RATE 25</td><td>-</td></tr><tr><td><strong>ENV</strong></td><td>WAVE SINE</td><td>FREQUENCY 56 Hz</td><td>ATTACK 0</td><td>DECAY 72</td></tr><tr><td><strong>LFO</strong></td><td>not heard (OSC/NOISE MIX 100.00/00.00), leave</td><td></td><td></td><td></td></tr><tr><td><strong>EDIT</strong></td><td>not heard (OSC/NOISE MIX 100.00/00.00), leave</td><td></td><td></td><td></td></tr><tr><td><strong>GLO</strong></td><td>OSC 0</td><td>NOISE 0</td><td>PITCH MOD 0</td><td>leave</td></tr></tbody></table></div>
+<p>AMOUNT is the depth of the drop and RATE its speed. For a click, set MIX 40 on FX, then LFO: MODE HP, FREQUENCY 2.9 kHz, and EDIT: DECAY 15. For a longer boom, raise ENV DECAY.</p>
+<h4 id="snare">Snare</h4>
+<div class="table"><table><thead><tr><th>Button</th><th>Knob 1</th><th>Knob 2</th><th>Knob 3</th><th>Knob 4</th></tr></thead><tbody><tr><td><strong>FX</strong></td><td>OSC/NOISE MIX 49.61/50.39</td><td>EQ FREQ 20 Hz</td><td>DIST 15</td><td>EQ GAIN 64</td></tr><tr><td><strong>SEL</strong></td><td>SHAPE DECAY</td><td>AMOUNT +12.85 sm</td><td>RATE 13</td><td>-</td></tr><tr><td><strong>ENV</strong></td><td>WAVE TRI</td><td>FREQUENCY 196 Hz</td><td>ATTACK 0</td><td>DECAY 46</td></tr><tr><td><strong>LFO</strong></td><td>MODE HP</td><td>Q 22</td><td>FREQUENCY 2.0 kHz</td><td>-</td></tr><tr><td><strong>EDIT</strong></td><td>MODE EXP</td><td>leave</td><td>ATTACK 0</td><td>DECAY 55</td></tr><tr><td><strong>GLO</strong></td><td>OSC 0</td><td>NOISE 0</td><td>PITCH MOD 0</td><td>leave</td></tr></tbody></table></div>
+<p>More snap: raise MIX. More body: lower MIX. For soft ghost notes, set GLO NOISE to 30: normal steps play the noise quieter and accents play it in full.</p>
+<h4 id="closed-hat">Closed hat</h4>
+<div class="table"><table><thead><tr><th>Button</th><th>Knob 1</th><th>Knob 2</th><th>Knob 3</th><th>Knob 4</th></tr></thead><tbody><tr><td><strong>FX</strong></td><td>OSC/NOISE MIX 00.00/100.00</td><td>EQ FREQ 20 Hz</td><td>DIST 0</td><td>EQ GAIN 64</td></tr><tr><td><strong>SEL</strong></td><td>not heard (OSC/NOISE MIX 00.00/100.00), leave</td><td></td><td></td><td></td></tr><tr><td><strong>ENV</strong></td><td>not heard (OSC/NOISE MIX 00.00/100.00), leave</td><td></td><td></td><td></td></tr><tr><td><strong>LFO</strong></td><td>MODE HP</td><td>Q 22</td><td>FREQUENCY 7.1 kHz</td><td>-</td></tr><tr><td><strong>EDIT</strong></td><td>MODE EXP</td><td>leave</td><td>ATTACK 0</td><td>DECAY 25</td></tr><tr><td><strong>GLO</strong></td><td>OSC 0</td><td>NOISE 0</td><td>PITCH MOD 0</td><td>leave</td></tr></tbody></table></div>
+<p>OSC/NOISE MIX 00.00/100.00 means noise only. Lower the LFO frequency for a darker hat.</p>
+<h4 id="open-hat">Open hat</h4>
+<p>The same as the closed hat, with <strong>EDIT DECAY 68</strong>. Put the two hats in one <strong>choke group</strong> so the closed hat stops the open one: on each of the two tracks hold FUNC and turn EDIT knob 2 to the right.</p>
+<h4 id="clap">Clap</h4>
+<div class="table"><table><thead><tr><th>Button</th><th>Knob 1</th><th>Knob 2</th><th>Knob 3</th><th>Knob 4</th></tr></thead><tbody><tr><td><strong>FX</strong></td><td>OSC/NOISE MIX 00.00/100.00</td><td>EQ FREQ 20 Hz</td><td>DIST 0</td><td>EQ GAIN 64</td></tr><tr><td><strong>SEL</strong></td><td>not heard (OSC/NOISE MIX 00.00/100.00), leave</td><td></td><td></td><td></td></tr><tr><td><strong>ENV</strong></td><td>not heard (OSC/NOISE MIX 00.00/100.00), leave</td><td></td><td></td><td></td></tr><tr><td><strong>LFO</strong></td><td>MODE BP</td><td>Q 40</td><td>FREQUENCY 1.1 kHz</td><td>-</td></tr><tr><td><strong>EDIT</strong></td><td>MODE CLAP</td><td>leave</td><td>ATTACK 0</td><td>DECAY 60</td></tr><tr><td><strong>GLO</strong></td><td>OSC 0</td><td>NOISE 0</td><td>PITCH MOD 0</td><td>leave</td></tr></tbody></table></div>
+<p>With these values you get 3 to 4 quick bursts in about a tenth of a second. EDIT DECAY lower = a tighter buzz, higher = slower, more separate claps and a longer tail (75 to 85). A little reverb send (HOME, 2nd press) makes it a room clap.</p>
+<h4 id="tom">Tom</h4>
+<div class="table"><table><thead><tr><th>Button</th><th>Knob 1</th><th>Knob 2</th><th>Knob 3</th><th>Knob 4</th></tr></thead><tbody><tr><td><strong>FX</strong></td><td>OSC/NOISE MIX 100.00/00.00</td><td>EQ FREQ 20 Hz</td><td>DIST 0</td><td>EQ GAIN 64</td></tr><tr><td><strong>SEL</strong></td><td>SHAPE DECAY</td><td>AMOUNT +17.39 sm</td><td>RATE 20</td><td>-</td></tr><tr><td><strong>ENV</strong></td><td>WAVE SINE</td><td>FREQUENCY 120 Hz</td><td>ATTACK 0</td><td>DECAY 65</td></tr><tr><td><strong>LFO</strong></td><td>not heard (OSC/NOISE MIX 100.00/00.00), leave</td><td></td><td></td><td></td></tr><tr><td><strong>EDIT</strong></td><td>not heard (OSC/NOISE MIX 100.00/00.00), leave</td><td></td><td></td><td></td></tr><tr><td><strong>GLO</strong></td><td>OSC 0</td><td>NOISE 0</td><td>PITCH MOD 0</td><td>leave</td></tr></tbody></table></div>
+<p>Use the same sound on other tracks with a different FREQUENCY (80 Hz for a floor tom, 200 Hz for a high tom).</p>
+<h4 id="zap">Zap</h4>
+<div class="table"><table><thead><tr><th>Button</th><th>Knob 1</th><th>Knob 2</th><th>Knob 3</th><th>Knob 4</th></tr></thead><tbody><tr><td><strong>FX</strong></td><td>OSC/NOISE MIX 100.00/00.00</td><td>EQ FREQ 20 Hz</td><td>DIST 0</td><td>EQ GAIN 64</td></tr><tr><td><strong>SEL</strong></td><td>SHAPE DECAY</td><td>AMOUNT +47.62 sm</td><td>RATE 62</td><td>-</td></tr><tr><td><strong>ENV</strong></td><td>WAVE SAW</td><td>FREQUENCY 1.0 kHz</td><td>ATTACK 0</td><td>DECAY 75</td></tr><tr><td><strong>LFO</strong></td><td>not heard (OSC/NOISE MIX 100.00/00.00), leave</td><td></td><td></td><td></td></tr><tr><td><strong>EDIT</strong></td><td>not heard (OSC/NOISE MIX 100.00/00.00), leave</td><td></td><td></td><td></td></tr><tr><td><strong>GLO</strong></td><td>OSC 0</td><td>NOISE 0</td><td>PITCH MOD 0</td><td>leave</td></tr></tbody></table></div>
+<p>The pitch falls 4 octaves in about 0.3 s. Send it to the delay (HOME, 2nd press) for a classic laser.</p>
+<h4 id="rimshot">Rimshot</h4>
+<div class="table"><table><thead><tr><th>Button</th><th>Knob 1</th><th>Knob 2</th><th>Knob 3</th><th>Knob 4</th></tr></thead><tbody><tr><td><strong>FX</strong></td><td>OSC/NOISE MIX 49.61/50.39</td><td>EQ FREQ 20 Hz</td><td>DIST 30</td><td>EQ GAIN 64</td></tr><tr><td><strong>SEL</strong></td><td>SHAPE DECAY</td><td>AMOUNT +11.34 sm</td><td>RATE 10</td><td>-</td></tr><tr><td><strong>ENV</strong></td><td>WAVE TRI</td><td>FREQUENCY 552 Hz</td><td>ATTACK 0</td><td>DECAY 25</td></tr><tr><td><strong>LFO</strong></td><td>MODE BP</td><td>Q 40</td><td>FREQUENCY 1.8 kHz</td><td>-</td></tr><tr><td><strong>EDIT</strong></td><td>MODE EXP</td><td>leave</td><td>ATTACK 0</td><td>DECAY 22</td></tr><tr><td><strong>GLO</strong></td><td>OSC 0</td><td>NOISE 0</td><td>PITCH MOD 0</td><td>leave</td></tr></tbody></table></div>
+<p>A short dry click (about 45 ms). Raise DIST for a harder rim; move the MIX to the left for more tone.</p>
+<h4 id="sub-bass">Sub bass</h4>
+<div class="table"><table><thead><tr><th>Button</th><th>Knob 1</th><th>Knob 2</th><th>Knob 3</th><th>Knob 4</th></tr></thead><tbody><tr><td><strong>FX</strong></td><td>OSC/NOISE MIX 100.00/00.00</td><td>EQ FREQ 20 Hz</td><td>DIST 35</td><td>EQ GAIN 64</td></tr><tr><td><strong>SEL</strong></td><td>SHAPE DECAY</td><td>AMOUNT +6.80 sm</td><td>RATE 12</td><td>-</td></tr><tr><td><strong>ENV</strong></td><td>WAVE SINE</td><td>FREQUENCY 41 Hz</td><td>ATTACK 6</td><td>DECAY 80</td></tr><tr><td><strong>LFO</strong></td><td>not heard (OSC/NOISE MIX 100.00/00.00), leave</td><td></td><td></td><td></td></tr><tr><td><strong>EDIT</strong></td><td>not heard (OSC/NOISE MIX 100.00/00.00), leave</td><td></td><td></td><td></td></tr><tr><td><strong>GLO</strong></td><td>OSC 0</td><td>NOISE 0</td><td>PITCH MOD 0</td><td>leave</td></tr></tbody></table></div>
+<p>A low note of about 0.9 s with a small pitch drop at the start and some DIST so it is heard on small speakers. Change FREQUENCY (30 to 60 Hz) for another note, or shorten DECAY for a long kick.</p>
+<h4 id="conga">Conga</h4>
+<div class="table"><table><thead><tr><th>Button</th><th>Knob 1</th><th>Knob 2</th><th>Knob 3</th><th>Knob 4</th></tr></thead><tbody><tr><td><strong>FX</strong></td><td>OSC/NOISE MIX 82.68/17.32</td><td>EQ FREQ 20 Hz</td><td>DIST 10</td><td>EQ GAIN 64</td></tr><tr><td><strong>SEL</strong></td><td>SHAPE DECAY</td><td>AMOUNT +5.29 sm</td><td>RATE 12</td><td>-</td></tr><tr><td><strong>ENV</strong></td><td>WAVE SINE</td><td>FREQUENCY 231 Hz</td><td>ATTACK 0</td><td>DECAY 54</td></tr><tr><td><strong>LFO</strong></td><td>MODE BP</td><td>Q 30</td><td>FREQUENCY 1.6 kHz</td><td>-</td></tr><tr><td><strong>EDIT</strong></td><td>MODE EXP</td><td>leave</td><td>ATTACK 0</td><td>DECAY 20</td></tr><tr><td><strong>GLO</strong></td><td>OSC 0</td><td>NOISE 0</td><td>PITCH MOD 0</td><td>leave</td></tr></tbody></table></div>
+<p>A round tone with a very short noise slap (about 0.2 s in all). Raise FREQUENCY (for example 330 Hz) on another track for a high conga.</p>
+<h4 id="crash">Crash</h4>
+<div class="table"><table><thead><tr><th>Button</th><th>Knob 1</th><th>Knob 2</th><th>Knob 3</th><th>Knob 4</th></tr></thead><tbody><tr><td><strong>FX</strong></td><td>OSC/NOISE MIX 00.00/100.00</td><td>EQ FREQ 20 Hz</td><td>DIST 0</td><td>EQ GAIN 64</td></tr><tr><td><strong>SEL</strong></td><td>not heard (OSC/NOISE MIX 00.00/100.00), leave</td><td></td><td></td><td></td></tr><tr><td><strong>ENV</strong></td><td>not heard (OSC/NOISE MIX 00.00/100.00), leave</td><td></td><td></td><td></td></tr><tr><td><strong>LFO</strong></td><td>MODE HP</td><td>Q 10</td><td>FREQUENCY 5.1 kHz</td><td>-</td></tr><tr><td><strong>EDIT</strong></td><td>MODE EXP</td><td>leave</td><td>ATTACK 0</td><td>DECAY 100</td></tr><tr><td><strong>GLO</strong></td><td>OSC 0</td><td>NOISE 0</td><td>PITCH MOD 0</td><td>leave</td></tr></tbody></table></div>
+<p>A cymbal of pure noise that lasts about 2.3 s. Lower DECAY (85 gives about 1 s) for a splash, or raise the LFO FREQUENCY for a thinner sound. Send it a little to the reverb (HOME, 2nd press).</p>
+<h4 id="clave">Clave</h4>
+<div class="table"><table><thead><tr><th>Button</th><th>Knob 1</th><th>Knob 2</th><th>Knob 3</th><th>Knob 4</th></tr></thead><tbody><tr><td><strong>FX</strong></td><td>OSC/NOISE MIX 100.00/00.00</td><td>EQ FREQ 20 Hz</td><td>DIST 0</td><td>EQ GAIN 64</td></tr><tr><td><strong>SEL</strong></td><td>SHAPE DECAY</td><td>AMOUNT 0.00 sm</td><td>RATE 0</td><td>-</td></tr><tr><td><strong>ENV</strong></td><td>WAVE SINE</td><td>FREQUENCY 2.5 kHz</td><td>ATTACK 0</td><td>DECAY 28</td></tr><tr><td><strong>LFO</strong></td><td>not heard (OSC/NOISE MIX 100.00/00.00), leave</td><td></td><td></td><td></td></tr><tr><td><strong>EDIT</strong></td><td>not heard (OSC/NOISE MIX 100.00/00.00), leave</td><td></td><td></td><td></td></tr><tr><td><strong>GLO</strong></td><td>OSC 0</td><td>NOISE 0</td><td>PITCH MOD 0</td><td>leave</td></tr></tbody></table></div>
+<p>A dry, high tone of about 50 ms with no pitch movement (AMOUNT 0.00 sm). Change FREQUENCY (2 to 3 kHz) for another tuning.</p>
+<p><strong>Tips.</strong> To hear one part alone, turn the MIX all the way left (100.00/00.00, oscillator only) or all the way right (00.00/100.00, noise only). To make accents change the sound and not only the volume, raise the GLO knobs. To try a value on one step only, hold the step and turn the knob (p-lock, chapter 4). A sound you like is kept by SAVE (chapter 5).</p>
+<h2 id="s9"><span class="num">9</span>Credits</h2>
+<p><strong>FM1 TONIC is made by Luigi Rossi</strong>, the developer and creative mind behind this firmware: the Tonic drum machine, its sequencer, screens, presets and the web tools (emulator, installer, backup). It is free software under the GNU General Public License, version 3; if you share the firmware you must share its source code.</p>
+<p><strong>Luigi Rossi online:</strong> <a href="https://linktr.ee/luigirossi">linktr.ee/luigirossi</a></p>
+<p>LICENSING.md lists every file's origin and licence. It stands on the work of:</p>
+<ul><li><strong>libpo32</strong> by Eric Lewis (MIT): the starting point of the FM1 TONIC drum synthesis code. Nothing is sampled.</li><li><strong>X0X</strong> by Charles Vestal, the firmware FM1 TONIC grew from, and the web pages (emulator, installer, backup); X0X is a fork of <strong>Felucca</strong> by Leo Kuroshita (@kurogedelic), Hügelton Instruments: the platform (hardware layer, USB, update loader, installer, storage) and the recovery board FM-1-transporter.</li><li>The reverb and delay are ported from <strong>9W9</strong> by athousanddetails, based on <strong>ER-99</strong> by Matthew Cieplak (GPL-3.0). The master compressor follows Giannoulis, Massberg and Reiss; the master filter is Vadim Zavalishin's TPT state-variable filter.</li><li><strong>Melodee</strong> by keremimo and <strong>Jangada</strong> by zednaked: what they found about the FM-1's second core.</li><li>Fonts: <strong>Barlow Semi Condensed</strong> (The Barlow Project Authors), <strong>Terminus</strong> (Dimitar Toshkov Zhekov), <strong>DotGothic16</strong> (The DotGothic16 Project Authors), all SIL Open Font License.</li></ul>
+<p>M-VAVE and FM-1 are trademarks of their owners. FM1 TONIC is not connected with, or endorsed by, M-VAVE, Sonic Charge or Luigi Rossi.</p>
+</main>
+<script>
+(() => {
+  const TABLE = { en: "Table", es: "Tabla", it: "Tabella", fr: "Tableau", pt: "Tabela", de: "Tabelle" };
+  const tables = [...document.querySelectorAll(".table")];
+  tables.forEach((t) => {
+    const th = t.querySelector("th"), l = t.closest(".lang");
+    t.setAttribute("aria-label", (TABLE[l ? l.lang : "en"] || "Table") + (th ? ": " + th.textContent : ""));
+  });
+  const fit = () => tables.forEach((t) => {
+    if (t.scrollWidth > t.clientWidth + 1) { t.tabIndex = 0; t.setAttribute("role", "region"); }
+    else { t.removeAttribute("tabindex"); t.removeAttribute("role"); }
+  });
+  fit();
+  addEventListener("resize", fit);
+  // several languages in one page: show one, remember it, follow links into another one
+  const langs = [...document.querySelectorAll(".lang")], links = [...document.querySelectorAll(".langbar a")];
+  if (langs.length > 1) {
+    const hooks = [];
+    const show = (code) => {
+      langs.forEach((l) => { l.hidden = l.lang !== code; });
+      links.forEach((a) => a.setAttribute("aria-current", String(a.dataset.lang === code)));
+      document.documentElement.lang = code;
+      try { localStorage.setItem("fm1-manual-lang", code); } catch (e) { /* private window */ }
+      fit();
+      hooks.forEach((h) => h(code));
+    };
+    const have = (c) => langs.some((l) => l.lang === c);
+    const inLang = (id) => { const e = id && document.getElementById(id); const l = e && e.closest(".lang"); return l ? l.lang : null; };
+    const fromHash = () => decodeURIComponent(location.hash.slice(1));
+    links.forEach((a) => a.addEventListener("click", (e) => {
+      e.preventDefault(); show(a.dataset.lang); history.replaceState(null, "", "#lang-" + a.dataset.lang); scrollTo(0, 0);
+    }));
+    addEventListener("hashchange", () => {
+      const id = fromHash(), c = inLang(id);
+      if (c) { show(c); document.getElementById(id).scrollIntoView(); }
+    });
+    // top bar: contents drawer (the contents of the language shown) and search (inside the language shown)
+    const bar = document.querySelector(".topbar");
+    if (bar) {
+      const L = { en: ["Contents", "Search"], es: ["Contenido", "Buscar"], it: ["Indice", "Cerca"], fr: ["Sommaire", "Rechercher"], pt: ["Índice", "Pesquisar"], de: ["Inhalt", "Suchen"] };
+      const panel = document.getElementById("tocpanel"), tbody = document.getElementById("tocbody"), tsearch = document.getElementById("tocsearch"), tocBtn = document.getElementById("tocbtn");
+      const q = document.getElementById("q"), cnt = document.getElementById("qcount"), prev = document.getElementById("qprev"), next = document.getElementById("qnext");
+      const size = () => document.documentElement.style.setProperty("--barh", bar.offsetHeight + "px");
+      size(); addEventListener("resize", size);
+      const wide = matchMedia("(min-width: 1000px)");   // wide: the contents is a permanent column, it never closes
+      const searchBox = document.querySelector(".search");
+      const side = matchMedia("(min-width: 1000px), (orientation: landscape) and (max-height: 520px)");   // wide or phone sideways: the search is under the contents
+      const place = () => { if (side.matches) tsearch.append(searchBox); else bar.insertBefore(searchBox, null); };   // else (phone upright): in the top bar
+      place();
+      side.addEventListener("change", () => { place(); size(); });
+      const closeToc = () => { if (wide.matches) return; panel.hidden = true; tocBtn.setAttribute("aria-expanded", "false"); };
+      panel.hidden = !wide.matches;
+      wide.addEventListener("change", () => { place(); panel.hidden = !wide.matches; tocBtn.setAttribute("aria-expanded", "false"); size(); });
+      // the chapter being read is highlighted in the contents
+      let tmap = [], curA = null;
+      const cur = () => {
+        if (!tmap.length) return;
+        const lim = bar.offsetHeight + 30; let best = tmap[0][0];
+        for (const [a, el] of tmap) { if (el.getBoundingClientRect().top <= lim) best = a; }
+        if (best === curA) return;
+        if (curA) { curA.classList.remove("cur"); curA.removeAttribute("aria-current"); }
+        best.classList.add("cur"); best.setAttribute("aria-current", "location"); curA = best;
+        if (!panel.hidden) {
+          const pr = tbody.getBoundingClientRect(), ar = best.getBoundingClientRect();
+          if (ar.top < pr.top + 8 || ar.bottom > pr.bottom - 8) tbody.scrollTop += ar.top - pr.top - pr.height / 3;
+        }
+      };
+      const track = () => {
+        curA = null;
+        tmap = [...panel.querySelectorAll("a[href^='#']")].map((a) => [a, document.getElementById(decodeURIComponent(a.getAttribute("href").slice(1)))]).filter((x) => x[1]);
+        cur();
+      };
+      let tick = 0;
+      addEventListener("scroll", () => { if (!tick) tick = requestAnimationFrame(() => { tick = 0; cur(); }); }, { passive: true });
+      tocBtn.addEventListener("click", () => { const open = panel.hidden; panel.hidden = !open; tocBtn.setAttribute("aria-expanded", String(open)); size(); cur(); });
+      panel.addEventListener("click", (e) => {
+        const a = e.target.closest("a"); if (!a) return;
+        const el = document.getElementById(decodeURIComponent(a.getAttribute("href").slice(1)));
+        if (el) { e.preventDefault(); history.replaceState(null, "", a.getAttribute("href")); el.scrollIntoView({ behavior: "instant" }); cur(); }   // a jump, not a long smooth scroll that stops short
+        closeToc();
+      });
+      document.addEventListener("click", (e) => { if (!panel.hidden && !panel.contains(e.target) && !tocBtn.contains(e.target)) closeToc(); });
+      const norm = (str) => {                       // lower case, no accents; map = where each character came from
+        let out = "", map = [];
+        for (let i = 0; i < str.length; i++) {
+          for (const ch of str[i].normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()) { out += ch; map.push(i); }
+        }
+        map.push(str.length);
+        return [out, map];
+      };
+      let hits = [], at = -1;
+      const clear = () => {
+        document.querySelectorAll("mark.hit").forEach((m) => { const p = m.parentNode; p.replaceChild(document.createTextNode(m.textContent), m); p.normalize(); });
+        hits = []; at = -1;
+      };
+      const go = (k) => {
+        if (!hits.length) return;
+        if (at >= 0) hits[at].classList.remove("cur");
+        at = (k + hits.length) % hits.length;
+        const m = hits[at];
+        m.classList.add("cur");
+        for (let d = m.closest("details"); d; d = d.parentElement && d.parentElement.closest("details")) d.open = true;
+        m.scrollIntoView({ block: "center" });
+        cnt.textContent = (at + 1) + "/" + hits.length;
+      };
+      const run = (jump) => {
+        clear();
+        cnt.textContent = ""; prev.disabled = next.disabled = true;
+        const term = norm(q.value)[0].trim();
+        if (term.length < 2) return;
+        const root = langs.find((l) => !l.hidden);
+        if (!root) return;
+        const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: (n) => (n.parentElement.closest("script,style,nav.contents") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
+        const nodes = [];
+        while (w.nextNode()) nodes.push(w.currentNode);
+        let n = 0;
+        for (const node of nodes) {
+          if (n >= 3000) break;
+          const [t, map] = norm(node.nodeValue);
+          let i = t.indexOf(term);
+          if (i < 0) continue;
+          const spans = [];
+          while (i >= 0 && n < 3000) { spans.push([map[i], map[i + term.length]]); n++; i = t.indexOf(term, i + term.length); }
+          for (let k = spans.length - 1; k >= 0; k--) {     // from the end, so the offsets stay true
+            const r = document.createRange(), m = document.createElement("mark");
+            r.setStart(node, spans[k][0]); r.setEnd(node, spans[k][1]);
+            m.className = "hit"; r.surroundContents(m);
+          }
+        }
+        hits = [...root.querySelectorAll("mark.hit")];
+        cnt.textContent = hits.length ? "" : "0";
+        prev.disabled = next.disabled = !hits.length;
+        if (jump) go(0); else if (hits.length) cnt.textContent = hits.length + "";
+      };
+      let timer = 0;
+      q.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(() => run(true), 180); });
+      q.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") { e.preventDefault(); if (!hits.length) run(true); else go(at + (e.shiftKey ? -1 : 1)); }
+        else if (e.key === "Escape") { q.value = ""; run(false); }
+      });
+      next.addEventListener("click", () => go(at + 1));
+      prev.addEventListener("click", () => go(at - 1));
+      addEventListener("keydown", (e) => {
+        if (e.key === "/" && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) { e.preventDefault(); q.focus(); q.select(); }
+        else if (e.key === "Escape" && !panel.hidden && !wide.matches) { closeToc(); tocBtn.focus(); }
+      });
+      hooks.push((code) => {
+        const t = L[code] || L.en, l = langs.find((x) => x.lang === code), nav = l && l.querySelector("nav.contents ol");
+        tocBtn.querySelector(".lbl").textContent = t[0]; tocBtn.setAttribute("aria-label", t[0]); panel.setAttribute("aria-label", t[0]);
+        q.placeholder = t[1]; q.setAttribute("aria-label", t[1]);
+        tbody.textContent = "";
+        const h = document.createElement("h3"); h.textContent = t[0]; tbody.append(h);
+        if (nav) { const c = nav.cloneNode(true); c.querySelectorAll("[id]").forEach((e) => e.removeAttribute("id")); tbody.append(c); }
+        closeToc(); size(); track();
+        if (q.value) run(false);
+      });
+    }
+    let start = inLang(fromHash());
+    if (!start) { try { start = localStorage.getItem("fm1-manual-lang"); } catch (e) { start = null; } }
+    if (!start || !have(start)) start = (navigator.languages || [navigator.language || "en"]).map((x) => x.slice(0, 2).toLowerCase()).find(have) || "en";
+    show(start);
+    if (location.hash && document.getElementById(fromHash())) document.getElementById(fromHash()).scrollIntoView();
+  }
+})();
+</script>
+</body>
+</html>

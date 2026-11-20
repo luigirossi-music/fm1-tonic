@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" role="img" aria-label="The FM1 Tonic engine: each of the 8 tracks has a pitch modulator and oscillator, a noise filter and noise envelope, a mix, a distortion and an EQ, then low cut, high cut, level and pan; the 8 tracks go through the sidechain, the master low cut and the compressor to the master volume, with reverb and delay as send effects" font-family="Arial, Helvetica, sans-serif">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#2146c8"/></marker></defs>
+<rect x="2" y="2" width="996" height="496" rx="22" fill="#f4f5f6" stroke="#9aa1a9" stroke-width="2"/>
+<rect x="15" y="15" width="970" height="290" rx="16" fill="#ffffff" stroke="#9aa1a9" stroke-width="1.5"/>
+<text x="30" y="34" font-size="12" font-weight="700" fill="#5b626a">ONE VOICE, TRACKS 1-8 (the small word in each box = the button that opens its page)</text>
+<rect x="40" y="48" width="170" height="56" rx="10" fill="#e9edf5" stroke="#5d86d6" stroke-width="2"/>
+<text x="125.0" y="72.0" text-anchor="middle" font-size="14" font-weight="700" fill="#1c1f23">PITCH MOD</text>
+<text x="125.0" y="90.0" text-anchor="middle" font-size="11.5" font-weight="600" fill="#3a4a6a">SEL</text>
+<rect x="40" y="128" width="170" height="56" rx="10" fill="#e9edf5" stroke="#5d86d6" stroke-width="2"/>
+<text x="125.0" y="152.0" text-anchor="middle" font-size="14" font-weight="700" fill="#1c1f23">OSCILLATOR</text>
+<text x="125.0" y="170.0" text-anchor="middle" font-size="11.5" font-weight="600" fill="#3a4a6a">ENV</text>
+<rect x="40" y="222" width="170" height="56" rx="10" fill="#e9edf5" stroke="#5d86d6" stroke-width="2"/>
+<text x="125.0" y="246.0" text-anchor="middle" font-size="14" font-weight="700" fill="#1c1f23">NOISE FILTER</text>
+<text x="125.0" y="264.0" text-anchor="middle" font-size="11.5" font-weight="600" fill="#3a4a6a">LFO</text>
+<rect x="250" y="222" width="170" height="56" rx="10" fill="#e9edf5" stroke="#5d86d6" stroke-width="2"/>
+<text x="335.0" y="246.0" text-anchor="middle" font-size="14" font-weight="700" fill="#1c1f23">NOISE ENVELOPE</text>
+<text x="335.0" y="264.0" text-anchor="middle" font-size="11.5" font-weight="600" fill="#3a4a6a">EDIT (K2 = CHOKE)</text>
+<rect x="450" y="150" width="110" height="58" rx="10" fill="#e9edf5" stroke="#5d86d6" stroke-width="2"/>
+<text x="505.0" y="175.0" text-anchor="middle" font-size="14" font-weight="700" fill="#1c1f23">MIX</text>
+<text x="505.0" y="193.0" text-anchor="middle" font-size="11.5" font-weight="600" fill="#3a4a6a">FX</text>
+<rect x="585" y="150" width="90" height="58" rx="10" fill="#e9edf5" stroke="#5d86d6" stroke-width="2"/>
+<text x="630.0" y="175.0" text-anchor="middle" font-size="14" font-weight="700" fill="#1c1f23">DIST</text>
+<text x="630.0" y="193.0" text-anchor="middle" font-size="11.5" font-weight="600" fill="#3a4a6a">FX</text>
+<rect x="700" y="150" width="90" height="58" rx="10" fill="#e9edf5" stroke="#5d86d6" stroke-width="2"/>
+<text x="745.0" y="175.0" text-anchor="middle" font-size="14" font-weight="700" fill="#1c1f23">EQ</text>
+<text x="745.0" y="193.0" text-anchor="middle" font-size="11.5" font-weight="600" fill="#3a4a6a">FX</text>
+<rect x="815" y="150" width="150" height="58" rx="10" fill="#e9edf5" stroke="#5d86d6" stroke-width="2"/>
+<text x="890.0" y="175.0" text-anchor="middle" font-size="14" font-weight="700" fill="#1c1f23">CUTS, LEVEL, PAN</text>
+<text x="890.0" y="193.0" text-anchor="middle" font-size="11.5" font-weight="600" fill="#3a4a6a">HOME</text>
+<rect x="250" y="48" width="380" height="56" rx="10" fill="#fff" stroke="#9aa1a9" stroke-width="2" stroke-dasharray="5 4"/>
+<text x="440.0" y="72.0" text-anchor="middle" font-size="14" font-weight="700" fill="#1c1f23">VELOCITY</text>
+<text x="440.0" y="90.0" text-anchor="middle" font-size="11.5" font-weight="600" fill="#3a4a6a">GLO: how much accent moves OSC, NOISE, PITCH MOD</text>
+<path d="M125 104 V128" fill="none" stroke="#2146c8" stroke-width="2.5" marker-end="url(#a)"/>
+<path d="M210 156 H330 V172 H450" fill="none" stroke="#2146c8" stroke-width="2.5" marker-end="url(#a)"/>
+<path d="M210 250 H250" fill="none" stroke="#2146c8" stroke-width="2.5" marker-end="url(#a)"/>
+<path d="M420 250 H505 V208" fill="none" stroke="#2146c8" stroke-width="2.5" marker-end="url(#a)"/>
+<path d="M560 179 H585" fill="none" stroke="#2146c8" stroke-width="2.5" marker-end="url(#a)"/>
+<path d="M675 179 H700" fill="none" stroke="#2146c8" stroke-width="2.5" marker-end="url(#a)"/>
+<path d="M790 179 H815" fill="none" stroke="#2146c8" stroke-width="2.5" marker-end="url(#a)"/>
+<path d="M890 208 V318 H105 V352" fill="none" stroke="#2146c8" stroke-width="2.5" marker-end="url(#a)"/>
+<rect x="15" y="325" width="970" height="160" rx="16" fill="#ffffff" stroke="#9aa1a9" stroke-width="1.5"/>
+<text x="30" y="344" font-size="12" font-weight="700" fill="#5b626a">THE WHOLE MACHINE</text>
+<rect x="40" y="355" width="130" height="58" rx="10" fill="#e9edf5" stroke="#5d86d6" stroke-width="2"/>
+<text x="105.0" y="389.0" text-anchor="middle" font-size="14" font-weight="700" fill="#1c1f23">8 TRACKS</text>
+<rect x="200" y="355" width="150" height="58" rx="10" fill="#e9edf5" stroke="#5d86d6" stroke-width="2"/>
+<text x="275.0" y="380.0" text-anchor="middle" font-size="14" font-weight="700" fill="#1c1f23">SIDECHAIN</text>
+<text x="275.0" y="398.0" text-anchor="middle" font-size="11.5" font-weight="600" fill="#3a4a6a">HOME 2nd press</text>
+<rect x="380" y="355" width="150" height="58" rx="10" fill="#e9edf5" stroke="#5d86d6" stroke-width="2"/>
+<text x="455.0" y="380.0" text-anchor="middle" font-size="14" font-weight="700" fill="#1c1f23">MASTER LOW CUT</text>
+<text x="455.0" y="398.0" text-anchor="middle" font-size="11.5" font-weight="600" fill="#3a4a6a">FX 2nd press</text>
+<rect x="560" y="355" width="150" height="58" rx="10" fill="#e9edf5" stroke="#5d86d6" stroke-width="2"/>
+<text x="635.0" y="380.0" text-anchor="middle" font-size="14" font-weight="700" fill="#1c1f23">COMPRESSOR</text>
+<text x="635.0" y="398.0" text-anchor="middle" font-size="11.5" font-weight="600" fill="#3a4a6a">GLO 3rd press</text>
+<rect x="740" y="355" width="150" height="58" rx="10" fill="#e9edf5" stroke="#5d86d6" stroke-width="2"/>
+<text x="815.0" y="380.0" text-anchor="middle" font-size="14" font-weight="700" fill="#1c1f23">VOLUME</text>
+<text x="815.0" y="398.0" text-anchor="middle" font-size="11.5" font-weight="600" fill="#3a4a6a">MASTER knob</text>
+<path d="M170 384 H200" fill="none" stroke="#2146c8" stroke-width="2.5" marker-end="url(#a)"/>
+<path d="M350 384 H380" fill="none" stroke="#2146c8" stroke-width="2.5" marker-end="url(#a)"/>
+<path d="M530 384 H560" fill="none" stroke="#2146c8" stroke-width="2.5" marker-end="url(#a)"/>
+<path d="M710 384 H740" fill="none" stroke="#2146c8" stroke-width="2.5" marker-end="url(#a)"/>
+<rect x="200" y="430" width="235" height="46" rx="10" fill="#eef6ec" stroke="#4fae3a" stroke-width="2"/>
+<text x="317.5" y="449.0" text-anchor="middle" font-size="14" font-weight="700" fill="#1c1f23">REVERB + DELAY</text>
+<text x="317.5" y="467.0" text-anchor="middle" font-size="11.5" font-weight="600" fill="#3a4a6a">FX hold / HOME hold</text>
+<path d="M105 413 V453 H200" fill="none" stroke="#2146c8" stroke-width="2.5" marker-end="url(#a)"/>
+<path d="M435 453 H455 V413" fill="none" stroke="#2146c8" stroke-width="2.5" marker-end="url(#a)"/>
+<text x="470" y="448" font-size="11.5" font-weight="600" fill="#3a4a6a">fed by each track's SENDS (HOME 2nd press)</text>
+<text x="470" y="464" font-size="11.5" font-weight="600" fill="#3a4a6a">and by PERFORM dry / wet (FX 2nd press)</text>
+</svg>
