@@ -3090,6 +3090,8 @@ static void tn_randomize(void)
         if (i == TNP_LEVEL)
             continue;                                 /* wip344: RANDOM never touches the volume (and never the pan: not in this loop) */
         pot = d ? (int)(sv_rand() % (uint32_t)(d->max + 1)) : 0;
+        if (d && i == TNP_DIST)                       /* wip522: RANDOM never reaches the maximum distortion (speakers, ears): top = 3/4 of the range; by hand it still goes to the end */
+            pot = (int)(sv_rand() % (uint32_t)((d->max * 3) / 4 + 1));
         tn_put(v, i, (uint8_t)pot, tonic_pot_to_val(i, pot));
     }
     mark_dirty();

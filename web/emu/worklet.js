@@ -82,6 +82,16 @@ class X0X extends AudioWorkletProcessor {
         res.push(all);
       }
       this.port.postMessage({ type: "hits", voices: res }, res.map((a) => a.buffer));
+    } else if (m.type === "clearpat") {            // wip521: the Clear pattern button: clear + song mode off, no question
+      this.ex.web_clear_pattern();
+    } else if (m.type === "preset") {             // wip520: a pasted preset (TNP1 bytes) into the running panel
+      const ex = this.ex, b = new Uint8Array(m.bytes || []);
+      let rc = -1;
+      if (b.length && b.length <= ex.web_preset_max()) {
+        new Uint8Array(this.mem.buffer, ex.web_preset_buf(), b.length).set(b);
+        rc = ex.web_preset_load(b.length);
+      }
+      this.port.postMessage({ type: "preset", rc });
     } else if (m.type === "slot") {                // a user break slot: {k, name, zones: [{pcm, rate}]}
       const ex = this.ex, name = new Uint8Array(this.mem.buffer, ex.web_slot_namebuf(), 9);
       name.fill(0);

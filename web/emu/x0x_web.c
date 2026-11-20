@@ -156,3 +156,41 @@ __attribute__((used, visibility("default"))) int web_slot_zone(int k, int z, uin
 }
 /* the slots changed: the break part reloads its loops (and the LOOPS page's names) */
 __attribute__((used, visibility("default"))) void web_slots_changed(void) { engine_brk_loops(); }
+
+/* wip521: the page's Clear pattern button (WEB ONLY, the device keeps its CLEAR PATTERN? question): clears the playing TONIC
+ * pattern and its lanes (tn_clear_pat) with NO question, and leaves song mode (songmode, song_on, chain_on = 0) so the
+ * panel stays on that empty pattern. A question left open on the screen is closed. Playing is NOT stopped. If song mode
+ * was on, the view goes back to the SEQ page as songexit_go() does (the SONG page makes no sense with song mode off). */
+__attribute__((used, visibility("default"))) void web_clear_pattern(void)
+{
+    int was_song = ui.songmode;
+    ui.overlay = O_NONE;
+    ui.songmode = 0;
+    seq.song_on = 0;
+    seq.chain_on = 0;
+    tn_clear_pat();
+    seq.chain_on = 0;                                   /* chain_after_clear() must not switch it back on */
+    if (was_song || ui.view == V_SONG) {
+        *page_of(V_SEQ) = 0;
+        set_view(V_SEQ);
+    }
+}
+
+/* wip520: a preset pasted on the page (a TNP1 blob, tnp.h) goes straight into the running panel: the page puts its bytes
+ * into web_preset_buf and calls web_preset_load(len). A playing sequence is stopped first (app_load_preset refuses while
+ * it plays). The pasted preset is NOT a slot: ui.preset_cur stays as it is. Returns app_load_preset's code: 0 = loaded. */
+static uint8_t web_pbuf[PLAT_STORE_MAX];
+__attribute__((used, visibility("default"))) uint8_t *web_preset_buf(void) { return web_pbuf; }
+__attribute__((used, visibility("default"))) uint32_t web_preset_max(void) { return PLAT_STORE_MAX; }
+__attribute__((used, visibility("default"))) int web_preset_load(uint32_t n)
+{
+    int k;
+    if (n > PLAT_STORE_MAX)
+        return -1;
+    for (k = 0; seq.playing && k < 40; k++) {
+        if (k == 0)
+            seq_stop(&seq);
+        run_ms(10);
+    }
+    return app_load_preset(web_pbuf, n);
+}

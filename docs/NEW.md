@@ -5,6 +5,8 @@ The newest version first. Install it with the [web installer](../install/); the
 
 ## FM1 Tonic 1.7 · 18 November 2026
 
+- CHANGED (wip523, firmware): **Safer random sounds.** RANDOM (GLO > VEL, FUNC + knob 4) never picks the maximum distortion any more: the random distortion stops at 3/4 of the range (host test: 60 randoms, highest 95 of 127). You can still turn it all the way by hand. Manual 1.70 (English).
+- CHANGED (wip522): manual 1.69 (English; the other languages follow): one line says how to try a Patternarium preset on the emulator page (copy it, then Ctrl+V / Cmd+V anywhere on the page). The same line is on the web page.
 - CHANGED (wip507): manual 1.68, all six languages: Features and chapter 5 now say that presets work both ways (load `.mtpreset` from Patternarium and Microtonic, export yours back for the Microtonic VST; tested, the sound is very close, not identical). The web page (emulator) says it too and has an update pop-up for 1.7; the downloads moved down.
 - CHANGED (wip489): **FM1 Tonic 1.7: the first build of the 1.7 line.** The instrument itself is the same as 1.6; what changed is the version number (the welcome screen, the package and the release say 1.7), the manual (1.57, it names firmware 1.7 in all six languages) and the project's card file for The FM-1 Firmware Hub, which now asks to be listed as a groovebox.
 

@@ -190,7 +190,7 @@ Press = VEL → MIXER → COMP → MEMORY → SETTINGS → VEL.
 
 | Page | Knob 1 · 2 · 3 · 4 | Also on this page |
 |---|---|---|
-| **VEL** | OSC · NOISE · PITCH MOD (how much velocity moves each) · RANDOM | {r:FUNC + knob 4}: the selected track gets a new random sound (the 21 sound settings only). Knob 4 alone only shows a reminder. Track page: p-locks work. |
+| **VEL** | OSC · NOISE · PITCH MOD (how much velocity moves each) · RANDOM | {r:FUNC + knob 4}: the selected track gets a new random sound (the 21 sound settings only; the random never reaches the maximum distortion, by hand you can still turn it all the way). Knob 4 alone only shows a reminder. Track page: p-locks work. |
 | **MIXER** | LEVEL of the four tracks shown | Eight tall sliders; SELECT switches tracks 1 to 4 / 5 to 8 and, as the blue hint on the screen says, cycles level / pan (pan centre = red). Black keys 1 to 8 pick a track and its group. A hit lights its slider. {r:FUNC + black key 1 to 8}: mute. A red dot under a slider = ducked, purple = sidechain input. Chance works here. |
 | **COMP** | ATTACK · RELEASE · THRESHOLD · MAKE-UP | Master compressor, ratio 4:1, a needle shows gain reduction. Default: nothing compressed (0.0 dB / 0.0 dB). Kept only by SAVE. |
 | **MEMORY** | - | A battery shows how full the project memory is (patterns, song, motion, ARP notes). Purple from 90 %, FULL at 100 %: a save is then refused. |
@@ -342,6 +342,8 @@ Every combination of buttons and keys, grouped by the button you hold first. Bla
 ## 5. Presets and saving
 
 **Presets work both ways.** The FM-1 loads `.mtpreset` presets from **Patternarium** and from **Microtonic**, and the presets you make on the FM1 TONIC can be exported back to `.mtpreset` and used in the **Microtonic VST**. This was tested: the exported presets open and play in Microtonic. The sound is very, very close to the original, not identical. Import and export are on the web page (the backup page: "Restore my presets" and "Export my presets as .mtpreset"). Slots 1 to 8 cannot be exported. What the FM1 TONIC added (ARP notes, late hits, track cuts and sends, compressor, reverb, delay, mute) has no place in a `.mtpreset` and is left out.
+
+To try a Patternarium preset on the emulator page, copy it in Patternarium, then press Ctrl+V (Cmd+V on Mac) anywhere on the page.
 
 Turn **PRESETS** through the 40 places: 01 to 08 are factory presets, 09 to 40 are yours (an empty place loads with the sounds of a factory preset and no pattern: 09 sounds like 01, 10 like 02, and so on in rotation). A question asks first: OCT+ loads it, OCT- keeps your sound. Loading is refused while playing.
 
