@@ -6363,7 +6363,7 @@ static void draw_knobs(void)
         uint16_t col = drum_mix_page() >= 0 ? PART_COL[drum_mix_page()] : part_col();   /* MIX: 909 in the 909's */
         if (gt_fx_knobs()) {
             cv_oy = -(KNOB_Y - MAIN_Y);
-            gt_knob_cell(i, 166, 190, 201);
+            gt_knob_cell(i, 162, 185, 196);
             cv_oy = 0;
             continue;
         }
@@ -7526,25 +7526,32 @@ static void gt_knob_s(int32_t cx, int32_t cy, float v, int grow)
  * cy / ny / vy = the page rows of the knob centre, the name and the value (the compressor page and the REVERB / DELAY pages use it) */
 static void gt_knob_cell(int i, int32_t cy, int32_t ny, int32_t vy)
 {
-    int pgi = cur_page();
+    int pgi = cur_page(), touched = ui.touched == i;
     pref_t r = pg.r[pgi][i];
     const x0x_param_t *d = pref_desc(r);
-    char nb[16], un[8], nm[12], ub[8];
-    int32_t cx = 30 + i * 60, wn, wu;
-    float x0;
+    char nb[16], un[8], nm[16];
+    const char *np;
+    const felucca_font_t *vf = touched ? &FONT_M : &FONT_B;
+    int32_t cx = 30 + i * 60, w, x, vt;
     if (!d)
         return;
-    gt_knob_s(cx, cy, d->max ? (float)pref_shown(r) / (float)d->max : 0.0f, ui.touched == i);
+    gt_knob_s(cx, touched ? cy - 2 : cy, d->max ? (float)pref_shown(r) / (float)d->max : 0.0f, touched);   /* the grown knob moves up 2 px: it keeps clear of the name */
     put_s(nm, caps_of(pref_name(r)));
-    gt_text(&GTF_BAR, (float)cx, (float)ny, nm, ui.touched == i ? GT_B1 : GT_INK, 1);
+    np = nm;
+    if (ui.view == V_FX && (np[0] == 'R' || np[0] == 'D') && np[1] == (np[0] == 'R' ? 'E' : 'L') && (np[2] == 'V' || np[2] == 'Y') && np[3] == ' ')
+        np += 4;                                                                /* "REV LOW CUT" / "DLY RETURN" on REVERB 2 / DELAY 2: the title says which */
+    text_c(cx, vc(&FONT_XS, ny - 4, 9), &FONT_XS, np, C_BLACK);                 /* wip591: the old skin's fonts, in black (the skin's greys hide small text); the turned knob's value is the bigger font */
     pref_value_of(r, pref_shown(r), nb, un);
-    put_s(ub, caps_of(un));
-    wn = gt_tw8(&GTF_DIALV, nb);
-    wu = ub[0] ? gt_tw8(&GTF_DIALS, ub) + 8 : 0;
-    x0 = (float)cx - (float)(wn + wu) / 16.0f;
-    gt_text(&GTF_DIALV, x0, (float)vy, nb, ui.touched == i ? GT_B1 : GT_INK, 0);
-    if (ub[0])
-        gt_text(&GTF_DIALS, x0 + (float)(wn + 8) / 8.0f, (float)vy + 1.0f, ub, ui.touched == i ? GT_B1 : RGB(110, 112, 114), 0);
+    w = tw(vf, nb) + (un[0] ? tw(&FONT_XS, un) + 1 : 0);
+    if (w > 58) {
+        vf = &FONT_B;
+        w = tw(vf, nb) + (un[0] ? tw(&FONT_XS, un) + 1 : 0);
+    }
+    x = cx - w / 2;
+    vt = vc(vf, vy - 7, 14);
+    x = cv_text(x, vt, vf, nb, C_BLACK);
+    if (un[0])
+        cv_text(x + 1, base_y(vf, vt, &FONT_XS), &FONT_XS, un, C_BLACK);
 }
 static void gt_page_comp(void)
 {

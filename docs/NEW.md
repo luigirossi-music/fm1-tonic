@@ -5,6 +5,7 @@ The newest version first. Install it with the [web installer](../install/); the
 
 ## FM1 Tonic 1.8a · 22 November 2026
 
+- CHANGED (wip591, firmware, Grigiotonic skin): **Compressor, REVERB and DELAY knobs: the old skin's font, big black numbers.** The small value text was too faint on the skin's grey, so the name and the value under each knob are now in the old skin's font and in black (the value as big as in the old skin); the knob you turn grows 25 % and its value gets a bigger size. If it still reads badly on the FM-1, the next step is a knob style and font made for this skin.
 - CHANGED (wip590, firmware + web, Grigiotonic skin): **REVERB and DELAY pages (long press FX, long press HOME) have the compressor's knobs.** Small grey knobs with the name and the value under each (the turned knob grows 25 %, name and value go blue), no big zoom, also on REVERB 2 and DELAY 2. The web page's Future updates list has a new line: the ZOOM KNOB setting with a third choice, 25 %.
 - CHANGED (wip589, firmware, Grigiotonic skin): **Compressor knobs: only a small zoom.** The knob you turn grows 25 % (as the knobs of the GLO mixer); no big zoom over the page. Name and value under it turn blue.
 - CHANGED (wip588, firmware, Grigiotonic skin): **No zoom on the compressor knobs.** Turning ATTACK, RELEAS, THRESH or MAKEUP only turns the knob; its value is already under it (the turned knob's name and value go blue). The other pages keep their zoom.
