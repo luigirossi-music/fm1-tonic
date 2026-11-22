@@ -4,7 +4,7 @@ autosave 1
 wait 300
 tap HOME
 tap HOME
-turn K4 50 80
+turn K4 -50 80   # wip580: inverted knob (right = off)
 turn K3 3 80
 turn ALGO 1
 tapkey b0

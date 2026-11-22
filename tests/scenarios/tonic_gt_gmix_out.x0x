@@ -1,0 +1,13 @@
+# wip578: GLO mixer: the blue outline: 4 faders, next 4 faders, 4 pans, next 4 pans
+wait 300
+tap GLO
+tap GLO
+shot gt_go_1_levels_1-4.png
+turn SELECT 1
+shot gt_go_2_levels_5-8.png
+turn SELECT 1
+shot gt_go_3_pans_1-4.png
+turn SELECT 1
+shot gt_go_4_pans_5-8.png
+turn SELECT 1
+shot gt_go_5_back_to_1.png

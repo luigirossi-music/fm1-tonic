@@ -1,0 +1,10 @@
+# wip561: the GRIGIOTONIC VELOCITY page (GLO 1st press): three sliders OSC / NOISE / PITCH MOD, knobs OSC NSE MOD, the RNDM button.
+wait 300
+tap GLO
+expect view 15
+shot gt_vel_a.png
+turn K1 30 80
+turn K2 -20 80
+turn K3 50 80
+wait 1500
+shot gt_vel_b.png

@@ -1,0 +1,22 @@
+# wip576: the KNOB ZOOM in the Grigiotonic skin: a turned knob = a big knob, its name and value over the whole area (ZOOM KNOB = YES)
+wait 300
+tap GLO
+tap GLO
+tap GLO
+turn K4 30 80
+shot gt_zoom_comp_gain.png
+turn K1 20 80
+shot gt_zoom_comp_atk.png
+wait 1500
+shot gt_zoom_comp_after.png
+tap HOME
+tap HOME
+turn K2 20 80
+shot gt_zoom_pan.png
+turn K4 20 80
+shot gt_zoom_thrs.png
+tap ENV
+turn K3 15 80
+shot gt_zoom_osc_k3.png
+turn K1 8 80
+shot gt_zoom_osc_k1_noicon.png

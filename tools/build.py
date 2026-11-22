@@ -383,10 +383,10 @@ def main():
         # model the update tools match on; the number is ours (X0X 0.3..0.9 were FM-1_9XY, one digit
         # each, which ran out at 0.9 and was also Felucca's own numbering). 12 of the 20 characters a
         # package's identity holds; digits only after the underscore, as the tools parse it.
-        m = re.fullmatch(r"(\d{1,2})\.(\d{1,2})(?:\.(\d{1,2}))?(-[A-Za-z0-9]+)?", a.release)
+        m = re.fullmatch(r"(\d{1,2})\.(\d{1,2})(?:\.(\d{1,2})|([a-z]))?(-[A-Za-z0-9]+)?", a.release)   # wip585: 1.8a = a letter after the minor number (a = 1, b = 2 ...) stands in the patch digits
         if not m:
             raise SystemExit(f"--release {a.release}: use X.Y[.Z][-suffix], up to two digits each")
-        PRODUCT = "FM-1_77%02d%02d%02d" % (int(m[1]), int(m[2]), int(m[3] or 0))   # wip468: own prefix 77, 8 digits as the hub asks (1.0-1.4 were FM-1_9XXYYZZ, the same scheme as X0X)
+        PRODUCT = "FM-1_77%02d%02d%02d" % (int(m[1]), int(m[2]), int(m[3] or (ord(m[4]) - 96 if m[4] else 0)))   # wip468: own prefix 77, 8 digits as the hub asks (1.0-1.4 were FM-1_9XXYYZZ, the same scheme as X0X)
         VERSION = a.release.upper()                 # wip433: 1.0 is no beta any more: "1.0" stays "1.0" (a suffix such as -beta is still shown)
         name = f"fm1-tonic-{a.release}.fwsc"
     fm1pkg_make.SDK = a.sdk

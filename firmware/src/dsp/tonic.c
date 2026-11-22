@@ -150,13 +150,13 @@ int tonic_duck_depth(const tonic_t *t)               /* wip352: how deep the duc
     d = d > 1.0f ? 1.0f : d;
     return (int)(a * d * 255.0f + 0.5f);
 }
-int tonic_duck_peak(tonic_t *t)                      /* wip356 */
+int tonic_duck_peak(tonic_t *t)                      /* wip356; wip581: the dot shows the input's ACTIVITY (0-255), not the depth x intensity: with a small intensity the dot used to pulse so little that it looked fixed */
 {
-    float pk = t->sc_pk > t->sc_p ? t->sc_pk : t->sc_p, d = pk * (1.0f / SC_PREF), a = (float)t->sc_int * (1.0f / 127.0f);
+    float pk = t->sc_pk > t->sc_p ? t->sc_pk : t->sc_p, d = pk * (1.0f / SC_PREF);
     t->sc_pk = t->sc_p;
     if (!t->sc_int || !t->sc_mask) return 0;
     d = d > 1.0f ? 1.0f : d;
-    return (int)(a * d * 255.0f + 0.5f);
+    return (int)(d * 255.0f + 0.5f);
 }
 static void sc_follow(tonic_t *t, const float *x, float gain, int got, int m, float *duck)   /* the duck gain of the next m samples; x = the input's samples (got of them), 0 = silent */
 {

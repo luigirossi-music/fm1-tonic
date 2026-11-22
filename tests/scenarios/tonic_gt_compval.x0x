@@ -1,0 +1,15 @@
+# wip571: GRIGIOTONIC COMPRESSOR: while a knob is turned its VALUE replaces the name (ATK ms, REL ms, THRS dB, GAIN dB)
+wait 300
+tap GLO
+tap GLO
+tap GLO
+turn K1 20 80
+shot gt_compval_atk.png
+wait 1500
+shot gt_compval_after.png
+turn K2 20 80
+shot gt_compval_rel.png
+turn K4 30 80
+shot gt_compval_gain.png
+turn K3 -20 80
+shot gt_compval_thrs.png

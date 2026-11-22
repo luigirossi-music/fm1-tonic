@@ -994,6 +994,8 @@ static int expect(const char *what, const char *val)
         got = seq.chain_on;
     else if (!strcmp(what, "scint"))                 /* wip349: the sidechain intensity 0-127 */
         got = proj.set.sc_int;
+    else if (!strcmp(what, "scduck"))                /* wip581: the dot's level 0-255 = the input's peak since the last call (the screens call it every frame: read it from a page with no dot) */
+        got = engine_tonic_duck();
     else if (!strcmp(what, "scmask"))                /* wip350: the sidechain's ducked tracks (bit v) */
         got = proj.set.sc_mask;
     else if (!strcmp(what, "dck"))                   /* wip350: the DUCK screen is open */

@@ -1,0 +1,31 @@
+# wip568: the GRIGIOTONIC PERFORM page (FX 2nd press): the pattern number in a circle, knobs REV DLY HPF, the ALL FX ON / OFF selector.
+wait 300
+press FX
+wait 100
+release FX
+wait 200
+press FX
+wait 100
+release FX
+wait 400
+shot gt_perf_a.png
+turn K1 30 80
+turn K2 -20 80
+turn K3 40 80
+wait 900
+shot gt_perf_b.png
+turn K4 -1 80
+wait 300
+shot gt_perf_c.png
+turn K4 1 80
+wait 300
+shot gt_perf_d.png
+# a queued two-digit pattern: the purple disc blinks at the circle's top right; once it plays, the big number has two digits
+tapkey w10
+wait 100
+shot gt_perf_e.png
+tap PLAY
+wait 4000
+shot gt_perf_f.png
+wait 3000
+shot gt_perf_g.png

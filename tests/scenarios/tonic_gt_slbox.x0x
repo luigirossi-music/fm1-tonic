@@ -1,0 +1,33 @@
+# wip577: Grigiotonic: a knob with a slider moving together = the big RECTANGLE with the value (no zoom); a knob without a slider = the zoom
+wait 300
+tap FX
+turn K1 6 80
+shot gt_sl_mix_k1.png
+wait 1500
+turn K2 6 80
+shot gt_sl_mix_k2.png
+turn K3 8 80
+shot gt_sl_mix_k3_zoom.png
+turn K4 8 80
+shot gt_sl_mix_k4_zoom.png
+wait 1500
+tap ENV
+turn K2 10 80
+shot gt_sl_osc_k2.png
+turn K3 10 80
+shot gt_sl_osc_k3_zoom.png
+tap LFO
+turn K2 10 80
+shot gt_sl_noise_k2.png
+tap GLO
+turn K2 10 80
+shot gt_sl_vel_k2.png
+tap HOME
+tap HOME
+tap HOME
+turn K1 2 80
+shot gt_sl_glob_k1.png
+turn K3 1 80
+shot gt_sl_glob_k3.png
+turn K4 10 80
+shot gt_sl_glob_k4_zoom.png

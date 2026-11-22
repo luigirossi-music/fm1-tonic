@@ -1,0 +1,258 @@
+# wip581: RANDOM SOUND ties LEVEL and DISTORTION: the random distortion ceiling (95 = 3/4 of the range) drops 1 for 1 for every pot the track's level is above its default (101).
+# Level 127 = +26 -> ceiling 69; level 121 = +20 -> 75; the level itself is never drawn (stays as set). 40 randoms per case, so a leak above the ceiling would show.
+wait 300
+tap GLO
+expect view 15
+key b10 down
+param 0 0 17 127
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+expect sound0.0.14 <70
+expect sound0.0.17 127
+param 0 0 17 121
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+expect sound0.0.14 <76
+expect sound0.0.17 121
+param 0 0 17 101
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+turn K4 1 80
+wait 150
+expect sound0.0.14 <96
+expect sound0.0.17 101
+key b10 up
+tap GLO
+expect view 3

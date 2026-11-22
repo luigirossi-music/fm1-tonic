@@ -1,0 +1,18 @@
+# wip555: the GRIGIOTONIC NOISE ENVELOPE page (EDIT button): envelope buttons, CHOKE button, MODE / CHOKE / ATK / DCY knobs.
+wait 300
+tap EDIT
+expect view 14
+shot gt_nenv_a.png
+turn K1 8 80
+turn K3 6 80
+turn K4 -5 80
+shot gt_nenv_b.png
+key b10 down
+turn K2 1 80
+wait 100
+key b10 up
+wait 300
+expect choke 1
+shot gt_nenv_c.png
+turn K1 8 80
+shot gt_nenv_d.png

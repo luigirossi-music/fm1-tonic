@@ -1,0 +1,20 @@
+# wip580: the SIDECHAIN THRESHOLD knob (SENDS K4) runs like the compressor's: inactive = all the way RIGHT (full blue trace), turning left = more ducking. Both skins.
+wait 300
+tap HOME
+tap HOME
+shot gt_scthr_1_inactive.png
+turn K4 -60 80
+shot gt_scthr_2_turned.png
+wait 1500
+shot gt_scthr_3_after.png
+tap GLO
+tap GLO
+tap GLO
+turn SELECT 8
+turn ALGO -6
+tap HOME
+tap HOME
+shot old_scthr_4_turned.png
+turn K4 60 80
+wait 1500
+shot old_scthr_5_inactive.png

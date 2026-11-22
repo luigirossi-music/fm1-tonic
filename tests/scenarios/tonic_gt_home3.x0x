@@ -1,0 +1,13 @@
+# wip557: the GRIGIOTONIC HOME 3rd press page (GLOBAL: quantization, swing, fill rate sliders; knobs QNT SWG fill-rate tempo).
+wait 300
+tap HOME
+tap HOME
+tap HOME
+expect view 10
+shot gt_home3_a.png
+turn K1 8 80
+turn K2 40 80
+turn K3 4 80
+turn K4 30 80
+wait 1500
+shot gt_home3_b.png

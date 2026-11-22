@@ -1,6 +1,6 @@
 # wip437: the FACTORY SETTINGS (GLO list) of a fresh unit / a factory reset:
 # CLOCK OUT off, NOTES OUT off, TONIC MIDI CH 10, REMOTE MIDI CH off, CC MODE off, CC CH BASE 1-8, OUTPUT LOUD,
-# USB AUDIO FOLLOWS KNOB, 4/4 LED on, theme TONIC, ZOOM KNOB yes, AUTOSAVE off, NAME PROJECTS generate,
+# USB AUDIO FOLLOWS KNOB, 4/4 LED on, theme GRIGIOTONIC (wip544), ZOOM KNOB yes, AUTOSAVE off, NAME PROJECTS generate,
 # TONIC ENGINE enhanced, 2ND CORE on.
 wait 300
 expect d_clkout 0
@@ -12,7 +12,7 @@ expect ccbase 0
 expect d_outloud 1
 expect d_usbfull 0
 expect d_beatoff 0
-expect d_palette 5
+expect d_palette 6
 expect d_zoomoff 0
 expect d_autosaveoff 1
 expect d_namemanual 0

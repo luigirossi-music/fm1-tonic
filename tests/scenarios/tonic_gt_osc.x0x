@@ -1,0 +1,13 @@
+# wip552: the GRIGIOTONIC OSC page (ENV button): the three wave buttons, WAVEFORM, the OSC FREQ slider, the four knobs.
+wait 300
+tap ENV
+expect view 12
+shot gt_osc_a.png
+turn K1 8 80
+shot gt_osc_b.png
+turn K2 12 80
+turn K3 6 80
+turn K4 -8 80
+shot gt_osc_c.png
+turn K1 8 80
+shot gt_osc_d.png

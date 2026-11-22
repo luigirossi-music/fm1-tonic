@@ -1,4 +1,4 @@
-# LFO = NOISE (view 13): K1 filter mode icon (slow), K2 filter Q, K3 filter freq slider
+# LFO = NOISE (view 13): K1 filter mode icon (slow), K2 filter freq slider, K3 filter Q (wip558)
 wait 300
 tap LFO
 expect view 13
@@ -9,10 +9,10 @@ shot noise_bp.png
 turn K1 4 80
 wait 3000
 shot noise_hp.png
-turn K3 -20 80
+turn K2 -20 80
 shot noise_freqbox.png
 wait 3000
-turn K2 10 80
+turn K3 10 80
 wait 3000
 shot noise_idle2.png
 tap LFO

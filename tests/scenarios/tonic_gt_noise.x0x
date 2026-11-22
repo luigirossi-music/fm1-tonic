@@ -1,0 +1,11 @@
+# wip554: the GRIGIOTONIC NOISE FILTER page (LFO button): three filter buttons, FILTER FREQ slider, MODE FREQ FLTQ knobs (wip558: K2 = freq, K3 = Q).
+wait 300
+tap LFO
+expect view 13
+shot gt_noise_a.png
+turn K1 8 80
+turn K2 -6 80
+turn K3 10 80
+shot gt_noise_b.png
+turn K1 8 80
+shot gt_noise_c.png

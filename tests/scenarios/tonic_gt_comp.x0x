@@ -1,0 +1,12 @@
+# wip566: the GRIGIOTONIC COMPRESSOR page (GLO 3rd press): the gain reduction dial + knobs ATK REL THRS GAIN.
+wait 300
+tap GLO
+tap GLO
+tap GLO
+shot gt_comp_a.png
+turn K1 20 80
+turn K2 -20 80
+turn K3 -40 80
+turn K4 30 80
+wait 800
+shot gt_comp_b.png

@@ -164,11 +164,11 @@ Press = MIX 2 → SENDS → GLOBAL → MIX 2. Hold = DELAY.
 | Page | Knob 1 · 2 · 3 · 4 | Also on this page |
 |---|---|---|
 | **MIX 2** | LEVEL · PAN · LOW CUT (20-663 Hz, never off) · HIGH CUT (20 kHz down to 1 kHz) | The two cuts are greyed in classic. |
-| **SENDS** | REVERB SEND · DELAY SEND · SIDECHAIN INPUT (track 1 to 8, big number) · SIDECHAIN THRESHOLD (0-100 %, 0 = nothing ducks) | ALGORITHM right: the DUCK screen (below). Sends work whatever PERFORM's D/W and ALL FX say. |
+| **SENDS** | REVERB SEND · DELAY SEND · SIDECHAIN INPUT (track 1 to 8, big number) · SIDECHAIN THRESHOLD (works like the compressor's threshold: all the way right = 100 % = nothing ducks, turn it left for more ducking) | ALGORITHM right: the DUCK screen (below). Sends work whatever PERFORM's D/W and ALL FX say. |
 | **DUCK** (SENDS, ALGORITHM right) | - | Black keys 1 to 8: blue = ducked, grey = not, purple = the input. The input cannot be ducked. Nothing is ducked until you choose. ALGORITHM left or HOME: back. |
 | **GLOBAL** | QUANTIZATION (1/8 ... 1/32) · SWING · FILL RATE (2x, 4x, 8x) · TEMPO | - |
 
-The duck follows the input track's sound (a long kick ducks for long; a muted input does not duck) and also ducks the tracks' sends. A red dot shows a ducked track, a purple dot the input; the dot pulses each time the input ducks. One sidechain for all tracks, saved with the preset.
+The duck follows the input track's sound (a long kick ducks for long; a muted input does not duck) and also ducks the tracks' sends. A red dot shows a ducked track, a purple dot the input; the dot follows the input track at every hit, whatever the threshold (with the knob all the way right nothing ducks and the dot stays dark). One sidechain for all tracks, saved with the preset.
 
 ### SEL, ENV, LFO, EDIT (the voice pages)
 
@@ -190,7 +190,7 @@ Press = VEL → MIXER → COMP → MEMORY → SETTINGS → VEL.
 
 | Page | Knob 1 · 2 · 3 · 4 | Also on this page |
 |---|---|---|
-| **VEL** | OSC · NOISE · PITCH MOD (how much velocity moves each) · RANDOM | {r:FUNC + knob 4}: the selected track gets a new random sound (the 21 sound settings only; the random never reaches the maximum distortion, by hand you can still turn it all the way). Knob 4 alone only shows a reminder. Track page: p-locks work. |
+| **VEL** | OSC · NOISE · PITCH MOD (how much velocity moves each) · RANDOM | {r:FUNC + knob 4}: the selected track gets a new random sound (the 21 sound settings only; the random never reaches the maximum distortion, and the higher the track's level is above its default the lower that ceiling (1 for 1), by hand you can still turn it all the way). Knob 4 alone only shows a reminder. Track page: p-locks work. |
 | **MIXER** | LEVEL of the four tracks shown | Eight tall sliders; SELECT switches tracks 1 to 4 / 5 to 8 and, as the blue hint on the screen says, cycles level / pan (pan centre = red). Black keys 1 to 8 pick a track and its group. A hit lights its slider. {r:FUNC + black key 1 to 8}: mute. A red dot under a slider = ducked, purple = sidechain input. Chance works here. |
 | **COMP** | ATTACK · RELEASE · THRESHOLD · MAKE-UP | Master compressor, ratio 4:1, a needle shows gain reduction. Default: nothing compressed (0.0 dB / 0.0 dB). Kept only by SAVE. |
 | **MEMORY** | - | A battery shows how full the project memory is (patterns, song, motion, ARP notes). Purple from 90 %, FULL at 100 %: a save is then refused. |
@@ -214,9 +214,9 @@ Settings are in the GLO list (SELECT moves up and down, ALGORITHM changes the va
 
 | Page | Knob 1 · 2 · 3 · 4 | Also on this page |
 |---|---|---|
-| **SEQ** (1st press) | FIXED LEN (8, 16, 32, 64) · AUTOSCROLL · FREE LEN (1 to 64) · SWING | White keys: the steps. SELECT: the step pages (16 at a time; AUTOSCROLL off). ALGORITHM: the voice (1 to 8, then AC = the global accent). Hold a step + ACCENT / FILL: flags (accent = dark blue, fill = yellow, both = green). {r:FUNC + SEQ}: song mode on / off (confirm with OCT+). {o:FILL + SEQ}: the SONG screen. |
+| **SEQ** (1st press) | FIXED LEN (8, 16, 32, 64) · AUTOSCROLL · FREE LEN (1 to 64) · SWING | White keys: the steps. SELECT: the step pages (16 at a time; AUTOSCROLL off): the page (1-16, 17-32 ...) shows big on the third knob for a moment, then the knob is FREE LEN again. The page never stays on steps that do not exist: if the loop gets shorter than the page you were on, it falls back to the last page the length has. ALGORITHM: the voice (1 to 8, then AC = the global accent). Hold a step + ACCENT / FILL: flags (accent = dark blue, fill = yellow, both = green). {r:FUNC + SEQ}: song mode on / off (confirm with OCT+). {o:FILL + SEQ}: the SONG screen. |
 | **PATTERN** (SEQ, 2nd press) | SONG ON / OFF | Black keys 1 to 8 mute, white keys 1 to 16 pick the next pattern. A dark key = empty pattern, low light = has notes, slow blink = the current one, fast blink = the next one (cued). {r:FUNC tap} and {o:FILL tap} as on PERFORM. SEQ again: back. |
-| **ARP** | FIXED LEN · OCTAVE (also OCT- / OCT+, -3 to +3) · - · - | The SEQ screen, but every key (white and black) plays the selected voice like a keyboard. The C keys (dim) play the voice's own pitch at octave 0. ALGORITHM: the voice. Nothing is recorded. SEQ: back. {r:FUNC + ARP}: delete the song (DELETE SONG?). |
+| **ARP** | FIXED LEN · OCTAVE (also OCT- / OCT+, -3 to +3) · PAGE (1-16, 17-32 ...) · - | The SEQ screen, but every key (white and black) plays the selected voice like a keyboard. The C keys (dim) play the voice's own pitch at octave 0. ALGORITHM: the voice. SELECT: the step pages, shown on the third knob. Nothing is recorded. SEQ: back. {r:FUNC + ARP}: delete the song (DELETE SONG?). |
 
 Making a pattern longer copies what is there into the new part (8 to 16 copies steps 1 to 8 into 9 to 16); making it shorter only shortens it.
 
@@ -348,7 +348,7 @@ Turn **PRESETS** through the 40 places: 01 to 08 are factory presets, 09 to 40 a
 - **SAVE** asks SAVE HERE? with the loaded place. OCT+ saves there and keeps the name. ALGORITHM picks another place (1 to 40; amber shows who would be replaced). OCT- goes to CHOOSE SLOT, then the slot screen, then the name screen (ALGORITHM = another made-up name; OCT+ saves). HOME leaves without saving. If nothing was loaded since power-on, SAVE starts at CHOOSE SLOT.
 - {r:FUNC + SAVE} quick-saves into the loaded place without asking for a slot, also while playing. An empty place saves at once as UNTITLED 01, 02 ...; a full one asks OVERWRITE SLOT? (OCT+ yes).
 - {r:FUNC + HOME} renames the loaded project (ALGORITHM = another name, OCT+ saves, OCT- or HOME cancels). With NAME PROJECTS set to MANUAL (GLO settings) the name screen becomes a letter editor: knob 4 cycles the characters, OCT+ (the screen says OK) takes the letter, OCT- deletes the last one, then press SAVE (8 letters at most; the screen shows PRESS SAVE and TURN KNOB 4 in big letters).
-- **What is saved.** With AUTOSAVE ON, your working project is saved 4 seconds after you stop touching things, except the compressor, the reverb and the delay: those are kept only by SAVE, inside the preset. PERFORM always starts clean at power-on (D/W 0 %, master low cut 20 Hz, ALL FX on). AUTOSAVE is OFF at the factory: press SAVE (or FUNC + SAVE) to keep your work. The settings are still kept by themselves. Turn AUTOSAVE ON in GLO > SETTINGS if you want the project kept by itself. Factory settings: clock out and notes out off, Tonic MIDI channel 10, remote MIDI channel off, CC mode off (CC CH BASE 1-8), output LOUD, USB audio follows knob, 4/4 LED on, theme TONIC, zoom knob yes, name projects GENERATE, Tonic Engine ENHANCED, 2nd core ON. A new unit or a FACTORY RESET gets them; a unit that already holds a saved project keeps its own settings.
+- **What is saved.** With AUTOSAVE ON, your working project is saved 4 seconds after you stop touching things, except the compressor, the reverb and the delay: those are kept only by SAVE, inside the preset. PERFORM always starts clean at power-on (D/W 0 %, master low cut 20 Hz, ALL FX on). AUTOSAVE is OFF at the factory: press SAVE (or FUNC + SAVE) to keep your work. The settings are still kept by themselves. Turn AUTOSAVE ON in GLO > SETTINGS if you want the project kept by itself. Factory settings: clock out and notes out off, Tonic MIDI channel 10, remote MIDI channel off, CC mode off (CC CH BASE 1-8), output LOUD, USB audio follows knob, 4/4 LED on, theme GRIGIOTONIC (grey; TONIC is the dark blue one), zoom knob yes, name projects GENERATE, Tonic Engine ENHANCED, 2nd core ON. A new unit or a FACTORY RESET gets them; a unit that already holds a saved project keeps its own settings.
 
 ## 6. Lights, MIDI and USB
 
@@ -516,7 +516,7 @@ The sends leave after the cuts and the sidechain, before the pan, and work whate
 Shared by all the tracks:
 
 - **Choke group** (EDIT, ALGORITHM right): a hit of one track in the group stops the others at once (closed hat stops open hat).
-- **Sidechain** (HOME, 2nd press): one input track makes the tracks you choose on the DUCK screen duck while it sounds; the threshold knob sets how deep (0 = off).
+- **Sidechain** (HOME, 2nd press): one input track makes the tracks you choose on the DUCK screen duck while it sounds; the threshold knob works like the compressor's: all the way right = off, turning left ducks more.
 - **Master low cut** (PERFORM · knob 3, 20 to 663 Hz): a low cut on the whole mix, before the compressor.
 - **Compressor** (GLO · COMP): 4:1, soft knee, attack 0.1 to 100 ms, release 10 to 1500 ms, threshold -48 to 0 dB, make-up 0 to 24 dB. A limiter after it keeps the output below full scale.
 - **Reverb** (hold FX): decay, tone, low cut, return level; a grainy, early-digital room. **Delay** (hold HOME): tempo-synced time (1/32 to 1/2), feedback, tone, TAPE (clean digital to worn tape), low cut, return, ping-pong.

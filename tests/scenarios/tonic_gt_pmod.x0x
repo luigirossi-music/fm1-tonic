@@ -1,0 +1,11 @@
+# wip553: the GRIGIOTONIC PITCH MOD page (SEL button): three mode buttons, WAV AMT RATE knobs.
+wait 300
+tap SEL
+expect view 11
+shot gt_pmod_a.png
+turn K1 8 80
+turn K2 10 80
+turn K3 -6 80
+shot gt_pmod_b.png
+turn K1 8 80
+shot gt_pmod_c.png

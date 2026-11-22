@@ -21,6 +21,7 @@ seq_t seq;
 volatile uint8_t eng_step[NTRACKS];
 volatile uint16_t eng_peak[NPARTS];
 volatile uint8_t eng_hit[NKIT][NDRUM];
+volatile uint8_t eng_hit_cnt[NDRUM];   /* wip584: Tonic hits counted per voice (wraps at 256): the UI's hit flash sees EVERY hit, however slow its frames are */
 int16_t eng_scope[SCOPE_N];
 volatile uint32_t eng_scope_w;
 
@@ -445,6 +446,8 @@ static void s_drum(void *x, int kit, int v, float vel)
         master_key(&mst, kit, vel);
     if ((unsigned)kit < NKIT && (unsigned)v < NDRUM)   /* MIX's drum pages: the track's meter jumps */
         eng_hit[kit][v] = (uint8_t)(vel >= 1.0f ? 255 : (int)(vel * 255.0f));
+    if (kit == 0 && (unsigned)v < NDRUM)
+        eng_hit_cnt[v] = (uint8_t)(eng_hit_cnt[v] + 1u);
 #ifdef X0X_HOST
     if (kit == 0 && v >= 0 && v < 8)
         eng_hit_n[v]++;                  /* (host tests: how many hits each Tonic voice got) */

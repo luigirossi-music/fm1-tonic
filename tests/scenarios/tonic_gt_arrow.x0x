@@ -1,0 +1,33 @@
+# wip569: the 2nd-page arrow in the skin: black, 9 x 11 (SENDS -> DUCK, PERFORM, REVERB)
+wait 300
+tap HOME
+tap HOME
+wait 300
+shot gt_arrow_sends.png
+turn ALGO 1 80
+wait 300
+shot gt_arrow_duck.png
+press FX
+wait 100
+release FX
+wait 200
+press FX
+wait 100
+release FX
+wait 400
+shot gt_arrow_perf.png
+# wip570: the BIG hint + blinking arrow: PERFORM (blink on / off), SENDS, DUCK, VELOCITY
+wait 230
+shot gt_arrow_perf2.png
+tap HOME
+tap HOME
+wait 300
+shot gt_arrow_sends2.png
+wait 280
+shot gt_arrow_sends3.png
+tap GLO
+wait 300
+shot gt_arrow_vel.png
+tap MIX
+wait 300
+shot gt_arrow_mix.png

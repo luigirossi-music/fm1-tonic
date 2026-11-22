@@ -2,7 +2,7 @@
 wait 300
 tap HOME
 tap HOME
-turn K4 50 80
+turn K4 -50 80   # wip580: inverted knob (right = off)
 turn K3 2 80
 turn ALGO 1
 tapkey b0
@@ -38,7 +38,7 @@ tap HOME
 tap HOME
 tap HOME
 tap HOME
-turn K4 20 80
+turn K4 -20 80   # wip580: inverted knob (right = off)
 turn K3 3 80
 wait 100
 expect scint 50
@@ -62,7 +62,7 @@ expect scint 50
 tap HOME
 tap HOME
 tap HOME
-turn K4 -10 80
+turn K4 10 80   # wip580: inverted knob (right = off)
 expect scint 40
 turn ALGO 1
 tapkey b3

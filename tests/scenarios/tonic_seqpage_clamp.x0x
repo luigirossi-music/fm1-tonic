@@ -1,0 +1,39 @@
+# wip583: (1) AUTOSCROLL off: SELECT shows the page (1-16, 17-32 ...) on the 3rd knob for a moment, every skin; (2) the page can never be one with no steps:
+# the length goes down (or a change of pattern) = the page falls back to the last one the length has; (3) the ARP page has the PAGE spot on K3 and SELECT turns the pages there too.
+wait 300
+expect view 7
+expect autoscroll 0
+turn K1 4 80
+expect len0 32
+wait 1500
+turn SELECT 1
+expect spage 1
+shot seqpage_select_1732.png
+wait 1500
+shot seqpage_after_1732.png
+# the length goes back to 16 while on page 17-32: the page follows (never an empty page)
+turn K1 -4 80
+expect len0 16
+wait 100
+expect spage 0
+# 64 steps, last page, then the length drops to 32: the page = the last one that exists
+turn K1 8 80
+expect len0 64
+wait 1500
+turn SELECT -1
+expect spage 3
+shot seqpage_4964.png
+wait 1500
+turn K1 -4 80
+expect len0 32
+wait 100
+expect spage 1
+# the ARP page: the PAGE spot is always on K3, SELECT turns the pages
+tap ARP
+wait 300
+shot arp_page_spot.png
+turn SELECT 1
+expect spage 0
+shot arp_page_spot_2.png
+turn SELECT 1
+expect spage 1

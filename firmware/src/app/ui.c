@@ -258,7 +258,7 @@ static const char *const NAMEMODE_N[] = {"GENERATE", "MANUAL"};
 static const x0x_param_t NAMEMODE_P = {"NAME PROJECTS", 1, 0, NAMEMODE_N};   /* wip324: GLO > PROJECT: GENERATE = the name generator (default), MANUAL = letter by letter (K4 cycles, OCT+ accepts) */
 static const x0x_param_t ZOOM_P = {"ZOOM KNOB", 1, 1, YESNO_N};   /* GLO: a turned knob shows the zoom (default YES) */
 static const char *const ROOT_N[] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
-static const char *const THEME_N[] = {"GREEN", "AMBER", "CYAN", "RED", "MONO", "TONIC"};
+static const char *const THEME_N[] = {"GREEN", "AMBER", "CYAN", "RED", "MONO", "TONIC", "GRIGIOTONIC"};
 enum { SQ_SWING, SQ_DLEN, SQ_DRATE, SQ_BLEN, SQ_BRATE, SQ_BDIR, SQ_BTRANS, SQ_TEMPO, SQ_ACCENT, SQ_CLK, SQ_NOTES,
        SQ_THEME, SQ_KEYLED, SQ_KEYSOUND, SQ_AUTOSAVE, NSQ };
 static const char *const KEYSOUND_N[] = {"STOPPED", "ALWAYS"};
@@ -266,7 +266,7 @@ static const char *const LIGHTS_N[] = {"OFF", "ON", "KEYS"};   /* ON: the keys, 
 static const x0x_param_t SEQ_P[NSQ] = {
     {"SWING", 100, 0, 0}, {"LENGTH", NSTEPS - 1, 15, 0}, {"RATE", 4, 0, RATE_N}, {"LENGTH", NSTEPS - 1, 15, 0},
     {"RATE", 4, 0, RATE_N}, {"DIR", 3, 0, DIR_N}, {"TRANSP", 48, 24, 0}, {"TEMPO", 255, 105, 0},
-    {"ACCENT", 127, 88, 0}, {"CLOCK OUT", 1, 1, ONOFF_N}, {"NOTES OUT", 1, 0, ONOFF_N}, {"THEME", 5, 5, THEME_N},
+    {"ACCENT", 127, 88, 0}, {"CLOCK OUT", 1, 1, ONOFF_N}, {"NOTES OUT", 1, 0, ONOFF_N}, {"THEME", 6, 6, THEME_N},
     {"LIGHTS", 2, 1, LIGHTS_N}, {"KEY SOUND", 1, 0, KEYSOUND_N},
     {"AUTOSAVE", 1, 1, ONOFF_N},
 };
@@ -446,7 +446,7 @@ static int pref_get(pref_t r)
     case R_BEAT: return !proj.set.beat_off;
     case R_SCROLL: return proj.set.autoscroll;
     case R_ARPO: return ui.arp_oct + 3;
-    case R_SCINT: return proj.set.sc_int;
+    case R_SCINT: return 127 - proj.set.sc_int;                /* wip580: the knob runs like the compressor's THRESHOLD: all the way RIGHT = no ducking (inactive), turning left = more */
     case R_SCIN: return proj.set.sc_in;
     case R_SHLO: return proj.sound.v[T_909][SH_LO_ROW][r.a & 7];
     case R_SHHI: return 127 - proj.sound.v[T_909][SH_HI_ROW][r.a & 7];
@@ -605,7 +605,7 @@ static void pref_set(pref_t r, int v)
     case R_CLASSIC: proj.set.classic = (uint8_t)v; sc_send(); break;   /* wip350: classic = no sidechain in the sound */
     case R_SCROLL: proj.set.autoscroll = (uint8_t)v; break;
     case R_ARPO: ui.arp_oct = (int8_t)(v - 3); break;
-    case R_SCINT: proj.set.sc_int = (uint8_t)v; sc_send(); break;   /* wip349 */
+    case R_SCINT: proj.set.sc_int = (uint8_t)(127 - v); sc_send(); break;   /* wip349; wip580: inverted (the stored intensity is unchanged: projects and presets stay compatible) */
     case R_SCIN: proj.set.sc_in = (uint8_t)v; sc_send(); break;
     case R_SHLO:                                       /* wip289: the shelving cuts: stored in the spare Tonic rows (the high one inverted), sent as the knob */
         proj.sound.v[T_909][SH_LO_ROW][r.a & 7] = (uint8_t)v;
@@ -1136,7 +1136,7 @@ static void build_pages(void)
     case V_NOISE:                                      /* LFO: the selected track's noise: filter mode, Q, freq */
         {
             int v = ui.sel[0];
-            add_page("NOISE", find_ref(T_909, v, "NFMode"), find_ref(T_909, v, "NFQ"), find_ref(T_909, v, "NFFreq"), NONE);
+            add_page("NOISE", find_ref(T_909, v, "NFMode"), find_ref(T_909, v, "NFFreq"), find_ref(T_909, v, "NFQ"), NONE);   /* wip558: K2 = filter freq (the slider), K3 = filter Q */
         }
         break;
     case V_NEV:                                        /* EDIT, 1st press: the selected track's noise envelope: mode (K1), CHOKE (K2), attack (K3), decay (K4) */
@@ -3055,6 +3055,23 @@ static void step_flag(int k, int v, int s, int fill)
     sp_step(s, fill ? 3 : 2);
 }
 
+/* wip583: the step PAGE spot (1-16, 17-32 ...) on the 3rd knob's cell, in every skin: always on the ARP page (its K3 is free) and with AUTOSCROLL on (SEQ: the FREE LEN cell);
+ * with AUTOSCROLL off the SEQ page keeps FREE LEN and shows the page for 1.2 s after a turn of SELECT */
+static uint32_t spage_until;
+static int spage_pages(void)                          /* the pages the track's pattern length has: 16 = 1, 32 = 2 ... */
+{
+    int n = (seq_part_len(&seq, TRK_DRUM + ui.part) + 15) / 16;
+    return n < 1 ? 1 : n > NSTEPS / 16 ? NSTEPS / 16 : n;
+}
+static int spage_spot(void)
+{
+    if (ui.view != V_SEQ || !is_drum() || ui.seqpat)
+        return 0;
+    if (ui.arp || proj.set.autoscroll)
+        return 1;
+    return (int32_t)(spage_until - plat_ms()) > 0;
+}
+
 static void drum_mod(int bit, int down)
 {
     if (!down) {
@@ -3090,8 +3107,16 @@ static void tn_randomize(void)
         if (i == TNP_LEVEL)
             continue;                                 /* wip344: RANDOM never touches the volume (and never the pan: not in this loop) */
         pot = d ? (int)(sv_rand() % (uint32_t)(d->max + 1)) : 0;
-        if (d && i == TNP_DIST)                       /* wip522: RANDOM never reaches the maximum distortion (speakers, ears): top = 3/4 of the range; by hand it still goes to the end */
-            pot = (int)(sv_rand() % (uint32_t)((d->max * 3) / 4 + 1));
+        if (d && i == TNP_DIST) {                     /* wip522: RANDOM never reaches the maximum distortion (speakers, ears): top = 3/4 of the range; by hand it still goes to the end */
+            /* wip581: LEVEL and DISTORTION are inversely tied: the louder the track's level is above its default (101), the lower the
+             * random distortion ceiling, 1 for 1 (level +20 = ceiling -20), so a high level and a high distortion never come together.
+             * The level itself is still never drawn; a level at or under the default keeps the old ceiling (3/4). */
+            int top = (d->max * 3) / 4;
+            int over = (int)proj.sound.v[T_909][v][TNP_LEVEL] - 101;
+            if (over > 0)
+                top = over >= top ? 0 : top - over;
+            pot = (int)(sv_rand() % (uint32_t)(top + 1));
+        }
         tn_put(v, i, (uint8_t)pot, tonic_pot_to_val(i, pot));
     }
     mark_dirty();
@@ -4205,6 +4230,7 @@ static void input(void)
                 ui.spage = 0;
             if (n > 1) {
                 ui.spage = (uint8_t)(pg_ < 0 ? n - 1 : pg_ >= n ? 0 : pg_);
+                spage_until = plat_ms() + 1200u;      /* wip583: the 3rd knob shows the page (1-16, 17-32 ...) */
                 put_i(put_s(put_i(put_s(t, "STEPS "), ui.spage * 16 + 1), "-"), ui.spage * 16 + 16);
                 say(t, 0);
             }
@@ -4287,6 +4313,14 @@ static void input(void)
                 else
                     warn("HOLD FUNC + TURN KNOB4: RANDOM", 0);   /* wip340: KNOB4, not K4 */
             }
+            continue;
+        }
+        if (i == 2)
+            spage_until = 0;                          /* wip583: K3 turned: the cell is FREE LEN again */
+        if (ui.view == V_SEQ && ui.overlay == O_NONE && is_drum() && !ui.arp && !ui.seqpat && pg.r[cur_page()][i].kind == R_DLEN && proj.set.autoscroll) {   /* wip567: AUTOSCROLL on: the FREE LEN cell shows the page, the length is not changed (the cell says why) */
+            ui.touched = (int8_t)i;
+            ui.touch_until = plat_ms() + 1200u;
+            warn("TURN AUTOSCROLL OFF", "TO CHANGE LENGTH");
             continue;
         }
         if (lock_step() >= 0) {                         /* EDIT, a step held: its p-lock */
@@ -4408,7 +4442,7 @@ static uint16_t blend(uint16_t a, uint16_t b, int t)  /* a..b, t of 16 */
     return (uint16_t)((r << 11) | (g << 5) | bl);
 }
 static uint16_t part_col(void) { return PART_COL[ui.part]; }
-static uint16_t dim(uint16_t c, int t) { return blend(C_BLACK, c, t); }
+static uint16_t dim(uint16_t c, int t) { return blend(C_BG, c, t); }
 
 static int32_t tw(const felucca_font_t *f, const char *s) { return text_w(f, s); }
 
@@ -4642,7 +4676,7 @@ static void arc(int32_t cx, int32_t cy, int32_t r, float v, uint16_t track, uint
         disc(fx + fm_cosf(e1) * rm - 0.5f, fy + fm_sinf(e1) * rm - 0.5f, th * 0.5f, hi >= 1.0f ? fill : track);
         if (hi > lo)
             disc(fx + fm_cosf(el) * rm - 0.5f, fy + fm_sinf(el) * rm - 0.5f, th * 0.5f, fill);
-        disc(fx + fm_cosf(ev) * rm - 0.5f, fy + fm_sinf(ev) * rm - 0.5f, th * 0.5f + 1.3f, C_BLACK);
+        disc(fx + fm_cosf(ev) * rm - 0.5f, fy + fm_sinf(ev) * rm - 0.5f, th * 0.5f + 1.3f, C_BG);
         disc(fx + fm_cosf(ev) * rm - 0.5f, fy + fm_sinf(ev) * rm - 0.5f, th * 0.5f + 0.6f, C_WHITE);
     }
 }
@@ -4763,7 +4797,7 @@ static void shade_rect(int32_t x, int32_t y, int32_t w, int32_t h)
     int32_t i, j;
     for (j = 0; j < h; j++)
         for (i = 0; i < w; i++)
-            px_blend(x + i, y + j, C_BLACK, 12u);
+            px_blend(x + i, y + j, C_BG, 12u);
 }
 
 static void play_icon(int32_t x, int32_t y, uint16_t c)
@@ -4787,11 +4821,16 @@ static int steps_len(void)
 }
 
 /* -------------------------------------------------------------- header --- */
+/* wip550: GRIGIOTONIC header text in Poppins (gt_text is defined further down; the Tonic theme keeps the pixel fonts) */
+static int grigio(void);
+static int32_t htw(const felucca_font_t *f, const char *s);
+static int32_t htext(int32_t x, const felucca_font_t *f, const char *s, uint16_t col);
+static void htext_r(int32_t x, const felucca_font_t *f, const char *s, uint16_t col);
 static void draw_header(void)
 {
     char b[24];
     int32_t x = 4;
-    cv_begin(240, HDR_H, C_BLACK);
+    cv_begin(240, HDR_H, C_BG);
     cv_rect(0, HDR_H - 1, 240, 1, C_LINE);
     if (ui.msg_until && (int32_t)(ui.msg_until - plat_ms()) > 0) {   /* what a button just did */
         box(0, 0, 240, HDR_H - 1, part_col());
@@ -4800,28 +4839,36 @@ static void draw_header(void)
         return;
     }
     ui.msg_until = 0;
-    if (tonic_part() && ui.view != V_GLOB && !fx_comp_page()) {   /* the Tonic, any page: the selected track at the left ("TRACK 3"); GLOBAL and the master's COMP have none */
+    if (tonic_part() && (ui.view != V_GLOB || grigio()) && (!fx_comp_page() || grigio())) {   /* the Tonic, any page: the selected track at the left ("TRACK 3"); GLOBAL and the master's COMP have none */
         char pn[12];
-        const char *tn = ui.view == V_MIX ? preset_name_cur(pn) : engine_voice_name(T_909, ui.sel[PART_909]);   /* wip229: the GLO mixer is the master mix: the project's name, not "TRACK n" */
-        int32_t w = tw(&FONT_B, tn) + 12;
-        box(0, 1, w, 17, part_col());
-        cv_text(6, vc(&FONT_B, 1, 17), &FONT_B, tn, C_BLACK);
-        x = w + 6;
+        const char *tn = ui.view == V_MIX && !grigio() ? preset_name_cur(pn) : engine_voice_name(T_909, ui.sel[PART_909]);   /* wip229: the GLO mixer is the master mix: the project's name, not "TRACK n" */
+        int32_t w = htw(&FONT_B, tn) + 12;
+        if (grigio()) {                              /* wip550: the mockup's chip: 56 wide at least, radius 3, text centred, the title 8 px after it */
+            int32_t cw = w + 6 < 56 ? 56 : w + 6;
+            rbox(2, 2, cw, 15, 3, part_col());
+            htext(2 + (cw - (w - 12)) / 2, &FONT_B, tn, C_BLACK);
+            x = cw + 8;
+        } else {
+            box(0, 1, w, 17, part_col());
+            htext(6, &FONT_B, tn, C_BLACK);
+            x = w + 6;
+        }
     }
     if (part_view()) {                                /* the part chip, then where we are */
         if (!tonic_part()) {
-            int32_t w = tw(&FONT_B, PART_N[ui.part]) + 12;
+            int32_t w = htw(&FONT_B, PART_N[ui.part]) + 12;
             box(0, 1, w, 17, part_col());
-            cv_text(6, vc(&FONT_B, 1, 17), &FONT_B, PART_N[ui.part], C_BLACK);
+            htext(6, &FONT_B, PART_N[ui.part], C_BLACK);
             x = w + 6;
         }
         if (ui.view == V_SEQ)
-            x = cv_text(x, vc(&FONT_S, 1, 17), &FONT_S, view_title(), C_HI) + 6;
+            x = htext(x, &FONT_S, view_title(), C_HI) + 6;
     } else {
         {
             const felucca_font_t *vf = ui.view == V_MIX2 || ui.view == V_GLOB || ui.view == V_PMOD || ui.view == V_OSC || ui.view == V_NOISE || ui.view == V_NEV || ui.view == V_VEL ? &FONT_XS : &FONT_B;   /* (the long "MIX PAGE 2" must stop before the pattern tag) */
-            if (ui.view != V_MIX || x + tw(vf, view_title()) < 128)   /* wip229: a wide project name leaves no room for "MIX" before the pattern tag */
-                x = cv_text(tonic_part() && ui.view != V_GLOB && !fx_comp_page() ? x : 4, vc(vf, 1, 17), vf, view_title(), C_HI) + 6;
+            const char *vt = grigio() && ui.view == V_OSC ? "OSC" : grigio() && ui.view == V_PMOD ? "PITCH" : grigio() && ui.view == V_NOISE ? "NOISE" : grigio() && ui.view == V_NEV ? "NOISE ENV" : grigio() && ui.view == V_MIX2 ? (cur_page() == 1 ? "SENDS" : "MIX 2") : grigio() && ui.view == V_GLOB ? "GLOBAL" : grigio() && ui.view == V_MIX ? "GLO MIX" : grigio() && fx_comp_page() ? "COMP" : view_title();   /* wip552: the OSC mockup's top bar says OSC (the page title says OSCILLATOR) */
+            if (ui.view != V_MIX || x + htw(vf, vt) < 128)   /* wip229: a wide project name leaves no room for "MIX" before the pattern tag */
+                x = htext(tonic_part() && (ui.view != V_GLOB || grigio()) && (!fx_comp_page() || grigio()) ? x : 4, vf, vt, C_HI) + 6;
         }
     }
     {   /* the pattern of the part on screen (else the 909's), its cue; in SONG mode the bar */
@@ -4829,21 +4876,21 @@ static void draw_header(void)
         if (seq.song_on) {
             b[0] = 'S';
             put_i(b + 1, (seq.playing ? seq.song_pos : ui.song_sel) + 1);
-            x = cv_text(ui.view == V_NEV ? 160 : ui.view == V_NOISE ? 146 : 132, vc(&FONT_B, 1, 17), &FONT_B, b, seq.song_rec ? RGB(255, 90, 80) : C_AMB);
+            x = htext(grigio() ? 118 : ui.view == V_NEV ? 160 : ui.view == V_NOISE ? 146 : 132, &FONT_B, b, seq.song_rec ? RGB(255, 90, 80) : C_AMB);
         } else {
             b[0] = 'P';
             put_i(b + 1, seq.ppat[part] + 1);
-            x = cv_text(ui.view == V_NEV ? 160 : ui.view == V_NOISE ? 146 : 132, vc(&FONT_B, 1, 17), &FONT_B, b, C_WHITE);
+            x = htext(grigio() ? 118 : ui.view == V_NEV ? 160 : ui.view == V_NOISE ? 146 : 132, &FONT_B, b, C_WHITE);
         }
         if (cue >= 0 && cue != seq.ppat[part] && !seq.song_on) {
             b[0] = '>';
             put_i(b + 1, cue + 1);
-            cv_text(x + 2, vc(&FONT_S, 1, 17), &FONT_S, b, (ui.frame & 16u) ? C_WHITE : C_GRAY);
+            htext(x + 2, &FONT_S, b, (ui.frame & 16u) ? C_WHITE : C_GRAY);
         } else if (seq.chain_a != seq.chain_b && !seq.song_on) {
-            cv_text(x + 3, vc(&FONT_XS, 1, 17), &FONT_XS, "CHN", C_AMB);
+            htext(x + 3, &FONT_XS, "CHN", C_AMB);
         } else if (steps_view() && steps_len() > 16) {   /* the 16 steps the keys show */
             put_i(put_s(put_i(b, ui.spage * 16 + 1), "-"), ui.spage * 16 + 16);
-            cv_text(x + 4, vc(&FONT_XS, 1, 17), &FONT_XS, b, C_GRAY);
+            htext(x + 4, &FONT_XS, b, C_GRAY);
         }
     }
     {   /* following an external clock, the measured tempo wanders a little from clock to clock: the
@@ -4858,7 +4905,7 @@ static void draw_header(void)
             shown = (int)(avg + 0.5f);
         put_i(b, shown);
     }
-    text_r(212, vc(&FONT_S, 1, 17), &FONT_S, b, seq.ext ? C_AMB : C_HI);
+    htext_r(212, &FONT_S, b, seq.ext ? C_AMB : C_HI);
     if (seq.playing)
         play_icon(217, 4, (eng_step[TRK_DRUM] & 3) == 0 ? C_WHITE : C_HI);
     if (ui.rec)
@@ -4881,6 +4928,7 @@ static int32_t col_x(int c) { return GX + c * 13 + (c >> 2); }   /* a pixel betw
 #define C_TBOTH RGB(166, 106, 224)
 #define C_SQACC RGB(25, 70, 200)         /* wip219, the sequencer's steps only, the whole cell: accent = dark blue */
 #define C_SQFIL RGB(250, 215, 40)        /* fill = yellow */
+#define C_SQBOTH_G RGB(222, 58, 58)      /* wip575: GRIGIOTONIC: accent + fill = RED (the same red as the centred pan of the GLO mixer) */
 #define C_SQBOTH RGB(60, 190, 90)        /* accent + fill = green, not too dark, not too light (the messages keep C_TBOTH) */
 static void draw_drum(int band)
 {
@@ -4922,7 +4970,7 @@ static void draw_drum(int band)
             }
             if (tonic) {
                 int acc = hit && (sm_get(d->vacc[v], s) || sm_get(d->accent, s)), fil = hit && sm_get(d->vfill[v], s);
-                uint16_t cc = !hit ? (sel || s == ph ? C_DIM : C_LINE) : muted ? C_DIM : acc && fil ? C_SQBOTH : acc ? C_SQACC : fil ? C_SQFIL : C_WHITE;
+                uint16_t cc = !hit ? (sel || s == ph ? C_DIM : C_LINE) : muted ? C_DIM : acc && fil ? (grigio() ? C_SQBOTH_G : C_SQBOTH) : acc ? C_SQACC : fil ? C_SQFIL : C_WHITE;
                 box(x, y, 12, dr - 2, cc);              /* wip219: white trig, dark blue accent, yellow fill, green both: the whole cell */
                 if (hit && s == ph)
                     box(x + 3, y + 2, 6, dr - 6, C_BLACK);   /* the playhead: a dark core */
@@ -5590,7 +5638,7 @@ static void draw_readout_h(int32_t H)
             vf = &FONT_M;
     if (tw(nf, nm) > right - tx)
         nf = &FONT_S;
-    cv_rect(0, 0, 240, H, C_BLACK);               /* the whole main area: a big knob, its name and value */
+    cv_rect(0, 0, 240, H, C_BG);               /* the whole main area: a big knob, its name and value */
     frame(2, 2, 236, H - 4, C_AMB);
     if (ui.view == V_PMOD && ui.touched == 0)    /* SEL K1: the zoom is the circle (the shape's icon), not a dial */
         draw_mod_icon(72, H / 2, 58, pref_shown(r), 1);
@@ -5628,7 +5676,7 @@ static void draw_mem(int oy)                 /* wip275: a rectangular BUCKET (a 
     hot = pct >= 90;
     col = hot ? C_TBOTH : RGB(36, 128, 246);                                /* wip267: the purple of the messages, not red */
     rbox(bx, top - oy, bw, bh, 9, wire);                                    /* the thick outline (a filled rounded box, the inside black again), the top left open */
-    cv_rect(bx + wall, top - oy, bw - 2 * wall, bh - wall, C_BLACK);
+    cv_rect(bx + wall, top - oy, bw - 2 * wall, bh - wall, C_BG);
     for (k = 0; k < nb; k++) {                                              /* the bars, from the bottom: each one grows in its place, a fifth of the memory each */
         int lo = k * 100 / nb, hi = (k + 1) * 100 / nb, h, yb = bot - wall - padb - k * (sh + gap);
         if (pct <= lo)
@@ -5848,7 +5896,7 @@ static void draw_ask(int band)
     }
     if (band == 0) {
         frame(6, 10, 228, 62, purple);
-        cv_rect(7, 71, 226, 1, C_BLACK);
+        cv_rect(7, 71, 226, 1, C_BG);
         if (ui.ask_act == ACT_PRESET || ui.ask_act == ACT_PRESETGO) {   /* wip198: the preset's number and name big and purple, the question small */
             const felucca_font_t *pf = tw(&FONT_M, ui.ask_q[1]) <= 216 ? &FONT_M : tw(&FONT_B, ui.ask_q[1]) <= 216 ? &FONT_B : &FONT_S;
             text_c(120, 16, &FONT_S, ui.ask_q[0], C_GRAY);
@@ -6080,11 +6128,28 @@ static int algo_level(void)                       /* wip359: the triangle fades 
     int f = (int)(ui.frame & 63u), t = f < 32 ? f : 63 - f;
     return 3 + t * 13 / 31;
 }
+static void gt_footer(int y, int dir, const char *a, const char *b, const char *c, uint16_t col);
+static int gt_big_page(void);
+static int gt_fx_knobs(void);
+static int gt_zoom_on(void);
+static void gt_big_hint(void);
 static void draw_footer_y(int y)
 {
     const char *a, *b, *c;
     uint16_t col = footer_text(&a, &b, &c);
     int dir = algo_page_dir();
+    if (grigio() && gt_zoom_on())                     /* wip576: the knob zoom owns the whole area: no hint */
+        return;
+    if (grigio() && gt_big_page()) {                  /* wip570: the skin's pages draw the hint BIG over the free strip under the knobs (gt_big_hint); this last canvas holds its lowest rows */
+        cv_oy = -2 * 104;
+        gt_big_hint();
+        cv_oy = 0;
+        return;
+    }
+    if (grigio()) {                                   /* wip550: Poppins, one blue line centred (the mockup), the triangles as before */
+        gt_footer(y, dir, a, b, c, col);
+        return;
+    }
     if (dir > 0 && (c == ALGO_WORD || c == SC_WORD || c == CK_WORD)) {                  /* wip370: PERFORM: the word ALGORITHM sits right at the triangle (nothing says what it does) */
         segs(4, vc(&FONT_T, y, 9), &FONT_T, col, FOOT_GAP, a, b, 0, 0);
         segs(225 - tw(&FONT_T, c), vc(&FONT_T, y, 9), &FONT_T, col, FOOT_GAP, c, 0, 0, 0);
@@ -6095,15 +6160,27 @@ static void draw_footer_y(int y)
 }
 static void draw_footer(void) { draw_footer_y(FOOT_Y); }
 
+static int grigio(void);
+/* wip568: GRIGIOTONIC: the PERFORM page (FX 2nd press, the first page of V_FX; not the MUTE / SOLO page) is drawn in his skin over the whole area */
+static int gt_perf(void) { return grigio() && ui.view == V_FX && cur_page() == 0 && !msp_page() && !ui.help && ui.overlay == O_NONE; }
+/* wip570: the pages of the skin that own the whole area: the hint line is drawn BIG under their knobs */
+static int gt_big_page(void)
+{
+    return grigio() && (ui.view == V_MIX1 || ui.view == V_MIX2 || ui.view == V_GLOB || ui.view == V_VEL || ui.view == V_OSC || ui.view == V_PMOD || ui.view == V_NOISE || ui.view == V_NEV || fx_comp_page() || gt_perf()) && ui.overlay == O_NONE && !ui.help && !chk_page() && !dck_page();
+}
 /* QUARTER LAYOUT (HANDOFF_65 B): the screen under the title is 4 equal quarters, one knob each (MIX pages first) */
 static int quarter_view(void)
 {
+    if (gt_perf())
+        return 1;                                     /* wip568: PERFORM in the skin: the whole area */
     if (mixer_tall())
         return 1;                                     /* wip224: the mixer takes the whole area, no knob strip */
     if (ui.seqpat && ui.view == V_SEQ && tonic_part() && !ui.help && ui.overlay == O_NONE)
         return 1;                                     /* the pattern number screen takes the whole area */
     if (ui.view == V_GLO && ui.overlay == O_MEM && !ui.help)
         return 1;                                     /* wip274: the MEMORY page (the bucket) takes the whole area, so it can sit in the middle of the screen */
+    if (grigio() && fx_comp_page() && !ui.help)
+        return 1;                                     /* wip566: GRIGIOTONIC: the COMPRESSOR page, the whole area */
     return (ui.view == V_MIX1 || ui.view == V_MIX2 || ui.view == V_GLOB || ui.view == V_PMOD || ui.view == V_OSC || ui.view == V_NOISE || ui.view == V_NEV || ui.view == V_VEL) && !ui.help && ui.overlay == O_NONE;
 }
 static void draw_quarters(void);
@@ -6117,7 +6194,7 @@ static void draw_main(void)
         draw_quarters();
         return;
     }
-    cv_begin(240, 2 * BAND_H, C_BLACK);           /* both bands, then one transfer: no tear between them */
+    cv_begin(240, 2 * BAND_H, C_BG);           /* both bands, then one transfer: no tear between them */
     for (band = 0; band < 2; band++) {
         cv_band(band * BAND_H, BAND_H);
         if (ui.help)
@@ -6142,7 +6219,7 @@ static void draw_main(void)
             draw_break(band);
     }
     cv_band(0, 2 * BAND_H);
-    if (readout && !proj.set.zoom_off && !(ui.view == V_SEQ && is_drum()) && !(ui.view == V_FX && cur_page() == 0) && !fx_comp_page() && ui.view != V_MIX && ui.view != V_SONG)   /* (the SEQ page: numbers only, no dial) */
+    if (readout && !proj.set.zoom_off && !(ui.view == V_SEQ && is_drum()) && !(ui.view == V_FX && cur_page() == 0) && !fx_comp_page() && !gt_fx_knobs() && ui.view != V_MIX && ui.view != V_SONG)   /* (the SEQ page: numbers only, no dial) */
         draw_readout();
     cv_commit_rect(1, 0, MAIN_Y);
 }
@@ -6175,6 +6252,7 @@ static uint32_t knobs_sig(void)
     MIXIN(ui.part);
     MIXIN(pgi);
     MIXIN(ui.touched);
+    MIXIN(ui.spage | proj.set.autoscroll << 8 | spage_spot() << 9);   /* wip567: the SEQ page spot follows the playhead (wip583: and it shows after SELECT) */
     MIXIN(ui.held_step);
     MIXIN(lock_step() + 1);
     MIXIN(proj.set.palette);
@@ -6240,6 +6318,9 @@ static void knob_tag(char *t)
     }
 }
 
+static void gt_knob_cell(int i, int32_t cy, int32_t ny, int32_t vy);
+/* wip590: the REVERB / DELAY pages (long press FX / HOME, and their 2nd pages) in the skin: the knob strip uses the compressor's small knobs, no big zoom */
+static int gt_fx_knobs(void) { return grigio() && ui.view == V_FX && cur_page() != 0 && !msp_page() && ui.overlay == O_NONE && !ui.help; }
 static void draw_knobs(void)
 {
     static uint32_t last_sig;
@@ -6248,7 +6329,7 @@ static void draw_knobs(void)
     if (quarter_view())
         return;
     if (ui.view == V_GLO && (ui.overlay == O_LIST || ui.overlay == O_MEM)) {   /* wip224: the settings list (wip267: and MEMORY): no compressor knobs below it */
-        cv_begin(240, KNOB_H, C_BLACK);
+        cv_begin(240, KNOB_H, C_BG);
         cv_commit(3, 0, KNOB_Y);
         last_sig = 0;
         return;
@@ -6256,7 +6337,7 @@ static void draw_knobs(void)
     if (sig == last_sig && blit_hash[3])
         return;
     last_sig = sig;
-    cv_begin(240, KNOB_H, C_BLACK);
+    cv_begin(240, KNOB_H, C_BG);
     {   /* the rule; at its right end, where you are: the tag, then the page dots */
         char t[28];
         int dots = pg.n > 1 && ui.view != V_GLO;
@@ -6280,8 +6361,33 @@ static void draw_knobs(void)
         char num[16], unit[8];
         int cx = i * 60 + 30, val, touched = ui.touched == i;
         uint16_t col = drum_mix_page() >= 0 ? PART_COL[drum_mix_page()] : part_col();   /* MIX: 909 in the 909's */
+        if (gt_fx_knobs()) {
+            cv_oy = -(KNOB_Y - MAIN_Y);
+            gt_knob_cell(i, 166, 190, 201);
+            cv_oy = 0;
+            continue;
+        }
         if (i)
             cv_rect(i * 60, 14, 1, 50, C_LINE);
+        if (i == 2 && spage_spot() && (ui.arp || r.kind == R_DLEN)) {   /* wip583: also the ARP page (its K3 is free) and, with AUTOSCROLL off, for 1.2 s after SELECT   /* wip567: AUTOSCROLL on: the FREE LEN cell is the big PAGE spot (where the playhead is); turned = why the length stays */
+            char pb[16];
+            const felucca_font_t *pf = &FONT_L;
+            box(i * 60 + 2, 11, 56, 56, dim(C_AMB, touched ? 3 : 2));
+            if (touched && !ui.arp && proj.set.autoscroll) {
+                text_c(cx, vc(&FONT_XS, 20, 9), &FONT_XS, "TURN AUTOSCROLL", C_WHITE);
+                text_c(cx, vc(&FONT_XS, 32, 9), &FONT_XS, "OFF TO CHANGE", C_WHITE);
+                text_c(cx, vc(&FONT_XS, 44, 9), &FONT_XS, "LENGTH", C_WHITE);
+                continue;
+            }
+            put_i(put_s(put_i(pb, ui.spage * 16 + 1), "-"), ui.spage * 16 + 16);
+            if (tw(pf, pb) > 54)
+                pf = &FONT_M;
+            if (tw(pf, pb) > 54)
+                pf = &FONT_B;
+            cell_value_big(cx, vc(pf, 16, 30), pf, pb, "", C_AMB);
+            text_c(cx, vc(&FONT_XS, 52, 9), &FONT_XS, "PAGE", C_WHITE);
+            continue;
+        }
         if (!d)
             continue;
         if (touched)
@@ -6358,7 +6464,7 @@ static int is_mixsl(pref_t r)
     const x0x_param_t *d = pref_desc(r);
     return r.kind == R_ENG && r.a == T_909 && d && d->name[0] == 'M' && d->name[1] == 'i' && d->name[2] == 'x' && !d->name[3];
 }
-static int slider_cell(int i) { return (ui.view == V_OSC && i == 1) || (ui.view == V_NOISE && i == 2) || (ui.view == V_MIX1 && i >= 0 && i < 2) || (ui.view == V_GLOB && i >= 0 && i < 4); }
+static int slider_cell(int i) { return (ui.view == V_OSC && i == 1) || (ui.view == V_NOISE && i == 1) || (ui.view == V_MIX1 && i >= 0 && i < 2) || (ui.view == V_GLOB && i >= 0 && i < 4); }
 
 /* the 3 words over a slider: left end, name (middle), right end */
 static void slider_words(pref_t r, const char **l, const char **c, const char **rt)
@@ -6383,7 +6489,27 @@ static void slider_words(pref_t r, const char **l, const char **c, const char **
         *l = "0%", *c = "SIDECHAIN THRESHOLD", *rt = "100%";
     else if (r.kind == R_SCIN)
         *l = "1", *c = "SIDECHAIN INPUT", *rt = "8";
-    else
+    else if (is_pan(r))
+        *l = "L", *c = "PAN", *rt = "R";                   /* wip556 */
+    else if (r.kind == R_ENG && r.a == T_909 && pref_desc(r) && name_is(pref_desc(r), "Rev"))
+        *l = "0", *c = "REVERB SEND", *rt = "100%";        /* wip559 */
+    else if (r.kind == R_ENG && r.a == T_909 && pref_desc(r) && name_is(pref_desc(r), "Dly"))
+        *l = "0", *c = "DELAY SEND", *rt = "100%";
+    else if (r.kind == R_ENG && r.a == T_909 && pref_desc(r) && name_is(pref_desc(r), "VelOsc"))
+        *l = "0", *c = "OSC", *rt = "100%";                /* wip561: the VELOCITY page */
+    else if (r.kind == R_ENG && r.a == T_909 && pref_desc(r) && name_is(pref_desc(r), "VelNs"))
+        *l = "0", *c = "NOISE", *rt = "100%";
+    else if (r.kind == R_ENG && r.a == T_909 && pref_desc(r) && name_is(pref_desc(r), "VelMod"))
+        *l = "0", *c = "PITCH MOD", *rt = "100%";
+    else if (r.kind == R_ENG && r.a == T_909 && name_is(pref_desc(r), "Level") && pref_desc(r)) {   /* the track's level: the real value at both ends */
+        static char lb[2][16];
+        char num[16], unit[8];
+        pref_value_of(r, 0, num, unit);
+        put_s(put_s(lb[0], num), unit);
+        pref_value_of(r, pref_desc(r)->max, num, unit);
+        put_s(put_s(lb[1], num), unit);
+        *l = lb[0], *c = "LEVEL", *rt = lb[1];
+    } else
         *l = "", *c = caps_of(pref_name(r)), *rt = "";
 }
 /* hundredths "05.00" .. "100.00" (at least 2 integer digits) */
@@ -6421,7 +6547,7 @@ static void draw_slider_box(pref_t r)
     char t1[24], t2[32];
     const felucca_font_t *vf = &FONT_M, *nf = &FONT_M;   /* wip74: the name in the biggest letter font (was FONT_B) */
     slider_readout_text(r, pref_shown(r), t1, t2);          /* wip249: a held step shows its own (locked) value */
-    cv_rect(0, 0, 240, Q_H, C_BLACK);
+    cv_rect(0, 0, 240, Q_H, C_BG);
     frame(2, 2, 236, Q_H - 4, C_AMB);
     if (tw(nf, t1) > 224)
         nf = &FONT_B;                                      /* (a very long name only) */
@@ -6630,48 +6756,1310 @@ static void draw_patinfo(int H)
     big_text(120 - big_w(&FONT_L, t, k) / 2, top + (avail - ch * k) / 2 - caps(&FONT_L)->top * k, &FONT_L, t, C_WHITE, k);
 }
 
+/* ---- GRIGIOTONIC drawing tools (wip545; docs/grigiotonic_*_mockup.png, tools/grigiotonic_*_mockup.py are the reference, units = pixels of the 240 screen).
+ * Cheap on purpose: solid shapes in a few layers (no per-pixel gradients except the knob's arc). Used only when THEME = GRIGIOTONIC. ---- */
+#define GT_INK RGB(62, 64, 66)
+#define GT_B1 RGB(28, 140, 214)
+#define GT_B2 RGB(70, 200, 240)
+#define GT_LIGHT RGB(233, 234, 233)
+#define GT_DARK RGB(146, 148, 147)
+#define GT_FILL RGB(201, 202, 201)
+#define GT_GREEN RGB(48, 184, 104)
+#define GT_GREEN_L RGB(150, 232, 176)
+#define GT_RED RGB(222, 58, 58)                    /* wip572: the centred pan of the GLO mixer */
+#define GT_RED_L RGB(246, 150, 150)
+#define GT_PURPLE_L RGB(200, 160, 244)
+#define GT_PURPLE RGB(166, 106, 224)               /* the firmware purple (accent + fill): the RNDM button */
+#define GT_SH RGB(104, 106, 105)                 /* neutral shadow grey (thumb shadow, drawn at 3/16) */
+static int grigio(void) { return proj.set.palette == GRIGIO_PAL; }
+/* wip547: the art is PRE-RENDERED (tools/gen_gt_art.py -> gt_art.h: groove, thumb, knob base as RGB565 + alpha, and Poppins glyphs), same
+ * geometry and soft shadows as the mockup; the code draws only what moves (thumb place, blue arc, white thumb, texts). */
+#include "gt_art.h"
+static void gt_px(int32_t x, int32_t y, uint16_t c, uint32_t a)             /* a = 0..255 */
+{
+    uint16_t *q;
+    uint32_t bg, r, g, b, v;
+    y += cv_oy;
+    if ((uint32_t)x >= cv_w || y < cv_y0 || y >= cv_y1 || !a)
+        return;
+    q = &cv_px[(uint32_t)y * cv_w + (uint32_t)x];
+    if (a >= 255u) {
+        *q = swap16(c);
+        return;
+    }
+    bg = swap16(*q);
+    v = (uint32_t)(c >> 11) * a + (bg >> 11) * (255u - a);
+    r = (v + (v >> 8) + 1u) >> 8;
+    v = (uint32_t)((c >> 5) & 63u) * a + ((bg >> 5) & 63u) * (255u - a);
+    g = (v + (v >> 8) + 1u) >> 8;
+    v = (uint32_t)(c & 31u) * a + (bg & 31u) * (255u - a);
+    b = (v + (v >> 8) + 1u) >> 8;
+    *q = swap16((uint32_t)((r << 11) | (g << 5) | b));
+}
+static void gt_blit(int32_t x0, int32_t y0, int32_t w, int32_t h, const uint16_t *c, const uint8_t *a)
+{
+    int32_t i, j;
+    for (j = 0; j < h; j++)
+        for (i = 0; i < w; i++)
+            gt_px(x0 + i, y0 + j, c[j * w + i], a[j * w + i]);
+}
+typedef struct { const gt_glyph_t *g; int32_t mid8; } gt_face_t;
+static const gt_face_t GTF_TITLE = {gtf_title, GTF_TITLE_MID}, GTF_MID = {gtf_mid, GTF_MID_MID}, GTF_SIDE = {gtf_side, GTF_SIDE_MID},
+                       GTF_KNOB3 = {gtf_knob3, GTF_KNOB3_MID}, GTF_KNOB4 = {gtf_knob4, GTF_KNOB4_MID}, GTF_KNOBS = {gtf_knobs, GTF_KNOBS_MID},
+                       GTF_DIAL = {gtf_dial, GTF_DIAL_MID}, GTF_DIALS = {gtf_dials, GTF_DIALS_MID}, GTF_DIALV = {gtf_dialv, GTF_DIALV_MID}, GTF_DIALR = {gtf_dialr, GTF_DIALR_MID},
+                       GTF_FOOT = {gtf_foot, GTF_FOOT_MID}, GTF_BAR = {gtf_bar, GTF_BAR_MID}, GTF_PNUM = {gtf_pnum, GTF_PNUM_MID}, GTF_ZVAL = {gtf_zval, GTF_ZVAL_MID};
+static int32_t gt_tw8(const gt_face_t *f, const char *s)                      /* width in 1/8 px */
+{
+    int32_t w = 0;
+    for (; *s; s++)
+        if ((uint8_t)*s >= 32u && (uint8_t)*s < 128u && gtf_map[(uint8_t)*s - 32] != 255u)
+            w += f->g[gtf_map[(uint8_t)*s - 32]].adv8;
+    return w;
+}
+/* al: 0 = x is the left edge, 1 = the centre, 2 = the right edge; ymid = the middle line of the text (like the mockup's anchor m) */
+static void gt_text(const gt_face_t *f, float x, float ymid, const char *s, uint16_t col, int al)
+{
+    int32_t pen = (int32_t)(x * 8.0f + 0.5f), base = (int32_t)(ymid + (float)f->mid8 / 8.0f + 0.5f);
+    if (al == 1)
+        pen -= gt_tw8(f, s) / 2;
+    else if (al == 2)
+        pen -= gt_tw8(f, s);
+    for (; *s; s++) {
+        const gt_glyph_t *g;
+        int32_t i, j, gx, gy;
+        if ((uint8_t)*s < 32u || (uint8_t)*s >= 128u || gtf_map[(uint8_t)*s - 32] == 255u)
+            continue;
+        g = &f->g[gtf_map[(uint8_t)*s - 32]];
+        gx = ((pen + 4) >> 3) + g->ox;
+        gy = base + g->oy;
+        for (j = 0; j < g->h; j++)
+            for (i = 0; i < g->w; i++)
+                gt_px(gx + i, gy + j, col, gtf_atlas[g->off + j * g->w + i]);
+        pen += g->adv8;
+    }
+}
+static int32_t htw(const felucca_font_t *f, const char *s) { return grigio() ? (gt_tw8(&GTF_BAR, s) + 4) / 8 : tw(f, s); }
+static int32_t htext(int32_t x, const felucca_font_t *f, const char *s, uint16_t col)
+{
+    if (!grigio())
+        return cv_text(x, vc(f, 1, 17), f, s, col);
+    gt_text(&GTF_BAR, (float)x, 9.6f, s, col, 0);
+    return x + htw(f, s);
+}
+static void htext_r(int32_t x, const felucca_font_t *f, const char *s, uint16_t col)
+{
+    if (!grigio())
+        text_r(x, vc(f, 1, 17), f, s, col);
+    else
+        gt_text(&GTF_BAR, (float)x, 9.6f, s, col, 2);
+}
+/* the footer hint: the (up to) three words joined by three spaces, centred, Poppins Medium; ALGORITHM-type words stay at the right */
+static void gt_footer(int y, int dir, const char *a, const char *b, const char *c, uint16_t col)
+{
+    char ln[96], *q = ln;
+    const char *p[3];
+    const gt_face_t *f = &GTF_FOOT;
+    int i, n = 0;
+    float ym = (float)y + 4.5f;
+    p[0] = a; p[1] = b; p[2] = c;
+    if (dir)
+        col = RGB(0, 0, 0);                                                     /* wip573: the words have the arrow's colour (black) */
+    if (dir > 0 && (c == ALGO_WORD || c == SC_WORD || c == CK_WORD)) {
+        q = put_s(q, a ? a : "");
+        if (b && *b) {
+            q = put_s(q, "   ");
+            q = put_s(q, b);
+        }
+        gt_text(f, 4.0f, ym, ln, col, 0);
+        gt_text(f, 225.0f, ym, c, col, 2);
+    } else {
+        for (i = 0; i < 3; i++)
+            if (p[i] && *p[i]) {
+                if (n++)
+                    q = put_s(q, "   ");
+                q = put_s(q, p[i]);
+            }
+        if (gt_tw8(f, ln) > 8 * 224)
+            f = &GTF_BAR;                                                       /* too long: the smaller face */
+        gt_text(f, dir < 0 ? 128.0f : dir > 0 ? 116.0f : 120.0f, ym, ln, col, 1);
+    }
+    if (dir && (ui.frame & 8u) == 0) {                                          /* wip569 (wip570: it BLINKS): the 2nd-page arrow in his skin: BLACK and bigger (9 x 11, the whole footer line), a slow soft pulse (9-16 of 16) */
+        const int32_t w = 9, h = 11, x0 = dir > 0 ? 229 : 4;
+        int32_t i, j;
+        uint32_t lv = (uint32_t)(9 + (algo_level() - 3) * 7 / 13);
+        for (j = 0; j < h; j++)
+            for (i = 0; i < w; i++) {
+                float fy = (float)j + 0.5f - (float)h * 0.5f, fx = (float)(dir > 0 ? i : w - 1 - i) + 0.5f;
+                float edge = ((float)w - 0.5f) - fx - fm_fabsf(fy) * (((float)w - 0.5f) / ((float)h * 0.5f));
+                float a = fm_clampf(edge * 0.7f + 0.5f, 0.0f, 1.0f) * fm_clampf(fx + 0.5f, 0.0f, 1.0f);
+                px_blend(x0 + i, y + j, RGB(0, 0, 0), (uint32_t)(a * (float)lv + 0.5f));
+            }
+    }
+}
+static void gt_disc(float cx, float cy, float r, uint16_t c, uint32_t a16)
+{
+    int32_t x0 = (int32_t)fm_floorf(cx - r - 1.0f), x1 = (int32_t)(cx + r + 1.0f);
+    int32_t y0 = (int32_t)fm_floorf(cy - r - 1.0f), y1 = (int32_t)(cy + r + 1.0f), x, y;
+    for (y = y0; y <= y1; y++)
+        for (x = x0; x <= x1; x++) {
+            float dx = (float)x + 0.5f - cx, dy = (float)y + 0.5f - cy, d = fm_sqrtf(dx * dx + dy * dy);
+            float a = fm_clampf(r - d + 0.5f, 0.0f, 1.0f);
+            px_blend(x, y, c, (uint32_t)(a * (float)a16 + 0.5f));
+        }
+}
+/* the sunken groove of a slider (224 x 26, at x, y) */
+static void gt_groove(int32_t x, int32_t y)
+{
+    gt_blit(x - 4, y - 4, GTS_GROOVE_W, GTS_GROOVE_H, gts_groove_c, gts_groove_a);
+}
+/* the raised blue thumb with three ridges, 43 x 21, centred on cx, cy (its shadow is in the sprite) */
+static void gt_thumb(int32_t cx, int32_t cy)
+{
+    gt_blit(cx - 29, cy - 18, GTS_THUMB_W, GTS_THUMB_H, gts_thumb_c, gts_thumb_a);
+}
+/* a standard horizontal slider: groove (y .. y+26), thin line, thumb at v (0..1); the three words under it */
+static void gt_slider(int32_t y, float v, const char *l, const char *m, const char *r, int hot)
+{
+    int32_t cy = y + 13, tx = 29 + (int32_t)(fm_clampf(v, 0.0f, 1.0f) * 183.0f + 0.5f);
+    float ly = (float)y + 34.5f;
+    gt_groove(8, y);
+    for (tx = 29; tx < 212; tx++) {                                             /* the thin line: 0.9 px wide on the line between two pixel rows */
+        gt_px(tx, cy - 1, GT_INK, 118);
+        gt_px(tx, cy, GT_INK, 118);
+    }
+    tx = 29 + (int32_t)(fm_clampf(v, 0.0f, 1.0f) * 183.0f + 0.5f);
+    gt_thumb(tx, cy);
+    gt_text(&GTF_SIDE, 9.0f, ly, l, GT_INK, 0);
+    gt_text(&GTF_SIDE, 231.0f, ly, r, GT_INK, 2);
+    gt_text(&GTF_MID, 120.0f, ly - 0.5f, m, hot ? GT_B1 : GT_INK, 1);
+}
+/* wip557: the GLOBAL page's slider: groove 20 high (y .. y+20), thumb 15 high, the three words 27 px under its top (mockup rows 35 / 73 / 111) */
+static void gt_slider20(int32_t y, float v, const char *l, const char *m, const char *r, int hot)
+{
+    int32_t cy = y + 10, tx;
+    float ly = (float)y + 27.0f;
+    gt_blit(4, y - 4, GTS_GROOVE20_W, GTS_GROOVE20_H, gts_groove20_c, gts_groove20_a);
+    for (tx = 29; tx < 212; tx++) {                                             /* the thin line, as on the other sliders */
+        gt_px(tx, cy - 1, GT_INK, 118);
+        gt_px(tx, cy, GT_INK, 118);
+    }
+    tx = 29 + (int32_t)(fm_clampf(v, 0.0f, 1.0f) * 183.0f + 0.5f);
+    gt_blit(tx - 29, cy - 15, GTS_THUMB15_W, GTS_THUMB15_H, gts_thumb15_c, gts_thumb15_a);
+    gt_text(&GTF_SIDE, 9.0f, ly, l, GT_INK, 0);
+    gt_text(&GTF_SIDE, 231.0f, ly, r, GT_INK, 2);
+    gt_text(&GTF_MID, 120.0f, ly - 0.5f, m, hot ? GT_B1 : GT_INK, 1);
+}
+/* a big knob (diameter 56): raised body, groove + blue arc from 6 o'clock clockwise (330 degrees, dark blue to light cyan), white thumb, inner button with the label */
+static void gt_knob_b(int32_t cx, int32_t cy, const char *label, float v, int hot, int bip);
+static void gt_knob(int32_t cx, int32_t cy, const char *label, float v, int hot) { gt_knob_b(cx, cy, label, v, hot, 0); }
+/* bip = 1: a centred knob (the PAN): the blue runs from the middle (12 o'clock) to the value, left or right */
+static void gt_knob_b(int32_t cx, int32_t cy, const char *label, float v, int hot, int bip)
+{
+    const float R = 28.0f, ra = 23.8f, aw = 4.0f, sweep = 330.0f / 360.0f, fcx = (float)cx + 0.5f, fcy = (float)cy + 0.5f;
+    const float st = bip ? 105.0f / 360.0f : 0.25f;                              /* wip565: the pan knob's groove is SYMMETRIC about 12 o'clock (105 to 435 degrees) */
+    int32_t x, y;
+    float ang, tx, ty;
+    float lo = 0.0f, hi;
+    int centred = 0;
+    v = fm_clampf(v, 0.0f, 1.0f);
+    if (bip) {                                                                   /* 64 of 0..127 = the centre = 0.5: each half is stretched to half the sweep */
+        const float vc = 64.0f / 127.0f;
+        v = v <= vc ? v / vc * 0.5f : 0.5f + (v - vc) / (1.0f - vc) * 0.5f;
+        centred = fm_fabsf(v - 0.5f) < 0.012f;
+        if (centred)
+            v = 0.5f;
+        lo = v < 0.5f ? v : 0.5f;
+        hi = v < 0.5f ? 0.5f : v;
+    } else
+        hi = v;
+    (void)R;
+    gt_blit(cx - 36, cy - 36, GTS_KNOB_W, GTS_KNOB_H, bip ? gts_knobp_c : gts_knob_c, bip ? gts_knobp_a : gts_knob_a);   /* body, shadows, the groove and the inner button */
+    for (y = -28; y <= 28; y++)
+        for (x = -28; x <= 28; x++) {
+            float d = fm_sqrtf((float)(x * x + y * y)), a, t;
+            a = fm_clampf(ra + aw * 0.5f + 0.5f - d, 0.0f, 1.0f) * fm_clampf(d - (ra - aw * 0.5f) + 0.5f, 0.0f, 1.0f);
+            if (a <= 0.0f)
+                continue;
+            t = turns((float)y, (float)x) - st;
+            if (t < 0.0f)
+                t += 1.0f;
+            t /= sweep;
+            if (t > 1.0f)
+                continue;
+            if (centred) {                                                       /* wip565: centred = the WHOLE ring purple, both sides (lighter toward the centre) */
+                px_blend(cx + x, cy + y, blend(GT_PURPLE, GT_PURPLE_L, (int)(16.0f * (1.0f - fm_fabsf(t - 0.5f) * 2.0f))), (uint32_t)(a * 16.0f + 0.5f));
+                continue;
+            }
+            if (t > hi || t < lo)
+                continue;
+            px_blend(cx + x, cy + y, blend(GT_B1, GT_B2, (int)(16.0f * (hi > lo ? (t - lo) / (hi - lo) : 0.0f))), (uint32_t)(a * 16.0f + 0.5f));
+        }
+    if (centred) {
+        float a0 = st * FM_TWO_PI, a1 = (st + sweep) * FM_TWO_PI;
+        disc(fcx + ra * fm_cosf(a0), fcy + ra * fm_sinf(a0), aw * 0.5f, GT_PURPLE);
+        disc(fcx + ra * fm_cosf(a1), fcy + ra * fm_sinf(a1), aw * 0.5f, GT_PURPLE);
+    } else if (hi > lo) {
+        float a0 = (st + sweep * lo) * FM_TWO_PI, a1 = (st + sweep * hi) * FM_TWO_PI;
+        disc(fcx + ra * fm_cosf(a0), fcy + ra * fm_sinf(a0), aw * 0.5f, GT_B1);   /* the round start */
+        disc(fcx + ra * fm_cosf(a1), fcy + ra * fm_sinf(a1), aw * 0.5f, GT_B2);   /* the round tip */
+    }
+    ang = (st + sweep * v) * FM_TWO_PI;
+    tx = fcx + ra * fm_cosf(ang);
+    ty = fcy + ra * fm_sinf(ang);
+    for (x = 3; x >= 1; x--)                                                    /* the white thumb with its soft shadow */
+        gt_disc(tx + 0.6f, ty + 1.0f, 3.6f + (float)x * 0.5f, GT_SH, 3);
+    disc(tx, ty, 3.6f, RGB(250, 250, 250));
+    gt_text((label[0] && label[1] && label[2] && label[3]) ? &GTF_KNOB4 : &GTF_KNOB3, fcx, fcy + 0.3f - 0.5f, label, hot ? GT_B1 : GT_INK, 1);
+}
+/* the MIX page (FX 1st press): title, the two sliders (they follow knobs 1 and 2: reference only), the four big knobs */
+static void gt_page_mix(const char *title, const char *const *LAB)
+{
+    int i, pgi = cur_page();
+    gt_text(&GTF_TITLE, 120.0f, 8.0f, title, GT_INK, 1);
+    for (i = 0; i < 2; i++) {
+        pref_t r = pg.r[pgi][i];
+        const x0x_param_t *d = pref_desc(r);
+        const char *wl, *wc, *wr;
+        char b1[24], b2[24], b3[24];                  /* caps_of() answers in ONE shared buffer: copy each word */
+        if (!d)
+            continue;
+        slider_words(r, &wl, &wc, &wr);
+        put_s(b1, caps_of(wl));
+        put_s(b2, caps_of(wc));
+        put_s(b3, caps_of(wr));
+        gt_slider(i ? 72 : 18, d->max ? (float)pref_shown(r) / (float)d->max : 0.0f, b1, b2, b3, ui.touched == i);
+        if (extra_off(r)) {                           /* wip559: CLASSIC: a shade over the slider (reverb / delay send) */
+            int32_t xx, yy;
+            for (yy = 0; yy < 34; yy++)
+                for (xx = 4; xx < 236; xx++)
+                    px_blend(xx, (i ? 72 : 18) - 4 + yy, C_BG, 10u);
+        }
+    }
+    for (i = 0; i < 4; i++) {
+        pref_t r = pg.r[pgi][i];
+        const x0x_param_t *d = pref_desc(r);
+        char nb[16], un[8];
+        const char *lab = LAB[i];
+        if (!d)
+            continue;
+        if (r.kind == R_SCIN) {                       /* wip559: SENDS K3 = the sidechain input track, its NUMBER is the label */
+            pref_value_of(r, pref_shown(r), nb, un);
+            lab = nb;
+        }
+        gt_knob_b(31 + i * 59 + (i + 1) / 3, 159, lab, d->max ? (float)pref_shown(r) / (float)d->max : 0.0f, ui.touched == i, is_pan(r));
+        if (extra_off(r))                             /* wip559: CLASSIC: the knob greyed with a shade */
+            gt_disc((float)(31 + i * 59 + (i + 1) / 3) + 0.5f, 159.5f, 31.0f, C_BG, 10);
+    }
+    if (ui.view == V_MIX2 && pgi == 1)                /* wip559: the sidechain dot (red pulsing = the selected track is ducked, purple = it is the input) between K3 and K4 */
+        sc_dot(180, 123, 4, ui.sel[0]);
+}
+
+/* wip557: the GLOBAL page (HOME 3rd press): title, three sliders (QUANTIZATION, SWING, FILL RATE: they follow knobs 1 to 3, reference only),
+ * four big knobs: QNT, SWG, then the fill rate (2X 4X 8X) and the tempo as numbers in the knob */
+static void gt_page_glob(void)
+{
+    static const char *const LAB[2] = {"QNT", "SWG"};
+    int i, pgi = cur_page();
+    char lb[2][8];
+    gt_text(&GTF_TITLE, 120.0f, 8.0f, "GLOBAL", GT_INK, 1);
+    for (i = 0; i < 3; i++) {
+        pref_t r = pg.r[pgi][i];
+        const x0x_param_t *d = pref_desc(r);
+        const char *wl, *wc, *wr;
+        char b1[24], b2[24], b3[24];
+        if (!d)
+            continue;
+        slider_words(r, &wl, &wc, &wr);
+        put_s(b1, caps_of(wl));
+        put_s(b2, caps_of(wc));
+        put_s(b3, caps_of(wr));
+        gt_slider20(15 + i * 38, d->max ? (float)pref_shown(r) / (float)d->max : 0.0f, b1, b2, b3, ui.touched == i);
+    }
+    {   /* the two numbers on the knobs: the fill rate (4X) and the tempo (125) */
+        pref_t r2 = pg.r[pgi][2], r3 = pg.r[pgi][3];
+        char num[16], unit[8];
+        pref_value_of(r2, pref_shown(r2), num, unit);
+        put_s(lb[0], caps_of(num));
+        put_i(lb[1], pref_shown(r3) + 20);
+    }
+    for (i = 0; i < 4; i++) {
+        pref_t r = pg.r[pgi][i];
+        const x0x_param_t *d = pref_desc(r);
+        if (d)
+            gt_knob(31 + i * 59 + (i + 1) / 3, 159, i < 2 ? LAB[i] : lb[i - 2], d->max ? (float)pref_shown(r) / (float)d->max : 0.0f, ui.touched == i);
+    }
+}
+
+/* wip561: the RNDM button (the purple ring + purple inner button, white RNDM): the knob body sprite, then the ring and the inner disc by code; lit = 1 */
+static void gt_rndm(int32_t cx, int32_t cy, int lit, int purple)   /* wip562: purple = 0 BLUE (voice random, GLO velocity), 1 PURPLE (RANDOM ALL, SEL: future) */
+{
+    const float ra = 23.8f, aw = 4.0f, rin = 19.1f, fcx = (float)cx + 0.5f, fcy = (float)cy + 0.5f;
+    int32_t x, y;
+    gt_blit(cx - 36, cy - 36, GTS_KNOB_W, GTS_KNOB_H, gts_knob_c, gts_knob_a);
+    for (y = -28; y <= 28; y++)
+        for (x = -28; x <= 28; x++) {
+            float d = fm_sqrtf((float)(x * x + y * y)), a, g;
+            a = fm_clampf(ra + aw * 0.5f + 0.5f - d, 0.0f, 1.0f) * fm_clampf(d - (ra - aw * 0.5f) + 0.5f, 0.0f, 1.0f);
+            if (a > 0.0f)
+                px_blend(cx + x, cy + y, purple ? GT_PURPLE : GT_B1, (uint32_t)(a * 16.0f + 0.5f));
+            a = fm_clampf(rin - d + 0.5f, 0.0f, 1.0f);
+            if (a <= 0.0f)
+                continue;
+            g = (float)(y + 19) / 38.0f;                                          /* light purple at the top, darker below */
+            g = fm_clampf(g, 0.0f, 1.0f);
+            px_blend(cx + x, cy + y, purple ? RGB((int)(190.0f - 48.0f * g), (int)(136.0f - 52.0f * g), (int)(238.0f - 32.0f * g))
+                                        : RGB((int)(120.0f - 70.0f * g), (int)(205.0f - 60.0f * g), (int)(248.0f - 28.0f * g)), (uint32_t)(a * (lit ? 16.0f : 9.0f) + 0.5f));
+        }
+    gt_text(&GTF_KNOB4, fcx, fcy + 0.3f - 0.5f, "RNDM", RGB(255, 255, 255), 1);
+}
+/* wip561: the VELOCITY page (GLO 1st press): title, three sliders (OSC, NOISE, PITCH MOD: they follow knobs 1 to 3), knobs OSC NSE MOD from the left,
+ * the 4th place = the RNDM button (FUNC + K4 randomizes the sound, as before) */
+static void gt_page_vel(void)
+{
+    static const char *const LAB[3] = {"OSC", "NSE", "MOD"};
+    int i, pgi = cur_page();
+    gt_text(&GTF_TITLE, 120.0f, 8.0f, "VELOCITY", GT_INK, 1);
+    for (i = 0; i < 3; i++) {
+        pref_t r = pg.r[pgi][i];
+        const x0x_param_t *d = pref_desc(r);
+        const char *wl, *wc, *wr;
+        char b1[24], b2[24], b3[24];
+        if (!d)
+            continue;
+        slider_words(r, &wl, &wc, &wr);
+        put_s(b1, caps_of(wl));
+        put_s(b2, caps_of(wc));
+        put_s(b3, caps_of(wr));
+        gt_slider20(15 + i * 38, d->max ? (float)pref_shown(r) / (float)d->max : 0.0f, b1, b2, b3, ui.touched == i);
+        gt_knob(31 + i * 59 + (i + 1) / 3, 159, LAB[i], d->max ? (float)pref_shown(r) / (float)d->max : 0.0f, ui.touched == i);
+    }
+    gt_rndm(31 + 3 * 59 + 1, 159, (int32_t)(rnd_until - plat_ms()) <= 0 || (ui.frame & 4u), 0);
+}
+
+/* wip552: an anti-aliased polyline (width w): the coverage of each pixel = the best of its segments, ONE blend per pixel (small icons only: 36 x 30 px at most) */
+static void gt_poly(const float *p, int n, float w, uint16_t col)
+{
+    uint8_t cov[36 * 30];
+    float hw = w * 0.5f, minx = p[0], maxx = p[0], miny = p[1], maxy = p[1];
+    int32_t i, x, y, ox, oy, bw, bh;
+    for (i = 1; i < n; i++) {
+        minx = p[2 * i] < minx ? p[2 * i] : minx;
+        maxx = p[2 * i] > maxx ? p[2 * i] : maxx;
+        miny = p[2 * i + 1] < miny ? p[2 * i + 1] : miny;
+        maxy = p[2 * i + 1] > maxy ? p[2 * i + 1] : maxy;
+    }
+    ox = (int32_t)fm_floorf(minx - hw - 1.0f);
+    oy = (int32_t)fm_floorf(miny - hw - 1.0f);
+    bw = (int32_t)(maxx + hw + 1.0f) - ox + 1;
+    bh = (int32_t)(maxy + hw + 1.0f) - oy + 1;
+    if (bw > 36 || bh > 30)
+        return;
+    for (i = 0; i < bw * bh; i++)
+        cov[i] = 0;
+    for (i = 0; i + 1 < n; i++) {
+        float ax = p[2 * i], ay = p[2 * i + 1], bx = p[2 * i + 2], by = p[2 * i + 3], dx = bx - ax, dy = by - ay, l2 = dx * dx + dy * dy;
+        int32_t x0 = (int32_t)fm_floorf((ax < bx ? ax : bx) - hw - 1.0f), x1 = (int32_t)((ax > bx ? ax : bx) + hw + 1.0f);
+        int32_t y0 = (int32_t)fm_floorf((ay < by ? ay : by) - hw - 1.0f), y1 = (int32_t)((ay > by ? ay : by) + hw + 1.0f);
+        for (y = y0; y <= y1; y++)
+            for (x = x0; x <= x1; x++) {
+                float qx = (float)x + 0.5f - ax, qy = (float)y + 0.5f - ay, t = l2 > 0.0f ? (qx * dx + qy * dy) / l2 : 0.0f, ex, ey, a;
+                int32_t k = (y - oy) * bw + (x - ox);
+                uint8_t v;
+                t = fm_clampf(t, 0.0f, 1.0f);
+                ex = qx - t * dx;
+                ey = qy - t * dy;
+                a = fm_clampf(hw - fm_sqrtf(ex * ex + ey * ey) + 0.5f, 0.0f, 1.0f);
+                v = (uint8_t)(a * 255.0f + 0.5f);
+                if (k >= 0 && k < bw * bh && v > cov[k])
+                    cov[k] = v;
+            }
+    }
+    for (y = 0; y < bh; y++)
+        for (x = 0; x < bw; x++)
+            gt_px(ox + x, oy + y, col, cov[y * bw + x]);
+}
+/* a round mode button (radius 25, pre-rendered: raised light disc, or the lit one with the blue glow), centred on the pixel cx, cy */
+static void gt_btn(int32_t cx, int32_t cy, int on)
+{
+    if (on)
+        gt_blit(cx - 32, cy - 32, GTS_BTNON_W, GTS_BTNON_H, gts_btnon_c, gts_btnon_a);
+    else
+        gt_blit(cx - 32, cy - 32, GTS_BTNOFF_W, GTS_BTNOFF_H, gts_btnoff_c, gts_btnoff_a);
+}
+/* the three waveform pictures of the OSC buttons (sine, triangle, saw), the mockup's numbers, centre cx, cy */
+static void gt_wave_icon(float cx, float cy, int kind)
+{
+    float p[2 * 25];
+    int i, n = 4;
+    const float w = 12.6f, h = 10.7f;
+    if (kind == 0) {
+        n = 25;
+        for (i = 0; i < n; i++) {
+            p[2 * i] = cx + w * ((float)i / 24.0f * 2.0f - 1.0f);
+            p[2 * i + 1] = cy - h * fm_sinf((float)i / 24.0f * FM_TWO_PI);
+        }
+    } else if (kind == 1) {
+        p[0] = cx - w;        p[1] = cy;
+        p[2] = cx - w * 0.5f; p[3] = cy - h;
+        p[4] = cx + w * 0.5f; p[5] = cy + h;
+        p[6] = cx + w;        p[7] = cy;
+    } else {
+        p[0] = cx - w * 0.9f; p[1] = cy - 0.3f * h;
+        p[2] = cx - w * 0.9f; p[3] = cy - h;
+        p[4] = cx + w * 0.9f; p[5] = cy + h;
+        p[6] = cx + w * 0.9f; p[7] = cy + 0.05f * h;
+    }
+    gt_poly(p, n, 1.5f, RGB(36, 38, 40));
+}
+/* the OSC page (ENV button): title, the three wave buttons (the lit one = the wave), WAVEFORM, the OSC FREQ slider (follows knob 2), the four big knobs */
+static void gt_page_osc(void)
+{
+    static const char *const LAB[4] = {"WAV", "OSC", "ATK", "DCY"};
+    int i, pgi = cur_page(), wv = 0;
+    pref_t wr = pg.r[pgi][0], sr = pg.r[pgi][1];
+    const x0x_param_t *wd = pref_desc(wr), *sd = pref_desc(sr);
+    if (wd)
+        wv = pref_shown(wr);
+    gt_text(&GTF_TITLE, 120.0f, 8.0f, "OSCILLATOR", GT_INK, 1);
+    for (i = 0; i < 3; i++) {
+        gt_btn(48 + i * 72, 40, i == wv);
+        gt_wave_icon(48.5f + (float)(i * 72), 40.5f, i);
+    }
+    gt_text(&GTF_MID, 120.0f, 73.5f, "WAVEFORM", ui.touched == 0 ? GT_B1 : GT_INK, 1);
+    if (sd) {
+        const char *wl, *wc, *wrr;
+        char b1[24], b2[24], b3[24];                  /* caps_of() answers in ONE shared buffer: copy each word */
+        slider_words(sr, &wl, &wc, &wrr);
+        put_s(b1, caps_of(wl));
+        put_s(b2, caps_of(wc));
+        put_s(b3, caps_of(wrr));
+        gt_slider(82, sd->max ? (float)pref_shown(sr) / (float)sd->max : 0.0f, b1, b2, b3, ui.touched == 1);
+    }
+    for (i = 0; i < 4; i++) {
+        pref_t r = pg.r[pgi][i];
+        const x0x_param_t *d = pref_desc(r);
+        if (d)
+            gt_knob(31 + i * 59 + (i + 1) / 3, 159, LAB[i], d->max ? (float)pref_shown(r) / (float)d->max : 0.0f, ui.touched == i);
+    }
+}
+
+/* the three pictures of the PITCH MOD buttons (exponential decay, sine, random), the mockup's numbers, centre cx, cy */
+static void gt_mod_icon(float cx, float cy, int kind)
+{
+    static const float RND[17] = {0.1f, -0.9f, 0.7f, -0.4f, 0.95f, -0.8f, 0.3f, -1.0f, 0.8f, -0.2f, 0.6f, -0.9f, 0.4f, -0.5f, 0.9f, -0.3f, 0.2f};
+    float p[2 * 49];
+    int i, n;
+    if (kind == 0) {
+        n = 31;
+        for (i = 0; i < n; i++) {
+            float t = (float)i / 30.0f;
+            p[2 * i] = cx + 12.5f * (t * 2.0f - 1.0f);
+            p[2 * i + 1] = cy - 10.5f + 21.0f * (1.0f - fm_expf(-5.0f * t)) / (1.0f - fm_expf(-5.0f));
+        }
+    } else if (kind == 1) {
+        n = 49;
+        for (i = 0; i < n; i++) {
+            float t = (float)i / 48.0f;
+            p[2 * i] = cx + 11.5f * (t * 2.0f - 1.0f);
+            p[2 * i + 1] = cy - 11.5f * fm_sinf(t * 2.0f * FM_TWO_PI);
+        }
+    } else {
+        n = 17;
+        for (i = 0; i < n; i++) {
+            p[2 * i] = cx + 12.5f * ((float)i / 16.0f * 2.0f - 1.0f);
+            p[2 * i + 1] = cy - 10.5f * RND[i];
+        }
+    }
+    gt_poly(p, n, 1.5f, RGB(36, 38, 40));
+}
+/* the PITCH MOD page (SEL button): title, three mode buttons (the lit one = the mod mode), then WAV AMT RATE from the left (no 4th knob yet) */
+static void gt_page_pmod(void)
+{
+    static const char *const LAB[3] = {"WAV", "AMT", "RATE"};
+    int i, pgi = cur_page(), wv = 0;
+    pref_t wr = pg.r[pgi][0];
+    if (pref_desc(wr))
+        wv = pref_shown(wr);
+    gt_text(&GTF_TITLE, 120.0f, 8.0f, "PITCH MOD", GT_INK, 1);
+    for (i = 0; i < 3; i++) {
+        gt_btn(48 + i * 72, 60, i == wv);
+        gt_mod_icon(48.5f + (float)(i * 72), 60.5f, i);
+    }
+    for (i = 0; i < 3; i++) {
+        pref_t r = pg.r[pgi][i];
+        const x0x_param_t *d = pref_desc(r);
+        if (d)
+            gt_knob(31 + i * 59 + (i + 1) / 3, 159, LAB[i], d->max ? (float)pref_shown(r) / (float)d->max : 0.0f, ui.touched == i);
+    }
+}
+
+/* the three pictures of the NOISE FILTER buttons (low pass, band pass, high pass), the mockup's numbers, centre cx, cy */
+static void gt_filt_icon(float cx, float cy, int kind)
+{
+    float p[2 * 41];
+    int i;
+    const float w = 12.6f, h = 10.4f;
+    for (i = 0; i < 41; i++) {
+        float t = (float)i / 40.0f, y, u;
+        if (kind == 0) {
+            u = fm_clampf((t - 0.3f) / 0.45f, 0.0f, 1.0f);
+            y = cy - h * (1.0f - 2.0f * u * u * (3.0f - 2.0f * u));
+        } else if (kind == 1) {
+            u = (t - 0.5f) / 0.2f;
+            y = cy + h - 2.0f * h * fm_expf(-u * u);
+        } else {
+            u = fm_clampf((t - 0.25f) / 0.45f, 0.0f, 1.0f);
+            y = cy + h * (1.0f - 2.0f * u * u * (3.0f - 2.0f * u));
+        }
+        p[2 * i] = cx + w * (t * 2.0f - 1.0f);
+        p[2 * i + 1] = y;
+    }
+    gt_poly(p, 41, 1.5f, RGB(36, 38, 40));
+}
+/* the NOISE FILTER page (LFO button): title, three filter buttons (lit = the mode), FILTER MODE, the FILTER FREQ slider (follows K2), knobs MODE FREQ FLTQ from the left */
+static void gt_page_noise(void)
+{
+    static const char *const LAB[3] = {"MODE", "FREQ", "FLTQ"};
+    int i, pgi = cur_page(), wv = 0;
+    pref_t wr = pg.r[pgi][0], sr = pg.r[pgi][1];
+    const x0x_param_t *sd = pref_desc(sr);
+    if (pref_desc(wr))
+        wv = pref_shown(wr);
+    gt_text(&GTF_TITLE, 120.0f, 8.0f, "NOISE FILTER", GT_INK, 1);
+    for (i = 0; i < 3; i++) {
+        gt_btn(48 + i * 72, 40, i == wv);
+        gt_filt_icon(48.5f + (float)(i * 72), 40.5f, i);
+    }
+    gt_text(&GTF_MID, 120.0f, 73.5f, "FILTER MODE", ui.touched == 0 ? GT_B1 : GT_INK, 1);
+    if (sd) {
+        const char *wl, *wc, *wrr;
+        char b1[24], b2[24], b3[24];                  /* caps_of() answers in ONE shared buffer: copy each word */
+        slider_words(sr, &wl, &wc, &wrr);
+        put_s(b1, caps_of(wl));
+        put_s(b2, caps_of(wc));
+        put_s(b3, caps_of(wrr));
+        gt_slider(82, sd->max ? (float)pref_shown(sr) / (float)sd->max : 0.0f, b1, b2, b3, ui.touched == 1);
+    }
+    for (i = 0; i < 3; i++) {
+        pref_t r = pg.r[pgi][i];
+        const x0x_param_t *d = pref_desc(r);
+        if (d)
+            gt_knob(31 + i * 59 + (i + 1) / 3, 159, LAB[i], d->max ? (float)pref_shown(r) / (float)d->max : 0.0f, ui.touched == i);
+    }
+}
+
+/* the three pictures of the NOISE ENVELOPE buttons (EXP spike + curve, LIN triangle, CLAP burst + curve), the mockup's numbers, centre cx, cy */
+static void gt_env_icon(float cx, float cy, int kind)
+{
+    float p[2 * 60];
+    int i, n = 0;
+    const float w = 11.2f, h = 11.0f, L = cx - w, T = cy - h, B = cy + h, wd = 2.0f * w;
+    if (kind == 1) {
+        p[0] = L;                    p[1] = B;
+        p[2] = L + 0.34f * wd;       p[3] = T;
+        p[4] = cx + w;               p[5] = B;
+        n = 3;
+    } else {
+        float x = L, x0, ww, k;
+        if (kind == 0) {
+            p[0] = L;                p[1] = B;
+            x0 = L + 0.20f * wd;
+            p[2] = x0;               p[3] = T;
+            n = 2;
+            ww = wd * 0.80f;
+            k = 4.2f;
+        } else {
+            int j;
+            p[0] = x;                p[1] = B;
+            n = 1;
+            for (j = 0; j < 4; j++) {
+                p[2 * n] = x + 1.6f;  p[2 * n + 1] = T + 1.2f;  n++;
+                p[2 * n] = x + 3.2f;  p[2 * n + 1] = B - 0.5f * h;  n++;
+                x += 3.2f;
+            }
+            p[2 * n] = x + 1.6f;     p[2 * n + 1] = T;  n++;
+            x0 = x + 1.6f;
+            ww = wd - (x0 - L);
+            k = 4.0f;
+        }
+        for (i = 1; i <= 24; i++) {
+            float t = (float)i / 24.0f;
+            p[2 * n] = x0 + ww * t;
+            p[2 * n + 1] = B - (B - T) * fm_expf(-k * t);
+            n++;
+        }
+    }
+    gt_poly(p, n, 1.5f, RGB(36, 38, 40));
+}
+/* his CHOKE icon (two walls, a slanted stroke, a dot): k = size, centre cx, cy */
+static void gt_choke_icon(float cx, float cy, float k)
+{
+    float p[4];
+    const uint16_t ink = RGB(36, 38, 40);
+    p[0] = cx - 9.6f * k; p[1] = cy - 8.4f * k; p[2] = cx - 9.6f * k; p[3] = cy + 8.4f * k;
+    gt_poly(p, 2, 1.3f * k, ink);
+    p[0] = cx + 9.6f * k; p[2] = cx + 9.6f * k;
+    gt_poly(p, 2, 1.3f * k, ink);
+    p[0] = cx - 6.6f * k; p[1] = cy - 5.6f * k; p[2] = cx + 6.6f * k; p[3] = cy + 5.6f * k;
+    gt_poly(p, 2, 1.5f * k, ink);
+    gt_disc(cx, cy, 2.6f * k, ink, 255);
+}
+/* the NOISE ENVELOPE page (EDIT button): title, three envelope buttons (lit = the mode), ENVELOPE MODE, the CHOKE button (blue = this track is in the group), knobs MODE (CHOKE icon) ATK DCY */
+static void gt_page_nenv(void)
+{
+    static const char *const LAB[4] = {"MODE", "", "ATK", "DCY"};
+    int i, pgi = cur_page(), wv = 0, in = (seq.choke >> ui.sel[0]) & 1;
+    pref_t wr = pg.r[pgi][0];
+    if (pref_desc(wr))
+        wv = pref_shown(wr);
+    gt_text(&GTF_TITLE, 120.0f, 8.0f, "NOISE ENVELOPE", GT_INK, 1);
+    for (i = 0; i < 3; i++) {
+        gt_btn(48 + i * 72, 40, i == wv);
+        gt_env_icon(48.5f + (float)(i * 72), 40.5f, i);
+    }
+    gt_text(&GTF_MID, 120.0f, 73.5f, "ENVELOPE MODE", ui.touched == 0 ? GT_B1 : GT_INK, 1);
+    if (in)
+        gt_blit(120 - 24, 98 - 24, GTS_CHKON_W, GTS_CHKON_H, gts_chkon_c, gts_chkon_a);
+    else
+        gt_blit(120 - 24, 98 - 24, GTS_CHKOFF_W, GTS_CHKOFF_H, gts_chkoff_c, gts_chkoff_a);
+    gt_choke_icon(120.5f, 98.5f, 1.0f);
+    gt_text(&GTF_SIDE, 120.0f, 122.0f, "CHOKE", ui.touched == 1 ? GT_B1 : GT_INK, 1);
+    for (i = 0; i < 4; i++) {
+        pref_t r = pg.r[pgi][i];
+        const x0x_param_t *d = pref_desc(r);
+        int32_t kx = 31 + i * 59 + (i + 1) / 3;
+        if (i == 1) {                                   /* K2 = the CHOKE switch: the icon in the knob, the arc full when in */
+            gt_knob(kx, 159, "", in ? 1.0f : 0.0f, 0);
+            gt_choke_icon((float)kx + 0.5f, 159.7f, 1.12f);
+        } else if (d)
+            gt_knob(kx, 159, LAB[i], d->max ? (float)pref_shown(r) / (float)d->max : 0.0f, ui.touched == i);
+    }
+}
+
+
+/* wip566: the COMPRESSOR (GLO 3rd press) in his drawing: the old gain-reduction dial (0 to 20 dB, 15 and 20 purple, purple needle, 4:1) on an inset panel, the four
+ * knobs ATK REL THRS GAIN. The panel and the dial are drawn by code (no new sprite). */
+static void gt_line(float x0, float y0, float x1, float y1, float w, uint16_t col, uint32_t a16)
+{
+    float hw = w * 0.5f, dx = x1 - x0, dy = y1 - y0, l2 = dx * dx + dy * dy;
+    int32_t xa = (int32_t)fm_floorf((x0 < x1 ? x0 : x1) - hw - 1.0f), xb = (int32_t)((x0 > x1 ? x0 : x1) + hw + 1.0f);
+    int32_t ya = (int32_t)fm_floorf((y0 < y1 ? y0 : y1) - hw - 1.0f), yb = (int32_t)((y0 > y1 ? y0 : y1) + hw + 1.0f), x, y;
+    for (y = ya; y <= yb; y++)
+        for (x = xa; x <= xb; x++) {
+            float qx = (float)x + 0.5f - x0, qy = (float)y + 0.5f - y0, t = l2 > 0.0f ? (qx * dx + qy * dy) / l2 : 0.0f, ex, ey, a;
+            t = fm_clampf(t, 0.0f, 1.0f);
+            ex = qx - t * dx;
+            ey = qy - t * dy;
+            a = fm_clampf(hw - fm_sqrtf(ex * ex + ey * ey) + 0.5f, 0.0f, 1.0f);
+            if (a > 0.0f)
+                px_blend(x, y, col, (uint32_t)(a * (float)a16 + 0.5f));
+        }
+}
+/* an inset panel (the slider groove's look: flat grey, a dark edge top left, a light edge bottom right), x0..x1 / y0..y1, corner radius r */
+static float gt_rsdf(float px, float py, float x0, float y0, float x1, float y1, float r)
+{
+    float hx = (x1 - x0) * 0.5f - r, hy = (y1 - y0) * 0.5f - r, qx = fm_fabsf(px - (x0 + x1) * 0.5f) - hx, qy = fm_fabsf(py - (y0 + y1) * 0.5f) - hy;
+    float mx = qx > 0.0f ? qx : 0.0f, my = qy > 0.0f ? qy : 0.0f, m = qx > qy ? qx : qy;
+    return fm_sqrtf(mx * mx + my * my) + (m < 0.0f ? m : 0.0f) - r;
+}
+static void gt_inset_panel(int32_t x0, int32_t y0, int32_t x1, int32_t y1, float r)
+{
+    const float dd = 1.7f, bl = 1.9f;
+    int32_t x, y;
+    cv_rect(x0 + 8, y0 + 8, x1 - x0 - 16, y1 - y0 - 16, RGB(189, 191, 190));
+    for (y = y0; y < y1; y++)
+        for (x = x0; x < x1; x++) {
+            float fx = (float)x + 0.5f, fy = (float)y + 0.5f, sd, dk, lt, rr, gg, bb;
+            if (x >= x0 + 8 && x < x1 - 8 && y >= y0 + 8 && y < y1 - 8)
+                continue;
+            sd = gt_rsdf(fx, fy, (float)x0, (float)y0, (float)x1, (float)y1, r);
+            if (sd > 0.5f)
+                continue;
+            dk = fm_clampf(0.5f + gt_rsdf(fx - dd, fy - dd, (float)x0, (float)y0, (float)x1, (float)y1, r) / (2.0f * bl * 0.8f), 0.0f, 1.0f) * 0.75f;
+            lt = fm_clampf(0.5f + gt_rsdf(fx + dd, fy + dd, (float)x0, (float)y0, (float)x1, (float)y1, r) / (2.0f * bl * 0.8f), 0.0f, 1.0f) * 0.9f;
+            rr = 189.0f; gg = 191.0f; bb = 190.0f;
+            rr += (146.0f - rr) * dk; gg += (148.0f - gg) * dk; bb += (147.0f - bb) * dk;
+            rr += (233.0f - rr) * lt; gg += (234.0f - gg) * lt; bb += (233.0f - bb) * lt;
+            px_blend(x, y, RGB((int)rr, (int)gg, (int)bb), (uint32_t)(fm_clampf(0.5f - sd, 0.0f, 1.0f) * 16.0f + 0.5f));
+        }
+}
+/* wip589: the touched knob grows 25 % (as the GLO mixer's); wip588: no big zoom on the compressor page (the value is always under the knob). wip587: the small knob of the compressor page (the old skin's size): grey body drawn by code, the blue trace from the start of the groove to the value, the white thumb */
+static void gt_knob_s(int32_t cx, int32_t cy, float v, int grow)
+{
+    const float gs = grow ? 1.25f : 1.0f, R = 15.0f * gs, ra = 12.4f * gs, aw = 3.0f * gs, sweep = 330.0f / 360.0f, st = 0.25f, fcx = (float)cx + 0.5f, fcy = (float)cy + 0.5f;
+    int32_t x, y;
+    float ang, tx, ty;
+    v = fm_clampf(v, 0.0f, 1.0f);
+    gt_disc(fcx + 0.5f, fcy + 1.0f, R + 1.0f, GT_SH, 3);
+    disc(fcx, fcy, R, GT_DARK);
+    disc(fcx, fcy, R - 0.8f, GT_FILL);
+    disc(fcx, fcy, ra - aw * 0.5f - 1.2f, RGB(214, 215, 214));
+    for (y = -21; y <= 21; y++)
+        for (x = -21; x <= 21; x++) {
+            float d = fm_sqrtf((float)(x * x + y * y)), a, t;
+            a = fm_clampf(ra + aw * 0.5f + 0.5f - d, 0.0f, 1.0f) * fm_clampf(d - (ra - aw * 0.5f) + 0.5f, 0.0f, 1.0f);
+            if (a <= 0.0f)
+                continue;
+            t = turns((float)y, (float)x) - st;
+            if (t < 0.0f)
+                t += 1.0f;
+            t /= sweep;
+            if (t > 1.0f)
+                continue;
+            if (t > v)
+                continue;
+            px_blend(cx + x, cy + y, blend(GT_B1, GT_B2, (int)(16.0f * (v > 0.0f ? t / v : 0.0f))), (uint32_t)(a * 16.0f + 0.5f));
+        }
+    if (v > 0.0f) {
+        float a0 = (st) * FM_TWO_PI, a1 = (st + sweep * v) * FM_TWO_PI;
+        disc(fcx + ra * fm_cosf(a0), fcy + ra * fm_sinf(a0), aw * 0.5f, GT_B1);
+        disc(fcx + ra * fm_cosf(a1), fcy + ra * fm_sinf(a1), aw * 0.5f, GT_B2);
+    }
+    ang = (st + sweep * v) * FM_TWO_PI;
+    tx = fcx + ra * fm_cosf(ang);
+    ty = fcy + ra * fm_sinf(ang);
+    for (x = 2; x >= 1; x--)
+        gt_disc(tx + 0.5f, ty + 0.8f, (2.4f + (float)x * 0.4f) * gs, GT_SH, 3);
+    disc(tx, ty, 2.4f * gs, RGB(250, 250, 250));
+}
+/* wip587 / wip590: one knob in the old skin's way, in the Grigiotonic look: the small grey knob (it grows 25 % while turned), the NAME under it, the VALUE and its unit under the name.
+ * cy / ny / vy = the page rows of the knob centre, the name and the value (the compressor page and the REVERB / DELAY pages use it) */
+static void gt_knob_cell(int i, int32_t cy, int32_t ny, int32_t vy)
+{
+    int pgi = cur_page();
+    pref_t r = pg.r[pgi][i];
+    const x0x_param_t *d = pref_desc(r);
+    char nb[16], un[8], nm[12], ub[8];
+    int32_t cx = 30 + i * 60, wn, wu;
+    float x0;
+    if (!d)
+        return;
+    gt_knob_s(cx, cy, d->max ? (float)pref_shown(r) / (float)d->max : 0.0f, ui.touched == i);
+    put_s(nm, caps_of(pref_name(r)));
+    gt_text(&GTF_BAR, (float)cx, (float)ny, nm, ui.touched == i ? GT_B1 : GT_INK, 1);
+    pref_value_of(r, pref_shown(r), nb, un);
+    put_s(ub, caps_of(un));
+    wn = gt_tw8(&GTF_DIALV, nb);
+    wu = ub[0] ? gt_tw8(&GTF_DIALS, ub) + 8 : 0;
+    x0 = (float)cx - (float)(wn + wu) / 16.0f;
+    gt_text(&GTF_DIALV, x0, (float)vy, nb, ui.touched == i ? GT_B1 : GT_INK, 0);
+    if (ub[0])
+        gt_text(&GTF_DIALS, x0 + (float)(wn + 8) / 8.0f, (float)vy + 1.0f, ub, ui.touched == i ? GT_B1 : RGB(110, 112, 114), 0);
+}
+static void gt_page_comp(void)
+{
+    static float needle;
+    static uint32_t last = 0xFFFFFFFFu;
+    const float CX = 120.0f, CY = 121.0f, RR = 82.0f, A0 = 148.0f, A1 = 32.0f;
+    int i, k;
+    float gr = engine_gr_db(), ang;
+    char t[24];
+    if (ui.frame != last) {                                                     /* the needle rises at once and falls slowly (as the old dial) */
+        needle = gr > needle ? gr : needle * 0.88f;
+        if (needle < 0.05f)
+            needle = 0.0f;
+        last = ui.frame;
+    }
+    gt_text(&GTF_TITLE, 120.0f, 8.0f, "COMPRESSOR", GT_INK, 1);
+    gt_inset_panel(8, 15, 232, 128, 9.0f);
+    for (k = 0; k <= 20; k++) {
+        int major = k % 5 == 0;
+        float a = (A0 + (A1 - A0) * (float)k / 20.0f) * FM_PI / 180.0f, c = fm_cosf(a), sn = fm_sinf(a), r0 = major ? RR - 9.0f : RR - 5.0f;
+        uint16_t col = k >= 15 ? GT_PURPLE : RGB(52, 54, 56);
+        gt_line(CX + r0 * c, CY - r0 * sn, CX + RR * c, CY - RR * sn, major ? 1.5f : 0.8f, col, 16);
+        if (major) {
+            put_i(t, k);
+            gt_text(&GTF_DIAL, CX + (RR + 8.5f) * c, CY - (RR + 8.5f) * sn, t, k >= 15 ? GT_PURPLE : GT_INK, 1);
+        }
+    }
+    ang = (A0 + (A1 - A0) * fm_clampf(needle / 20.0f, 0.0f, 1.0f)) * FM_PI / 180.0f;
+    gt_line(CX + 0.6f, CY + 1.0f, CX + (RR - 6.0f) * fm_cosf(ang) + 0.6f, CY - (RR - 6.0f) * fm_sinf(ang) + 1.0f, 2.2f, GT_SH, 7);   /* its soft shadow */
+    gt_line(CX, CY, CX + (RR - 6.0f) * fm_cosf(ang), CY - (RR - 6.0f) * fm_sinf(ang), 1.7f, GT_PURPLE, 16);
+    gt_disc(CX + 0.6f, CY + 1.0f, 7.0f, GT_SH, 4);                              /* the hub */
+    gt_disc(CX, CY, 6.0f, RGB(206, 207, 206), 16);
+    gt_disc(CX, CY, 2.6f, RGB(110, 112, 114), 16);
+    gt_text(&GTF_DIALS, 16.0f, 23.0f, "GAIN REDUCTION DB", RGB(110, 112, 114), 0);
+    put_s(put_i(t, (int)(needle + 0.5f)), " DB");
+    gt_text(&GTF_DIALV, 16.0f, 118.0f, t, GT_INK, 0);
+    gt_text(&GTF_DIALR, 224.0f, 118.0f, "4:1", RGB(130, 132, 134), 2);
+    for (i = 0; i < 4; i++)
+        gt_knob_cell(i, 158, 180, 191);
+}
+
+/* wip564: the GLO MIXER (GLO 2nd press) in his drawing: 8 tall faders (BLUE = the live volume of the track, WHITE dot = its level), under each a small PAN knob
+ * (the track number inside; pan at the centre = purple on both sides of the thumb, at a side = a blue trace from the centre), a blue line = the group the four
+ * hardware knobs act on, the sidechain dots under it. The arc starts at 6 o'clock, so the pan centre is drawn at 12 o'clock (as the HOME pan knob, wip562). */
+static void gt_fader(int32_t x0, int32_t y0, float level, float meter, int muted)
+{
+    const int32_t yt = y0 + 8, yb = y0 + 114 - 8;
+    const float cx = (float)x0 + 11.0f, gw = 3.5f;
+    int32_t x, y, top;
+    float ty;
+    level = fm_clampf(level, 0.0f, 1.0f);
+    meter = fm_clampf(meter, 0.0f, 1.0f);
+    gt_blit(x0 - 4, y0 - 4, GTS_FADER_W, GTS_FADER_H, gts_fader_c, gts_fader_a);
+    top = (int32_t)((float)yb - (float)(yb - yt) * meter);
+    if (!muted && meter > 0.004f)
+        for (y = top - 4; y <= yb + 4; y++) {                                   /* the blue capsule: dark at the bottom, light cyan at the tip */
+            float yy = (float)y + 0.5f, dy = yy < (float)top ? (float)top - yy : yy > (float)yb ? yy - (float)yb : 0.0f, t = ((float)yb + gw - yy) / ((float)(yb - top) + 2.0f * gw);
+            for (x = x0 + 6; x < x0 + 16; x++) {
+                float dx = fm_fabsf((float)x + 0.5f - cx), d = fm_sqrtf(dx * dx + dy * dy), a = fm_clampf(gw - d + 0.5f, 0.0f, 1.0f);
+                if (a <= 0.0f)
+                    continue;
+                t = fm_clampf(t, 0.0f, 1.0f);
+                px_blend(x, y, blend(GT_B1, GT_B2, (int)(16.0f * fm_sqrtf(t) * 0.9f + 0.5f)), (uint32_t)(a * 16.0f + 0.5f));
+            }
+        }
+    ty = (float)yb - (float)(yb - yt) * level;
+    {
+        int k;
+        for (k = 3; k >= 1; k--)
+            gt_disc(cx + 0.7f, ty + 1.2f, 4.4f + (float)k * 0.4f, GT_SH, 3);
+        disc(cx, ty, 4.4f, muted ? RGB(205, 205, 205) : RGB(250, 250, 250));
+    }
+}
+/* the small pan knob: v = the pan 0..1 (64 / 127 = the centre); wip565: symmetric groove (105 to 435 degrees), centred = the whole ring purple */
+static void gt_pan_small(int32_t cx, int32_t cy, const char *label, float v, int hot, int grow)
+{
+    const float gs = grow ? 1.25f : 1.0f, k = 27.0f / 56.0f * gs, R = 13.5f * gs, ra = R - 4.2f * k, aw = 4.0f * k, sweep = 330.0f / 360.0f, st = 105.0f / 360.0f, fcx = (float)cx, fcy = (float)cy;
+    const float vc = 64.0f / 127.0f;
+    int32_t x, y;
+    int centred;
+    float lo, hi, ang, tx, ty;
+    v = fm_clampf(v, 0.0f, 1.0f);
+    v = v <= vc ? v / vc * 0.5f : 0.5f + (v - vc) / (1.0f - vc) * 0.5f;
+    centred = fm_fabsf(v - 0.5f) < 0.012f;
+    if (centred)
+        v = 0.5f;
+    lo = v < 0.5f ? v : 0.5f;
+    hi = v < 0.5f ? 0.5f : v;
+    if (grow) {                                                                 /* wip567: the touched knob grows 25 % (as the old skin), body by code */
+        gt_disc(fcx + 0.4f, fcy + 0.8f, R + 1.0f, GT_SH, 3);
+        disc(fcx, fcy, R, GT_DARK);
+        disc(fcx, fcy, R - 0.8f, GT_FILL);
+    } else
+        gt_blit(cx - GTS_SKNOBP_W / 2, cy - GTS_SKNOBP_H / 2, GTS_SKNOBP_W, GTS_SKNOBP_H, gts_sknobp_c, gts_sknobp_a);
+    if (centred)                                                                /* wip567: centred = the WHOLE knob RED (wip572) (body and ring) */
+        gt_disc(fcx, fcy, R - 0.5f, GT_RED, 9);
+    {
+        int32_t m = grow ? 21 : 15;
+    for (y = cy - m; y < cy + m; y++)
+        for (x = cx - m; x < cx + m; x++) {
+            float dx = (float)x + 0.5f - fcx, dy = (float)y + 0.5f - fcy, d = fm_sqrtf(dx * dx + dy * dy), a, t;
+            a = fm_clampf(ra + aw * 0.5f + 0.5f - d, 0.0f, 1.0f) * fm_clampf(d - (ra - aw * 0.5f) + 0.5f, 0.0f, 1.0f);
+            if (a <= 0.0f)
+                continue;
+            t = turns(dy, dx) - st;
+            if (t < 0.0f)
+                t += 1.0f;
+            t /= sweep;
+            if (t > 1.0f)
+                continue;
+            if (centred) {                                                      /* the WHOLE ring purple, both sides (lighter toward the centre) */
+                px_blend(x, y, blend(GT_RED, GT_RED_L, (int)(16.0f * (1.0f - fm_fabsf(t - 0.5f) * 2.0f))), (uint32_t)(a * 16.0f + 0.5f));
+                continue;
+            }
+            if (t > hi || t < lo)
+                continue;
+            px_blend(x, y, blend(GT_B1, GT_B2, (int)(16.0f * (hi > lo ? (v > 0.5f ? (t - lo) : (hi - t)) / (hi - lo) : 0.0f))), (uint32_t)(a * 16.0f + 0.5f));
+        }
+    }
+    if (centred) {
+        float a0 = st * FM_TWO_PI, a1 = (st + sweep) * FM_TWO_PI;
+        disc(fcx + ra * fm_cosf(a0), fcy + ra * fm_sinf(a0), aw * 0.5f, GT_RED);
+        disc(fcx + ra * fm_cosf(a1), fcy + ra * fm_sinf(a1), aw * 0.5f, GT_RED);
+    } else if (hi > lo) {
+        float a0 = (st + sweep * lo) * FM_TWO_PI, a1 = (st + sweep * hi) * FM_TWO_PI;
+        disc(fcx + ra * fm_cosf(a0), fcy + ra * fm_sinf(a0), aw * 0.5f, v > 0.5f ? GT_B1 : GT_B2);
+        disc(fcx + ra * fm_cosf(a1), fcy + ra * fm_sinf(a1), aw * 0.5f, v > 0.5f ? GT_B2 : GT_B1);
+    }
+    ang = (st + sweep * v) * FM_TWO_PI;
+    tx = fcx + ra * fm_cosf(ang);
+    ty = fcy + ra * fm_sinf(ang);
+    gt_disc(tx + 0.3f, ty + 0.5f, 1.74f + 0.5f, GT_SH, 3);
+    disc(tx, ty, 1.74f, RGB(250, 250, 250));
+    gt_text(&GTF_KNOBS, fcx, fcy + 0.15f - 0.5f, label, hot ? GT_B1 : GT_INK, 1);
+}
+/* wip568: the PERFORM page in his skin: the pattern number (two digits fit) in a raised circle like a knob, the knobs REV DLY HPF and the ALL FX ON / OFF selector.
+ * The circle: R 48, a blue ring (purple and blinking while the next pattern is queued: its number sits in a small purple disc), the number in Poppins Medium 48 (PNUM: a 2 digit number is 62 x 37 px, its corner is 36 px from the middle, the ring's inside is 40) */
+static void gt_page_perf(void)
+{
+    static const char *const LAB[3] = {"REV", "DLY", "HPF"};
+    const float CX = 120.0f, CY = 72.0f, R = 48.0f, RA = 42.8f, AW = 3.2f;
+    int cur = seq.ppat[PART_909], cue = seq_cue_of(&seq, PART_909), pend = cue >= 0 && cue != cur, blink = (ui.frame & 16u) != 0, i, on, x, y;
+    int32_t x0 = 179, x1 = 237, y0 = 145, y1 = 173, tx;
+    char t[8];
+    gt_text(&GTF_TITLE, 120.0f, 8.0f, "PERFORM", GT_INK, 1);
+    for (x = 3; x >= 1; x--)                                                    /* the soft shadow */
+        gt_disc(CX + 0.6f, CY + 1.4f, R + (float)x * 0.9f, GT_SH, 3);
+    gt_disc(CX + 0.9f, CY + 1.0f, R, GT_DARK, 16);                              /* the raised edge: dark bottom right, light top left */
+    gt_disc(CX - 0.9f, CY - 1.0f, R, GT_LIGHT, 16);
+    gt_disc(CX, CY, R - 1.1f, RGB(206, 207, 206), 16);
+    for (y = (int)CY - 48; y <= (int)CY + 48; y++)
+        for (x = (int)CX - 48; x <= (int)CX + 48; x++) {
+            float dx = (float)x + 0.5f - CX, dy = (float)y + 0.5f - CY, d = fm_sqrtf(dx * dx + dy * dy), a, g;
+            a = fm_clampf(RA + AW * 0.5f + 1.3f - d, 0.0f, 1.0f) * fm_clampf(d - (RA - AW * 0.5f - 1.3f) + 0.5f, 0.0f, 1.0f);
+            if (a > 0.0f)                                                       /* the groove under the ring */
+                px_blend(x, y, GT_DARK, (uint32_t)(a * 5.0f + 0.5f));
+            a = fm_clampf(RA + AW * 0.5f + 0.5f - d, 0.0f, 1.0f) * fm_clampf(d - (RA - AW * 0.5f) + 0.5f, 0.0f, 1.0f);
+            if (a <= 0.0f)
+                continue;
+            g = fm_clampf((dy + RA) / (2.0f * RA), 0.0f, 1.0f);
+            px_blend(x, y, pend && blink ? blend(GT_PURPLE_L, GT_PURPLE, (int)(16.0f * g)) : blend(GT_B2, GT_B1, (int)(16.0f * g)), (uint32_t)(a * 16.0f + 0.5f));
+        }
+    put_i(t, cur + 1);
+    gt_text(&GTF_PNUM, CX, CY + 1.2f, t, GT_INK, 1);
+    if (pend && blink) {                                                        /* the queued pattern: a purple disc at the top right of the circle */
+        char n[8];
+        put_i(n, cue + 1);
+        gt_disc(CX + 38.0f, CY - 38.0f + 0.8f, 17.0f, GT_SH, 3);
+        gt_disc(CX + 38.0f, CY - 38.0f, 16.0f, GT_PURPLE, 16);
+        gt_text(&GTF_KNOB3, CX + 38.0f, CY - 38.0f - 0.2f, n, RGB(255, 255, 255), 1);
+    }
+    for (i = 0; i < 3; i++) {
+        pref_t r = pg.r[0][i];
+        const x0x_param_t *d = pref_desc(r);
+        if (d)
+            gt_knob(31 + i * 59 + (i + 1) / 3, 159, LAB[i], d->max ? (float)pref_shown(r) / (float)d->max : 0.0f, ui.touched == i);
+    }
+    on = pref_get(pg.r[0][3]) != 0;                                             /* ALL FX: a selector, the thumb right = ON (blue), left = OFF */
+    gt_inset_panel(x0, y0, x1, y1, 14.0f);
+    tx = on ? x1 - 14 : x0 + 14;
+    if (ui.touched == 3)
+        gt_disc((float)tx, 159.0f, 13.5f, GT_B1, 6);
+    gt_disc((float)tx + 0.4f, 160.0f, 12.0f, GT_SH, 3);
+    gt_disc((float)tx, 159.0f, 11.0f, on ? GT_B1 : RGB(250, 250, 250), 16);
+    if (on)
+        gt_disc((float)tx, 158.2f, 8.0f, GT_B2, 9);
+    gt_text(&GTF_KNOB4, on ? (float)(x0 + 8 + tx - 11) * 0.5f : (float)(tx + 11 + x1 - 8) * 0.5f, 159.0f - 0.2f, on ? "ON" : "OFF", on ? GT_B1 : RGB(104, 106, 105), 1);
+}
+/* wip570: the hint line of the skin's pages, BIG (Poppins 14.6, blue) in the strip under the knobs (page rows 190 to 218), and the 2nd-page arrow: BLACK, 22 x 30, BLINKING, at the right edge
+ * (a page to the right: the word ALGORITHM is in the hint) or the left edge (the way back). Long hints: the smaller face, then two lines. Drawn with cv_oy set by the caller (the strip crosses two canvases). */
+static void gt_big_hint(void)
+{
+    const char *a, *b, *c, *p[3];
+    char l1[96], l2[96], *q1 = l1, *q2 = l2;
+    const float xl = 6.0f, xr = 234.0f;
+    uint16_t col = footer_text(&a, &b, &c);
+    int dir = algo_page_dir(), i, n = 0;
+    float x0 = dir < 0 ? 30.0f : xl, x1 = dir > 0 ? 210.0f : xr, cx = (x0 + x1) * 0.5f;
+    int32_t avail8 = (int32_t)((x1 - x0) * 8.0f);
+    const gt_face_t *f = &GTF_KNOB3;
+    p[0] = a; p[1] = b; p[2] = c;
+    if (dir)
+        col = RGB(0, 0, 0);                                                     /* wip573: the words have the arrow's colour (black) */
+    l1[0] = 0;
+    l2[0] = 0;
+    for (i = 0; i < 3; i++)
+        if (p[i] && *p[i]) {
+            if (n++)
+                q1 = put_s(q1, "   ");
+            q1 = put_s(q1, p[i]);
+        }
+    if (gt_tw8(f, l1) > avail8)
+        f = &GTF_KNOB4;
+    if (gt_tw8(f, l1) <= avail8) {
+        gt_text(f, cx, 204.0f, l1, col, 1);
+    } else {                                                                    /* two lines: the first part, then the rest */
+        n = 0;
+        for (i = 1; i < 3; i++)
+            if (p[i] && *p[i]) {
+                if (n++)
+                    q2 = put_s(q2, "   ");
+                q2 = put_s(q2, p[i]);
+            }
+        (void)q2;
+        put_s(l1, p[0] ? p[0] : "");
+        if (gt_tw8(&GTF_KNOB4, l2) > avail8 || gt_tw8(&GTF_KNOB4, l1) > avail8)
+            f = &GTF_BAR;
+        else
+            f = &GTF_KNOB4;
+        gt_text(f, cx, 197.5f, l1, col, 1);
+        gt_text(f, cx, 211.5f, l2, col, 1);
+    }
+    if (dir && (ui.frame & 8u) == 0) {                                          /* wip573: twice as fast */
+        const int32_t w = 22, h = 30, tx0 = dir > 0 ? 216 : 2, ty0 = 189;
+        int32_t ii, jj;
+        for (jj = 0; jj < h; jj++)
+            for (ii = 0; ii < w; ii++) {
+                float fy = (float)jj + 0.5f - (float)h * 0.5f, fx = (float)(dir > 0 ? ii : w - 1 - ii) + 0.5f;
+                float edge = ((float)w - 0.5f) - fx - fm_fabsf(fy) * (((float)w - 0.5f) / ((float)h * 0.5f));
+                float al = fm_clampf(edge * 0.7f + 0.5f, 0.0f, 1.0f) * fm_clampf(fx + 0.5f, 0.0f, 1.0f);
+                px_blend(tx0 + ii, ty0 + jj, RGB(0, 0, 0), (uint32_t)(al * 16.0f + 0.5f));
+            }
+    }
+}
+/* wip578 / wip579: the group the four hardware knobs act on = a BLUE OUTLINE (4 px, rounded) round its four faders (level pages) or its four pan knobs (pan pages) */
+static void gt_group_glow(int32_t x0, int32_t y0, int32_t x1, int32_t y1)
+{
+    const float r = 10.0f;
+    int32_t x, y, ya = y0 - 3, yb = y1 + 3;
+    if (ya < -cv_oy)
+        ya = -cv_oy;                                                            /* only the rows of the canvas being drawn */
+    if (yb > -cv_oy + Q_H)
+        yb = -cv_oy + Q_H;
+    for (y = ya; y < yb; y++)
+        for (x = x0 - 3; x < x1 + 3; x++) {
+            float sd = gt_rsdf((float)x + 0.5f, (float)y + 0.5f, (float)x0, (float)y0, (float)x1, (float)y1, r), a;
+            a = fm_clampf(2.0f - fm_fabsf(sd + 2.0f) + 0.5f, 0.0f, 1.0f);       /* wip579: a ring 4 px wide, anti-aliased */
+            if (a > 0.0f)
+                px_blend(x, y, GT_B1, (uint32_t)(a * 16.0f + 0.5f));
+        }
+}
+static void gt_page_gmix(int k)
+{
+    int v, pgi = cur_page(), grp = pgi & 1, panmode = pgi >> 1, tv = ui.touched >= 0 && ui.touched < 4 ? grp * 4 + ui.touched : -1;
+    int32_t xs[8];
+    char tnb[2] = {0, 0};
+    int tpv = 64;
+    gt_text(&GTF_TITLE, 120.0f, 8.0f, "GLOBAL MIXER", GT_INK, 1);
+    gt_group_glow(7 + (int32_t)((float)(grp * 4) * 29.2f + 0.5f) + 11 - 17, panmode ? 134 : 13, 7 + (int32_t)((float)(grp * 4 + 3) * 29.2f + 0.5f) + 11 + 17, panmode ? 175 : 134);
+    for (v = 0; v < NDRUM_TONIC; v++) {
+        pref_t lv = find_ref(T_909, v, "Level"), pn = find_ref(T_909, v, "Pan");
+        int l = lv.kind ? proj.sound.v[T_909][v][lv.c] : 0, pv = pn.kind ? proj.sound.v[T_909][v][pn.c] : 64;
+        int muted = (int)(((seq.mute | seq.vmute) >> (k * NDRUM + v)) & 1u);
+        float lvl = (float)l / 127.0f, mt = lvl * (float)eng_hit[k][v] / 255.0f;
+        char nb[4];
+        xs[v] = 7 + (int32_t)(v * 29.2f + 0.5f);                                /* the pill's left edge (his drawing: centres 17.8 + 29.2 v) */
+        gt_fader(xs[v], 16, lvl, mt, muted);
+        nb[0] = (char)('1' + v);
+        nb[1] = 0;
+        if (!(v == tv && panmode))
+            gt_pan_small(xs[v] + 11, 152, nb, (float)pv / 127.0f, 0, 0);
+        else {
+            tnb[0] = nb[0];
+            tnb[1] = 0;
+            tpv = pv;
+        }
+        sc_dot(xs[v] + 11, 180, 4, v);
+    }
+    if (tnb[0])                                                                 /* wip567: the touched pan knob last (it grows over its neighbours) */
+        gt_pan_small(xs[tv] + 11, 152, tnb, (float)tpv / 127.0f, 1, 1);
+}
+
+/* wip576: the KNOB ZOOM in his skin (GLO settings ZOOM KNOB = YES, as the old skin): a turned knob on the skin's pages shows a BIG knob with its name and value over the whole
+ * area (the same moments as the old zoom: not for the sliders (a later piece), not on PERFORM / SONG, not for the K1 icon cells (a later piece)). */
+/* wip577: the knobs of the skin's pages that have a SLIDER moving together with them (the old skin's slider cells, plus the VELOCITY sliders): their big readout is a RECTANGLE
+ * with the value over the knobs' place, never a zoom. (GLOBAL K4 = the tempo has no slider: it zooms.) */
+static int gt_slider_cell(int i)
+{
+    if (!grigio() || i < 0 || i > 3)
+        return 0;
+    return (ui.view == V_MIX1 && i < 2) || (ui.view == V_OSC && i == 1) || (ui.view == V_NOISE && i == 1) || (ui.view == V_GLOB && i < 3) || (ui.view == V_VEL && i < 3);
+}
+static int gt_slbox_on(void)
+{
+    pref_t r;
+    int t = ui.touched;
+    if (!gt_big_page() || ui.overlay != O_NONE || ui.help || gt_perf() || !gt_slider_cell(t))
+        return 0;
+    r = pg.r[cur_page()][t];
+    return r.kind != R_NONE && pref_desc(r) != 0;
+}
+static int gt_zoom_on(void)
+{
+    pref_t r;
+    int t = ui.touched;
+    if (!grigio() || !gt_big_page() || proj.set.zoom_off || gt_perf() || ui.view == V_SONG || fx_comp_page() || ui.overlay != O_NONE || ui.help)
+        return 0;
+    if (t < 0 || t > 3 || gt_slider_cell(t))
+        return 0;                                                               /* wip577: a knob with a slider moving together = the slider's rectangle (gt_slider_box), not a zoom */
+    if (t == 0 && (ui.view == V_PMOD || ui.view == V_OSC || ui.view == V_NEV || ui.view == V_NOISE))
+        return 0;                                                               /* K1 = an icon cell */
+    if (ui.view == V_NEV && t == 1)
+        return 0;                                                               /* the CHOKE switch */
+    if (ui.view == V_VEL && t == 3)
+        return 0;                                                               /* RANDOM SOUND */
+    r = pg.r[cur_page()][t];
+    return r.kind != R_NONE && r.kind != R_ACT && pref_desc(r) != 0;
+}
+/* a big knob (R 56): the sprite look by code: soft shadow, light body, the groove with the blue value arc, the inner button, the white thumb. bip = a centred knob (pan). */
+static void gt_knob_big(int32_t cx, int32_t cy, float v, int bip)
+{
+    const float R = 56.0f, ra = 47.6f, aw = 8.0f, sweep = 330.0f / 360.0f, st = bip ? 105.0f / 360.0f : 0.25f, fcx = (float)cx + 0.5f, fcy = (float)cy + 0.5f;
+    float lo = 0.0f, hi, ang, tx, ty;
+    int32_t x, y;
+    int centred = 0, k;
+    v = fm_clampf(v, 0.0f, 1.0f);
+    if (bip) {
+        const float vc = 64.0f / 127.0f;
+        v = v <= vc ? v / vc * 0.5f : 0.5f + (v - vc) / (1.0f - vc) * 0.5f;
+        centred = fm_fabsf(v - 0.5f) < 0.012f;
+        if (centred)
+            v = 0.5f;
+        lo = v < 0.5f ? v : 0.5f;
+        hi = v < 0.5f ? 0.5f : v;
+    } else
+        hi = v;
+    for (k = 4; k >= 1; k--)
+        gt_disc(fcx + 1.0f, fcy + 2.4f, R + (float)k * 1.3f, GT_SH, 3);          /* the soft shadow */
+    gt_disc(fcx, fcy, R + 0.6f, GT_DARK, 16);
+    gt_disc(fcx - 0.6f, fcy - 0.8f, R - 0.4f, GT_LIGHT, 16);
+    gt_disc(fcx + 0.4f, fcy + 0.6f, R - 1.6f, GT_FILL, 16);
+    for (y = -56; y <= 56; y++)
+        for (x = -56; x <= 56; x++) {
+            float d = fm_sqrtf((float)(x * x + y * y)), a, t;
+            a = fm_clampf(ra + aw * 0.5f + 0.5f - d, 0.0f, 1.0f) * fm_clampf(d - (ra - aw * 0.5f) + 0.5f, 0.0f, 1.0f);
+            if (a <= 0.0f)
+                continue;
+            t = turns((float)y, (float)x) - st;
+            if (t < 0.0f)
+                t += 1.0f;
+            t /= sweep;
+            if (t > 1.0f)
+                continue;
+            px_blend(cx + x, cy + y, RGB(168, 170, 169), (uint32_t)(a * 16.0f + 0.5f));      /* the empty groove */
+            if (centred) {
+                px_blend(cx + x, cy + y, blend(GT_RED, GT_RED_L, (int)(16.0f * (1.0f - fm_fabsf(t - 0.5f) * 2.0f))), (uint32_t)(a * 16.0f + 0.5f));
+                continue;
+            }
+            if (t > hi || t < lo)
+                continue;
+            px_blend(cx + x, cy + y, blend(GT_B1, GT_B2, (int)(16.0f * (hi > lo ? (t - lo) / (hi - lo) : 0.0f))), (uint32_t)(a * 16.0f + 0.5f));
+        }
+    if (hi > lo && !centred) {
+        float a0 = (st + sweep * lo) * FM_TWO_PI, a1 = (st + sweep * hi) * FM_TWO_PI;
+        gt_disc(fcx + ra * fm_cosf(a0), fcy + ra * fm_sinf(a0), aw * 0.5f, GT_B1, 16);
+        gt_disc(fcx + ra * fm_cosf(a1), fcy + ra * fm_sinf(a1), aw * 0.5f, GT_B2, 16);
+    }
+    for (k = 3; k >= 1; k--)
+        gt_disc(fcx + 0.8f, fcy + 1.6f, 30.0f + (float)k * 1.2f, GT_SH, 3);         /* the inner button */
+    gt_disc(fcx, fcy, 30.0f, GT_DARK, 16);
+    gt_disc(fcx - 0.4f, fcy - 0.6f, 29.2f, GT_LIGHT, 16);
+    gt_disc(fcx + 0.3f, fcy + 0.5f, 28.0f, RGB(214, 215, 214), 16);
+    ang = (st + sweep * v) * FM_TWO_PI;
+    tx = fcx + ra * fm_cosf(ang);
+    ty = fcy + ra * fm_sinf(ang);
+    for (k = 3; k >= 1; k--)
+        gt_disc(tx + 1.0f, ty + 1.8f, 7.0f + (float)k * 1.0f, GT_SH, 3);
+    gt_disc(tx, ty, 7.0f, RGB(250, 250, 250), 16);
+}
+static void gt_page_zoom(void)
+{
+    char num[16], unit[8], ub[8], nmb[28];
+    pref_t r;
+    const char *nm;
+    const gt_face_t *nf = &GTF_TITLE, *vf = &GTF_ZVAL;
+    int dim;
+    int32_t uw = 0, avail8;
+    put_s(nmb, readout_name(&r));                                               /* (caps_of / readout_name share two static buffers: copy the name first) */
+    nm = nmb;
+    if (r.kind == R_NONE)
+        return;
+    pref_value_of(r, pref_shown(r), num, unit);
+    put_s(num, caps_of(num));
+    put_s(ub, caps_of(unit));
+    if (gt_tw8(nf, nm) > 8 * 96)
+        nf = &GTF_BAR;
+    dim = extra_off(r);
+    gt_knob_big(68, 104, pref_frac(r), bipolar_of(r));
+    if (dim)
+        gt_disc(68.5f, 104.5f, 64.0f, C_BG, 10);
+    if (ub[0])
+        uw = gt_tw8(&GTF_KNOB3, ub) / 8 + 4;
+    avail8 = (232 - 134 - uw) * 8;
+    if (gt_tw8(vf, num) > avail8)
+        vf = &GTF_KNOB3;                                                        /* too wide for the big face (a long name): the next size */
+    if (gt_tw8(vf, num) > avail8)
+        vf = &GTF_BAR;
+    gt_text(nf, 186.0f, 72.0f, nm, dim ? GT_SH : RGB(90, 92, 94), 1);
+    gt_text(vf, 232.0f - (float)uw, 106.0f, num, dim ? GT_SH : GT_INK, 2);
+    if (ub[0])
+        gt_text(&GTF_KNOB3, 232.0f, 108.0f, ub, RGB(110, 112, 114), 2);
+}
+
+/* wip577: the slider's big rectangle (as the old skin's draw_slider_box): over the knobs' place an inset panel with the NAME (grey) and the VALUE (big, readable);
+ * OSC/NOISE MIX shows both halves (50.00/50.00). The sliders above it stay. */
+static void gt_slider_box(void)
+{
+    char t1[24], t2[32], nb[32], vb[32], ub[8];
+    pref_t r = pg.r[cur_page()][ui.touched];
+    const gt_face_t *nf = &GTF_TITLE, *vf = &GTF_ZVAL;
+    int32_t avail8 = 218 * 8, uw = 0;
+    int dim = extra_off(r), mix = is_mixsl(r);
+    slider_readout_text(r, pref_shown(r), t1, t2);                              /* (a held step shows its own locked value) */
+    put_s(nb, t1);
+    if (mix) {
+        put_s(vb, t2);
+        ub[0] = 0;
+    } else {
+        char num[16], unit[8];
+        const char *wl, *wc, *wr;
+        slider_words(r, &wl, &wc, &wr);                                         /* the name = the word the slider shows on the page (OSC FREQ, FILTER FREQ, QUANTIZATION ...) */
+        put_s(nb, caps_of(wc));
+        pref_value_of(r, pref_shown(r), num, unit);
+        put_s(vb, caps_of(num));
+        put_s(ub, caps_of(unit));
+    }
+    cv_rect(0, 124, 240, 66, C_BG);
+    gt_inset_panel(6, 126, 234, 188, 9.0f);
+    if (gt_tw8(nf, nb) > avail8)
+        nf = &GTF_KNOB3;
+    if (gt_tw8(nf, nb) > avail8)
+        nf = &GTF_BAR;
+    if (ub[0])
+        uw = gt_tw8(&GTF_KNOB3, ub) / 8 + 4;
+    avail8 = (218 - uw) * 8;
+    if (gt_tw8(vf, vb) > avail8)
+        vf = &GTF_KNOB3;
+    if (gt_tw8(vf, vb) > avail8)
+        vf = &GTF_BAR;
+    gt_text(nf, 120.0f, 139.5f, nb, dim ? GT_SH : RGB(90, 92, 94), 1);
+    if (ub[0]) {
+        float tw8 = (float)gt_tw8(vf, vb) / 8.0f, x0 = 120.0f - ((float)uw + tw8) * 0.5f;
+        gt_text(vf, x0, 166.0f, vb, dim ? GT_SH : GT_INK, 0);
+        gt_text(&GTF_KNOB3, x0 + tw8 + 4.0f, 168.0f, ub, RGB(110, 112, 114), 0);
+    } else
+        gt_text(vf, 120.0f, 166.0f, vb, dim ? GT_SH : GT_INK, 1);
+}
+
 static void draw_quarters(void)
 {
     int row, c, pgi = cur_page();
     if (mixer_tall()) {                               /* wip224: the 8 sliders, tall; the zoom is not drawn here */
         for (row = 0; row < 2; row++) {
-            cv_begin(240, Q_H, C_BLACK);
-            draw_mix_tall(row * Q_H, drum_mix_page());
+            cv_begin(240, Q_H, C_BG);
+            if (grigio()) {                           /* wip564: GRIGIOTONIC: the GLO mixer in his drawing */
+                cv_oy = -row * Q_H;
+                gt_page_gmix(drum_mix_page());
+                cv_oy = 0;
+            } else
+                draw_mix_tall(row * Q_H, drum_mix_page());
             cv_commit(4 + row, 0, MAIN_Y + row * Q_H);
         }
-        cv_begin(240, 12, C_BLACK);
+        cv_begin(240, 12, C_BG);
         draw_footer_y(1);                             /* wip371: the blue hint under the mixer */
         cv_commit(2, 0, MAIN_Y + 2 * Q_H);
         return;
     }
     if (chk_page() || dck_page()) {                   /* wip328: the CHOKE screen takes the whole area, the footer under it (wip350: and the DUCK screen) */
         for (row = 0; row < 2; row++) {
-            cv_begin(240, Q_H, C_BLACK);
+            cv_begin(240, Q_H, C_BG);
             if (dck_page())
                 draw_dck(row * Q_H);
             else
                 draw_chk(row * Q_H);
             cv_commit(4 + row, 0, MAIN_Y + row * Q_H);
         }
-        cv_begin(240, 12, C_BLACK);
+        cv_begin(240, 12, C_BG);
         draw_footer_y(1);
         cv_commit(2, 0, MAIN_Y + 2 * Q_H);
         return;
     }
     if (ui.view == V_GLO && ui.overlay == O_MEM) {    /* wip274: MEMORY: the bucket over the whole area, the footer under it */
         for (row = 0; row < 2; row++) {
-            cv_begin(240, Q_H, C_BLACK);
+            cv_begin(240, Q_H, C_BG);
             draw_mem(row * Q_H);
             cv_commit(4 + row, 0, MAIN_Y + row * Q_H);
         }
-        cv_begin(240, 12, C_BLACK);
+        cv_begin(240, 12, C_BG);
         draw_footer_y(1);
         cv_commit(2, 0, MAIN_Y + 2 * Q_H);
         return;
     }
     if (ui.seqpat && ui.view == V_SEQ) {              /* SEQ, 2nd press: only the number of the pattern, big (the next one small, when cued) */
         for (row = 0; row < 2; row++) {
-            cv_begin(240, Q_H, C_BLACK);
+            cv_begin(240, Q_H, C_BG);
             cv_oy = -row * Q_H;
             draw_patinfo(2 * Q_H);
             cv_oy = 0;
@@ -6683,15 +8071,58 @@ static void draw_quarters(void)
             }
             cv_commit(4 + row, 0, MAIN_Y + row * Q_H);
         }
-        cv_begin(240, 12, C_BLACK);                       /* wip112: the footer of this page (it was left over from the last page before) */
+        cv_begin(240, 12, C_BG);                       /* wip112: the footer of this page (it was left over from the last page before) */
         draw_footer_y(1);
         cv_commit(2, 0, MAIN_Y + 2 * Q_H);
         return;
     }
     for (row = 0; row < 2; row++) {
-        cv_begin(240, Q_H, C_BLACK);
+        cv_begin(240, Q_H, C_BG);
+        if (gt_zoom_on()) {                                                     /* wip576: the knob zoom in the skin */
+            cv_oy = -row * Q_H;
+            gt_page_zoom();
+            cv_oy = 0;
+            cv_commit(4 + row, 0, MAIN_Y + row * Q_H);
+            continue;
+        }
+        if (gt_big_page()) {   /* wip545 / wip552 / wip553 / wip554 / wip555: GRIGIOTONIC: the MIX and OSC pages in their own drawing, the whole area, no zoom rectangle */
+            cv_oy = -row * Q_H;
+            if (fx_comp_page())
+                gt_page_comp();
+            else if (gt_perf())
+                gt_page_perf();
+            else if (ui.view == V_VEL)
+                gt_page_vel();
+            else if (ui.view == V_GLOB)
+                gt_page_glob();
+            else if (ui.view == V_OSC)
+                gt_page_osc();
+            else if (ui.view == V_PMOD)
+                gt_page_pmod();
+            else if (ui.view == V_NOISE)
+                gt_page_noise();
+            else if (ui.view == V_NEV)
+                gt_page_nenv();
+            else if (ui.view == V_MIX2) {
+                static const char *const L2[4] = {"LVL", "PAN", "LCUT", "HCUT"};
+                static const char *const L3[4] = {"REV", "DLY", "", "THRS"};
+                if (cur_page() == 1)
+                    gt_page_mix("SENDS", L3);
+                else
+                    gt_page_mix("MIXER 2", L2);
+            } else {
+                static const char *const L1[4] = {"MIX", "EQF", "DIST", "EQG"};
+                gt_page_mix("MIXER", L1);
+            }
+            if (gt_slbox_on())                              /* wip577: a slider's knob turned: the big rectangle over the knobs */
+                gt_slider_box();
+            gt_big_hint();                                  /* wip570 */
+            cv_oy = 0;
+            cv_commit(4 + row, 0, MAIN_Y + row * Q_H);
+            continue;
+        }
         /* K1 of SEL / ENV / LFO is an icon: its zoom is the circle (draw_readout_h), never a dial */
-        if (ui.touched >= 0 && !slider_cell(ui.touched) && !proj.set.zoom_off && ui.view != V_SONG && !(ui.view == V_FX && pgi == 0)) {   /* wip380: the SONG screen: no zoom, the turned cell is only highlighted */   /* (the PERFORM page: no zoom) */   /* GLO > ZOOM KNOB = NO: the cell is only highlighted */
+        if (ui.touched >= 0 && !slider_cell(ui.touched) && !proj.set.zoom_off && ui.view != V_SONG && !(ui.view == V_FX && pgi == 0) && !gt_fx_knobs()) {   /* wip380: the SONG screen: no zoom, the turned cell is only highlighted */   /* (the PERFORM page: no zoom) */   /* GLO > ZOOM KNOB = NO: the cell is only highlighted */
             /* a knob was turned: the zoom (big dial, name, value) over the whole area */
             cv_oy = -row * Q_H;
             draw_readout_h(2 * Q_H);
@@ -6699,7 +8130,7 @@ static void draw_quarters(void)
             cv_commit(4 + row, 0, MAIN_Y + row * Q_H);
             continue;
         }
-        if (slider_cell(ui.touched) && row == ((ui.view == V_GLOB || ui.view == V_NOISE || ui.view == V_NEV || ui.view == V_VEL) && ui.touched >= 2 ? 0 : 1)) {
+        if (slider_cell(ui.touched) && row == ((ui.view == V_GLOB || ui.view == V_NEV || ui.view == V_VEL) && ui.touched >= 2 ? 0 : ui.view == V_NOISE ? 0 : 1)) {
             /* a slider was moved: the big rectangle over the knobs' place (bottom half); GLOBAL's third slider
              * lives in the bottom half, so for it the rectangle goes to the top half (its animation stays seen) */
             draw_slider_box(pg.r[pgi][ui.touched]);
@@ -6720,7 +8151,7 @@ static void draw_quarters(void)
             continue;
         }
         if (row == 1 && ui.view == V_NOISE) {     /* LFO: the Filter Freq slider at the bottom */
-            draw_slider_cell(2, 26);
+            draw_slider_cell(1, 26);
             cv_commit(5, 0, MAIN_Y + Q_H);
             continue;
         }
@@ -6824,7 +8255,7 @@ static void draw_quarters(void)
             sc_dot(120, 38, 7, ui.sel[0]);
         cv_commit(4 + row, 0, MAIN_Y + row * Q_H);
     }
-    cv_begin(240, 12, C_BLACK);
+    cv_begin(240, 12, C_BG);
     draw_footer_y(1);
     cv_commit(2, 0, MAIN_Y + 2 * Q_H);
 }
@@ -7060,15 +8491,21 @@ static void leds(void)
             }
     }
     {                                                /* wip376: HIT FLASH (like the Digitakt): when a track's trig plays, its black key blinks for that hit, on every page except ARP (wip378) */
-        static uint8_t hp[NDRUM_TONIC], fl[NDRUM_TONIC];
+        static uint8_t hc[NDRUM_TONIC];              /* wip584: the hit counters seen last; a hit = the counter moved (every hit counts, at any frame rate) */
+        static uint32_t fu[NDRUM_TONIC];             /* the flash lasts until this time (ms), not a number of frames: the same look on a slow page and a fast one */
+        static uint8_t fl[NDRUM_TONIC], hinit;
+        uint32_t now = plat_ms();
         for (i = 0; i < NDRUM_TONIC; i++) {
-            uint8_t h = eng_hit[PART_909][i];
-            if (h > hp[i])
-                fl[i] = 3;                           /* a new hit: about 100 ms at 30 frames a second */
-            else if (fl[i])
-                fl[i]--;
-            hp[i] = h;
+            uint8_t c = eng_hit_cnt[i];
+            if (!hinit)
+                hc[i] = c;                           /* the first look: no flash for hits from before */
+            if (c != hc[i]) {
+                hc[i] = c;
+                fu[i] = now + 90u;                   /* a new hit: about 90 ms */
+            }
+            fl[i] = (uint8_t)((int32_t)(fu[i] - now) > 0);
         }
+        hinit = 1;
         if (tonic_part() && !(ui.view == V_SEQ && ui.arp) && seq.playing)   /* wip378: every page except ARP */
             for (i = 0; i < NDRUM_TONIC; i++)
                 if (fl[i]) {
@@ -7912,7 +9349,7 @@ static void draw_fullscreen(int kind)
     static const uint8_t hh[3] = {104, 104, 32};
     int k;
     for (k = 0; k < 3; k++) {
-        cv_begin(240, hh[k], C_BLACK);
+        cv_begin(240, hh[k], C_BG);
         cv_oy = -(int)y0[k];
         fs_body(kind);
         cv_oy = 0;
@@ -8032,6 +9469,8 @@ void ui_frame(void)
         if (pgp > NSTEPS / 16 - 1)
             pgp = NSTEPS / 16 - 1;
         ui.spage = (uint8_t)pgp;
+    } else if (is_drum() && (ui.view == V_PART || ui.view == V_SEQ) && ui.spage >= spage_pages()) {
+        ui.spage = (uint8_t)(spage_pages() - 1);      /* wip583: never an empty page: a 16-step loop cannot stay on 17-32 (SEQ, ARP, EDIT; autoscroll off, or stopped) */
     }
     {   /* wip199: a warning / a question takes the whole screen; entering or leaving it, every region is sent again */
         static int was_fs;
@@ -8075,7 +9514,7 @@ void ui_save_now(void) { save_project(); }
 void ui_redraw(void)
 {
     int i;
-    lcd_fill(0, 0, 240, 240, C_BLACK);
+    lcd_fill(0, 0, 240, 240, C_BG);
     for (i = 0; i < 6; i++)
         blit_hash[i] = 0;
 }

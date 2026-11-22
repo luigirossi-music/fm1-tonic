@@ -1,0 +1,17 @@
+# wip556: the GRIGIOTONIC HOME 1st press page (MIXER 2: level, pan, low cut, high cut).
+wait 300
+tap HOME
+expect view 8
+shot gt_home1_a.png
+turn K1 6 80
+turn K2 -5 80
+turn K3 8 80
+turn K4 -4 80
+shot gt_home1_b.png
+# wip560: the PAN knob is centred: the blue runs from the middle to the value
+turn K2 -30 80
+wait 1200
+shot gt_home1_panleft.png
+turn K2 70 80
+wait 1200
+shot gt_home1_panright.png

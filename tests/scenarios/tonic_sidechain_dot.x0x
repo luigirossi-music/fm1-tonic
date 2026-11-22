@@ -1,0 +1,34 @@
+# wip581: the SIDECHAIN dot must pulse with the input's sound whatever the intensity (it used to be scaled by the intensity: a small one looked fixed).
+# Track 1 = the input (kick on steps 1 and 9), track 2 ducked, the threshold knob only a little left (intensity small).
+wait 300
+tapkey b0
+tapkey w0
+tapkey w8
+tap HOME
+tap HOME
+expect view 8
+turn K4 -6 80
+expect scint 6
+turn ALGO 1
+tapkey b1
+expect scmask 2
+turn ALGO -1
+tapkey b1
+shot dot_sends_idle.png
+tap GLO
+expect view 15
+expect scduck 0
+tap PLAY
+wait 800
+expect scduck >200
+tap PLAY
+tap HOME
+tap HOME
+tap PLAY
+wait 90
+shot dot_sends_play_a.png
+wait 130
+shot dot_sends_play_b.png
+wait 130
+shot dot_sends_play_c.png
+tap PLAY

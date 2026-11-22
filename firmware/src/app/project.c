@@ -51,7 +51,7 @@ void project_defaults(void)
     int i;
     proj.set.magic = PROJ_MAGIC;
     proj.set.format = PROJ_FORMAT;
-    proj.set.palette = 5;                /* tonic */
+    proj.set.palette = 6;                /* wip544: GRIGIOTONIC (the default skin); 5 = TONIC */
     proj.set.keyled = 1;
     proj.set.keysound = 0;
     proj.set.beat_off = 0;               /* wip437: the 4 / 4 beat lights are ON by default (GLO > 4/4 LED; wip234 had them off) */

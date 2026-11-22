@@ -163,11 +163,11 @@ Appui = MIX 2 → SENDS → GLOBAL → MIX 2. Maintien = DELAY.
 | Page | Knob 1 · 2 · 3 · 4 | Aussi sur cette page |
 |---|---|---|
 | **MIX 2** | LEVEL · PAN · LOW CUT (20-663 Hz, jamais coupé) · HIGH CUT (de 20 kHz jusqu'à 1 kHz) | Les deux cuts sont grisés en classic. |
-| **SENDS** | REVERB SEND · DELAY SEND · SIDECHAIN INPUT (track 1 à 8, grand nombre) · SIDECHAIN THRESHOLD (0-100 %, 0 = rien n'est duck) | ALGORITHM à droite : l'écran DUCK (ci-dessous). Les sends fonctionnent quoi que disent le D/W de PERFORM et ALL FX. |
+| **SENDS** | REVERB SEND · DELAY SEND · SIDECHAIN INPUT (track 1 à 8, grand nombre) · SIDECHAIN THRESHOLD (fonctionne comme le threshold du compresseur : tout à droite = 100 % = rien n'est duck, tournez à gauche pour plus de duck) | ALGORITHM à droite : l'écran DUCK (ci-dessous). Les sends fonctionnent quoi que disent le D/W de PERFORM et ALL FX. |
 | **DUCK** (SENDS, ALGORITHM à droite) | - | Touches noires 1 à 8 : bleu = duck, gris = non, violet = l'input. L'input ne peut pas être duck. Rien n'est duck tant que vous ne choisissez pas. ALGORITHM à gauche ou HOME : retour. |
 | **GLOBAL** | QUANTIZATION (1/8 ... 1/32) · SWING · FILL RATE (2x, 4x, 8x) · TEMPO | - |
 
-Le duck suit le son de la track d'input (un long kick fait duck longtemps ; un input en mute ne fait pas duck) et fait aussi duck les sends des tracks. Un point rouge indique une track duck, un point violet l'input ; le point pulse à chaque fois que l'input fait duck. Un seul sidechain pour toutes les tracks, enregistré avec le preset.
+Le duck suit le son de la track d'input (un long kick fait duck longtemps ; un input en mute ne fait pas duck) et fait aussi duck les sends des tracks. Un point rouge indique une track duck, un point violet l'input ; le point suit la track d'input à chaque coup, quel que soit le threshold (avec le knob tout à droite rien n'est duck et le point reste sombre). Un seul sidechain pour toutes les tracks, enregistré avec le preset.
 
 ### SEL, ENV, LFO, EDIT (les pages de voix)
 
@@ -213,9 +213,9 @@ Les réglages sont dans la liste GLO (SELECT monte et descend, ALGORITHM change 
 
 | Page | Knob 1 · 2 · 3 · 4 | Aussi sur cette page |
 |---|---|---|
-| **SEQ** (1er appui) | FIXED LEN (8, 16, 32, 64) · AUTOSCROLL · FREE LEN (1 à 64) · SWING | Touches blanches : les steps. SELECT : les pages de steps (16 à la fois ; AUTOSCROLL off). ALGORITHM : la voix (1 à 8, puis AC = l'accent global). Maintenir un step + ACCENT / FILL : flags (accent = bleu foncé, fill = jaune, les deux = vert). {r:FUNC + SEQ} : mode song on / off (confirmer avec OCT+). {o:FILL + SEQ} : l'écran SONG. |
+| **SEQ** (1er appui) | FIXED LEN (8, 16, 32, 64) · AUTOSCROLL · FREE LEN (1 à 64) · SWING | Touches blanches : les steps. SELECT : les pages de steps (16 à la fois ; AUTOSCROLL off) : la page (1-16, 17-32 ...) s'affiche en grand sur le troisième knob un instant, puis le knob redevient FREE LEN. La page ne reste jamais sur des steps qui n'existent pas : si la boucle devient plus courte que la page où vous étiez, elle revient à la dernière page que la longueur a. ALGORITHM : la voix (1 à 8, puis AC = l'accent global). Maintenir un step + ACCENT / FILL : flags (accent = bleu foncé, fill = jaune, les deux = vert). {r:FUNC + SEQ} : mode song on / off (confirmer avec OCT+). {o:FILL + SEQ} : l'écran SONG. |
 | **PATTERN** (SEQ, 2e appui) | SONG ON / OFF | Touches noires 1 à 8 : mute, touches blanches 1 à 16 : choisissent le pattern suivant. Touche éteinte = pattern vide, faible lumière = a des notes, clignotement lent = l'actuel, clignotement rapide = le suivant (cued). {r:FUNC tap} et {o:FILL tap} comme sur PERFORM. SEQ encore : retour. |
-| **ARP** | FIXED LEN · OCTAVE (aussi OCT- / OCT+, -3 à +3) · - · - | L'écran SEQ, mais chaque touche (blanche et noire) joue la voix sélectionnée comme un clavier. Les touches de do (faibles) jouent le pitch propre de la voix à l'octave 0. ALGORITHM : la voix. Rien n'est enregistré. SEQ : retour. {r:FUNC + ARP} : supprime la song (DELETE SONG ?). Touche noire 11 maintenue + PLAY : efface le pattern (CLEAR PATTERN ?), PLAY ne démarre pas alors. |
+| **ARP** | FIXED LEN · OCTAVE (aussi OCT- / OCT+, -3 à +3) · PAGE (1-16, 17-32 ...) · - | L'écran SEQ, mais chaque touche (blanche et noire) joue la voix sélectionnée comme un clavier. Les touches de do (faibles) jouent le pitch propre de la voix à l'octave 0. ALGORITHM : la voix. SELECT : les pages de steps, affichées sur le troisième knob. Rien n'est enregistré. SEQ : retour. {r:FUNC + ARP} : supprime la song (DELETE SONG ?). Touche noire 11 maintenue + PLAY : efface le pattern (CLEAR PATTERN ?), PLAY ne démarre pas alors. |
 
 Allonger un pattern copie ce qui s'y trouve dans la nouvelle partie (de 8 à 16 copie les steps 1 à 8 dans 9 à 16) ; le raccourcir ne fait que le raccourcir.
 
@@ -515,7 +515,7 @@ Les send sortent après les cut et le sidechain, avant le pan, et ils fonctionne
 Commun à toutes les tracks :
 
 - **Choke group** (EDIT, ALGORITHM à droite) : un coup d'une track du groupe arrête aussitôt les autres (le hi-hat fermé arrête l'ouvert).
-- **Sidechain** (HOME, 2e appui) : une track d'entrée fait baisser les tracks que vous choisissez dans l'écran DUCK pendant qu'elle joue ; le knob de threshold dit de combien (0 = off).
+- **Sidechain** (HOME, 2e appui) : une track d'entrée fait baisser les tracks que vous choisissez dans l'écran DUCK pendant qu'elle joue ; le knob de threshold fonctionne comme celui du compresseur : tout à droite = off, vers la gauche fait plus de duck.
 - **Master low cut** (PERFORM · knob 3, 20 à 663 Hz) : un low cut sur tout le mix, avant le compresseur.
 - **Compresseur** (GLO · COMP) : 4:1, soft knee, attack de 0,1 à 100 ms, release de 10 à 1500 ms, threshold de -48 à 0 dB, make-up de 0 à 24 dB. Un limiter placé après lui garde la sortie sous la pleine échelle.
 - **Reverb** (maintenez FX) : decay, tone, low cut, niveau de return ; une pièce granuleuse des débuts du numérique. **Delay** (maintenez HOME) : temps synchronisé (de 1/32 à 1/2), feedback, tone, TAPE (du numérique propre à la bande usée), low cut, return, ping-pong.

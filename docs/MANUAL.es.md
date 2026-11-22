@@ -163,11 +163,11 @@ Pulsar = MIX 2 → SENDS → GLOBAL → MIX 2. Mantener = DELAY.
 | Página | Knob 1 · 2 · 3 · 4 | También en esta página |
 |---|---|---|
 | **MIX 2** | LEVEL · PAN · LOW CUT (20-663 Hz, nunca apagado) · HIGH CUT (de 20 kHz a 1 kHz) | Los dos cuts están en gris en classic. |
-| **SENDS** | REVERB SEND · DELAY SEND · SIDECHAIN INPUT (pista 1 a 8, número grande) · SIDECHAIN THRESHOLD (0-100 %, 0 = nada hace duck) | ALGORITHM a la derecha: la pantalla DUCK (abajo). Los sends funcionan diga lo que diga el D/W de PERFORM y ALL FX. |
+| **SENDS** | REVERB SEND · DELAY SEND · SIDECHAIN INPUT (pista 1 a 8, número grande) · SIDECHAIN THRESHOLD (funciona como el threshold del compresor: todo a la derecha = 100 % = nada hace duck, gíralo a la izquierda para más duck) | ALGORITHM a la derecha: la pantalla DUCK (abajo). Los sends funcionan diga lo que diga el D/W de PERFORM y ALL FX. |
 | **DUCK** (SENDS, ALGORITHM a la derecha) | - | Teclas negras 1 a 8: azul = con duck, gris = sin duck, morado = la entrada. La entrada no puede recibir duck. No se hace duck a nada hasta que eliges. ALGORITHM a la izquierda o HOME: volver. |
 | **GLOBAL** | QUANTIZATION (1/8 ... 1/32) · SWING · FILL RATE (2x, 4x, 8x) · TEMPO | - |
 
-El duck sigue el sonido de la pista de entrada (un kick largo hace duck largo; una entrada en mute no hace duck) y también hace duck a los sends de las pistas. Un punto rojo marca una pista con duck, un punto morado la entrada; el punto pulsa cada vez que la entrada hace duck. Un solo sidechain para todas las pistas, guardado con el preset.
+El duck sigue el sonido de la pista de entrada (un kick largo hace duck largo; una entrada en mute no hace duck) y también hace duck a los sends de las pistas. Un punto rojo marca una pista con duck, un punto morado la entrada; el punto sigue la pista de entrada en cada golpe, sea cual sea el threshold (con el knob todo a la derecha nada hace duck y el punto queda oscuro). Un solo sidechain para todas las pistas, guardado con el preset.
 
 ### SEL, ENV, LFO, EDIT (las páginas de la voz)
 
@@ -213,9 +213,9 @@ Los ajustes están en la lista de GLO (SELECT sube y baja, ALGORITHM cambia el v
 
 | Página | Knob 1 · 2 · 3 · 4 | También en esta página |
 |---|---|---|
-| **SEQ** (1ª pulsación) | FIXED LEN (8, 16, 32, 64) · AUTOSCROLL · FREE LEN (1 a 64) · SWING | Teclas blancas: los steps. SELECT: las páginas de steps (de 16 en 16; AUTOSCROLL off). ALGORITHM: la voz (1 a 8, luego AC = el accent global). Mantén un step + ACCENT / FILL: flags (accent = azul oscuro, fill = amarillo, ambos = verde). {r:FUNC + SEQ}: modo song on / off (confirma con OCT+). {o:FILL + SEQ}: la pantalla SONG. |
+| **SEQ** (1ª pulsación) | FIXED LEN (8, 16, 32, 64) · AUTOSCROLL · FREE LEN (1 a 64) · SWING | Teclas blancas: los steps. SELECT: las páginas de steps (de 16 en 16; AUTOSCROLL off): la página (1-16, 17-32 ...) aparece grande en el tercer knob un momento y luego el knob vuelve a ser FREE LEN. La página nunca se queda en steps que no existen: si el loop se acorta por debajo de la página en que estabas, vuelve a la última página que tiene la longitud. ALGORITHM: la voz (1 a 8, luego AC = el accent global). Mantén un step + ACCENT / FILL: flags (accent = azul oscuro, fill = amarillo, ambos = verde). {r:FUNC + SEQ}: modo song on / off (confirma con OCT+). {o:FILL + SEQ}: la pantalla SONG. |
 | **PATTERN** (SEQ, 2ª pulsación) | SONG ON / OFF | Teclas negras 1 a 8: mute; teclas blancas 1 a 16: eligen el siguiente pattern. Tecla apagada = pattern vacío, luz tenue = tiene notas, parpadeo lento = el actual, parpadeo rápido = el siguiente (en cola). {r:FUNC toque} y {o:FILL toque} como en PERFORM. SEQ otra vez: volver. |
-| **ARP** | FIXED LEN · OCTAVE (también OCT- / OCT+, -3 a +3) · - · - | La pantalla SEQ, pero todas las teclas (blancas y negras) tocan la voz seleccionada como un teclado. Las teclas C (tenues) tocan el pitch propio de la voz en la octava 0. ALGORITHM: la voz. No se graba nada. SEQ: volver. {r:FUNC + ARP}: borra la song (¿DELETE SONG?). Tecla negra 11 mantenida + PLAY: borra el pattern (¿CLEAR PATTERN?), PLAY no arranca entonces. |
+| **ARP** | FIXED LEN · OCTAVE (también OCT- / OCT+, -3 a +3) · PAGE (1-16, 17-32 ...) · - | La pantalla SEQ, pero todas las teclas (blancas y negras) tocan la voz seleccionada como un teclado. Las teclas C (tenues) tocan el pitch propio de la voz en la octava 0. ALGORITHM: la voz. SELECT: las páginas de steps, mostradas en el tercer knob. No se graba nada. SEQ: volver. {r:FUNC + ARP}: borra la song (¿DELETE SONG?). Tecla negra 11 mantenida + PLAY: borra el pattern (¿CLEAR PATTERN?), PLAY no arranca entonces. |
 
 Alargar un pattern copia lo que hay en la parte nueva (de 8 a 16 copia los steps 1 a 8 en el 9 a 16); acortarlo solo lo acorta.
 
@@ -515,7 +515,7 @@ Los sends salen después de los cuts y del sidechain, antes del pan, y funcionan
 Compartido por todas las pistas:
 
 - **Choke group** (EDIT, ALGORITHM a la derecha): un golpe de una pista del grupo detiene a las demás al instante (el hi-hat cerrado detiene al abierto).
-- **Sidechain** (HOME, 2ª pulsación): una pista de entrada hace que las pistas que elijas en la pantalla DUCK bajen mientras ella suena; el knob de threshold fija cuánto (0 = off).
+- **Sidechain** (HOME, 2ª pulsación): una pista de entrada hace que las pistas que elijas en la pantalla DUCK bajen mientras ella suena; el knob de threshold funciona como el del compresor: todo a la derecha = off, a la izquierda hace más duck.
 - **Low cut master** (PERFORM · knob 3, 20 a 663 Hz): un low cut sobre toda la mezcla, antes del compresor.
 - **Compresor** (GLO · COMP): 4:1, soft knee, attack de 0,1 a 100 ms, release de 10 a 1500 ms, threshold de -48 a 0 dB, make-up de 0 a 24 dB. Un limiter después mantiene la salida por debajo del fondo de escala.
 - **Reverb** (mantener FX): decay, tone, low cut, nivel de return; una sala granulada de los primeros tiempos del digital. **Delay** (mantener HOME): tiempo sincronizado con el tempo (1/32 a 1/2), feedback, tone, TAPE (digital limpio a cinta gastada), low cut, return, ping-pong.

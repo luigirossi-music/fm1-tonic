@@ -22,7 +22,10 @@ static int32_t cv_y0, cv_y1;     /* X0X: the rows drawing may touch (cv_band) */
 
 #define RGB(r, g, b) ((uint16_t)((((r) >> 3) << 11) | (((g) >> 2) << 5) | ((b) >> 3)))
 #define C_BLACK 0x0000u
-#define C_WHITE 0xFFFFu              /* accent only: what is being touched / where we are */
+/* wip544 GRIGIOTONIC: the background and the "touched" colour follow the theme (black / white in the dark themes) */
+static uint16_t pal_bg, pal_wh = 0xFFFFu;
+#define C_BG pal_bg                  /* the page background (black; GRIGIOTONIC: the logo grey) */
+#define C_WHITE pal_wh               /* accent only: what is being touched / where we are (GRIGIOTONIC: near black) */
 /* The screen's five steps, darkest to brightest, plus white; picked as THEME in GLOBAL. */
 typedef struct {
     const char *name;
@@ -40,7 +43,10 @@ static const palette_t PALETTES[] = {
     {"MONO", {NEUTRALS, RGB(196, 196, 202), RGB(236, 236, 240)}},
     /* TONIC: Microtonic's greys and blues (blue-tinted greys; the two brightest steps are the blues) */
     {"TONIC", {RGB(22, 30, 36), RGB(45, 53, 58), RGB(160, 170, 177), RGB(59, 114, 148), RGB(169, 219, 241)}},
+    /* GRIGIOTONIC (wip544): the steps flip on the light grey: rules / empty cells a little darker than the grey, labels dark grey, values blue */
+    {"GRIGIOTONIC", {RGB(172, 174, 176), RGB(150, 153, 158), RGB(70, 72, 78), RGB(40, 104, 170), RGB(24, 118, 205)}},
 };
+#define GRIGIO_PAL 6u
 #define NPALETTES (sizeof(PALETTES) / sizeof(PALETTES[0]))
 static uint16_t pal[5];
 #define C_LINE pal[0]                /* 1 rules, separators */
@@ -54,6 +60,8 @@ static void palette_set(uint32_t i)
     uint32_t k;
     for (k = 0; k < 5u; k++)
         pal[k] = PALETTES[i % NPALETTES].c[k];
+    pal_bg = (i % NPALETTES) == GRIGIO_PAL ? RGB(197, 198, 197) : C_BLACK;   /* the grey of the welcome logo */
+    pal_wh = (i % NPALETTES) == GRIGIO_PAL ? RGB(20, 26, 34) : 0xFFFFu;
 }
 
 static inline uint16_t swap16(uint32_t c) { return (uint16_t)(((c >> 8) & 0xFFu) | ((c & 0xFFu) << 8)); }

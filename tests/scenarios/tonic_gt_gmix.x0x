@@ -1,0 +1,21 @@
+# wip564: the GRIGIOTONIC GLO MIXER (GLO 2nd press): 8 faders (blue = live volume, white dot = level) + 8 small pan knobs.
+wait 300
+tap GLO
+expect view 15
+tap GLO
+expect view 3
+shot gt_gmix_a.png
+turn K1 -30 80
+turn K3 -60 80
+shot gt_gmix_b.png
+turn SELECT 1
+turn SELECT 1
+shot gt_gmix_c.png
+turn K2 -40 80
+turn K4 40 80
+wait 800
+shot gt_gmix_d.png
+turn SELECT 1
+turn K1 -30 80
+turn K2 30 80
+shot gt_gmix_e.png
