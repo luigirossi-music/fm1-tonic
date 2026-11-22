@@ -1253,6 +1253,10 @@ int main(int argc, char **argv)
             accel_off = 1;                              /* a test's exact values, not a hand's speed */
             run_ms(1);
             accel_off = 0;
+        } else if (!strcmp(cmd, "palette")) {           /* palette N: the skin (0 = the old black one, 6 = GRIGIOTONIC), for a shot */
+            proj.set.palette = (uint8_t)atoi(a);
+            palette_set((uint32_t)proj.set.palette);
+            run_ms(50);
         } else if (!strcmp(cmd, "param")) {             /* param T V I VALUE: a sound pot, as a knob would set it */
             int t = atoi(a), v = atoi(b), i = atoi(c), val = atoi(line_d);
             if (t < 0 || t >= NTARGETS || v < 0 || v >= NVOICES_MAX || i < 0 || i >= NPARAMS_MAX) {

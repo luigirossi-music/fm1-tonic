@@ -36,6 +36,7 @@ typedef struct {
     float g, g_t, k;
     volatile uint8_t fbypass;         /* X0X: ALL FX OFF: the filter is bypassed */
     float fwet;                       /* X0X: the filter's wet share (BP fades in from the left) */
+    float fb_amt;                     /* wip592: ALL FX OFF ramp, 0 = filter on, 1 = bypassed (glides ~5 ms: no click) */
     float a1;                         /* 1 / (1 + g (g + k)): recomputed only while g moves */
     float ic1, ic2;
     float ic1r, ic2r;                 /* X0X stereo: the right side's filter state */

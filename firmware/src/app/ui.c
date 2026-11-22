@@ -1107,7 +1107,7 @@ static void build_pages(void)
         {
             int v = ui.sel[0];
             add_page("MIX 2", find_ref(T_909, v, "Level"), find_ref(T_909, v, "Pan"), PR(R_SHLO, v, 0, 0), PR(R_SHHI, v, 0, 0));   /* wip289: K3 / K4 = the track's low / high shelving cut */
-            add_page("SENDS", find_ref(T_909, v, "Rev"), find_ref(T_909, v, "Dly"), PR(R_SCIN, 0, 0, 0), PR(R_SCINT, 0, 0, 0));   /* wip349: K3 = sidechain intensity, K4 = sidechain input (global, not per track). wip288: HOME 2nd press: the track's own reverb / delay sends on K1 / K2 (they were K3 / K4 of MIX 2) */
+            add_page("SENDS", find_ref(T_909, v, "Rev"), find_ref(T_909, v, "Dly"), PR(R_SCINT, 0, 0, 0), PR(R_SCIN, 0, 0, 0));   /* wip598: K3 = THRESHOLD, K4 = INPUT (his order: the outlined sidechain section reads THRESHOLD, INPUT) */   /* wip349: K3 = sidechain intensity, K4 = sidechain input (global, not per track). wip288: HOME 2nd press: the track's own reverb / delay sends on K1 / K2 (they were K3 / K4 of MIX 2) */
         }
         break;
     case V_MIX1:                                       /* FX, 1st press: the selected track's Mix, EQ Freq, Distort, EQ Gain */
@@ -5095,42 +5095,51 @@ static void draw_home(int band)
     }
 }
 
-/* SONG: a table of bars, twelve rows across the two bands (the first is the heading) */
+/* SONG: a table of bars, six rows of 23 px across the two bands (the first is the heading, then five bars).
+ * wip593: big characters (FONT_B, were FONT_XS); GRIGIOTONIC: all in black, the other skins keep their colours */
+#define SONG_RP 23
 static void draw_song(int band)
 {
     const song_t *sg = song();
-    int r, p, top = ui.song_sel > 5 ? ui.song_sel - 5 : 0;
+    const int gt = grigio();
+    const uint16_t ink = C_WHITE;                      /* (GRIGIOTONIC: C_WHITE is the near-black ink) */
+    int r, p, top = ui.song_sel > 4 ? ui.song_sel - 4 : 0;
     for (r = 0; r < 6; r++) {
-        int row = band * 6 + r, y = r * 11, k = top + row - 1;
+        int y = r * SONG_RP + 1 - band * BAND_H, k = top + r - 1;
         char t[8];
-        if (row == 0) {                                /* the heading */
-            cv_text(4, vc(&FONT_XS, y, 11), &FONT_XS, "BAR", C_GRAY);
+        if (y < -SONG_RP || y >= BAND_H)
+            continue;
+        if (r == 0) {                                  /* the heading */
+            cv_text(4, vc(&FONT_S, y, 21), &FONT_S, "BAR", gt ? ink : C_GRAY);
             for (p = 0; p <= PART_909; p++)             /* wip135: the Tonic's column only (no 808, no BREAK) */
-                text_c(58 + p * 36, vc(&FONT_XS, y, 11), &FONT_XS, PART_S[p], PART_COL[p]);
+                text_c(100 + p * 36, vc(&FONT_S, y, 21), &FONT_S, PART_S[p], gt ? ink : PART_COL[p]);
             continue;
         }
         if (k > sg->len || k >= NSONG)
             break;
         if (k == ui.song_sel)
-            box(0, y, 236, 11, C_LINE);
+            box(0, y, 236, SONG_RP - 2, C_LINE);
         put_i(t, k + 1);
-        cv_text(4, vc(&FONT_XS, y, 11), &FONT_XS, t, k == ui.song_sel ? C_WHITE : C_GRAY);
+        cv_text(4, vc(&FONT_B, y, 21), &FONT_B, t, gt ? ink : k == ui.song_sel ? C_WHITE : C_GRAY);
         if (seq.song_on && seq.playing && k == seq.song_pos)
-            play_icon(26, y + 1, seq.song_rec ? RGB(255, 80, 70) : C_WHITE);
+            play_icon(46, y + 6, seq.song_rec ? RGB(255, 80, 70) : C_WHITE);
         if (k == sg->len) {                            /* one past the end: where the song grows */
-            cv_text(50, vc(&FONT_XS, y, 11), &FONT_XS, k ? "END" : "EMPTY: WHITE KEYS ADD BARS", C_DIM);
+            if (k)
+                cv_text(70, vc(&FONT_B, y, 21), &FONT_B, "END", gt ? ink : C_DIM);
+            else
+                cv_text(40, vc(&FONT_S, y, 21), &FONT_S, "EMPTY: WHITE KEYS ADD", gt ? ink : C_DIM);
             continue;
         }
         for (p = 0; p <= PART_909; p++)             /* wip135: the Tonic's column only (no 808, no BREAK) */ {
             int muted = sg->bar[k].mute >> p & 1u;
             t[0] = 'P';
             put_i(t + 1, sg->bar[k].pat[p] + 1);
-            text_c(58 + p * 36, vc(&FONT_XS, y, 11), &FONT_XS, muted ? "-" : t, muted ? C_DIM : PART_COL[p]);
+            text_c(100 + p * 36, vc(&FONT_B, y, 21), &FONT_B, muted ? "-" : t, gt ? ink : muted ? C_DIM : PART_COL[p]);
         }
         if (SONG_REP(&sg->bar[k]) > 1) {               /* a bar played more than once: x2 .. x8 */
             t[0] = 'x';
             put_i(t + 1, SONG_REP(&sg->bar[k]));
-            text_r(238, vc(&FONT_XS, y, 11), &FONT_XS, t, C_WHITE);
+            text_r(230, vc(&FONT_B, y, 21), &FONT_B, t, C_WHITE);
         }
     }
 }
@@ -5987,9 +5996,9 @@ static int help_fits(void)
 
 /* the footer: one line at the bottom of the main area, what the keys do on this screen (until the
  * first button, how to find out what any of them does) */
-static const char ALGO_WORD[] = "ALGORITHM";
-static const char CK_WORD[] = "CHOKE ALGORITHM";             /* wip374: the EDIT page's whole footer */
-static const char SC_WORD[] = "SIDECHAIN ALGORITHM";           /* wip373: the SENDS page's whole footer */
+static const char ALGO_WORD[] = "TURN ALGORITHM";           /* wip594: TURN in front, all skins */
+static const char CK_WORD[] = "CHOKE TURN ALGORITHM";             /* wip374: the EDIT page's whole footer */
+static const char SC_WORD[] = "SIDECHAIN TURN ALGORITHM";           /* wip373: the SENDS page's whole footer */
 static uint16_t footer_text(const char **a, const char **b, const char **c)
 {
     *a = *b = *c = 0;
@@ -6129,6 +6138,28 @@ static int algo_level(void)                       /* wip359: the triangle fades 
     return 3 + t * 13 / 31;
 }
 static void gt_footer(int y, int dir, const char *a, const char *b, const char *c, uint16_t col);
+static int grigio(void);
+/* wip594: the BIG way-back triangle of the DUCK / CHOKE screens in the skin: 16 x 24, black, bottom left of the area (o = the canvas's first row), same slow blink + pulse */
+static void gt_back_tri(int32_t o)
+{
+    const int32_t w = 16, h = 24, x0 = 3, y0 = 180;
+    int32_t i, j;
+    uint32_t lv;
+    if (!grigio() || (ui.frame & 8u) != 0)
+        return;
+    lv = (uint32_t)(9 + (algo_level() - 3) * 7 / 13);
+    for (j = 0; j < h; j++) {
+        int32_t py = y0 + j - o;
+        if (py < 0 || py >= 104)
+            continue;
+        for (i = 0; i < w; i++) {
+            float fy = (float)j + 0.5f - (float)h * 0.5f, fx = (float)(w - 1 - i) + 0.5f;
+            float edge = ((float)w - 0.5f) - fx - fm_fabsf(fy) * (((float)w - 0.5f) / ((float)h * 0.5f));
+            float a = fm_clampf(edge * 0.7f + 0.5f, 0.0f, 1.0f) * fm_clampf(fx + 0.5f, 0.0f, 1.0f);
+            px_blend(x0 + i, py, RGB(0, 0, 0), (uint32_t)(a * (float)lv + 0.5f));
+        }
+    }
+}
 static int gt_big_page(void);
 static int gt_fx_knobs(void);
 static int gt_zoom_on(void);
@@ -6151,8 +6182,11 @@ static void draw_footer_y(int y)
         return;
     }
     if (dir > 0 && (c == ALGO_WORD || c == SC_WORD || c == CK_WORD)) {                  /* wip370: PERFORM: the word ALGORITHM sits right at the triangle (nothing says what it does) */
-        segs(4, vc(&FONT_T, y, 9), &FONT_T, col, FOOT_GAP, a, b, 0, 0);
-        segs(225 - tw(&FONT_T, c), vc(&FONT_T, y, 9), &FONT_T, col, FOOT_GAP, c, 0, 0, 0);
+        int gap = FOOT_GAP;                           /* wip594: TURN ALGORITHM is longer: if the tips and the word do not fit, the tips close up */
+        if ((a ? tw(&FONT_T, a) : 0) + (b ? tw(&FONT_T, b) : 0) + FOOT_GAP * 2 + tw(&FONT_T, c) > 221)
+            gap = 5;
+        segs(3, vc(&FONT_T, y, 9), &FONT_T, col, gap, a, b, 0, 0);
+        segs(226 - tw(&FONT_T, c), vc(&FONT_T, y, 9), &FONT_T, col, FOOT_GAP, c, 0, 0, 0);
     } else
         segs(dir < 0 ? 15 : 4, vc(&FONT_T, y, 9), &FONT_T, col, FOOT_GAP, a, b, c, 0);   /* (on a 2nd page the text starts after the triangle) */
     if (dir)                                          /* wip341: our blue, bottom right = there is a page to the right; bottom LEFT = there is one to the left (the way back); wip359: it fades slowly in and out, the footer stays */
@@ -6862,8 +6896,8 @@ static void gt_footer(int y, int dir, const char *a, const char *b, const char *
     int i, n = 0;
     float ym = (float)y + 4.5f;
     p[0] = a; p[1] = b; p[2] = c;
-    if (dir)
-        col = RGB(0, 0, 0);                                                     /* wip573: the words have the arrow's colour (black) */
+    col = RGB(0, 0, 0);                                                         /* wip595 (1.8b): the whole footer hint is BLACK in Grigiotonic, no blue words (was: tips blue, only the TURN ALGORITHM word black) */
+    ln[0] = 0;
     if (dir > 0 && (c == ALGO_WORD || c == SC_WORD || c == CK_WORD)) {
         q = put_s(q, a ? a : "");
         if (b && *b) {
@@ -6871,7 +6905,7 @@ static void gt_footer(int y, int dir, const char *a, const char *b, const char *
             q = put_s(q, b);
         }
         gt_text(f, 4.0f, ym, ln, col, 0);
-        gt_text(f, 225.0f, ym, c, col, 2);
+        gt_text(f, 220.0f, ym, c, RGB(0, 0, 0), 2);
     } else {
         for (i = 0; i < 3; i++)
             if (p[i] && *p[i]) {
@@ -6879,12 +6913,12 @@ static void gt_footer(int y, int dir, const char *a, const char *b, const char *
                     q = put_s(q, "   ");
                 q = put_s(q, p[i]);
             }
-        if (gt_tw8(f, ln) > 8 * 224)
-            f = &GTF_BAR;                                                       /* too long: the smaller face */
-        gt_text(f, dir < 0 ? 128.0f : dir > 0 ? 116.0f : 120.0f, ym, ln, col, 1);
+        if (gt_tw8(f, ln) > 8 * (dir ? 210 : 224))
+            f = &GTF_BAR;                                                       /* too long: the smaller face (wip594: next to the big arrow it has 210 px) */
+        gt_text(f, dir < 0 ? 132.0f : dir > 0 ? 116.0f : 120.0f, ym, ln, col, 1);
     }
-    if (dir && (ui.frame & 8u) == 0) {                                          /* wip569 (wip570: it BLINKS): the 2nd-page arrow in his skin: BLACK and bigger (9 x 11, the whole footer line), a slow soft pulse (9-16 of 16) */
-        const int32_t w = 9, h = 11, x0 = dir > 0 ? 229 : 4;
+    if (dir && !(dir < 0 && (dck_page() || chk_page())) && (ui.frame & 8u) == 0) {   /* wip569 (wip570: it BLINKS); wip594: DUCK / CHOKE have their own big one (gt_back_tri): the 2nd-page arrow in his skin, BLACK and big, a slow soft pulse */
+        const int32_t w = 13, h = 20, x0 = dir > 0 ? 226 : 2, y0 = y - 9;   /* wip594: BIG (was 9 x 11), both ways */
         int32_t i, j;
         uint32_t lv = (uint32_t)(9 + (algo_level() - 3) * 7 / 13);
         for (j = 0; j < h; j++)
@@ -6892,7 +6926,7 @@ static void gt_footer(int y, int dir, const char *a, const char *b, const char *
                 float fy = (float)j + 0.5f - (float)h * 0.5f, fx = (float)(dir > 0 ? i : w - 1 - i) + 0.5f;
                 float edge = ((float)w - 0.5f) - fx - fm_fabsf(fy) * (((float)w - 0.5f) / ((float)h * 0.5f));
                 float a = fm_clampf(edge * 0.7f + 0.5f, 0.0f, 1.0f) * fm_clampf(fx + 0.5f, 0.0f, 1.0f);
-                px_blend(x0 + i, y + j, RGB(0, 0, 0), (uint32_t)(a * (float)lv + 0.5f));
+                px_blend(x0 + i, y0 + j, RGB(0, 0, 0), (uint32_t)(a * (float)lv + 0.5f));
             }
     }
 }
@@ -7011,6 +7045,121 @@ static void gt_knob_b(int32_t cx, int32_t cy, const char *label, float v, int ho
     disc(tx, ty, 3.6f, RGB(250, 250, 250));
     gt_text((label[0] && label[1] && label[2] && label[3]) ? &GTF_KNOB4 : &GTF_KNOB3, fcx, fcy + 0.3f - 0.5f, label, hot ? GT_B1 : GT_INK, 1);
 }
+static float gt_rsdf(float px, float py, float x0, float y0, float x1, float y1, float r);
+/* wip597 / wip598: the SIDECHAIN section of the SENDS page: a thin blue rounded outline that CLOSES round K3 (THRESHOLD) + K4 (INPUT), SIDECHAIN written over K3 and INPUT over K4, as big as the column allows */
+static void gt_sc_section(void)
+{
+    const int32_t x0 = 118, y0 = 116, x1 = 238, y1 = 190;
+    const float r = 9.0f;
+    const gt_face_t *fs[3] = {&GTF_KNOB4, &GTF_FOOT, &GTF_BAR};
+    const gt_face_t *f = fs[2];
+    int32_t x, y, ya = y0 - 3, yb = y1 + 3, k;
+    if (ya < -cv_oy)
+        ya = -cv_oy;
+    if (yb > -cv_oy + Q_H)
+        yb = -cv_oy + Q_H;
+    for (y = ya; y < yb; y++)
+        for (x = x0 - 3; x < x1 + 3; x++) {
+            float sd = gt_rsdf((float)x + 0.5f, (float)y + 0.5f, (float)x0, (float)y0, (float)x1, (float)y1, r), a;
+            a = fm_clampf(1.4f - fm_fabsf(sd + 0.7f) + 0.5f, 0.0f, 1.0f);       /* a 2 px ring, anti-aliased, closed */
+            if (a > 0.0f)
+                px_blend(x, y, GT_B1, (uint32_t)(a * 16.0f + 0.5f));
+        }
+    for (k = 0; k < 3; k++)                                                     /* the biggest face in which SIDECHAIN fits its column (58 px) */
+        if (gt_tw8(fs[k], "SIDECHAIN") <= 8 * 58) {
+            f = fs[k];
+            break;
+        }
+    gt_text(f, 150.0f, 125.0f, "SIDECHAIN", ui.touched == 2 ? GT_B1 : GT_INK, 1);
+    gt_text(f, 209.0f, 125.0f, "INPUT", ui.touched == 3 ? GT_B1 : GT_INK, 1);
+}
+static void gt_line(float x0, float y0, float x1, float y1, float w, uint16_t col, uint32_t a16);
+/* wip599: SENDS page symbol 1 = the REVERB CUBE (blue), FACING THE USER: a square front face with horizontal / vertical edges, the top and the right side going back (up and right).
+ * A LIQUID inside with gravity: the blue rises from the BASE as a horizontal level (the front and the side fill from the bottom, the level shows as a light surface); empty at 0, full at 100 % */
+static void gt_send_cube(float cx, float cy, float v)
+{
+    const float a = 38.0f, d = 14.0f;                                            /* the front square and the depth offset */
+    const float x0 = cx - (a + d) * 0.5f, yt = cy - (a + d) * 0.5f, yf = yt + d, yb = yf + a;   /* front: x0 .. x0 + a, yf .. yb */
+    const float H = fm_clampf(v, 0.0f, 1.0f) * a;                                /* the liquid height up from the base */
+    int32_t x, y, ya = (int32_t)fm_floorf(yt - 2.0f), yz = (int32_t)(yb + 3.0f);
+    if (ya < -cv_oy)
+        ya = -cv_oy;
+    if (yz > -cv_oy + Q_H)
+        yz = -cv_oy + Q_H;
+    for (y = ya; y < yz; y++)
+        for (x = (int32_t)fm_floorf(x0 - 2.0f); x < (int32_t)(x0 + a + d + 3.0f); x++) {
+            int nin = 0, nf = 0, nr = 0, ns = 0, sx, sy;
+            for (sy = 0; sy < 3; sy++)                                            /* 3 x 3 samples per pixel */
+                for (sx = 0; sx < 3; sx++) {
+                    float qx = (float)x + ((float)sx + 0.5f) / 3.0f, qy = (float)y + ((float)sy + 0.5f) / 3.0f;
+                    float u = qx - (x0 + a), t = (yf - qy) / d;                  /* u: into the side face; t: into the top face (0 front .. 1 back) */
+                    int inF = qx >= x0 && qx <= x0 + a && qy >= yf && qy <= yb;
+                    int inR = u > 0.0f && u <= d && qy >= yf - u && qy <= yb - u;
+                    int inT = t > 0.0f && t <= 1.0f && qx >= x0 + t * d && qx <= x0 + a + t * d;
+                    float ts;
+                    if (!inF && !inR && !inT)
+                        continue;
+                    nin++;
+                    if (H < 0.4f)
+                        continue;
+                    ts = ((yb - H) - qy) / d;                                     /* the liquid's surface: a parallelogram at the level */
+                    if (ts >= 0.0f && ts <= 1.0f && qx >= x0 + ts * d && qx <= x0 + a + ts * d) {
+                        ns++;
+                        continue;
+                    }
+                    if (inT)
+                        continue;                                                 /* nothing of the liquid above its level */
+                    if (inF && qy >= yb - H)
+                        nf++;
+                    else if (inR && qy >= yb - u - H)
+                        nr++;
+                }
+            if (nin)
+                px_blend(x, y, GT_B1, (uint32_t)((nin * 2 + 4) / 9));            /* the empty cube: a faint blue body */
+            if (nf)
+                px_blend(x, y, GT_B1, (uint32_t)((nf * 16 + 4) / 9));
+            if (nr)
+                px_blend(x, y, RGB(16, 100, 168), (uint32_t)((nr * 16 + 4) / 9));
+            if (ns)
+                px_blend(x, y, GT_B2, (uint32_t)((ns * 16 + 4) / 9));
+        }
+    gt_line(x0, yf, x0 + a, yf, 2.0f, GT_B1, 16);                                /* the front square */
+    gt_line(x0 + a, yf, x0 + a, yb, 2.0f, GT_B1, 16);
+    gt_line(x0 + a, yb, x0, yb, 2.0f, GT_B1, 16);
+    gt_line(x0, yb, x0, yf, 2.0f, GT_B1, 16);
+    gt_line(x0, yf, x0 + d, yt, 2.0f, GT_B1, 16);                                /* the top and the side going back */
+    gt_line(x0 + d, yt, x0 + a + d, yt, 2.0f, GT_B1, 16);
+    gt_line(x0 + a + d, yt, x0 + a + d, yb - d, 2.0f, GT_B1, 16);
+    gt_line(x0 + a + d, yb - d, x0 + a, yb, 2.0f, GT_B1, 16);
+    gt_line(x0 + a, yf, x0 + a + d, yt, 2.0f, GT_B1, 16);
+}
+/* wip599: SENDS page symbol 2 = the DELAY CIRCLE (blue): the outer circle is always there; at 0 nothing inside, then rings appear one by one from the small one in the middle outwards (4 rings) */
+static void gt_send_rings(float cx, float cy, float v)
+{
+    const float R = 29.0f;
+    float ak[4];
+    int32_t x, y, ya = (int32_t)fm_floorf(cy - R - 2.0f), yb = (int32_t)(cy + R + 3.0f);
+    int k;
+    for (k = 0; k < 4; k++)
+        ak[k] = fm_clampf((fm_clampf(v, 0.0f, 1.0f) * 4.0f - (float)k) * 2.0f, 0.0f, 1.0f);   /* each ring fades in over half a step */
+    if (ya < -cv_oy)
+        ya = -cv_oy;
+    if (yb > -cv_oy + Q_H)
+        yb = -cv_oy + Q_H;
+    for (y = ya; y < yb; y++)
+        for (x = (int32_t)fm_floorf(cx - R - 2.0f); x < (int32_t)(cx + R + 3.0f); x++) {
+            float dx = (float)x + 0.5f - cx, dy = (float)y + 0.5f - cy, d = fm_sqrtf(dx * dx + dy * dy);
+            float a = fm_clampf(1.5f - fm_fabsf(d - R), 0.0f, 1.0f);              /* the outer ring, 2 px */
+            for (k = 0; k < 4; k++)
+                if (ak[k] > 0.0f) {
+                    float b = fm_clampf(1.5f - fm_fabsf(d - (5.0f + 6.0f * (float)k)), 0.0f, 1.0f) * ak[k];
+                    if (b > a)
+                        a = b;
+                }
+            if (a > 0.0f)
+                px_blend(x, y, GT_B1, (uint32_t)(a * 16.0f + 0.5f));
+        }
+}
 /* the MIX page (FX 1st press): title, the two sliders (they follow knobs 1 and 2: reference only), the four big knobs */
 static void gt_page_mix(const char *title, const char *const *LAB)
 {
@@ -7023,6 +7172,21 @@ static void gt_page_mix(const char *title, const char *const *LAB)
         char b1[24], b2[24], b3[24];                  /* caps_of() answers in ONE shared buffer: copy each word */
         if (!d)
             continue;
+        if (ui.view == V_MIX2 && pgi == 1) {          /* wip599: SENDS: no fader, the blue symbols: the cube (reverb) and the circle (delay), the word under each */
+            float v = d->max ? (float)pref_shown(r) / (float)d->max : 0.0f;
+            if (i == 0)
+                gt_send_cube(60.0f, 56.0f, v);
+            else
+                gt_send_rings(180.0f, 56.0f, v);
+            gt_text(&GTF_MID, i ? 180.0f : 60.0f, 98.0f, i ? "DELAY" : "REVERB", ui.touched == i ? GT_B1 : GT_INK, 1);
+            if (extra_off(r)) {                       /* CLASSIC: a shade over the symbol */
+                int32_t xx, yy;
+                for (yy = 18; yy < 108; yy++)
+                    for (xx = i ? 122 : 4; xx < (i ? 236 : 118); xx++)
+                        px_blend(xx, yy, C_BG, 10u);
+            }
+            continue;
+        }
         slider_words(r, &wl, &wc, &wr);
         put_s(b1, caps_of(wl));
         put_s(b2, caps_of(wc));
@@ -7051,7 +7215,9 @@ static void gt_page_mix(const char *title, const char *const *LAB)
             gt_disc((float)(31 + i * 59 + (i + 1) / 3) + 0.5f, 159.5f, 31.0f, C_BG, 10);
     }
     if (ui.view == V_MIX2 && pgi == 1)                /* wip559: the sidechain dot (red pulsing = the selected track is ducked, purple = it is the input) between K3 and K4 */
-        sc_dot(180, 123, 4, ui.sel[0]);
+        sc_dot(230, 123, 4, ui.sel[0]);
+    if (ui.view == V_MIX2 && pgi == 1 && tonic_part())  /* wip597 */
+        gt_sc_section();
 }
 
 /* wip557: the GLOBAL page (HOME 3rd press): title, three sliders (QUANTIZATION, SWING, FILL RATE: they follow knobs 1 to 3, reference only),
@@ -7753,10 +7919,29 @@ static void gt_big_hint(void)
     int32_t avail8 = (int32_t)((x1 - x0) * 8.0f);
     const gt_face_t *f = &GTF_KNOB3;
     p[0] = a; p[1] = b; p[2] = c;
-    if (dir)
-        col = RGB(0, 0, 0);                                                     /* wip573: the words have the arrow's colour (black) */
+    col = RGB(0, 0, 0);                                                         /* wip595 (1.8b): the whole hint is BLACK in Grigiotonic, no blue words */
     l1[0] = 0;
     l2[0] = 0;
+    if (dir > 0 && (c == ALGO_WORD || c == SC_WORD || c == CK_WORD)) {          /* wip594: the tips in our blue (first line), the TURN ALGORITHM word in the arrow's black (last line) */
+        const gt_face_t *fw = &GTF_KNOB3;
+        for (i = 0; i < 2; i++)
+            if (p[i] && *p[i]) {
+                if (n++)
+                    q1 = put_s(q1, "   ");
+                q1 = put_s(q1, p[i]);
+            }
+        if (gt_tw8(fw, c) > avail8)
+            fw = &GTF_KNOB4;
+        if (l1[0]) {
+            const gt_face_t *ft = &GTF_KNOB4;
+            if (gt_tw8(ft, l1) > avail8)
+                ft = &GTF_BAR;
+            gt_text(ft, cx, 197.5f, l1, col, 1);
+            gt_text(fw, cx, 211.5f, c, RGB(0, 0, 0), 1);
+        } else
+            gt_text(fw, cx, 204.0f, c, RGB(0, 0, 0), 1);
+    } else {
+    n = 0;
     for (i = 0; i < 3; i++)
         if (p[i] && *p[i]) {
             if (n++)
@@ -7783,6 +7968,7 @@ static void gt_big_hint(void)
             f = &GTF_KNOB4;
         gt_text(f, cx, 197.5f, l1, col, 1);
         gt_text(f, cx, 211.5f, l2, col, 1);
+    }
     }
     if (dir && (ui.frame & 8u) == 0) {                                          /* wip573: twice as fast */
         const int32_t w = 22, h = 30, tx0 = dir > 0 ? 216 : 2, ty0 = 189;
@@ -7871,6 +8057,8 @@ static int gt_zoom_on(void)
         return 0;
     if (t < 0 || t > 3 || gt_slider_cell(t))
         return 0;                                                               /* wip577: a knob with a slider moving together = the slider's rectangle (gt_slider_box), not a zoom */
+    if (ui.view == V_MIX2 && cur_page() == 1 && t < 2)
+        return 0;                                                               /* wip599: SENDS: REV and DLY have their symbols (cube, circle): no zoom */
     if (t == 0 && (ui.view == V_PMOD || ui.view == V_OSC || ui.view == V_NEV || ui.view == V_NOISE))
         return 0;                                                               /* K1 = an icon cell */
     if (ui.view == V_NEV && t == 1)
@@ -7959,7 +8147,7 @@ static void gt_page_zoom(void)
     if (gt_tw8(nf, nm) > 8 * 96)
         nf = &GTF_BAR;
     dim = extra_off(r);
-    gt_knob_big(68, 104, pref_frac(r), bipolar_of(r));
+    gt_knob_big(68, 104, pref_frac(r), is_pan(r));
     if (dim)
         gt_disc(68.5f, 104.5f, 64.0f, C_BG, 10);
     if (ub[0])
@@ -8046,6 +8234,7 @@ static void draw_quarters(void)
                 draw_dck(row * Q_H);
             else
                 draw_chk(row * Q_H);
+            gt_back_tri(row * Q_H);                   /* wip594: the big way-back triangle (the skin) */
             cv_commit(4 + row, 0, MAIN_Y + row * Q_H);
         }
         cv_begin(240, 12, C_BG);
@@ -8112,7 +8301,7 @@ static void draw_quarters(void)
                 gt_page_nenv();
             else if (ui.view == V_MIX2) {
                 static const char *const L2[4] = {"LVL", "PAN", "LCUT", "HCUT"};
-                static const char *const L3[4] = {"REV", "DLY", "", "THRS"};
+                static const char *const L3[4] = {"REV", "DLY", "THRS", ""};
                 if (cur_page() == 1)
                     gt_page_mix("SENDS", L3);
                 else

@@ -3,7 +3,7 @@ wait 300
 tap HOME
 tap HOME
 shot gt_scthr_1_inactive.png
-turn K4 -60 80
+turn K3 -60 80
 shot gt_scthr_2_turned.png
 wait 1500
 shot gt_scthr_3_after.png
@@ -15,6 +15,6 @@ turn ALGO -6
 tap HOME
 tap HOME
 shot old_scthr_4_turned.png
-turn K4 60 80
+turn K3 60 80
 wait 1500
 shot old_scthr_5_inactive.png

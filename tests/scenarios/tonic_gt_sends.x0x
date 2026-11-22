@@ -6,7 +6,7 @@ expect view 8
 shot gt_sends_a.png
 turn K1 40 80
 turn K2 20 80
-turn K3 8 80
-turn K4 30 80
+turn K4 8 80
+turn K3 30 80
 wait 1500
 shot gt_sends_b.png

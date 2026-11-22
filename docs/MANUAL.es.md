@@ -163,7 +163,7 @@ Pulsar = MIX 2 → SENDS → GLOBAL → MIX 2. Mantener = DELAY.
 | Página | Knob 1 · 2 · 3 · 4 | También en esta página |
 |---|---|---|
 | **MIX 2** | LEVEL · PAN · LOW CUT (20-663 Hz, nunca apagado) · HIGH CUT (de 20 kHz a 1 kHz) | Los dos cuts están en gris en classic. |
-| **SENDS** | REVERB SEND · DELAY SEND · SIDECHAIN INPUT (pista 1 a 8, número grande) · SIDECHAIN THRESHOLD (funciona como el threshold del compresor: todo a la derecha = 100 % = nada hace duck, gíralo a la izquierda para más duck) | ALGORITHM a la derecha: la pantalla DUCK (abajo). Los sends funcionan diga lo que diga el D/W de PERFORM y ALL FX. |
+| **SENDS** | REVERB SEND · DELAY SEND · SIDECHAIN THRESHOLD (funciona como el threshold del compresor: todo a la derecha = 100 % = nada hace duck, gíralo a la izquierda para más duck) · SIDECHAIN INPUT (pista 1 a 8, número grande) | ALGORITHM a la derecha: la pantalla DUCK (abajo). Los sends funcionan diga lo que diga el D/W de PERFORM y ALL FX. |
 | **DUCK** (SENDS, ALGORITHM a la derecha) | - | Teclas negras 1 a 8: azul = con duck, gris = sin duck, morado = la entrada. La entrada no puede recibir duck. No se hace duck a nada hasta que eliges. ALGORITHM a la izquierda o HOME: volver. |
 | **GLOBAL** | QUANTIZATION (1/8 ... 1/32) · SWING · FILL RATE (2x, 4x, 8x) · TEMPO | - |
 

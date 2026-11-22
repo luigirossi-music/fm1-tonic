@@ -452,12 +452,23 @@ void fxbus_process_st(fxbus_t *f, const float *dry_l, const float *dry_r, const 
     /* wip242: the reverb and delay always run: ALL FX OFF mutes the PERFORM sends (engine.c kit_fx_off), the tracks' own sends still pass */
     fx_reverb(f, rev, out_l, out_r, n);
     fx_delay(f, dly, out_l, out_r, n);
-    if (!f->bypass && f->dist_mode >= 1) {
+    if (f->dist_mode >= 1) {                         /* wip592: runs always, ALL FX OFF crossfades it out over ~5 ms (it used to switch: a click) */
         const float k = f->drive;
+        const float tb = f->bypass ? 1.0f : 0.0f;
+        float off = f->dist_off;
         for (int i = 0; i < n; ++i) {
-            out_l[i] = d9_shape(&f->shape, out_l[i] * k, f->crush_st) * 0.7f;
-            out_r[i] = d9_shape(&f->shape, out_r[i] * k, f->crush_str) * 0.7f;
+            off += (tb - off) * 0.004f;
+            if (fm_fabsf(tb - off) < 1e-4f)
+                off = tb;
+            const float dl = out_l[i], dr = out_r[i];
+            const float wl = d9_shape(&f->shape, dl * k, f->crush_st) * 0.7f;
+            const float wr = d9_shape(&f->shape, dr * k, f->crush_str) * 0.7f;
+            out_l[i] = wl + (dl - wl) * off;
+            out_r[i] = wr + (dr - wr) * off;
         }
+        f->dist_off = off;
+    } else {
+        f->dist_off = f->bypass ? 1.0f : 0.0f;
     }
     if (f->comp > 0.001f) {                          /* (the glue comp is not a performance effect: ALL FX OFF leaves it on) */
         const float thr = f->c_thr, slope = f->c_slope, makeup = f->c_makeup;

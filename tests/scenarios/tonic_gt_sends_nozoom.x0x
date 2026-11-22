@@ -1,0 +1,13 @@
+# wip599: SENDS page, Grigiotonic: K1 / K2 (REV, DLY) never zoom (the cube and the circle stay); K3 / K4 still zoom.
+wait 300
+tap HOME
+tap HOME
+expect view 8
+turn K1 10 80
+shot gt_sends_k1.png
+wait 1500
+turn K2 10 80
+shot gt_sends_k2.png
+wait 1500
+turn K3 10 80
+shot gt_sends_k3.png

@@ -161,7 +161,7 @@ Toque = MIX 2 → SENDS → GLOBAL → MIX 2. Mantido = DELAY.
 | Página | Knob 1 · 2 · 3 · 4 | Também nesta página |
 |---|---|---|
 | **MIX 2** | LEVEL · PAN · LOW CUT (20-663 Hz, nunca desligado) · HIGH CUT (20 kHz até 1 kHz) | Os dois cuts ficam acinzentados em classic. |
-| **SENDS** | REVERB SEND · DELAY SEND · SIDECHAIN INPUT (faixa de 1 a 8, número grande) · SIDECHAIN THRESHOLD (funciona como o threshold do compressor: todo à direita = 100 % = nada sofre duck, gire para a esquerda para mais duck) | ALGORITHM à direita: a tela DUCK (abaixo). Os sends funcionam seja o que for que PERFORM D/W e ALL FX digam. |
+| **SENDS** | REVERB SEND · DELAY SEND · SIDECHAIN THRESHOLD (funciona como o threshold do compressor: todo à direita = 100 % = nada sofre duck, gire para a esquerda para mais duck) · SIDECHAIN INPUT (faixa de 1 a 8, número grande) | ALGORITHM à direita: a tela DUCK (abaixo). Os sends funcionam seja o que for que PERFORM D/W e ALL FX digam. |
 | **DUCK** (SENDS, ALGORITHM à direita) | - | Teclas pretas de 1 a 8: azul = com duck, cinza = sem, roxo = a entrada. A entrada não pode sofrer duck. Nada sofre duck até você escolher. ALGORITHM à esquerda ou HOME: volta. |
 | **GLOBAL** | QUANTIZATION (1/8 ... 1/32) · SWING · FILL RATE (2x, 4x, 8x) · TEMPO | - |
 

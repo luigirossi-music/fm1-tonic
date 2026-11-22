@@ -218,6 +218,12 @@ void master_process(master_t *m, float *x, int n, float volume)
     float k = m->k, grmax = 0.0f;
     for (i = 0; i < n; i++) {
         float s = x[i];
+        {                                                    /* wip592: ALL FX OFF fades in ~5 ms */
+            float tb = m->fbypass ? 1.0f : 0.0f;
+            m->fb_amt += (tb - m->fb_amt) * 0.004f;
+            if (fm_fabsf(tb - m->fb_amt) < 1e-4f)
+                m->fb_amt = tb;
+        }
         if (m->comp_on) {
             float lv, want, total, wet;
             /* the level: mean square over ~8 ms, x2 so a sine reads its peak. Read sample by sample
@@ -265,7 +271,7 @@ void master_process(master_t *m, float *x, int n, float volume)
             m->ic1 = fm_flush(2.0f * v1 - m->ic1);
             m->ic2 = fm_flush(2.0f * v2 - m->ic2);
             s = mode == 1 ? v2 : mode == 2 ? v1 : s - k * v1 - v2;
-            s = fdry + (s - fdry) * (m->fbypass ? 0.0f : m->fwet);
+            s = fdry + (s - fdry) * (m->fwet * (1.0f - m->fb_amt));
         }
         s *= volume;
         if (m->pot[MST_LIMIT]) {
@@ -320,18 +326,22 @@ void master_process_st(master_t *m, float *xl, float *xr, int n, float volume)
     float k = m->k, grmax = 0.0f, vc = m->vol_cur < 0.0f ? volume : m->vol_cur;
     for (i = 0; i < n; i++) {
         float s = xl[i], sr = xr[i];
+        {                                                    /* wip592: ALL FX OFF fades in ~5 ms instead of switching */
+            float tb = m->fbypass ? 1.0f : 0.0f;
+            m->fb_amt += (tb - m->fb_amt) * 0.004f;
+            if (fm_fabsf(tb - m->fb_amt) < 1e-4f)
+                m->fb_amt = tb;
+        }
         {                                                    /* wip368: the master LOW CUT (before the compressor); ALL FX OFF bypasses it, the state keeps running */
             float x = s, y = m->lc[0] * x + m->lz[0];
             m->lz[0] = fm_flush(-2.0f * m->lc[0] * x - m->lc[1] * y + m->lz[1]);
             m->lz[1] = fm_flush(m->lc[0] * x - m->lc[2] * y);
-            if (!m->fbypass)
-                s = y;
+            s += (y - s) * (1.0f - m->fb_amt);
             x = sr;
             y = m->lc[0] * x + m->lz[2];
             m->lz[2] = fm_flush(-2.0f * m->lc[0] * x - m->lc[1] * y + m->lz[3]);
             m->lz[3] = fm_flush(m->lc[0] * x - m->lc[2] * y);
-            if (!m->fbypass)
-                sr = y;
+            sr += (y - sr) * (1.0f - m->fb_amt);
         }
         if (m->comp_on) {
             float lv, want, total, wet;
@@ -383,14 +393,14 @@ void master_process_st(master_t *m, float *xl, float *xr, int n, float volume)
             m->ic1 = fm_flush(2.0f * v1 - m->ic1);
             m->ic2 = fm_flush(2.0f * v2 - m->ic2);
             s = mode == 1 ? v2 : mode == 2 ? v1 : s - k * v1 - v2;
-            s = fdry + (s - fdry) * (m->fbypass ? 0.0f : m->fwet);
+            s = fdry + (s - fdry) * (m->fwet * (1.0f - m->fb_amt));
             v3 = sr - m->ic2r;
             v1 = a1 * m->ic1r + g * a1 * v3;
             v2 = m->ic2r + g * v1;
             m->ic1r = fm_flush(2.0f * v1 - m->ic1r);
             m->ic2r = fm_flush(2.0f * v2 - m->ic2r);
             sr = mode == 1 ? v2 : mode == 2 ? v1 : sr - k * v1 - v2;
-            sr = fdry_r + (sr - fdry_r) * (m->fbypass ? 0.0f : m->fwet);
+            sr = fdry_r + (sr - fdry_r) * (m->fwet * (1.0f - m->fb_amt));
         }
         if (vc != volume) {                          /* the MASTER knob glides (~10 ms): no zipper */
             vc += (volume - vc) * 0.0022651f;

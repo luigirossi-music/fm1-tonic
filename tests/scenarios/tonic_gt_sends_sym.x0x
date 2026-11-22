@@ -1,0 +1,25 @@
+# wip599: the GRIGIOTONIC SENDS page: no faders; the blue cube (reverb) and the blue circle (delay) fill with the send (0, 25, 50, 75, 100 %).
+wait 300
+tap HOME
+tap HOME
+expect view 8
+turn K1 -140 60
+turn K2 -140 60
+wait 600
+shot gt_sym_0.png
+turn K1 32 100
+turn K2 32 100
+wait 600
+shot gt_sym_25.png
+turn K1 32 100
+turn K2 32 100
+wait 600
+shot gt_sym_50.png
+turn K1 32 100
+turn K2 32 100
+wait 600
+shot gt_sym_75.png
+turn K1 40 100
+turn K2 40 100
+wait 600
+shot gt_sym_100.png

@@ -69,6 +69,8 @@ Inspired by Microtonic VST by Sonic Charge, FM1 TONIC is an 8-voice drum synthes
 3. Pages, button by button
   - Button combinations
 4. Playing
+  - Record and sequencer mode
+  - Song mode
 5. Presets and saving
 6. Lights, MIDI and USB
 7. Install, back up, recover
@@ -164,7 +166,7 @@ Press = MIX 2 → SENDS → GLOBAL → MIX 2. Hold = DELAY.
 | Page | Knob 1 · 2 · 3 · 4 | Also on this page |
 |---|---|---|
 | **MIX 2** | LEVEL · PAN · LOW CUT (20-663 Hz, never off) · HIGH CUT (20 kHz down to 1 kHz) | The two cuts are greyed in classic. |
-| **SENDS** | REVERB SEND · DELAY SEND · SIDECHAIN INPUT (track 1 to 8, big number) · SIDECHAIN THRESHOLD (works like the compressor's threshold: all the way right = 100 % = nothing ducks, turn it left for more ducking) | ALGORITHM right: the DUCK screen (below). Sends work whatever PERFORM's D/W and ALL FX say. |
+| **SENDS** | REVERB SEND · DELAY SEND · SIDECHAIN THRESHOLD (works like the compressor's threshold: all the way right = 100 % = nothing ducks, turn it left for more ducking) · SIDECHAIN INPUT (track 1 to 8, big number) | ALGORITHM right: the DUCK screen (below). Sends work whatever PERFORM's D/W and ALL FX say. |
 | **DUCK** (SENDS, ALGORITHM right) | - | Black keys 1 to 8: blue = ducked, grey = not, purple = the input. The input cannot be ducked. Nothing is ducked until you choose. ALGORITHM left or HOME: back. |
 | **GLOBAL** | QUANTIZATION (1/8 ... 1/32) · SWING · FILL RATE (2x, 4x, 8x) · TEMPO | - |
 
@@ -216,7 +218,7 @@ Settings are in the GLO list (SELECT moves up and down, ALGORITHM changes the va
 |---|---|---|
 | **SEQ** (1st press) | FIXED LEN (8, 16, 32, 64) · AUTOSCROLL · FREE LEN (1 to 64) · SWING | White keys: the steps. SELECT: the step pages (16 at a time; AUTOSCROLL off): the page (1-16, 17-32 ...) shows big on the third knob for a moment, then the knob is FREE LEN again. The page never stays on steps that do not exist: if the loop gets shorter than the page you were on, it falls back to the last page the length has. ALGORITHM: the voice (1 to 8, then AC = the global accent). Hold a step + ACCENT / FILL: flags (accent = dark blue, fill = yellow, both = green). {r:FUNC + SEQ}: song mode on / off (confirm with OCT+). {o:FILL + SEQ}: the SONG screen. |
 | **PATTERN** (SEQ, 2nd press) | SONG ON / OFF | Black keys 1 to 8 mute, white keys 1 to 16 pick the next pattern. A dark key = empty pattern, low light = has notes, slow blink = the current one, fast blink = the next one (cued). {r:FUNC tap} and {o:FILL tap} as on PERFORM. SEQ again: back. |
-| **ARP** | FIXED LEN · OCTAVE (also OCT- / OCT+, -3 to +3) · PAGE (1-16, 17-32 ...) · - | The SEQ screen, but every key (white and black) plays the selected voice like a keyboard. The C keys (dim) play the voice's own pitch at octave 0. ALGORITHM: the voice. SELECT: the step pages, shown on the third knob. Nothing is recorded. SEQ: back. {r:FUNC + ARP}: delete the song (DELETE SONG?). |
+| **ARP** | FIXED LEN · OCTAVE (also OCT- / OCT+, -3 to +3) · PAGE (1-16, 17-32 ...) · - | The SEQ screen, but every key (white and black) plays the selected voice like a keyboard. The C keys (dim) play the voice's own pitch at octave 0. ALGORITHM: the voice. SELECT: the step pages, shown on the third knob. With REC + PLAY every key records the hit and its note (patterns 1 to 16). SEQ: back. {r:FUNC + ARP}: delete the song (DELETE SONG?). |
 
 Making a pattern longer copies what is there into the new part (8 to 16 copies steps 1 to 8 into 9 to 16); making it shorter only shortens it.
 
@@ -338,6 +340,116 @@ Every combination of buttons and keys, grouped by the button you hold first. Bla
 - **P-locks and chance.** Hold a white key and turn a knob on a voice page: that step gets its own value, every other step keeps the sound. While playing, you hear it next time the step comes round. To remove one: hold the step, hold SAVE, turn the same knob. A track holds 3 locked knobs per pattern (the screen says MAX 3 PER TRACK, MOTION FULL when no room is left). Hold a step and turn SELECT: its chance, down from 100 % in 5 % steps, then 1:2, 2:2, 1:3 ... 8:8. While you turn, the chance fills the whole screen (TRIG % and the step), big, so you can read it at once.
 - **Chains.** A pattern can be flagged to run into the next one when it ends (after pattern 8 comes 1). A flag only counts on a pattern with notes. A preset with chains loads playing through them (SONG ON); SEQ's pattern page knob 1 turns it off and the pattern loops.
 - **Song mode.** {r:FUNC + SEQ}, confirm with OCT+ (OCT- = back). With no song yet, the PATTERNS screen opens: white keys 1 to 16 add patterns, OCT- (or FUNC + a white key) takes the last off, OCT+ is OK. PLAY plays one bar per pattern, looping. The same gesture leaves song mode. On the **SONG screen** (one row per bar) knob 1 = the bar, knob 2 = its pattern, knob 3 = repeats (x1 to x8); white keys write a pattern into the bar on the cursor and move on; FILL, pressed and let go, deletes the bar at once (the last bar deleted = the song is deleted and song mode ends). {r:FUNC + ARP} deletes the whole song.
+
+### Record and sequencer mode
+
+There are two ways to put notes into a pattern: **step entry** (you place steps one by one, the music can be stopped or playing) and **live recording** (you play the keys and turn the knobs while the pattern runs). This part is the step sequencer. Live recording follows below.
+
+#### The step sequencer
+
+The sequencer has 16 patterns per project. Each pattern has 8 tracks, and every track has up to 64 steps. The white keys 1 to 16 are the 16 steps of the page you see; the black keys 1 to 8 are the tracks.
+
+| You want to | You do |
+|---|---|
+| Pick a track | Black key 1 to 8 (it also plays the track). On the SEQ page ALGORITHM picks the voice too (1 to 8, then AC = the global accent). |
+| Put a step on or take it off | White key. |
+| Make a step loud (**accent**) | Hold the white key and press ACCENT (again = off). Or hold ACCENT first, then press white keys. Accent = dark blue. |
+| Make a step a **fill** | Hold the white key and press FILL (again = off). Or hold FILL first, then press white keys. Fill = yellow, accent and fill together = green (red in Grigiotonic). A filled step plays several times inside its step; GLO > FILL RATE sets how many (2x, 4x or 8x; four times unless you change it). |
+| Give a step a **chance** | Hold the white key and turn SELECT: from 100 % down in 5 % steps, then 1:2, 2:2, 1:3 ... 8:8. |
+| Give a step its own sound value (**p-lock**) | Hold the white key and turn a knob on a sound page. See Live recording below for the full explanation. |
+| Change the pattern length | SEQ page, knob 1 = FIXED LEN (8, 16, 32 or 64 steps), knob 3 = FREE LEN (any length from 1 to 64). |
+| See the other steps | SELECT turns the step pages (1-16, 17-32 ...). The page shows big on the third knob for a moment. With AUTOSCROLL on, the page follows the playing step. A page the pattern does not have is never shown. |
+| Make the groove swing | SEQ page, knob 4 = SWING (0 = straight, 100 = a heavy shuffle). Swing belongs to the pattern. GLO > SWING is the same control. |
+| Change the step length | GLO > QUANTIZATION: the grid of the pattern, 1/8 to 1/32. A finer grid means shorter steps. |
+| Change pattern | {r:FUNC + white key 1 to 16}: it changes at the end of the bar while playing. |
+| Copy, paste, clear | {r:FUNC + ACCENT} copies, {r:FUNC + FILL} pastes, {r:FUNC + PLAY} clears. With a black key held as well, only that track. See chapter 4, Patterns. |
+| Play a track like a keyboard | The ARP page: every key plays the selected voice. With REC + PLAY the keys record the hit and its note (see Live recording). |
+
+On the lit keys: white keys show the steps of the selected track and the playing step flips; the lights are explained at the end of chapter 4.
+
+#### Live recording
+
+Live recording writes what you play while the pattern runs: the trigs of the black keys and the moves of the knobs.
+
+1. Press **REC**. The screen says RECORD ON: KEYS + KNOBS (REC again: RECORD OFF).
+2. Press **PLAY**. Nothing is written while the sequencer is stopped. {r:FUNC + REC} while playing switches recording on at once.
+3. Play. Every black key 1 to 8 writes a trig of its track, and every sound knob you turn is recorded as automation, into the pattern that is playing. It works on every page except PERFORM and the pattern page, where the black keys are mute buttons.
+
+Recording only adds: a trig you play is put on, but no existing trig is taken off. To remove steps, press their white keys; {r:FUNC + PLAY} clears the pattern.
+
+**Quantized and unquantized.** {r:FUNC + REC} switches between the two (the screen says QUANTIZED REC or UNQUANTIZED REC).
+
+| | QUANTIZED REC (default) | UNQUANTIZED REC |
+|---|---|---|
+| Where the trig goes | On the nearest step: if you hit less than half a step before the next one, it goes to the next step. The step length is GLO > QUANTIZATION. | On the step that is playing when you hit. |
+| Timing | Exactly on the step. | The step stays on the grid, but it remembers how late inside the step you hit, and plays it that late. A hit under about 1.5 % of a step late is kept on the grid. Up to 96 such hits are remembered. |
+| REC light | Steady while stopped, blinking with the beat while playing. | Two fast blinks then one slow, over and over. |
+
+**Accents.** Hold ENV and hit a black key: that step is recorded with an accent. (The key plays loud too.)
+
+**The ARP page.** Every key plays the selected voice at a pitch (the C keys are the voice's own pitch). With REC + PLAY the key records the trig and its note (NOTE +3 shows on the screen). The notes are kept for patterns 1 to 16, one note per track per step.
+
+**Automation: recording a knob.** Turn a sound knob of a voice page while recording and playing:
+
+- The steps you turn it on get its value. A pause of up to 4 steps between two written steps is filled with a straight line, so a slow sweep has no holes. The steps you did not touch keep what they had.
+- While you turn, you hear the knob. Next time round you hear the recorded values; the knob moves between steps smoothly.
+- If you turn the knob while playing but not recording, your value wins for one pass and the recording stays.
+- **Limit: 3 knobs per track in each pattern.** The screen says MAX 3 PER TRACK when you turn a fourth. MOTION FULL means the whole project has no room left for more. The chance of a step does not count in the 3.
+
+**Automation or p-lock?** They are the same thing stored in the same place and they share the same 3 knobs per track and pattern. A **p-lock** is one step: hold a white key and turn a knob (playing or stopped), and only that step gets the value. **Automation** is a recorded move over many steps.
+
+| You want to | You do |
+|---|---|
+| Record on, then play | REC, then PLAY |
+| Record on while playing | {r:FUNC + REC} |
+| Quantized / unquantized | {r:FUNC + REC} again |
+| Record a trig | Black key 1 to 8 (ARP: any key, with its note) |
+| Record an accent | Hold ENV, black key |
+| Record a knob | Turn a sound knob |
+| P-lock one step | Hold the white key, turn a knob |
+| Forget a knob's recorded moves and locks in this pattern | SAVE held, turn that knob |
+| Remove one step's lock of a knob | Hold the step, hold SAVE, turn the same knob |
+| Delete the selected track's p-locks and recorded moves in the playing pattern | {r:FUNC + EDIT}, tapped alone (it asks) |
+| Put a step's chance | Hold the white key, turn SELECT |
+
+### Song mode
+
+Song mode plays your patterns in a chosen order, one bar after another. A song is a list of **bars**: each bar says which pattern plays and how many times (x1 to x8). A song has up to 192 bars and is saved with the project (it uses project memory, see GLO > MEMORY).
+
+#### Enter and leave song mode
+
+| You want to | You do |
+|---|---|
+| Enter song mode | **Stop** the music first (the screen says STOP FIRST otherwise). {r:FUNC + SEQ}, then **OCT+** to confirm (OCT- or HOME cancels). |
+| ... when the song already has bars | The SONG screen opens and the song starts playing from bar 1. |
+| ... when there is no song yet | The **PATTERNS screen** opens: white keys 1 to 16 add patterns to the song, one after another (the same pattern as often as you like). OCT- takes the last one off (with none left: cancel). **OCT+** makes the song: one bar per pattern, and you are on the SONG screen. Then PLAY. |
+| Leave song mode | {r:FUNC + SEQ} again, **OCT+** to confirm (EXIT SONG MODE?). The music stops and you are back on the patterns. |
+| Delete the whole song | {r:FUNC + ARP}, OCT+ = yes (DELETE SONG?). Song mode ends. With no song the screen says NO SONG YET. |
+
+#### The SONG screen: edit the song
+
+The SONG screen shows five bars at a time, one row per bar: the bar number, the pattern (P1, P2 ...), and the repeat (x2 ...). The row after the last bar says END. It has one page of knobs:
+
+| Knob | What it does |
+|---|---|
+| **1 BAR** | Moves the cursor to a bar. |
+| **2 PATTERN** | The pattern of the bar on the cursor (a bar on END becomes a new bar). |
+| **3 REPEAT** | How many times the bar plays: x1 to x8. |
+
+| You want to | You do |
+|---|---|
+| Write a pattern into the bar | White key 1 to 16 = pattern 1 to 16 into every track of the bar on the cursor, and the cursor moves to the next bar. On the END row it adds a bar. So you can write a whole song by pressing white keys. |
+| Delete a bar | Press **FILL** and let it go: the bar on the cursor is deleted at once (no question). The last bar deleted = the song is deleted and song mode ends. |
+| Hear a pattern | The black keys 1 to 8 play their track (and record with REC + PLAY, as on HOME). They do not edit the song. |
+| Go back to the SONG screen from another page | {o:FILL + SEQ}. (Outside song mode: NOT IN SONG MODE.) |
+| Change the pattern while the song plays | You cannot: in song mode the song decides ({r:FUNC + white key} does nothing). Edit the bar instead. |
+
+#### Playing the song
+
+- **PLAY** starts from the bar on the cursor (from bar 1 if the cursor is on END). A bar with a repeat plays that many times. After the last bar the song starts again from bar 1. While playing, the top bar shows the bar number.
+- **SONG ON / OFF.** On the pattern page (SEQ, 2nd press) knob 1 is SONG ON / OFF. OFF pauses the advance: the bar that is playing loops. ON: the song moves on.
+- The patterns inside the bars play as they are: step pages, lengths, p-locks and automation of each pattern are heard. Copy and paste of patterns work while the song plays (see Copy-paste on the fly).
+- The SONG screen never zooms the knobs (GLO > ZOOM KNOB).
 
 ## 5. Presets and saving
 

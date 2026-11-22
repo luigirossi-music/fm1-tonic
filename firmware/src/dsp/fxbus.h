@@ -59,6 +59,7 @@ struct fxbus {
     float drive, volume, comp;
     int32_t dist_mode;
     volatile int32_t bypass;          /* X0X: ALL FX OFF (PERFORM K4): the dry signal only, no reverb, delay or distortion (the glue comp and the volume stay: a compressor is not a performance effect) */
+    float dist_off;                   /* wip592: ALL FX OFF ramp for the distortion, 0 = on, 1 = off (~5 ms: no click) */
     d9_shape_t shape;
     float crush_st[2], crush_str[2];
     float comp_env_db, comp_det, c_thr, c_slope, c_makeup, c_drel, c_atk, c_rel;
