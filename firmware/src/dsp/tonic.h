@@ -36,6 +36,7 @@ typedef struct {
     uint8_t  sc_in, sc_int, sc_mask;     /* wip348: the SIDECHAIN (one for the project): the input voice 0..7, the intensity 0..127 (0 = no ducking), the ducked voices (bit v) */
     float    sc_pk;                      /* wip356: the highest sc_p since the screen last looked (the dot pulses at any tempo) */
     float    sc_p;                       /* ... the follower of the input's sound (its power, smoothed) */
+    float    sc_e;                       /* wip619: the duck depth 0..1 (1 - the gain), after the 1 ms attack / 30 ms release */
     int16_t  kill[TN_VOICES];           /* wip328: samples of the choke fade still to run (0 = not being choked) */
     uint8_t  snd_rev[TN_VOICES], snd_dly[TN_VOICES];   /* wip242: each track's own reverb / delay send, 0..127 (pots 22 / 23) */
     uint8_t  sh_lo[TN_VOICES], sh_hi[TN_VOICES];       /* wip289: the shelving cuts' knobs (lo 0 = 20 Hz, hi 127 = 20 kHz: never off, wip318) */
@@ -54,6 +55,7 @@ void tonic_trigger_note(tonic_t *t, int voice, int vel, int semis);
 void tonic_set(tonic_t *t, int voice, int i, uint16_t value);
 void tonic_set_choke(tonic_t *t, int mask);          /* wip328: the choke group (bits 0..7) */
 void tonic_set_sidechain(tonic_t *t, int input, int intensity, int mask);   /* wip348: the SIDECHAIN: what the input voice sounds like ducks the voices of the mask (the input itself is never ducked); intensity 0 = none */
+float tonic_sc_thr_db(int sc_int);                   /* wip619: the sidechain threshold in dB for the stored value: 0 = 0.0 (off) .. 126 = -59.0, 127 = -INF (-120) */
 int tonic_duck_peak(tonic_t *t);                     /* wip356: the deepest duck since the last call (0-255), then restarts from now: for the pulsing dot */
 int tonic_duck_depth(const tonic_t *t);              /* wip352: the sidechain's duck right now, 0-255 */
 void tonic_set_pan(tonic_t *t, int voice, int pan_pot);

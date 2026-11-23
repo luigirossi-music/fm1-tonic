@@ -1,7 +1,22 @@
 # What's new
-
 The newest version first. Install it with the [web installer](../install/); the
 [manual](../manual/) covers everything in detail.
+
+## FM1 Tonic 1.8c · 23 November 2026
+
+- DECLARED (wip626, firmware + manual + web): **version 1.8c**. The welcome screen says VER. 1.8C, the package is fm1-tonic-1.8c.fwsc with identity FM-1_77010803, the manual is **1.8c11** in all six languages and the web page's What's new in 1.8c and Future updates are rewritten (every new function says how to use it).
+- CHANGED (wip626, manual 1.8c6 to 1.8c11, en es it fr pt de): global accent +1 to +10 (default +3), the sidechain as a compressor (threshold 0.0 dB to -59 dB then -INF, knob 3; input on knob 4), battery indicator and LOW BATTERY screen, key blink speeds, no hit flash on PERFORM / pattern page / mixer, mute and solo mode stays, SONG screen (ALGORITHM, lit / dark / blinking white keys), PERFORM in song mode (purple PATTERN box, white keys do nothing).
+- DONE (wip620, firmware 1.8c) **SIDECHAIN is a compressor**: SENDS knob 3 = THRESHOLD in dB (0.0 right = off, down to -59 dB, then -INF), knob 4 = INPUT track; fixed 4:1, soft knee 6 dB, attack 1 ms, release 30 ms; the dot follows the real duck.
+- DONE (wip615, firmware 1.8c) **Key blinks by the clock**: the playing pattern's key blinks slowly (about 110), a muted track's key faster (150), a soloed track's key fastest (200), evenly whatever the frame rate.
+- DONE (wip605, firmware 1.8c) **Battery indicator** (top right, 3 stages; blue = USB) and the full-screen **LOW BATTERY** message (HOME closes it).
+- DONE (wip607, firmware 1.8c) **GLO mixer = the PERFORM keys**: FUNC tap = MUTE mode, FILL tap = SOLO mode, black keys mute / solo, white keys pick the next pattern. wip606: the MUTE / SOLO mode stays when you leave the page.
+- wip625 (1.8c): PERFORM page in song mode: the white keys do not change the pattern (the song is written), the purple PATTERN box shows the next bar of the song; the Grigiotonic PERFORM page uses the same purple box as the normal screen.
+- wip624 (1.8c): SONG screen: turn ALGORITHM to move the bar row (like knob 1); white keys: patterns with notes lit, empty ones dark, the pattern of the bar under the cursor blinks.
+- ADDED (wip609, web page) **What's new in 1.8c** (battery indicator, mixer mute and solo, mute / solo stay on, song LOOP and lines) on top of 1.8b; Battery indicator and Mixer solo mode taken out of Future updates.
+- DONE (wip612, firmware 1.8c) **GLOBAL ACCENT** (GLO list > AUDIO): the strength of the TOTAL accent row (the AC track), wip616: shown as +1 to +10 (+n = n x 10 %), default +3 (30 %), +10 = full accent as before; a track's own accent stays full. (Public pop-up text 'Future updates' NOT changed yet: list first.)
+- DONE (wip611, firmware 1.8c) **No hit blink on PERFORM, the pattern page and the GLO mixer**: the 8 black keys show MUTE / SOLO there, so they stay steady (the blink looked reversed against the full-on mute lights). Every other page keeps the hit blink.
+- DONE (wip610, firmware 1.8c) **RANDOM ALL VOICES**: on the SEL page (PITCH MOD) the 4th place is a purple RNDM button: hold FUNC and turn knob 4 = a new random sound for all 8 tracks, with the same safety as the single random (level and pan stay, distortion never reaches the maximum). Knob 4 alone only shows a reminder. Only on SEL, no undo. (Public pop-up text 'Future updates' NOT changed yet: list first.)
+- DONE (wip608, firmware 1.8c) **SONG screen: LOOP and lines**: knob 3 REPEAT goes x1 to x8 and then LOOP (the bar plays until you stop); OCT+ adds a line after the cursor (a copy of the line before it), OCT- deletes the line (on the SONG screen OCT no longer changes the octave). Manual 1.8c3, six languages.
 
 ## FM1 Tonic 1.8b · 22 November 2026
 

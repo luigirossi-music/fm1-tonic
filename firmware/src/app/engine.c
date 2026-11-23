@@ -441,7 +441,12 @@ static int s_drum_seq(void *x, int kit, int v, float vel)
 }
 static void s_drum(void *x, int kit, int v, float vel)
 {
+    float gshare = 1.0f;                 /* wip612: vel above 1.0 = a TOTAL-row accent at GLOBAL ACCENT below 100 %: the part over 1.0 is the share of the boost */
     (void)x;
+    if (vel > 1.0f) {
+        gshare = vel - 1.0f;
+        vel = 1.0f;
+    }
     if (v == 0)                          /* BD (both kits' track 1): the master's PUMP key */
         master_key(&mst, kit, vel);
     if ((unsigned)kit < NKIT && (unsigned)v < NDRUM)   /* MIX's drum pages: the track's meter jumps */
@@ -454,7 +459,16 @@ static void s_drum(void *x, int kit, int v, float vel)
 #endif
     if (kit == 0) {                      /* Microtonic: an accented step at full velocity, a normal one about a third of it */
         if (v < TN_VOICES)
-            tonic_trigger_note(&tn, v, vel >= 0.999f ? TN_VEL_ACCENT : (int)(vel * 127.0f * ((float)TN_VEL_NORMAL / 88.0f) + 0.5f), tn_note_semis);
+        {
+            int tv;
+            if (gshare < 1.0f && gshare > 0.0f) {      /* wip612: the normal level + the share of the way to the full accent */
+                float nrm = (float)seq.accent_q7 * ((float)TN_VEL_NORMAL / 88.0f);
+                tv = (int)(nrm + gshare * ((float)TN_VEL_ACCENT - nrm) + 0.5f);
+                tv = tv > TN_VEL_ACCENT ? TN_VEL_ACCENT : tv;
+            } else
+                tv = vel >= 0.999f ? TN_VEL_ACCENT : (int)(vel * 127.0f * ((float)TN_VEL_NORMAL / 88.0f) + 0.5f);
+            tonic_trigger_note(&tn, v, tv, tn_note_semis);
+        }
     }                                      /* (kit 1, the old 808: no engine behind it any more, silent) */
 }
 static uint8_t brk_applied[BRK_NSET];  /* the pattern settings the break was last given */

@@ -51,6 +51,7 @@ static void reset(void)
     for (i = 0; i < NPAT; i++)
         pattern_init(&P[i]);
     seq_init(&S, P);
+    S.gacc = 100;                                          /* wip616: the device default is +3 (30 %); these checks assume the full accent */
     S.send_clock = 0;
     nev = 0;
     now = 0;
@@ -91,6 +92,40 @@ static void test_drum_timing(void)
         CHECK(abs((int)evs[i].t - (int)((2 * k + 1) * step + 0.5)) <= 1, "CH %d at %u", k, evs[i].t);
     CHECK(k == 16, "CH hits %d", k);
     printf("  drum timing: %d BD, %d CH on the sample\n", n, k);
+}
+
+/* wip612: GLOBAL ACCENT: the TOTAL accent row's boost is scaled (100 = as before: vel 1.0; below: the sink gets 1.0 + share), a track's own accent stays full */
+static void test_global_accent(void)
+{
+    int i, got = 0;
+    double step = 44100.0 * 60.0 / 120.0 / 4.0;
+    reset();
+    S.bpm = 120.0f;
+    S.gacc = 50;
+    P[0].drum[0].hit[0][0] |= 1u;                          /* BD step 1: total accent */
+    P[0].drum[0].accent[0] |= 1u;
+    P[0].drum[0].hit[1][0] |= 1u << 4;                     /* SD step 5: its own accent */
+    P[0].drum[0].vacc[1][0] |= 1u << 4;
+    P[0].drum[0].hit[2][0] |= 1u << 8;                     /* CY step 9: no accent */
+    seq_start(&S);
+    run((uint32_t)(step * 12.0));
+    i = find(E_DRUM, 0, 0);
+    CHECK(i >= 0 && evs[i].b == 191, "total accent at 50 %%: sink vel %d, want 191 (1.5)", i >= 0 ? evs[i].b : -1);
+    i = find(E_DRUM, 1, 0);
+    CHECK(i >= 0 && evs[i].b == 127, "own accent stays full: %d", i >= 0 ? evs[i].b : -1);
+    i = find(E_DRUM, 2, 0);
+    CHECK(i >= 0 && evs[i].b == 88, "normal hit %d", i >= 0 ? evs[i].b : -1);
+    seq_stop(&S);
+    run(256);
+    nev = 0;
+    S.gacc = 100;                                          /* 100 %: exactly as before */
+    seq_start(&S);
+    run((uint32_t)(step * 2.0));
+    i = find(E_DRUM, 0, 0);
+    CHECK(i >= 0 && evs[i].b == 127, "total accent at 100 %%: %d, want 127", i >= 0 ? evs[i].b : -1);
+    seq_stop(&S);
+    run(256);
+    printf("  global accent ok%s\n", got ? "" : "");
 }
 
 /* wip311: a late hit (UNQUANTIZED REC) plays off / 256 of a step after its step; seq_rec_off measures it */
@@ -364,6 +399,7 @@ int main(void)
 {
     test_drum_timing();
     test_late_hit();
+    test_global_accent();
     test_swing_and_rates();
     test_polymeter_cue_chain();
     test_part_cue();

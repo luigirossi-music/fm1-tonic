@@ -1,0 +1,28 @@
+# wip606: the MUTE / SOLO mode stays when PERFORM is left and entered again (FILL lit = SOLO, tracks can keep being soloed)
+wait 300
+tap FX
+tap FX
+wait 100
+expect msmode 0
+tapkey b9
+wait 50
+expect msmode 1
+tapkey b0
+tap HOME
+wait 100
+tap FX
+wait 100
+expect msmode 1
+tapkey b1
+wait 50
+expect msmode 1
+shot solo_back.png
+wait 200
+tapkey b9
+wait 200
+expect msmode 0
+tap HOME
+wait 100
+tap FX
+wait 100
+expect msmode 0

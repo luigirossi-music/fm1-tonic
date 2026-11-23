@@ -68,7 +68,7 @@ void tonic_init(tonic_t *t, uint32_t sr)
     int v, i;
     t->sr = sr;
     t->choke = 0;
-    t->sc_in = 0; t->sc_int = 0; t->sc_mask = 0; t->sc_p = 0.0f;   /* wip348: no sidechain */
+    t->sc_in = 0; t->sc_int = 0; t->sc_mask = 0; t->sc_p = 0.0f; t->sc_e = 0.0f;   /* wip348: no sidechain */
     for (v = 0; v < TN_VOICES; v++) {
         for (i = 0; i < TN_NPARAMS; i++) t->p[v][i] = INIT[i];
         t->pan[v] = 64;
@@ -132,47 +132,62 @@ void tonic_trigger_note(tonic_t *t, int v, int vel, int semis)
 
 void tonic_set_choke(tonic_t *t, int mask) { t->choke = (uint8_t)mask; }
 
-/* wip348: SIDECHAIN. The input voice's sound (after its cuts, its choke fade and its level) feeds a power follower (attack 2 ms, release 12 ms: only
- * enough to keep the duck smooth, the length of the duck is the length of the input's sound); a ducked voice is multiplied by 1 - intensity x power / SC_PREF
- * (power over SC_PREF counts as 1): its whole sound, so its reverb and delay sends too. A muted input makes no sound: no duck. */
-#define SC_PREF 0.005f        /* the power (of the voice's output, before pan) that ducks all the way: a loud kick; calibrated in tests/host/tonic_sidechain_test.c */
+/* wip619: SIDECHAIN = a COMPRESSOR with an external sidechain (his Ableton settings): the input voice's sound (after its cuts, its choke fade and its level) is measured as
+ * RMS (5 ms average of the power), in dB; the gain computer has a fixed ratio 4:1 and a soft knee of 6 dB round the THRESHOLD; the gain reduction is smoothed
+ * with attack 1 ms and release 30 ms; no look-ahead, no makeup. A ducked voice is multiplied by that gain: its whole sound, so its reverb and delay sends too.
+ * The only knob is the threshold: sc_int 0 = off (0 dB, nothing ducks), 126 = -59 dB, 127 = -INF (the range of the Ableton compressor's threshold).
+ * A muted input makes no sound: no duck. */
+#define SC_RATIO 4.0f
+#define SC_KNEE  6.0f
+float tonic_sc_thr_db(int sc_int)                    /* wip620: like the Ableton compressor: 0 = 0 dB (off), 1..126 = -0.5 .. -59 dB, 127 = -INF (counted as -120 dB: whatever sounds ducks all it can) */
+{
+    return sc_int >= 127 ? -120.0f : -59.0f * (float)sc_int * (1.0f / 126.0f);
+}
 void tonic_set_sidechain(tonic_t *t, int input, int intensity, int mask)
 {
     t->sc_in = (uint8_t)(input & 7);
     t->sc_int = (uint8_t)(intensity < 0 ? 0 : intensity > 127 ? 127 : intensity);
     t->sc_mask = (uint8_t)(mask & 0xFF & ~(1 << t->sc_in));
-    if (!t->sc_int || !t->sc_mask) t->sc_p = t->sc_pk = 0.0f;
+    if (!t->sc_int || !t->sc_mask) t->sc_p = t->sc_pk = t->sc_e = 0.0f;
 }
-int tonic_duck_depth(const tonic_t *t)               /* wip352: how deep the ducked voices are ducked right now, 0-255 (for the pulsing dot of the screen) */
+int tonic_duck_depth(const tonic_t *t)               /* wip352; wip619: the duck right now, 0-255 (0 = no reduction) */
 {
-    float d = t->sc_p * (1.0f / SC_PREF), a = (float)t->sc_int * (1.0f / 127.0f);
+    float d = t->sc_e;
     if (!t->sc_int || !t->sc_mask) return 0;
     d = d > 1.0f ? 1.0f : d;
-    return (int)(a * d * 255.0f + 0.5f);
+    return (int)(d * 255.0f + 0.5f);
 }
-int tonic_duck_peak(tonic_t *t)                      /* wip356; wip581: the dot shows the input's ACTIVITY (0-255), not the depth x intensity: with a small intensity the dot used to pulse so little that it looked fixed */
+int tonic_duck_peak(tonic_t *t)                      /* wip356; wip619: the deepest duck since the last call (0-255), for the pulsing dot */
 {
-    float pk = t->sc_pk > t->sc_p ? t->sc_pk : t->sc_p, d = pk * (1.0f / SC_PREF);
-    t->sc_pk = t->sc_p;
+    float d = t->sc_pk > t->sc_e ? t->sc_pk : t->sc_e;
+    t->sc_pk = t->sc_e;
     if (!t->sc_int || !t->sc_mask) return 0;
     d = d > 1.0f ? 1.0f : d;
     return (int)(d * 255.0f + 0.5f);
 }
 static void sc_follow(tonic_t *t, const float *x, float gain, int got, int m, float *duck)   /* the duck gain of the next m samples; x = the input's samples (got of them), 0 = silent */
 {
-    float p = t->sc_p, ka = 1.0f / (0.002f * (float)t->sr), kr = 1.0f / (0.012f * (float)t->sr);
-    float amt = (float)t->sc_int * (1.0f / 127.0f), inv = 1.0f / SC_PREF;
+    float p = t->sc_p, e = t->sc_e, thr = tonic_sc_thr_db((int)t->sc_int), tgt = e;
+    float kp = 1.0f / (0.005f * (float)t->sr), ka = 1.0f / (0.001f * (float)t->sr), kr = 1.0f / (0.030f * (float)t->sr);
+    const float slope = 1.0f - 1.0f / SC_RATIO;
     int k;
     for (k = 0; k < m; k++) {
-        float s = (x && k < got) ? x[k] * gain : 0.0f, d;
+        float s = (x && k < got) ? x[k] * gain : 0.0f;
         s *= s;
-        p += (s > p ? ka : kr) * (s - p);
-        if (p > t->sc_pk) t->sc_pk = p;
-        d = p * inv;
-        if (d > 1.0f) d = 1.0f;
-        duck[k] = 1.0f - amt * d;
+        p += kp * (s - p);                           /* RMS: the power, averaged over about 5 ms */
+        if ((k & 3) == 0) {                          /* the gain computer every 4th sample (the log and the exp are the costly part) */
+            float over = 3.0103f * fm_log2f(p + 1e-12f) - thr, gr;   /* the level in dB (10 log10 of the power) over the threshold */
+            if (over <= -0.5f * SC_KNEE) gr = 0.0f;
+            else if (over >= 0.5f * SC_KNEE) gr = over * slope;
+            else { float q = over + 0.5f * SC_KNEE; gr = slope * q * q / (2.0f * SC_KNEE); }   /* the soft knee */
+            tgt = 1.0f - fm_exp2f(-gr * 0.166096405f);                /* the depth: 1 - 10^(-gr / 20) */
+        }
+        e += (tgt > e ? ka : kr) * (tgt - e);        /* attack 1 ms down, release 30 ms back up */
+        if (e > t->sc_pk) t->sc_pk = e;
+        duck[k] = 1.0f - e;
     }
     t->sc_p = fm_flush(p);
+    t->sc_e = fm_flush(e);
 }
 
 void tonic_set(tonic_t *t, int v, int i, uint16_t val)

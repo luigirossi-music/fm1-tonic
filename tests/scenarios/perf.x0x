@@ -17,7 +17,7 @@ tap GLO   # wip130: mixer, COMP, then the settings list
 tap GLO
 tap GLO
 tap GLO   # wip267: ...then MEMORY, then the settings list
-turn SELECT 17
+turn SELECT 18
 tap SEL
 expect view 6
 tap PLAY

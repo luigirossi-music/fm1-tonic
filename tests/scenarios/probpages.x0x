@@ -11,12 +11,12 @@ tap GLO   # wip290: 1st press = VEL
 expect view 15
 tap GLO
 expect view 3
+# wip607: the GLO mixer has the pattern keys now (white key = next pattern): no step is held there, SELECT only changes the page
 key w0 down
 turn SELECT -10
 key w0 up
-expect laneval6.0.0.0 50
+expect lanes 0
 expect view 3
-expect lanes 1
 # FX: MIX (first press), PERFORM, REVERB
 tap FX
 tap FX

@@ -1,0 +1,52 @@
+# wip607: the GLO mixer (GLO 2nd press) has the PERFORM system: FUNC = MUTE mode, FILL = SOLO mode, black keys 1-8 = the tracks, white keys = the next pattern
+wait 300
+tap GLO
+tap GLO
+expect view 3
+expect curpage 1
+expect msmode 0
+expect mutes 0
+# MUTE mode: black key 3 mutes track 3 (it no longer plays the pad / picks the group), again = unmute; the page stays the same
+tapkey b2
+expect mutes 1
+expect solo 0
+expect curpage 1
+tapkey b6
+expect mutes 2
+expect curpage 1
+shot glomix_mute.png
+tapkey b2
+tapkey b6
+expect mutes 0
+# SOLO mode (FILL tapped): key 5 = solo 5; key 1 added; keys again = off; FILL with solos = all solos off + MUTE mode
+tapkey b9
+expect msmode 1
+tapkey b4
+expect solo 5
+shot glomix_solo.png
+tapkey b0
+expect solo 1
+tapkey b0
+tapkey b4
+expect solo 0
+tapkey b0
+tapkey b9
+expect solo 0
+expect msmode 0
+expect mutes 0
+# mute mode again, FUNC with mutes = all unmuted
+tapkey b3
+expect mutes 1
+tapkey b10
+expect mutes 0
+# a white key = the next pattern (it used to hold a step): stopped = at once
+expect pattern 1
+tapkey w2
+wait 100
+expect pattern 3
+tapkey w0
+wait 100
+expect pattern 1
+# the mixer's own knobs and SELECT still work
+turn SELECT 1
+expect curpage 2

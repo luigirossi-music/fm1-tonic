@@ -21,6 +21,7 @@ void seq_init(seq_t *s, pattern_t *patterns)
         s->pcue[i] = 0xFF;
     s->bpm = 125.0f;
     s->ext_bpm = 125.0f;
+    s->gacc = 30;   /* wip616: default +3 */
     s->accent_q7 = 88;                /* a 909 non-accented hit sits ~3 dB under an accent */
     s->send_clock = 1;
     {
@@ -109,12 +110,20 @@ static void midi(const seq_sink_t *o, uint8_t st, uint8_t d1, uint8_t d2)
 
 /* one drum hit: an accent at full velocity, the rest at accent_q7; 0 = the sink did not play it (its chance).
  * (RECONSTRUCTED in wip40: it had been lost; the MIDI out is a GUESS: see HANDOFF) */
+/* acc: 0 = a normal hit, 1 = accented (its own track row: full), 2 = wip612 accented only by the TOTAL row: the boost over a normal hit is scaled by GLOBAL ACCENT (100 % = full, as before) */
 static int hit_drum(seq_t *s, int k, int v, int acc, const seq_sink_t *o)
 {
     if (!o->drum)
         return 0;
-    float vel = acc ? 1.0f : (float)s->accent_q7 / 127.0f;
-    if (!o->drum(o->ctx, k, v, vel))
+    float vel = (float)s->accent_q7 / 127.0f, sv = 1.0f;
+    if (acc == 1)
+        vel = 1.0f;
+    else if (acc == 2) {
+        float g = (float)(s->gacc >= 10 && s->gacc < 100 ? s->gacc : 100) / 100.0f;
+        vel += g * (1.0f - vel);
+        sv = g < 1.0f ? 1.0f + g : 1.0f;           /* the sink's contract (wip612): above 1.0 = an accent, the part over 1.0 = the share (GLOBAL ACCENT) of the boost */
+    }
+    if (acc == 2 && sv > 1.0f ? !o->drum(o->ctx, k, v, sv) : !o->drum(o->ctx, k, v, vel))
         return 0;
     if (s->send_notes && s->ch[k] != SEQ_CH_OFF) {       /* MIDI out: the GM drum note, a trigger (on, then off) */
         uint8_t n = GM_DRUM[k][v], vl = (uint8_t)(vel * 127.0f + 0.5f);
@@ -132,12 +141,13 @@ static void fire_drum(seq_t *s, int k, int p, const seq_sink_t *o)
     int w = p >> 5;
     int v;
     tr->fill_n = 0;                                  /* the last step's retriggers end with it */
-    tr->fill_mask = tr->fill_acc = 0;
+    tr->fill_mask = tr->fill_acc = tr->fill_gac = 0;
     for (v = 0; v < NDRUM; v++) {
-        int acc;
+        int acc, gonly;
         if (!(d->hit[v][w] & bit) || ((s->mute | s->vmute) & (1u << (k * NDRUM + v))) || (s->vsolo && !(s->vsolo & (1u << (k * NDRUM + v)))))
             continue;
         acc = ((d->accent[w] | d->vacc[v][w]) & bit) != 0;
+        gonly = acc && !(d->vacc[v][w] & bit);                 /* wip612: accented by the TOTAL row alone */
         if (k == TRK_DRUM && !s->ext && v < 8) {   /* wip311: a late hit waits inside its step */
             int off = seq_late_get(s, s->ppat[k], v, p);
             if (off) {
@@ -145,15 +155,19 @@ static void fire_drum(seq_t *s, int k, int p, const seq_sink_t *o)
                 s->late_mask |= (uint16_t)(1u << v);
                 if (acc)
                     s->late_acc |= (uint16_t)(1u << v);
+                if (gonly)
+                    s->late_gac |= (uint16_t)(1u << v);
                 continue;                            /* (a late hit has no FILL retriggers) */
             }
         }
-        if (!hit_drum(s, k, v, acc, o))
+        if (!hit_drum(s, k, v, acc ? (gonly ? 2 : 1) : 0, o))
             continue;
         if (d->vfill[v][w] & bit) {                  /* FILL: three more hits follow, a quarter step apart */
             tr->fill_mask |= (uint16_t)(1u << v);
             if (acc)
                 tr->fill_acc |= (uint16_t)(1u << v);
+            if (gonly)
+                tr->fill_gac |= (uint16_t)(1u << v);
         }
     }
 }
@@ -165,11 +179,11 @@ static void fire_fill(seq_t *s, int k, const seq_sink_t *o)
     int v;
     for (v = 0; v < NDRUM; v++)
         if ((tr->fill_mask >> v & 1u) && !((s->mute | s->vmute) & (1u << (k * NDRUM + v))) && !(s->vsolo && !(s->vsolo & (1u << (k * NDRUM + v)))))
-            hit_drum(s, k, v, (tr->fill_acc >> v & 1u) != 0, o);
+            hit_drum(s, k, v, (tr->fill_acc >> v & 1u) ? ((tr->fill_gac >> v & 1u) ? 2 : 1) : 0, o);
     tr->fill_n--;
     tr->fill_to = (tr->fill_to < 256u ? tr->fill_to : 0) + tr->fill_gap;
     if (!tr->fill_n)
-        tr->fill_mask = tr->fill_acc = 0;
+        tr->fill_mask = tr->fill_acc = tr->fill_gac = 0;
 }
 
 /* wip311: the late hits due now (unless muted since) */
@@ -181,8 +195,9 @@ static void fire_late(seq_t *s, const seq_sink_t *o)
             continue;
         s->late_mask &= (uint16_t)~(1u << v);
         if (!((s->mute | s->vmute) & (1u << (TRK_DRUM * NDRUM + v))) && !(s->vsolo && !(s->vsolo & (1u << (TRK_DRUM * NDRUM + v)))))
-            hit_drum(s, TRK_DRUM, v, (s->late_acc >> v & 1u) != 0, o);
+            hit_drum(s, TRK_DRUM, v, (s->late_acc >> v & 1u) ? ((s->late_gac >> v & 1u) ? 2 : 1) : 0, o);
         s->late_acc &= (uint16_t)~(1u << v);
+        s->late_gac &= (uint16_t)~(1u << v);
     }
 }
 
@@ -234,7 +249,7 @@ static uint32_t bar_end(seq_t *s, int start)
         next[t] = s->ppat[t];
     if (song_plays(s) && !s->song_rec) {               /* the song: its next bar (looping), or this one again */
         int k = start ? s->song_start : s->song_pos + 1;
-        if (!start && s->song_hold && s->song_pos < s->song->len) {   /* SONG OFF (wip211): not left, the advance is paused: this bar loops */
+        if (!start && (s->song_hold || SONG_LOOP(&s->song->bar[s->song_pos < s->song->len ? s->song_pos : 0])) && s->song_pos < s->song->len) {   /* SONG OFF (wip211): not left, the advance is paused: this bar loops */
             k = s->song_pos;
         } else if (!start && s->song_rep > 1 && s->song_pos < s->song->len) {
             k = s->song_pos;
@@ -443,12 +458,12 @@ static void do_start(seq_t *s, int from_top, const seq_sink_t *o)
         }
         tr->to_off = 0;
         tr->fill_n = 0;
-        tr->fill_mask = tr->fill_acc = 0;
+        tr->fill_mask = tr->fill_acc = tr->fill_gac = 0;
         tr->to_next = s->ext ? NEVER : 0;
         tr->ext_ticks = (uint8_t)(TICKS_PER_STEP[part_rate(s, t)] - 1);   /* the first clock is the downbeat */
     }
     s->clk_to_next = 0;
-    s->late_mask = s->late_acc = 0;                  /* wip311 */
+    s->late_mask = s->late_acc = s->late_gac = 0;                  /* wip311 */
     s->playing = 1;
     if (!s->ext && s->send_clock)
         midi(o, from_top ? 0xFA : 0xFB, 0, 0);
@@ -463,9 +478,9 @@ static void do_stop(seq_t *s, const seq_sink_t *o)
     for (t = 0; t < NTRACKS; t++) {
         s->t[t].to_next = NEVER;
         s->t[t].fill_n = 0;
-        s->t[t].fill_mask = s->t[t].fill_acc = 0;
+        s->t[t].fill_mask = s->t[t].fill_acc = s->t[t].fill_gac = 0;
     }
-    s->late_mask = s->late_acc = 0;                  /* wip311 */
+    s->late_mask = s->late_acc = s->late_gac = 0;                  /* wip311 */
     if (!s->ext && s->send_clock)
         midi(o, 0xFC, 0, 0);
 }
@@ -623,6 +638,24 @@ void seq_cue_part(seq_t *s, int t, int p)
         s->pcue[t] = (uint8_t)p;
 }
 int seq_cue_of(const seq_t *s, int t) { return s->pcue[t] < NPAT ? s->pcue[t] : -1; }
+
+/* wip625: the pattern the song will play at the end of this bar (same rule as bar_end), or -1 when no song is playing (stopped, SONG OFF is a loop of
+ * this bar, recording) or it is the pattern now. Reads only: nothing is changed. */
+int seq_song_next(const seq_t *s)
+{
+    int k, n;
+    if (!s->playing || !song_plays(s) || s->song_rec || !s->song || s->song_pos >= s->song->len)
+        return -1;
+    k = s->song_pos + 1;
+    if (s->song_hold || SONG_LOOP(&s->song->bar[s->song_pos]) || s->song_rep > 1)
+        k = s->song_pos;
+    else if (k >= s->song->len)
+        k = 0;
+    n = s->song->bar[k].pat[TRK_DRUM];
+    if (n >= NPAT || n == s->ppat[TRK_DRUM])
+        return -1;
+    return n;
+}
 int seq_next_step(seq_t *s, int t, int p) { return next_pos(s, t, p, 0); }
 void seq_chain(seq_t *s, int a, int b)
 {

@@ -135,7 +135,7 @@ tap GLO
 tap GLO
 tap GLO
 tap GLO
-turn SELECT 17
+turn SELECT 18
 turn ALGO 1
 expect classic 1
 ccmode 2 0

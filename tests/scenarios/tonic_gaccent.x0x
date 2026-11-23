@@ -1,0 +1,26 @@
+# wip616: GLO > AUDIO > GLOBAL ACCENT: the level of the TOTAL accent row as +1 .. +10 (+n = n x 10 %), default +3 (30 %), stored as 0 = default.
+# (the sequencer's own check of the velocities is in tests/host/seq_test.c test_global_accent)
+wait 300
+expect gacc 0
+expect seqgacc 30
+tap GLO
+tap GLO
+tap GLO
+tap GLO
+tap GLO
+# rows (headers skipped): CLOCK OUT, NOTES OUT, TONIC MIDI CH, REMOTE MIDI CH, CC MODE, CC CH BASE, OUT LOUD, USB, GLOBAL ACCENT = 8 down
+turn SELECT 8
+shot gaccent_3.png
+turn ALGO 1
+wait 100
+expect seqgacc 40
+turn ALGO 50
+wait 100
+shot gaccent_10.png
+expect seqgacc 100
+expect gacc 10
+turn ALGO -100
+wait 100
+shot gaccent_1.png
+expect seqgacc 10
+expect gacc 1

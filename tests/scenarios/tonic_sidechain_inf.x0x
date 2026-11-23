@@ -1,0 +1,7 @@
+wait 300
+tap HOME
+tap HOME
+turn K3 -127 80
+shot gt_scthr_inf.png
+turn K3 3 80
+shot gt_scthr_59.png

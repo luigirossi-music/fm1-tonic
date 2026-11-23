@@ -95,7 +95,8 @@ int32_t plat_enc(int role)
     return v;
 }
 uint32_t plat_master(void) { return master; }
-int plat_battery(void) { return 3; }    /* the simulator: a full battery */
+static int host_batt = 3;
+int plat_battery(void) { return host_batt; }    /* the simulator: a full battery (the script's "batt N": 0..3 bars, 4 USB power, -1 not read) */
 void plat_leds(uint32_t b, uint32_t k)
 {
     lit_btn = b;
@@ -583,6 +584,7 @@ static void run_ms(uint32_t ms)
             ui_frame();
         } else {
             ui_input_only();
+            ui_leds_tick();
         }
     }
 }
@@ -908,6 +910,10 @@ static int expect(const char *what, const char *val)
         got = d && pref_get(r) == d->def;
     } else if (!strcmp(what, "projsame"))           /* 1: the patterns are as at the last snapproj */
         got = memcmp(proj.pat, pat_snap, sizeof pat_snap) == 0;
+    else if (!strcmp(what, "gacc"))                 /* wip612: proj.set.gacc (0 = 100 %, else the percent - 9) */
+        got = proj.set.gacc;
+    else if (!strcmp(what, "seqgacc"))              /* wip612: seq.gacc, the level the sequencer uses (10-100) */
+        got = seq.gacc;
     else if (!strcmp(what, "zoomoff"))              /* wip321: proj.set.zoom_off (a settings row) */
         got = proj.set.zoom_off;
     else if (!strcmp(what, "namemanual"))           /* wip324: GLO > NAME PROJECTS: 0 GENERATE, 1 MANUAL */
@@ -926,6 +932,12 @@ static int expect(const char *what, const char *val)
         got = ui.seqpat;
     else if (!strcmp(what, "songmode"))              /* SONG MODE on = 1 */
         got = ui.songmode;
+    else if (!strcmp(what, "songnext"))              /* wip625: the pattern the song plays next bar, 1-based, 0 = none */
+        got = seq_song_next(&seq) + 1;
+    else if (!strcmp(what, "patcur"))                /* wip625: the pattern playing now, 1-based */
+        got = seq.ppat[0] + 1;
+    else if (!strcmp(what, "songsel"))               /* wip624: the SONG screen's cursor row (0 = bar 1, len = END) */
+        got = ui.song_sel;
     else if (!strcmp(what, "cpm"))                   /* wip362: COPY-PASTE MODE (FUNC + ACCENT) on = 1 */
         got = ui.cpm & 1;
     else if (!strcmp(what, "cpsticky"))              /* wip377: the mode was kept with FUNC (many pastes) = 1 */
@@ -1034,6 +1046,8 @@ static int expect(const char *what, const char *val)
     else if (!strcmp(what, "d_zoomoff")) got = proj.set.zoom_off;
     else if (!strcmp(what, "d_namemanual")) got = proj.set.name_manual;
     else if (!strcmp(what, "d_palette")) got = proj.set.palette;
+    else if (!strcmp(what, "lowbatt")) got = ui_lowbatt();
+    else if (!strcmp(what, "msmode")) got = ui_msmode();
     else if (!strcmp(what, "d_tonicch")) got = seq.ch[0] + 1;                /* the Tonic's MIDI channel as the screen shows it */
     else if (!strcmp(what, "d_remch")) got = proj.set.midi_ch[4];            /* 0 = OFF */
     else if (!strcmp(what, "ccmode"))                /* wip386: CC MODE 0-3 and CC CH BASE 0-8 */
@@ -1253,6 +1267,9 @@ int main(int argc, char **argv)
             accel_off = 1;                              /* a test's exact values, not a hand's speed */
             run_ms(1);
             accel_off = 0;
+        } else if (!strcmp(cmd, "batt")) {              /* batt N: the battery the simulator reads (0..3 bars, 4 = USB power, -1 = not read yet) */
+            host_batt = atoi(a);
+            run_ms(50);
         } else if (!strcmp(cmd, "palette")) {           /* palette N: the skin (0 = the old black one, 6 = GRIGIOTONIC), for a shot */
             proj.set.palette = (uint8_t)atoi(a);
             palette_set((uint32_t)proj.set.palette);

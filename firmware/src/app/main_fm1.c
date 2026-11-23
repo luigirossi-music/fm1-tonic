@@ -568,6 +568,7 @@ static void fm1_main(void)
             ui_frame();
         } else {
             ui_input_only();
+            ui_leds_tick();
         }
     }
 }

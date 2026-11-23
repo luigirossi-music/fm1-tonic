@@ -1,0 +1,48 @@
+# wip610: RANDOM ALL VOICES: SEL (PITCH MOD page, view 11), K4 = the purple RNDM button: FUNC (key b10 in scenarios) held + turn K4 = a new safe random sound for ALL 8 voices.
+# K4 alone only warns; level and pan of every voice stay; distortion never above 3/4 of its range; no zoom on K4; the VEL page's RANDOM SOUND still changes one voice only. Both skins.
+wait 300
+tap SEL
+expect view 11
+shot randomall_idle.png
+expect sound0.0.17 101
+expect sound0.5.17 101
+expect sound0.0.21 64
+expect sound0.7.21 64
+turn K4 1 80
+shot randomall_warn.png
+expect sound0.0.21 64
+expect sound0.7.21 64
+key b10 down
+turn K4 1 80
+shot randomall_blink.png
+wait 200
+shot randomall_blink2.png
+expect view 11
+expect sound0.0.17 101
+expect sound0.3.17 101
+expect sound0.7.17 101
+expect sound0.0.21 64
+expect sound0.4.21 64
+expect sound0.7.21 64
+expect sound0.0.22 0
+expect sound0.7.23 0
+wait 2000
+shot randomall_after.png
+key b10 up
+# K1..K3 of the page still work
+turn K3 20 80
+# the VEL page's RANDOM SOUND still randomizes ONE voice
+tap GLO
+expect view 15
+# the old skin (palette 0)
+palette 0
+wait 2500
+tap HOME
+tap SEL
+expect view 11
+shot randomall_old_idle.png
+key b10 down
+turn K4 1 80
+shot randomall_old_blink.png
+wait 2000
+key b10 up

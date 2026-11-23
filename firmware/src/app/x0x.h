@@ -55,6 +55,7 @@ typedef struct {
     uint8_t choke;                       /* wip335: the CHOKE group (bit v = Tonic track v), kept by the autosave too (older projects: 0 = none) */
     uint8_t sc_int, sc_in, sc_mask;      /* wip353: the SIDECHAIN (intensity 0-127, input track 0-7, ducked tracks bit v): kept by the autosave and the presets (older projects: 0, track 1, none) */
     uint8_t cc_mode, cc_base;            /* wip386: GLO > CC MODE (0 OFF default, also older projects; 1 SELECTED TRACK, 2 CHANNELS, 3 BOTH) and CC CH BASE (0-8 = the first channel of the 8-channel block, 1-9 on the screen) */
+    uint8_t gacc;                        /* wip612: GLO > GLOBAL ACCENT: 0 = 100 % (default, also older projects), else the percent - 9 (1..91 = 10..100 %): how much of its boost the TOTAL accent row keeps */
 } settings_t;
 
 /* the song and the motion lanes: one blob, split across OBJ_SONG and OBJ_MOTION */
@@ -90,7 +91,10 @@ void ui_init(void);
 void ui_frame(void);
 int ui_midi_seen(int what);            /* wip384 (host tests): 0 = packets the UI took from the MIDI queue, 1 = the last controller number, 2 = its value */
 void ui_input_only(void);
+void ui_leds_tick(void);                 /* wip615: between the frames: the blinking keys by the clock */
 int ui_dirty(void);
+int ui_msmode(void);                  /* wip606: 0 = MUTE mode, 1 = SOLO mode */
+int ui_lowbatt(void);                 /* wip605: the LOW BATTERY screen is up */
 void ui_say(const char *a, const char *b);
 void ui_warn(const char *a, const char *b);   /* ui_say for what did not happen: a screen reader says it whole */
 /* backup and restore over USB (backup.c) */

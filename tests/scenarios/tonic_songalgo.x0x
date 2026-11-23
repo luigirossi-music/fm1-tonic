@@ -1,0 +1,53 @@
+# wip624: SONG screen: ALGORITHM moves the bar row like K1 (stops at the ends); key LEDs: patterns with notes lit, empty ones dark, the cursor bar's pattern blinks
+wait 300
+tapkey w0
+key b10 down
+tapkey w1
+key b10 up
+tapkey w0
+key b10 down
+tapkey w2
+key b10 up
+tapkey w0
+key b10 down
+tapkey w0
+key b10 up
+key b10 down
+tap SEQ
+key b10 up
+tap OCT+
+tapkey w0
+tapkey w1
+tap OCT+
+expect songlen 2
+expect view 5
+expect songsel 0
+turn ALGO 1
+expect songsel 1
+turn ALGO 1
+expect songsel 2
+turn ALGO -1
+expect songsel 1
+turn ALGO -1
+expect songsel 0
+turn ALGO -1
+expect songsel 0
+turn ALGO 1
+expect songsel 1
+turn ALGO 1
+expect songsel 2
+turn ALGO 1
+expect songsel 2
+turn K1 -1
+expect songsel 1
+echo ---LEDs on the SONG screen (patterns 1 2 3 have notes: lit; the rest dark; the cursor bar's pattern blinks)
+leds
+wait 150
+leds
+wait 150
+leds
+wait 150
+leds
+wait 150
+leds
+shot songalgo_1.png

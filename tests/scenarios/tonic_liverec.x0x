@@ -32,9 +32,11 @@ tap GLO   # wip290: 1st press = VEL
 expect view 15
 tap GLO
 expect view 3
+# wip607: the GLO mixer has the PERFORM keys now: a black key mutes the track, no pad is played or recorded
 tapkey b4
 wait 100
-expect nhit0.4 >0
+expect nhit0.4 0
+tapkey b4
 # the effects pages: FX held = REVERB
 press FX
 wait 700

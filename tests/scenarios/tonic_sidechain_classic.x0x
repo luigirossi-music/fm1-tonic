@@ -17,7 +17,7 @@ tap GLO
 tap GLO
 tap GLO
 tap GLO
-turn SELECT 17
+turn SELECT 18
 turn ALGO 1
 wait 100
 expect classic 1
@@ -54,7 +54,7 @@ tap GLO
 tap GLO
 tap GLO
 tap GLO
-turn SELECT 17
+turn SELECT 18
 turn ALGO -1
 wait 100
 expect classic 0

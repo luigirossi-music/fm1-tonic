@@ -1,0 +1,95 @@
+# wip615: blink rates by the clock: MUTE key 150 BPM (400 ms period), SOLO key 200 BPM (300 ms), current pattern key 110 BPM (545 ms); read the dumps
+wait 300
+tapkey w0
+tapkey w2
+tapkey w4
+tapkey w6
+tapkey w8
+tapkey w10
+tapkey w12
+tapkey w14
+tapkey b1
+tapkey w0
+tapkey w4
+tapkey w8
+tapkey w12
+tapkey b0
+expect mutes 0
+tap PLAY
+wait 100
+tap FX
+tap FX
+tapkey b3
+wait 50
+echo ---MUTE
+leds
+wait 50
+leds
+wait 50
+leds
+wait 50
+leds
+wait 50
+leds
+wait 50
+leds
+wait 50
+leds
+wait 50
+leds
+wait 50
+leds
+wait 50
+leds
+wait 50
+leds
+wait 50
+leds
+wait 50
+leds
+wait 50
+leds
+wait 50
+leds
+wait 50
+leds
+wait 50
+tapkey b3
+tapkey b9
+tapkey b4
+wait 50
+echo ---SOLO
+leds
+wait 50
+leds
+wait 50
+leds
+wait 50
+leds
+wait 50
+leds
+wait 50
+leds
+wait 50
+leds
+wait 50
+leds
+wait 50
+leds
+wait 50
+leds
+wait 50
+leds
+wait 50
+leds
+wait 50
+leds
+wait 50
+leds
+wait 50
+leds
+wait 50
+leds
+wait 50
+tapkey b4
+tapkey b9

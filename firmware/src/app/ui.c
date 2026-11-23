@@ -77,6 +77,7 @@ typedef struct {
     uint16_t pc16[4];
     uint8_t pst_sh;                    /* Tonic: FUNC + FILL (black key 10) went down: 1 = a paste waits for FILL's release (or a white key), 2 = a white key used it */
     uint8_t cpexit;                    /* wip422: SEQ was pressed in the COPY-PASTE MODE: when it is let go it goes to the SEQUENCER page (never the pattern page) */
+    uint8_t lowbatt;                   /* wip605: the LOW BATTERY screen is up (the battery fell to stage 1): HOME leaves it */
     uint8_t cpm;                       /* wip362: COPY-PASTE MODE (FUNC + ACCENT): the white keys blink, a white key pastes the copy there; any button leaves */
     uint8_t cpf;                       /* wip377: FUNC went down inside the COPY-PASTE MODE and nothing else was pressed since (a tap keeps the mode on) */
     uint16_t cpdone;                   /* wip365: the keys already pasted into in this mode: they stop blinking (steady) */
@@ -227,7 +228,7 @@ static void warn(const char *a, const char *b) { say_as(a, b, ANN_NOW | ANN_KEEP
 enum { R_NONE, R_ENG, R_SWING, R_DLEN, R_DRATE, R_BRKSET,
        R_BRKSLOT, R_TEMPO, R_ACCENT, R_CLKOUT, R_NOTEOUT, R_PALETTE, R_KEYLED, R_KEYSOUND, R_AUTOSAVE, R_ACT, R_SBAR, R_SPAT,
        R_SLEN, R_STALLS, R_HDR, R_TAPE, R_MIDICH, R_OUTLOUD, R_SREP, R_BATT, R_USBFULL, R_CORES,
-       R_QUANT, R_FILLR, R_ZOOM, R_FIXLEN, R_SCROLL, R_FXALL, R_BEAT, R_ARPO, R_SHLO, R_SHHI, R_CLASSIC, R_NAMEMODE, R_SCINT, R_SCIN, R_REMCH, R_CCMODE, R_CCBASE };   /* R_SHLO / R_SHHI (wip289): the track's low / high shelving cut (a = the track) */   /* R_ARPO (wip251): the ARP page's keyboard octave */   /* wip74, GLOBAL PARAMETERS: R_QUANT = the pattern's step grid (slider position 1/8 .. 1/32), R_FILLR = FILL RATE (2x 4x 8x) */   /* R_TAPE: FX's one-knob TAPE (DIGI .. worn tape) */          /* R_HDR: a list's section header (a = its group), never selected */
+       R_QUANT, R_FILLR, R_ZOOM, R_FIXLEN, R_SCROLL, R_FXALL, R_BEAT, R_ARPO, R_SHLO, R_SHHI, R_CLASSIC, R_NAMEMODE, R_SCINT, R_SCIN, R_REMCH, R_CCMODE, R_CCBASE, R_GACC };   /* R_SHLO / R_SHHI (wip289): the track's low / high shelving cut (a = the track) */   /* R_ARPO (wip251): the ARP page's keyboard octave */   /* wip74, GLOBAL PARAMETERS: R_QUANT = the pattern's step grid (slider position 1/8 .. 1/32), R_FILLR = FILL RATE (2x 4x 8x) */   /* R_TAPE: FX's one-knob TAPE (DIGI .. worn tape) */          /* R_HDR: a list's section header (a = its group), never selected */
 typedef struct { uint8_t kind, a, b, c; } pref_t;
 #define PR(k, a, b, c) ((pref_t){(k), (a), (b), (c)})
 #define NONE PR(R_NONE, 0, 0, 0)
@@ -279,6 +280,7 @@ static const x0x_param_t STALLS_P = {"STALLS", 1, 0, ONOFF_N};
 static const x0x_param_t REMCH_P = {"REMOTE MIDI CH", 16, 0, 0};   /* wip385: 0 = OFF, 1-16 (proj.set.midi_ch[4]) */
 static const char *const CCMODE_N[] = {"OFF", "SELECTED", "CHANNELS", "BOTH"};
 static const x0x_param_t CCMODE_P = {"CC MODE", 3, 0, CCMODE_N};   /* wip386: OFF (default) / SELECTED TRACK (CC on the Tonic channel) / CHANNELS (channel = track) / BOTH (proj.set.cc_mode) */
+static const x0x_param_t GACC_P = {"GLOBAL ACCENT", 9, 2, 0};   /* wip616: +1 .. +10 (index 0-9; +3 = 30 % default, +10 = full) of the total accent row's boost */
 static const x0x_param_t CCBASE_P = {"CC CH BASE", 8, 0, 0};          /* wip386: the first channel of the 8-channel block, 1-9 (proj.set.cc_base 0-8) */
 static const x0x_param_t MIDICH_P[NPARTS] = {   /* 0 = OFF (no notes in or out), 1-16 */
     {"TONIC MIDI CH", 16, 10, 0}, {"808 MIDI CH", 16, 11, 0}, {"BREAK MIDI CH", 16, 4, 0}};
@@ -290,7 +292,7 @@ static const char *const ENGMODE_N[] = {"ENHANCED", "CLASSIC"};
 static const x0x_param_t ENGMODE_P = {"TONIC ENGINE", 1, 0, ENGMODE_N};   /* wip302: GLO > SYSTEM: ENHANCED (default) / CLASSIC (= what Microtonic can read) */
 static const char *const CORES_N[] = {"ON", "OFF"};
 static const x0x_param_t CORES_P = {"2ND CORE", 1, 0, CORES_N};   /* proj.set.one_core: at the next power-on */
-static const x0x_param_t SREP_P = {"REPEAT", 7, 0, 0};    /* the bar plays 1-8 times */
+static const x0x_param_t SREP_P = {"REPEAT", 8, 0, 0};    /* the bar plays 1-8 times; 8 = LOOP (wip608) */
 static const char *const BATT_N[] = {"EMPTY", "1/3", "2/3", "FULL", "USB POWER", "..."};
 static const x0x_param_t BATT_P = {"BATTERY", 5, 0, BATT_N};   /* read only (plat_battery) */
 static const x0x_param_t SONG_P[] = {
@@ -313,8 +315,35 @@ static void song_fill(int k)
                 b->pat[p] = seq.ppat[p];
             b->mute = 0;
         }
+        if (SONG_LOOP(b))                                  /* wip608: a copy of a LOOP bar is a plain bar, played once */
+            b->mute &= 0x0Fu;
         sg->len++;
     }
+}
+
+/* wip608: OCT+ on the SONG screen: a new line right after the cursor, the same patterns as the line before it; on END it is added at the end */
+static void song_add_cur(void)
+{
+    song_t *sg = song();
+    int k = ui.song_sel, i;
+    if (sg->len >= NSONG) {
+        warn("SONG FULL", 0);
+        return;
+    }
+    if (k >= sg->len || !sg->len) {
+        song_fill(sg->len);
+        ui.song_sel = (uint8_t)(sg->len - 1);
+    } else {
+        for (i = sg->len; i > k + 1; i--)
+            sg->bar[i] = sg->bar[i - 1];
+        sg->bar[k + 1] = sg->bar[k];
+        if (SONG_LOOP(&sg->bar[k + 1]))
+            sg->bar[k + 1].mute &= 0x0Fu;
+        sg->len++;
+        ui.song_sel = (uint8_t)(k + 1);
+    }
+    mark_dirty();
+    say("LINE ADDED", 0);
 }
 
 static void songexit_go(void);                        /* wip360: below */
@@ -377,6 +406,7 @@ static const x0x_param_t *pref_desc(pref_t r)
     case R_REMCH: return &REMCH_P;
     case R_CCMODE: return &CCMODE_P;
     case R_CCBASE: return &CCBASE_P;
+    case R_GACC: return &GACC_P;
     case R_OUTLOUD: return &OUT_P;
     case R_USBFULL: return &USBA_P;
     case R_ZOOM: return &ZOOM_P;
@@ -440,6 +470,7 @@ static int pref_get(pref_t r)
     case R_REMCH: return proj.set.midi_ch[4] >= 1 && proj.set.midi_ch[4] <= 16 ? proj.set.midi_ch[4] : 0;
     case R_CCMODE: return proj.set.cc_mode;
     case R_CCBASE: return proj.set.cc_base;
+    case R_GACC: return (proj.set.gacc >= 1 && proj.set.gacc <= 10) ? proj.set.gacc - 1 : 2;   /* wip616: stored 1-10 = +1..+10, 0 (or an old wip612 value) = +3 */
     case R_OUTLOUD: return proj.set.out_loud;
     case R_USBFULL: return proj.set.usb_full;
     case R_ZOOM: return !proj.set.zoom_off;
@@ -454,7 +485,7 @@ static int pref_get(pref_t r)
     case R_FIXLEN: { int n = pat_of(r.a)->drum[r.a].len; return n <= 8 ? 0 : n <= 16 ? 1 : n <= 32 ? 2 : 3; }   /* the block the length lives in */
     case R_CORES: return proj.set.one_core;
     case R_CLASSIC: return proj.set.classic;
-    case R_SREP: return ui.song_sel < song()->len ? song()->bar[ui.song_sel].mute >> 5 : 0;
+    case R_SREP: return ui.song_sel < song()->len ? (SONG_LOOP(&song()->bar[ui.song_sel]) ? 8 : song()->bar[ui.song_sel].mute >> 5) : 0;
     case R_BATT: return plat_battery() < 0 ? 5 : plat_battery();
     case R_SLEN: return song()->len;
     case R_STALLS: return perf.stalls_on;
@@ -543,7 +574,7 @@ static void pref_set(pref_t r, int v)
     }
     mark_dirty();
     switch (r.kind) {                                  /* wip321: the settings list (they live in proj.set): kept even when AUTOSAVE is off */
-    case R_PALETTE: case R_KEYLED: case R_KEYSOUND: case R_AUTOSAVE: case R_MIDICH: case R_REMCH: case R_CCMODE: case R_CCBASE: case R_OUTLOUD: case R_USBFULL:
+    case R_PALETTE: case R_KEYLED: case R_KEYSOUND: case R_AUTOSAVE: case R_MIDICH: case R_REMCH: case R_CCMODE: case R_CCBASE: case R_GACC: case R_OUTLOUD: case R_USBFULL:
     case R_ZOOM: case R_BEAT: case R_CLASSIC: case R_NAMEMODE: case R_SCROLL: case R_CORES: case R_CLKOUT: case R_NOTEOUT:
         ui.set_dirty = 1;
         break;
@@ -598,6 +629,7 @@ static void pref_set(pref_t r, int v)
     case R_REMCH: proj.set.midi_ch[4] = (uint8_t)(v ? v : 17); engine_remote_ch(v ? v - 1 : -1); break;
     case R_CCMODE: proj.set.cc_mode = (uint8_t)v; engine_cc_cfg(proj.set.cc_mode, proj.set.cc_base); break;   /* wip386 */
     case R_CCBASE: proj.set.cc_base = (uint8_t)v; engine_cc_cfg(proj.set.cc_mode, proj.set.cc_base); break;
+    case R_GACC: proj.set.gacc = (uint8_t)(v + 1); seq.gacc = (uint8_t)((v + 1) * 10); break;   /* wip616: +n = n x 10 % */
     case R_OUTLOUD: proj.set.out_loud = (uint8_t)v; engine_out_loud(v); break;
     case R_USBFULL: proj.set.usb_full = (uint8_t)v; engine_usb_full(v); break;
     case R_ZOOM: proj.set.zoom_off = (uint8_t)!v; break;
@@ -625,7 +657,7 @@ static void pref_set(pref_t r, int v)
             song_bar_t *b;
             song_fill(ui.song_sel);
             b = &song()->bar[ui.song_sel];
-            b->mute = (uint8_t)((b->mute & 0x1Fu) | v << 5);
+            b->mute = (uint8_t)((b->mute & 0x0Fu) | (v >= 8 ? 0x10u | 7u << 5 : (unsigned)v << 5));   /* wip608: 8 = LOOP */
         }
         break;
     case R_TAPE: {                                    /* 0..15 the clean digital delay; above, tape, wearing */
@@ -919,18 +951,41 @@ static void pref_value_of(pref_t r, int v, char *num, char *unit)
         put_i(num, hz); put_s(unit, "Hz");                /* wip299: always the whole number of Hz (19900, 20000 ...) */
         return;
     }
-    case R_SCINT: put_i(num, (v * 100 + 63) / 127); put_s(unit, "%"); return;   /* wip349: 0-127 shown as 0-100 % */
+    case R_SCINT: {                                    /* wip617; wip619: the real compressor THRESHOLD in dB: 0.0 all the way right (no ducking) to -59.0, then -INF all the way left (the knob 127 .. 0), as the Ableton compressor */
+        int t10 = ((127 - v) * 590 + 63) / 126;       /* wip620: 0.0 .. -59.0 dB, the very last step (knob 0) = -INF */
+        char *q = num;
+        if (v == 0) {
+            put_s(num, "-INF");
+            unit[0] = 0;
+            return;
+        }
+        if (t10 > 0)
+            *q++ = '-';
+        q = put_i(q, t10 / 10);
+        *q++ = '.';
+        put_i(q, t10 % 10);
+        put_s(unit, "dB");
+        return;
+    }
     case R_SCIN: put_i(num, v + 1); return;                                      /* wip349: track 1-8 */
     case R_SBAR: put_i(num, v + 1); return;
     case R_SPAT: num[0] = 'P'; put_i(num + 1, v + 1); return;
     case R_MIDICH: case R_REMCH: if (v) put_i(num, v); else put_s(num, "OFF"); return;
+    case R_GACC: num[0] = '+'; put_i(num + 1, v + 1); return;   /* wip616: +1 .. +10 */
     case R_CCBASE: {                                   /* wip386: the block, e.g. 1-8 */
         char *e = put_i(num, v + 1);
         *e++ = '-';
         put_i(e, v + 8);
         return;
     }
-    case R_SREP: num[0] = 'x'; put_i(num + 1, v + 1); return;
+    case R_SREP:
+        if (v >= 8)
+            put_s(num, "LOOP");
+        else {
+            num[0] = 'x';
+            put_i(num + 1, v + 1);
+        }
+        return;
     case R_SLEN: put_i(num, v); put_s(unit, "bar"); return;
     default: put_i(num, v); return;
     }
@@ -1280,6 +1335,7 @@ static void open_global(void)
     list_rows[ui.list_n++] = PR(R_HDR, GR_AUDIO, 0, 0);
     list_add(PR(R_OUTLOUD, 0, 0, 0));
     list_add(PR(R_USBFULL, 0, 0, 0));
+    list_add(PR(R_GACC, 0, 0, 0));                       /* wip612: GLOBAL ACCENT 10-100 % (100 by default = as before) */
     list_rows[ui.list_n++] = PR(R_HDR, GR_KEYS, 0, 0);
     list_add(PR(R_KEYLED, 0, 0, 0));
     list_add(PR(R_BEAT, 0, 0, 0));
@@ -1726,7 +1782,8 @@ static int help_lines(int b, const char *l[HELP_LINES])
         break;
     case B_OCTDN:
     case B_OCTUP:
-        if (ui.view == V_HOME || ui.view == V_SONG) L(b == B_OCTUP ? "PATTERNS 17-32" : "PATTERNS 1-16");
+        if (ui.view == V_SONG) L(b == B_OCTUP ? "ADD A LINE AFTER THE CURSOR" : "DELETE THE LINE");
+        else if (ui.view == V_HOME) L(b == B_OCTUP ? "PATTERNS 17-32" : "PATTERNS 1-16");
         else {
             L(b == B_OCTUP ? "THE NEXT 16 STEPS" : "THE 16 STEPS BEFORE"); L("PAGES: 1-16 17-32 33-48 49-64");
         }
@@ -2714,7 +2771,7 @@ static void set_view(int v)
     ui.chk = 0;                                        /* wip328: and the CHOKE screen closes */
     ui.dck = 0;                                        /* wip350: and the DUCK screen */
     ui.msp = 0;                                        /* wip272: any page change goes back to the first PERFORM page (ALGO selects the MUTE / SOLO one) */
-    ui.msmode = 0;                                     /* (and MUTE mode: the default) */
+                                                       /* wip606: the MUTE / SOLO mode is NOT reset by a page change: back on PERFORM (or the GLO mixer) it is as it was left (FILL lit = SOLO, tracks can keep being soloed) */
     if (v == V_FX)
         ui.fx_mem = 1;
     else if (v == V_MIX1)
@@ -2796,7 +2853,7 @@ static int step_hold_view(void)
 {
     if (ui.overlay != O_NONE || !is_drum())
         return 0;
-    return ui.view == V_MIX || (ui.view == V_FX && cur_page() != 0 && !fx_comp_page());
+    return (ui.view == V_MIX && !tonic_part()) || (ui.view == V_FX && cur_page() != 0 && !fx_comp_page());   /* wip607: the Tonic's GLO mixer has the pattern keys now (white keys = next pattern) */
 }
 static int lock_step(void)
 {
@@ -3088,19 +3145,11 @@ static void drum_mod(int bit, int down)
 /* wip326: RANDOM SOUND. GLO 1st press (the VEL page), K4 = a blue RND icon: a turn gives the selected track a new random sound.
  * Only the 21 libpo32 parameters (TNP_*) are drawn; the extras (pan, reverb / delay sends, low / high cut) are not touched.
  * wip344: LEVEL (the volume) is not drawn any more: it stays as it is (as the pan). The icon blinks for rnd_until. Not while a step is held. */
-static uint32_t rnd_until, rnd_last;
-static void tn_randomize(void)
+static uint32_t rnd_until, rnd_last, rnd_all_until;
+/* wip610: one voice gets a new SAFE random sound (the body of RANDOM SOUND; RANDOM ALL calls it for every voice) */
+static void tn_randomize_voice(int v)
 {
-    int v = ui.sel[PART_909], i;
-    uint32_t now = plat_ms();
-    if (!tn_page_ok() || ui.overlay != O_NONE || lock_step() >= 0)
-        return;
-    if (now - rnd_last < 120u)                        /* a fast spin: one new sound per 120 ms at most */
-        return;
-    rnd_last = now;
-    sv_rng ^= now * 2654435761u + 1u;                 /* the name generator's xorshift, stirred with the time */
-    if (!sv_rng)
-        sv_rng = 0x2F6E2B1u;
+    int i;
     for (i = 0; i < TN_NPARAMS; i++) {
         const x0x_param_t *d = tonic_param(v, i);
         int pot;
@@ -3119,8 +3168,30 @@ static void tn_randomize(void)
         }
         tn_put(v, i, (uint8_t)pot, tonic_pot_to_val(i, pot));
     }
+}
+/* all = 0: RANDOM SOUND (the selected voice); all = 1: wip610 RANDOM ALL (SEL page = PITCH MOD, FUNC + K4): every voice, the same safe random */
+static void tn_randomize(int all)
+{
+    int v = ui.sel[PART_909], n;
+    uint32_t now = plat_ms();
+    if (!tn_page_ok() || ui.overlay != O_NONE || lock_step() >= 0)
+        return;
+    if (now - rnd_last < 120u)                        /* a fast spin: one new sound per 120 ms at most */
+        return;
+    rnd_last = now;
+    sv_rng ^= now * 2654435761u + 1u;                 /* the name generator's xorshift, stirred with the time */
+    if (!sv_rng)
+        sv_rng = 0x2F6E2B1u;
+    if (all)
+        for (n = 0; n < NDRUM_TONIC; n++)
+            tn_randomize_voice(n);
+    else
+        tn_randomize_voice(v);
     mark_dirty();
-    rnd_until = now + 900u;
+    if (all)
+        rnd_all_until = now + 900u;
+    else
+        rnd_until = now + 900u;
     if (!seq.playing)
         engine_drum(PART_909, v, 0.75f);              /* stopped: hear the new sound (playing: the pattern plays it) */
 }
@@ -3292,9 +3363,9 @@ static void arp_key(int k, int down)
     }
 }
 
-static int msp_on(void)                               /* wip272: the fixed MUTE / SOLO system is active: BOTH PERFORM pages (the big pattern number and the MUTE / SOLO boxes) */
+static int msp_on(void)                               /* wip272: the fixed MUTE / SOLO system is active: BOTH PERFORM pages (the big pattern number and the MUTE / SOLO boxes), the pattern page and the GLO mixer */
 {
-    return ((ui.view == V_FX && cur_page() == 0) || (ui.view == V_SEQ && ui.seqpat)) && tonic_part() && ui.overlay == O_NONE;   /* wip285: the pattern page (SEQ, 2nd press) has the same system */
+    return ((ui.view == V_FX && cur_page() == 0) || (ui.view == V_SEQ && ui.seqpat) || ui.view == V_MIX) && tonic_part() && ui.overlay == O_NONE;   /* wip285: the pattern page (SEQ, 2nd press) has the same system; wip607: the GLO mixer too (V_MIX: FUNC = MUTE mode, FILL = SOLO mode, black keys 1-8 = the tracks, white keys = the next pattern) */
 }
 static int msp_page(void)                             /* wip272: the second PERFORM page (the MUTE / SOLO boxes) is on screen (ALGO selects it) */
 {
@@ -3446,6 +3517,8 @@ static void key_event(int k, int down)
     }
     if (msp_on() && !perf_testing()) {                      /* wip272: both PERFORM pages: FUNC = MUTE mode, FILL = SOLO mode / clear every solo, black keys 1-8 = the voices */
         if (bl == 10) {                                     /* FUNC: mutes active = all unmuted (like FILL with solos); none = MUTE mode */
+            if (down && ui.view == V_MIX)
+                ui.mod_held |= 4u;                          /* wip607: on the GLO mixer FUNC is still the modifier of the combinations too (FUNC + HOME = RENAME, FUNC + REC, ...) */
             if (down) {
                 uint32_t mm = seq.vmute & (((1u << NDRUM_TONIC) - 1u) << (PART_909 * NDRUM));   /* wip284: the Tonic voices that are muted now */
                 ui.msmode = 0;
@@ -3528,8 +3601,8 @@ static void key_event(int k, int down)
                 return;
         }
     }
-    if (((ui.seqpat && ui.view == V_SEQ) || (ui.view == V_FX && cur_page() == 0)) && w >= 0 && !(ui.mod_held & 4u)) {   /* (also the PERFORM page) */   /* the pattern screen: a white key = the next pattern, */
-        if (down) {                                                         /* at the end of the current one (stopped: at once) */
+    if (((ui.seqpat && ui.view == V_SEQ) || (ui.view == V_FX && cur_page() == 0) || (ui.view == V_MIX && ui.overlay == O_NONE && tonic_part())) && w >= 0 && !(ui.mod_held & 4u)) {   /* (also the PERFORM page; wip607: the GLO mixer too: it used to hold a step) */   /* the pattern screen: a white key = the next pattern, */
+        if (down && !ui.songmode) {                                         /* at the end of the current one (stopped: at once); wip625: not in SONG MODE (the song is written: it decides) */
             seq_chain(&seq, 0, 0);
             seq_cue(&seq, wp);
         }
@@ -4075,6 +4148,14 @@ static void button_tap(int b)
             ui.arp_oct = (int8_t)(o < -3 ? -3 : o > 3 ? 3 : o);
             put_s(put_s(t, "OCTAVE "), ARPO_N[ui.arp_oct + 3]);
             say(t, 0);
+        } else if (ui.view == V_SONG && tonic_part() && ui.overlay == O_NONE && !(ui.mod_held & 4u)) {   /* wip608: the SONG screen: OCT- deletes the line, OCT+ adds one (no octave change here) */
+            if (up)
+                song_add_cur();
+            else if (song()->len) {
+                song_del_cur();
+                if (song()->len)
+                    say("LINE DELETED", 0);
+            }
         } else if (up && tonic_part() && (ui.mod_held & 4u)) {   /* (wip211: FUNC + OCT+ does nothing now) */
             ;
         } else if (tonic_part()) {                    /* the Tonic, any page: the selected voice's pitch an octave up / down */
@@ -4114,6 +4195,17 @@ static void input(void)
 {
     uint32_t btn = plat_buttons(), keys = plat_keys() | rkeys, ch, i;   /* wip385: rkeys = the remote panel's keys */
     int e;
+    if (ui.lowbatt) {                                  /* wip605: LOW BATTERY: only HOME is heard (it leaves); keys, buttons and knobs wait */
+        for (i = 0; i < NE; i++)
+            enc((int)i);
+        if ((btn & ~ui.btn) & (1u << B_HOME)) {
+            ui.lowbatt = 0;
+            ui.btn_used |= 1u << B_HOME;               /* its release is not a HOME tap */
+        }
+        ui.btn = btn;
+        ui.keys = keys;
+        return;
+    }
     ch = btn ^ ui.btn;
     for (i = 0; i < NB; i++) {
         uint32_t m = 1u << i;
@@ -4254,6 +4346,9 @@ static void input(void)
                 ui.sel[PART_909] = (uint8_t)v;
             build_pages();
             say(ui.ac ? "ACCENT" : engine_voice_name(T_909, ui.sel[PART_909]), 0);
+        } else if (ui.view == V_SONG && ui.overlay == O_NONE && tonic_part() && !ui.help) {   /* wip624: the SONG screen: ALGORITHM moves the bar row like K1 (0 .. END, stops at the ends) */
+            int mx = song()->len < NSONG ? (int)song()->len : NSONG - 1, nr = (int)ui.song_sel + (e > 0 ? 1 : -1);
+            ui.song_sel = (uint8_t)(nr < 0 ? 0 : nr > mx ? mx : nr);
         } else if (ui.view == V_MIX2 && (ui.dck || cur_page() == 1) && ui.overlay == O_NONE && tonic_part() && !ui.help) {   /* wip350: SENDS: ALGORITHM right = the DUCK screen, left = back */
             ui.dck = (uint8_t)(e > 0);
         } else if (ui.view == V_NEV && ui.overlay == O_NONE && tonic_part() && !ui.help) {   /* wip333: EDIT: ALGORITHM right = show who is in the CHOKE group, left = back */
@@ -4309,9 +4404,18 @@ static void input(void)
         if (i == 3 && ui.view == V_VEL && ui.overlay == O_NONE) {   /* wip326: VEL page, K4 = RANDOM SOUND (wip327: FUNC held; no zoom, no p-lock, no ENV / SAVE use) */
             if (!(ui.btn & ((1u << B_SAVE) | (1u << B_ENV)))) {
                 if (ui.mod_held & 4u)                  /* wip327: only with FUNC held */
-                    tn_randomize();
+                    tn_randomize(0);
                 else
                     warn("HOLD FUNC + TURN KNOB4: RANDOM", 0);   /* wip340: KNOB4, not K4 */
+            }
+            continue;
+        }
+        if (i == 3 && ui.view == V_PMOD && ui.overlay == O_NONE) {  /* wip610: SEL page, K4 = RANDOM ALL (the purple button): FUNC held + turn */
+            if (!(ui.btn & ((1u << B_SAVE) | (1u << B_ENV)))) {
+                if (ui.mod_held & 4u)
+                    tn_randomize(1);
+                else
+                    warn("HOLD FUNC + TURN KNOB4: RANDOM ALL", 0);
             }
             continue;
         }
@@ -4826,6 +4930,49 @@ static int grigio(void);
 static int32_t htw(const felucca_font_t *f, const char *s);
 static int32_t htext(int32_t x, const felucca_font_t *f, const char *s, uint16_t col);
 static void htext_r(int32_t x, const felucca_font_t *f, const char *s, uint16_t col);
+/* wip605: THE BATTERY, top right of the header: 3 stages (3 full, 2 half, 1 almost empty; plat_battery: 0 and 1 bars = stage 1, 4 = a USB host
+ * powers it = 3 blue segments). The stage goes DOWN at once and UP only after 3 s steady (the reading hovers at a threshold). When it falls to
+ * stage 1 the LOW BATTERY screen takes the whole screen until HOME is pressed (it comes back only after the battery has been up again). */
+static int8_t bat_st;                    /* 0 = not read yet, 1..3, 4 = USB power */
+static uint32_t bat_up;                  /* since when a higher stage has been read (0: none) */
+static void batt_update(void)
+{
+    int b = plat_battery(), s, prev = bat_st;
+    uint32_t now = plat_ms();
+    if (b < 0)
+        return;
+    s = b >= 4 ? 4 : b < 1 ? 1 : b;
+    if (!bat_st || s == 4 || s < bat_st) {
+        bat_st = (int8_t)s;
+        bat_up = 0;
+    } else if (s > bat_st) {
+        if (!bat_up)
+            bat_up = now ? now : 1u;
+        else if (now - bat_up >= 3000u) {
+            bat_st = (int8_t)s;
+            bat_up = 0;
+        }
+    } else
+        bat_up = 0;
+    if (bat_st == 1 && prev != 1)
+        ui.lowbatt = 1;
+    else if (bat_st != 1)
+        ui.lowbatt = 0;
+}
+static void draw_batt(void)
+{
+    int st = bat_st, n = st > 3 ? 3 : st, i, blink_off = st == 1 && !(ui.frame & 16u);
+    uint16_t on = st == 4 ? C_SLBLUE : st == 3 ? RGB(60, 190, 90) : st == 2 ? RGB(240, 170, 30) : RGB(222, 58, 58);
+    if (st <= 0)
+        return;
+    cv_rect(217, 4, 19, 1, C_WHITE);                   /* the outline: 19 x 11, the nub 2 x 5 */
+    cv_rect(217, 14, 19, 1, C_WHITE);
+    cv_rect(217, 4, 1, 11, C_WHITE);
+    cv_rect(235, 4, 1, 11, C_WHITE);
+    cv_rect(236, 7, 2, 5, C_WHITE);
+    for (i = 0; i < 3; i++)
+        cv_rect(219 + 5 * i, 6, 4, 7, i < n && !blink_off ? on : C_LINE);
+}
 static void draw_header(void)
 {
     char b[24];
@@ -4905,13 +5052,14 @@ static void draw_header(void)
             shown = (int)(avg + 0.5f);
         put_i(b, shown);
     }
-    htext_r(212, &FONT_S, b, seq.ext ? C_AMB : C_HI);
+    htext_r(191, &FONT_S, b, seq.ext ? C_AMB : C_HI);   /* wip605: 21 px to the left, the battery has the corner */
     if (seq.playing)
-        play_icon(217, 4, (eng_step[TRK_DRUM] & 3) == 0 ? C_WHITE : C_HI);
+        play_icon(196, 4, (eng_step[TRK_DRUM] & 3) == 0 ? C_WHITE : C_HI);
     if (ui.rec)
-        dot(231, 9, 4, RGB(255, 50, 50));
+        dot(210, 9, 4, RGB(255, 50, 50));
     else if (ui.dirty)
-        dot(233, 9, 1, C_GRAY);
+        dot(212, 9, 1, C_GRAY);
+    draw_batt();
     cv_commit(0, 0, 0);
 }
 
@@ -5136,7 +5284,9 @@ static void draw_song(int band)
             put_i(t + 1, sg->bar[k].pat[p] + 1);
             text_c(100 + p * 36, vc(&FONT_B, y, 21), &FONT_B, muted ? "-" : t, gt ? ink : muted ? C_DIM : PART_COL[p]);
         }
-        if (SONG_REP(&sg->bar[k]) > 1) {               /* a bar played more than once: x2 .. x8 */
+        if (SONG_LOOP(&sg->bar[k]))                    /* wip608: LOOP */
+            text_r(230, vc(&FONT_B, y, 21), &FONT_B, "LOOP", C_WHITE);
+        else if (SONG_REP(&sg->bar[k]) > 1) {          /* a bar played more than once: x2 .. x8 */
             t[0] = 'x';
             put_i(t + 1, SONG_REP(&sg->bar[k]));
             text_r(230, vc(&FONT_B, y, 21), &FONT_B, t, C_WHITE);
@@ -5145,6 +5295,10 @@ static void draw_song(int band)
 }
 
 static void draw_patinfo(int H);
+static int pat_next(void)                          /* wip625: the pattern to come: the cued one; in SONG MODE the song's next bar */
+{
+    return ui.songmode ? seq_song_next(&seq) : seq_cue_of(&seq, PART_909);
+}
 
 /* the COMP page (palette: purple, blue, light blue, white, black; no red): an Ableton Glue-style needle meter of the gain reduction, 0 .. 20 dB left to right (the whole 2-band area is one
  * picture; the band only clips). The needle jumps to a new peak and falls back slowly, as the meter on the old MASTER page */
@@ -5359,7 +5513,9 @@ static void draw_mix_tall(int o, int k)
             pref_t lv = find_ref(t, v, "Level"), pn = find_ref(t, v, "Pan");
             int l = lv.kind ? proj.sound.v[t][v][lv.c] : 0, pv = pn.kind ? proj.sound.v[t][v][pn.c] : 64;
             int f = l * fh / 127, ty = top + fh - f, muted = (int)(((seq.mute | seq.vmute) >> (k * NDRUM + v)) & 1u);
-            int sl_on = ing && !panmode;                               /* the sliders' lit box: level pages only */
+            int sl_on = ing && !panmode;
+            if (seq.vsolo && !((seq.vsolo >> (k * NDRUM + v)) & 1u))
+                muted = 1;                                             /* wip607: a track the solo silences is grey, as a muted one */                               /* the sliders' lit box: level pages only */
             uint16_t col = C_SLBLUE;                                   /* wip281: the sliders keep the normal slider colours in every mode */
             if (pass && !touch)
                 continue;
@@ -6056,8 +6212,9 @@ static uint16_t footer_text(const char **a, const char **b, const char **c)
         *a = "FUNC+WHITE: PATTERN";
         *b = "FUNC+BLK: MUTE";
     } else if (ui.view == V_SONG) {                               /* wip356: in our blue, only on the SONG screen */
-        *a = "WHITE KEYS 1-16 ADD ROW";                           /* wip362 / wip364 (he typed POLY by mistake: FILL) */
-        *b = "FILL KEY DELETE";
+        *a = "WHITE: ADD ROW";                           /* wip362 / wip364 (he typed POLY by mistake: FILL) */
+        *b = "FILL: DELETE";
+        *c = "OCT+ ADD OCT- DEL";
         return C_SLBLUE;
     } else if (ui.view == V_MIX2 && cur_page() == 1 && !ui.dck && tonic_part()) {   /* wip373: SENDS: only SIDECHAIN ALGORITHM, at the right, next to the triangle */
         *c = SC_WORD;
@@ -6520,7 +6677,7 @@ static void slider_words(pref_t r, const char **l, const char **c, const char **
     else if (r.kind == R_TEMPO)
         *l = "20", *c = "TEMPO", *rt = "275";
     else if (r.kind == R_SCINT)
-        *l = "0%", *c = "SIDECHAIN THRESHOLD", *rt = "100%";
+        *l = "-INF", *c = "SIDECHAIN THRESHOLD", *rt = "0dB";   /* wip617; wip619; wip620 */
     else if (r.kind == R_SCIN)
         *l = "1", *c = "SIDECHAIN INPUT", *rt = "8";
     else if (is_pan(r))
@@ -6770,7 +6927,7 @@ static int32_t big_w(const felucca_font_t *f, const char *s, int32_t k)
 static void draw_patinfo(int H)
 {
     char t[8], n[20], *q;
-    int cur = seq.ppat[PART_909], cue = seq_cue_of(&seq, PART_909);
+    int cur = seq.ppat[PART_909], cue = pat_next();
     int ch, pend = cue >= 0 && cue != cur, k, top = pend ? H * 35 / 100 : 0, avail = H - top, nw;
     put_i(t, cur + 1);
     nw = big_w(&FONT_L, t, 1);
@@ -6780,11 +6937,11 @@ static void draw_patinfo(int H)
     k = k / 2 > 1 ? k / 2 : 1;                   /* wip110: the current number at half the size that would fill the area */
     q = put_s(n, "PATTERN ");
     put_i(q, cue + 1);
-    if (pend && (ui.frame & 16u)) {              /* the NEXT pattern: a purple box about a third of the area, blinking */
-        rbox(4, 4, 232, top - 8, 10, C_TBOTH);
+    if (pend && (plat_ms() % 500u) < 250u) {     /* the NEXT pattern: a purple box about a third of the area, blinking (wip625: by the clock, even) */
+        rbox(4, 4, 232, top - 8, 10, grigio() ? RGB(166, 106, 224) : C_TBOTH);
         {                                        /* wip110: the box text twice as big (FONT_B x2), centred in the box */
             int bch = caps(&FONT_B)->bot - caps(&FONT_B)->top + 1;
-            big_text(120 - big_w(&FONT_B, n, 2) / 2, 4 + (top - 8 - bch * 2) / 2 - caps(&FONT_B)->top * 2, &FONT_B, n, C_WHITE, 2);
+            big_text(120 - big_w(&FONT_B, n, 2) / 2, 4 + (top - 8 - bch * 2) / 2 - caps(&FONT_B)->top * 2, &FONT_B, n, grigio() ? RGB(255, 255, 255) : C_WHITE, 2);
         }
     }
     big_text(120 - big_w(&FONT_L, t, k) / 2, top + (avail - ch * k) / 2 - caps(&FONT_L)->top * k, &FONT_L, t, C_WHITE, k);
@@ -7457,6 +7614,7 @@ static void gt_page_pmod(void)
         if (d)
             gt_knob(31 + i * 59 + (i + 1) / 3, 159, LAB[i], d->max ? (float)pref_shown(r) / (float)d->max : 0.0f, ui.touched == i);
     }
+    gt_rndm(31 + 3 * 59 + 1, 159, (int32_t)(rnd_all_until - plat_ms()) <= 0 || (ui.frame & 4u), 1);   /* wip610: RANDOM ALL = the purple button */
 }
 
 /* the three pictures of the NOISE FILTER buttons (low pass, band pass, high pass), the mockup's numbers, centre cx, cy */
@@ -7858,37 +8016,9 @@ static void gt_pan_small(int32_t cx, int32_t cy, const char *label, float v, int
 static void gt_page_perf(void)
 {
     static const char *const LAB[3] = {"REV", "DLY", "HPF"};
-    const float CX = 120.0f, CY = 72.0f, R = 48.0f, RA = 42.8f, AW = 3.2f;
-    int cur = seq.ppat[PART_909], cue = seq_cue_of(&seq, PART_909), pend = cue >= 0 && cue != cur, blink = (ui.frame & 16u) != 0, i, on, x, y;
+    int i, on;
     int32_t x0 = 179, x1 = 237, y0 = 145, y1 = 173, tx;
-    char t[8];
-    gt_text(&GTF_TITLE, 120.0f, 8.0f, "PERFORM", GT_INK, 1);
-    for (x = 3; x >= 1; x--)                                                    /* the soft shadow */
-        gt_disc(CX + 0.6f, CY + 1.4f, R + (float)x * 0.9f, GT_SH, 3);
-    gt_disc(CX + 0.9f, CY + 1.0f, R, GT_DARK, 16);                              /* the raised edge: dark bottom right, light top left */
-    gt_disc(CX - 0.9f, CY - 1.0f, R, GT_LIGHT, 16);
-    gt_disc(CX, CY, R - 1.1f, RGB(206, 207, 206), 16);
-    for (y = (int)CY - 48; y <= (int)CY + 48; y++)
-        for (x = (int)CX - 48; x <= (int)CX + 48; x++) {
-            float dx = (float)x + 0.5f - CX, dy = (float)y + 0.5f - CY, d = fm_sqrtf(dx * dx + dy * dy), a, g;
-            a = fm_clampf(RA + AW * 0.5f + 1.3f - d, 0.0f, 1.0f) * fm_clampf(d - (RA - AW * 0.5f - 1.3f) + 0.5f, 0.0f, 1.0f);
-            if (a > 0.0f)                                                       /* the groove under the ring */
-                px_blend(x, y, GT_DARK, (uint32_t)(a * 5.0f + 0.5f));
-            a = fm_clampf(RA + AW * 0.5f + 0.5f - d, 0.0f, 1.0f) * fm_clampf(d - (RA - AW * 0.5f) + 0.5f, 0.0f, 1.0f);
-            if (a <= 0.0f)
-                continue;
-            g = fm_clampf((dy + RA) / (2.0f * RA), 0.0f, 1.0f);
-            px_blend(x, y, pend && blink ? blend(GT_PURPLE_L, GT_PURPLE, (int)(16.0f * g)) : blend(GT_B2, GT_B1, (int)(16.0f * g)), (uint32_t)(a * 16.0f + 0.5f));
-        }
-    put_i(t, cur + 1);
-    gt_text(&GTF_PNUM, CX, CY + 1.2f, t, GT_INK, 1);
-    if (pend && blink) {                                                        /* the queued pattern: a purple disc at the top right of the circle */
-        char n[8];
-        put_i(n, cue + 1);
-        gt_disc(CX + 38.0f, CY - 38.0f + 0.8f, 17.0f, GT_SH, 3);
-        gt_disc(CX + 38.0f, CY - 38.0f, 16.0f, GT_PURPLE, 16);
-        gt_text(&GTF_KNOB3, CX + 38.0f, CY - 38.0f - 0.2f, n, RGB(255, 255, 255), 1);
-    }
+    draw_patinfo(134);                                                          /* wip625: the same pattern information as the normal screen (the purple PATTERN n box blinking when one is to come, the number big under it); only the knobs and the colours are the skin's */
     for (i = 0; i < 3; i++) {
         pref_t r = pg.r[0][i];
         const x0x_param_t *d = pref_desc(r);
@@ -8013,6 +8143,8 @@ static void gt_page_gmix(int k)
         int muted = (int)(((seq.mute | seq.vmute) >> (k * NDRUM + v)) & 1u);
         float lvl = (float)l / 127.0f, mt = lvl * (float)eng_hit[k][v] / 255.0f;
         char nb[4];
+        if (seq.vsolo && !((seq.vsolo >> (k * NDRUM + v)) & 1u))
+            muted = 1;                                                          /* wip607: a track the solo silences is grey, as a muted one */
         xs[v] = 7 + (int32_t)(v * 29.2f + 0.5f);                                /* the pill's left edge (his drawing: centres 17.8 + 29.2 v) */
         gt_fader(xs[v], 16, lvl, mt, muted);
         nb[0] = (char)('1' + v);
@@ -8063,8 +8195,8 @@ static int gt_zoom_on(void)
         return 0;                                                               /* K1 = an icon cell */
     if (ui.view == V_NEV && t == 1)
         return 0;                                                               /* the CHOKE switch */
-    if (ui.view == V_VEL && t == 3)
-        return 0;                                                               /* RANDOM SOUND */
+    if ((ui.view == V_VEL || ui.view == V_PMOD) && t == 3)
+        return 0;                                                               /* RANDOM SOUND / wip610 RANDOM ALL */
     r = pg.r[cur_page()][t];
     return r.kind != R_NONE && r.kind != R_ACT && pref_desc(r) != 0;
 }
@@ -8401,6 +8533,14 @@ static void draw_quarters(void)
                 cell_value(cx, vc(&FONT_B, 88, 14), "TURN", "", busy ? C_WHITE : C_HI);
                 continue;
             }
+            if (ui.view == V_PMOD && i == 3) {                /* wip610: K4 = RANDOM ALL: the purple disc (blinks while it works) */
+                int busy = (int32_t)(rnd_all_until - plat_ms()) > 0;
+                disc((float)cx + 0.5f, 38.5f, 34.0f, (!busy || (ui.frame & 4u)) ? GT_PURPLE : dim(GT_PURPLE, 4));
+                text_c(cx, vc(&FONT_M, 38 - 10, 20), &FONT_M, "RNDM", C_BLACK);
+                text_c(cx, vc(&FONT_S, 75, 11), &FONT_S, "RANDOM ALL", busy ? C_WHITE : C_GRAY);
+                cell_value(cx, vc(&FONT_B, 88, 14), "TURN", "", busy ? C_WHITE : C_HI);
+                continue;
+            }
             if (!d)
                 continue;
             if (extra_off(r))                                 /* wip302: CLASSIC: greyed */
@@ -8457,9 +8597,39 @@ static void draw_quarters(void)
 }
 
 /* ===================================================================== LEDs === */
+/* wip615: BLINKS BY TIME, at fixed rates (his words): the muted track's key 150 BPM, the soloed track's key 200 BPM, the current pattern's key (FUNC held, PERFORM) 110 BPM.
+ * leds() builds the steady lights once per UI frame and only NOTES which keys blink (lq.mute / solo / cur); leds_out() adds them by the clock and sends the lights.
+ * ui_leds_tick() calls leds_out() between the frames (the FM-1 draws few frames a second: frame-counted blinks came out uneven). */
+static struct { uint32_t b, k, d, f, mute, solo, cur; } lq;
+static void leds_out(void)
+{
+    uint32_t ms = plat_ms(), k = lq.k;
+    if (ms % 400u < 200u)
+        k |= lq.mute;                                /* 150 BPM */
+    if (ms % 300u < 150u)
+        k |= lq.solo;                                /* 200 BPM */
+    if (ms % 545u < 273u)
+        k |= lq.cur;                                 /* 110 BPM */
+    k |= ui.keys;
+    plat_keys_dim(lq.d & ~k);
+    plat_keys_faint(lq.f & ~k & ~lq.d);
+    plat_glow(proj.set.keyled == 1);
+    plat_play_red(ui.rec);                           /* PLAY green; red while recording */
+    plat_leds(lq.b, k);
+}
+void ui_leds_tick(void)
+{
+    static uint32_t last;
+    uint32_t ms = plat_ms();
+    if (ms - last < 5u)
+        return;
+    last = ms;
+    leds_out();
+}
 static void leds(void)
 {
     uint32_t b = 0, k = 0, d = 0, f = 0, i;
+    lq.mute = lq.solo = lq.cur = 0;
     int blink = (ui.frame & 8u) != 0;
     int slow = (ui.frame & 16u) != 0;                 /* wip230: the muted track's key blinks slowly (as the FUNC lights do) */
     if (seq.playing && eng_step[TRK_DRUM] % 4 == 0)
@@ -8521,8 +8691,12 @@ static void leds(void)
             int cu = seq_cue_of(&seq, PART_909) - ui.pbank * 16;
             k |= 1u << BLACK_KEY[10];                    /* FUNC itself */
             for (i = 0; i < NDRUM; i++)
-                if (sm_any(d0->hit[i]) && (!track_muted(PART_909, (int)i) || (ui.frame & 16u)))
-                    k |= 1u << BLACK_KEY[i];
+                if (sm_any(d0->hit[i])) {
+                    if (!track_muted(PART_909, (int)i))
+                        k |= 1u << BLACK_KEY[i];
+                    else
+                        lq.mute |= 1u << BLACK_KEY[i];
+                }
             for (i = 0; i < 16; i++)
                 if (pattern_used(&proj.pat[ui.pbank * 16 + i]))
                     k |= 1u << WHITE_KEY[i];
@@ -8535,8 +8709,7 @@ static void leds(void)
                 int cp = seq.ppat[PART_909] - ui.pbank * 16;
                 if (cp >= 0 && cp < 16 && cp != cu) {
                     k &= ~(1u << WHITE_KEY[cp]);
-                    if (slow)
-                        k |= 1u << WHITE_KEY[cp];
+                    lq.cur |= 1u << WHITE_KEY[cp];
                 }
             }
             if (ui.blink_pat >= 0 && ui.blink_pat < 16 && (int32_t)(plat_ms() - ui.blink_until) < 0) {   /* a paste just went here: */
@@ -8555,10 +8728,20 @@ static void leds(void)
             int pp = (bar ? sg->bar[ui.song_sel].pat[PART_909] : seq.ppat[PART_909]) - ui.pbank * 16;
             int cu = seq_cue_of(&seq, PART_909) - ui.pbank * 16;
             for (i = 0; i < 16; i++)                  /* patterns with notes */
-                if (pattern_used(&proj.pat[ui.pbank * 16 + i]))
-                    d |= 1u << WHITE_KEY[i];
-            if (pp >= 0 && pp < 16 && (ui.view == V_HOME || bar))
-                k |= 1u << WHITE_KEY[pp];
+                if (pattern_used(&proj.pat[ui.pbank * 16 + i])) {
+                    if (ui.view == V_SONG && tonic_part())   /* wip624: the SONG screen: a pattern with notes is LIT, an empty one is dark */
+                        k |= 1u << WHITE_KEY[i];
+                    else
+                        d |= 1u << WHITE_KEY[i];
+                }
+            if (pp >= 0 && pp < 16 && (ui.view == V_HOME || bar)) {
+                if (ui.view == V_SONG && tonic_part()) {  /* wip624: the cursor bar's pattern blinks (where the next white key writes over) */
+                    k &= ~(1u << WHITE_KEY[pp]);
+                    if (blink)
+                        k |= 1u << WHITE_KEY[pp];
+                } else
+                    k |= 1u << WHITE_KEY[pp];
+            }
             if (ui.view == V_HOME && seq_cue_of(&seq, PART_909) >= 0 && blink && cu >= 0 && cu < 16)
                 k |= 1u << WHITE_KEY[cu];
             for (i = 0; i < NPARTS; i++) {            /* the parts: playing bright, muted dim */
@@ -8568,7 +8751,7 @@ static void leds(void)
                 else
                     k |= 1u << BLACK_KEY[i];
             }
-        } else if ((ui.view == V_MIX || ui.view == V_MIX2 || ui.view == V_MIX1 || ui.view == V_PMOD || ui.view == V_OSC || ui.view == V_NOISE || ui.view == V_NEV || ui.view == V_VEL) && (cur_page() == 0 || drum_mix_page() >= 0)) {
+        } else if (((ui.view == V_MIX && !msp_on()) || ui.view == V_MIX2 || ui.view == V_MIX1 || ui.view == V_PMOD || ui.view == V_OSC || ui.view == V_NOISE || ui.view == V_NEV || ui.view == V_VEL) && (cur_page() == 0 || drum_mix_page() >= 0)) {
             int dm = drum_mix_page(), n = dm >= 0 ? NDRUM : NPARTS, on = dm >= 0 ? ui.sel[dm] : ui.mixsel;
             if (dm >= 0) {                               /* the Tonic's sound pages (FX 1st press, SEL, ENV, LFO, EDIT, HOME 1st press): */
                 const dpart_t *dd = &cur_pat()->drum[dm];   /* the white keys show the selected track's trigs and the playhead, as on SEQ */
@@ -8585,9 +8768,12 @@ static void leds(void)
             }
             for (i = 0; i < (uint32_t)n && i < 11u; i++) {  /* the knobs' channel bright (blinking: muted), */
                 int mu = dm >= 0 ? track_muted(dm, (int)i) : part_muted((int)i);   /* the others dim, muted dark */
-                if ((int)i == on ? !mu || slow : 0)
-                    k |= 1u << BLACK_KEY[i];
-                else if ((int)i != on && !mu)
+                if ((int)i == on) {
+                    if (!mu)
+                        k |= 1u << BLACK_KEY[i];
+                    else
+                        lq.mute |= 1u << BLACK_KEY[i];
+                } else if (!mu)
                     d |= 1u << BLACK_KEY[i];
             }
         } else if (dck_page()) {                      /* wip350: the DUCK screen: black keys 1-8 lit = ducked or the input */
@@ -8598,24 +8784,23 @@ static void leds(void)
             for (i = 0; i < NDRUM_TONIC; i++)
                 if ((seq.choke >> i) & 1u)
                     k |= 1u << BLACK_KEY[i];
-        } else if ((ui.view == V_FX && cur_page() == 0) || (ui.seqpat && ui.view == V_SEQ && tonic_part())) {   /* PERFORM and the pattern page: black keys 1-8 are the mute buttons: lit = the track plays, dark = muted */
+        } else if ((ui.view == V_FX && cur_page() == 0) || (ui.seqpat && ui.view == V_SEQ && tonic_part()) || (ui.view == V_MIX && msp_on())) {   /* PERFORM, the pattern page and the GLO mixer (wip607): black keys 1-8 are the mute buttons: lit = the track plays, dark = muted */
             for (i = 0; i < NDRUM_TONIC; i++)
                 if (!track_muted(PART_909, (int)i) && (!msp_on() || !seq.vsolo || (seq.vsolo & (1u << (PART_909 * NDRUM + i)))))   /* (wip271: on the MUTE / SOLO page a voice the solo silences is dark) */
                     k |= 1u << BLACK_KEY[i];
-                else if (msp_on() && track_muted(PART_909, (int)i) && slow)   /* wip282: on both PERFORM pages a muted voice's key blinks slowly */
-                    k |= 1u << BLACK_KEY[i];
+                else if (msp_on() && track_muted(PART_909, (int)i))   /* wip615: a muted voice's key blinks at 150 BPM, by the clock (lq.mute) */
+                    lq.mute |= 1u << BLACK_KEY[i];
             if (msp_on()) {                               /* wip272 (both PERFORM pages): the mode's key is lit: FUNC = MUTE, FILL = SOLO */
                 k |= 1u << BLACK_KEY[ui.msmode ? 9 : 10];
                 {                                         /* wip375: the white keys = the 16 patterns: empty = no light, with notes = low light, the CURRENT one blinks slowly, the cued (next) one blinks (fast) */
                     int cp = seq.ppat[PART_909] - ui.pbank * 16;
-                    int cu = seq_cue_of(&seq, PART_909) - ui.pbank * 16;
+                    int cu = pat_next() - ui.pbank * 16;
                     for (i = 0; i < 16; i++)
                         if (pattern_used(&proj.pat[ui.pbank * 16 + i]))
                             d |= 1u << WHITE_KEY[i];
                     if (cp >= 0 && cp < 16) {
                         d &= ~(1u << WHITE_KEY[cp]);
-                        if (slow)
-                            k |= 1u << WHITE_KEY[cp];
+                        lq.cur |= 1u << WHITE_KEY[cp];
                     }
                     if (cu >= 0 && cu < 16 && cu != cp) {
                         d &= ~(1u << WHITE_KEY[cu]);
@@ -8654,9 +8839,12 @@ static void leds(void)
             }
             for (i = 0; i < NDRUM && i < 11u; i++) {    /* the track bright (blinking: muted), the others */
                 int mu = track_muted(ui.part, (int)i);  /* with hits dim, muted dark */
-                if (!ac_on() && (int)i == ui.sel[ui.part] ? !mu || slow : 0)
-                    k |= 1u << BLACK_KEY[i];
-                else if ((int)i != ui.sel[ui.part] && sm_any(d0->hit[i]) && !mu)
+                if (!ac_on() && (int)i == ui.sel[ui.part]) {
+                    if (!mu)
+                        k |= 1u << BLACK_KEY[i];
+                    else
+                        lq.mute |= 1u << BLACK_KEY[i];
+                } else if ((int)i != ui.sel[ui.part] && sm_any(d0->hit[i]) && !mu)
                     d |= 1u << BLACK_KEY[i];
             }
         } else if (ui.part == PART_BRK) {
@@ -8682,8 +8870,7 @@ static void leds(void)
             if (seq.vsolo & (1u << (PART_909 * NDRUM + i))) {
                 k &= ~(1u << BLACK_KEY[i]);
                 d &= ~(1u << BLACK_KEY[i]);
-                if (ui.frame & 4u)
-                    k |= 1u << BLACK_KEY[i];
+                lq.solo |= 1u << BLACK_KEY[i];    /* wip615: a soloed voice's key blinks at 200 BPM, by the clock */
             }
     }
     {                                                /* wip376: HIT FLASH (like the Digitakt): when a track's trig plays, its black key blinks for that hit, on every page except ARP (wip378) */
@@ -8702,9 +8889,9 @@ static void leds(void)
             fl[i] = (uint8_t)((int32_t)(fu[i] - now) > 0);
         }
         hinit = 1;
-        if (tonic_part() && !(ui.view == V_SEQ && ui.arp) && seq.playing)   /* wip378: every page except ARP */
+        if (tonic_part() && !(ui.view == V_SEQ && ui.arp) && seq.playing && !msp_on())   /* wip378: every page except ARP; wip611: and not where the 8 black keys show MUTE / SOLO (PERFORM, the pattern page, the GLO mixer): there they stay steady */
             for (i = 0; i < NDRUM_TONIC; i++)
-                if (fl[i]) {
+                if (fl[i] && !(lq.solo & (1u << BLACK_KEY[i]))) {
                     if (k & (1u << BLACK_KEY[i]))
                         k &= ~(1u << BLACK_KEY[i]);   /* a key that is lit (the selected track) goes dark for the hit */
                     else {
@@ -8713,12 +8900,11 @@ static void leds(void)
                     }
                 }
     }
-    k |= ui.keys;
-    plat_keys_dim(d & ~k);
-    plat_keys_faint(f & ~k & ~d);
-    plat_glow(proj.set.keyled == 1);
-    plat_play_red(ui.rec);                           /* PLAY green; red while recording */
-    plat_leds(b, k);
+    lq.b = b;
+    lq.k = k;
+    lq.d = d;
+    lq.f = f;
+    leds_out();
 }
 
 /* ===================================================================== frame === */
@@ -9289,8 +9475,10 @@ static void autosave(void)
  * A warning (warn(): something did not happen) and every question (wip205: the two editors SAVE AS and
  * CHAIN too) take the whole 240 x 240 screen: no header, no knobs, no legend under it. Plain say()
  * messages stay in the header. A warning shown now wins over a question; the question comes back. */
-static int full_kind(void)                            /* 0 none, 1 a warning, 2 a question, 3 the COPY-PASTE MODE (wip423), 4 the TRIG % (wip433) */
+static int full_kind(void)                            /* 0 none, 1 a warning, 2 a question, 3 the COPY-PASTE MODE (wip423), 4 the TRIG % (wip433), 5 LOW BATTERY (wip605) */
 {
+    if (ui.lowbatt)
+        return 5;
     if (ui.help)
         return 0;
     if (ui.msg_warn && ui.msg_until && (int32_t)(ui.msg_until - plat_ms()) > 0)
@@ -9477,13 +9665,19 @@ static void fs_editor(void)                           /* wip205: the SAVE AS scr
 }
 static void fs_body(int kind)
 {
-    uint16_t purple = kind == 3 ? C_SLBLUE : C_TBOTH;   /* wip423: the copy-paste screen is in our blue like the hints */
+    uint16_t purple = kind == 3 ? C_SLBLUE : kind == 5 ? RGB(222, 58, 58) : C_TBOTH;   /* wip423: the copy-paste screen is in our blue like the hints; wip605: LOW BATTERY is red */
     cv_rect(0, 0, 240, 4, purple);
     cv_rect(0, 236, 240, 4, purple);
     cv_rect(0, 0, 4, 240, purple);
     cv_rect(236, 0, 4, 240, purple);
     if (kind == 1) {
         fs_msg(ui.msg, 120, C_WHITE);
+        return;
+    }
+    if (kind == 5) {                                  /* wip605: LOW BATTERY: big and red, what to do under it, how to leave */
+        fs_msg("LOW BATTERY", 70, RGB(222, 58, 58));
+        text_c(120, vc(&FONT_B, 104, 30), &FONT_B, "(PLUG YOUR DEVICE)", C_WHITE);
+        text_c(120, vc(&FONT_B, 172, 30), &FONT_B, "PRESS HOME TO EXIT", C_SLBLUE);
         return;
     }
     if (kind == 4) {                                  /* wip433: TRIG %: the value as big as it fits, the step under it */
@@ -9634,6 +9828,7 @@ void ui_frame(void)
 {
     uint32_t i;
     midi_queue_run();                                  /* wip385: first, so the remote keys are in this frame's input() */
+    batt_update();                                     /* wip605 */
     input();
     if (ui.preset_pend && !seq.playing && !seq.req_stop) {   /* the preset chosen while playing: the sequencer has stopped, load it */
         int id = ui.preset_pend - 1;
@@ -9692,6 +9887,8 @@ void ui_frame(void)
 
 void ui_input_only(void) { input(); }
 int ui_dirty(void) { return ui.dirty != 0; }
+int ui_lowbatt(void) { return ui.lowbatt != 0; }
+int ui_msmode(void) { return ui.msmode; }
 void ui_say(const char *a, const char *b) { say(a, b); }
 void ui_warn(const char *a, const char *b) { warn(a, b); }
 

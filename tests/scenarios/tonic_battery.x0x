@@ -1,0 +1,40 @@
+# wip605: the BATTERY indicator (top right of the header, 3 stages) and the LOW BATTERY full screen: stage 1 = the screen, only HOME leaves it
+# (keys, PLAY, knobs are not heard), it comes back only after the battery has been up again; USB power = blue, no message; going up waits 3 s.
+wait 300
+batt 3
+wait 100
+shot b3.png
+batt 2
+wait 100
+shot b2.png
+expect lowbatt 0
+batt 1
+wait 200
+expect lowbatt 1
+shot low.png
+tapkey w0
+tap PLAY
+turn K1 3
+wait 100
+expect lowbatt 1
+expect playing 0
+tap HOME
+wait 100
+expect lowbatt 0
+shot b1.png
+wait 400
+expect lowbatt 0
+batt 4
+wait 100
+shot usb.png
+batt 1
+wait 100
+expect lowbatt 1
+tap HOME
+wait 50
+batt 2
+wait 500
+shot b2still.png
+batt 3
+wait 3500
+shot b3again.png

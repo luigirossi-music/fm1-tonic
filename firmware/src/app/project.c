@@ -767,6 +767,7 @@ void project_apply_io(void)
     seq.send_clock = proj.set.clk_out;
     seq.send_notes = proj.set.notes_out;
     engine_cc_cfg(proj.set.cc_mode, proj.set.cc_base);   /* wip386: CC MODE / CC CH BASE */
+    seq.gacc = (proj.set.gacc >= 1 && proj.set.gacc <= 10) ? (uint8_t)(proj.set.gacc * 10) : 30;   /* wip616: GLOBAL ACCENT +1..+10, default +3 */
     engine_remote_ch(proj.set.midi_ch[4] >= 1 && proj.set.midi_ch[4] <= 16 ? proj.set.midi_ch[4] - 1 : -1);   /* wip385: midi_ch[4] = the REMOTE PANEL's channel (never written by older firmware: 0 = OFF) */
     for (p = 0; p < NTRACKS; p++) {
         int v = proj.set.midi_ch[p];

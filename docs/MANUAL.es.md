@@ -9,21 +9,21 @@ Inspirado en Microtonic VST de Sonic Charge, FM1 TONIC es un sintetizador de bat
 - Sintetizador de batería de 8 voces: cada track tiene su propio oscillator, pitch mod, noise, mix, EQ y distorsión.
 - Level y pan por track, y reverb send y delay send por track (más low cut y high cut en el engine Enhanced).
 - Engine Enhanced o Classic (Classic = solo los ajustes básicos de sonido, sin los extras de FM1 TONIC).
-- Randomizer de track: un sonido nuevo al azar para el track seleccionado.
+- Randomizer de track: un sonido nuevo al azar para el track seleccionado, o para los 8 tracks a la vez (RANDOM ALL VOICES).
 - Choke groups (por ejemplo hi-hat cerrado y abierto).
-- Compresor sidechain: cualquier track puede hacer duck a los demás.
+- Compresor sidechain: una pista (la entrada, por ejemplo el kick) hace duck a las pistas que elijas, con un threshold de 0 dB hasta -INF.
 
 **Secuenciador**
 
 - Secuenciador de 64 steps, 16 patterns por proyecto. Longitud fija de 8, 16, 32 o 64 steps, o longitud libre de 1 a 64.
-- Song mode.
-- Accent global y accent por track, fill con retrig (2x, 4x, 8x) y trig % (chance) en cada step.
+- Song mode: compases con repeticiones (x1 a x8 o LOOP), que se editan en la pantalla SONG.
+- Accent global (+1 a +10) y accent por track, fill con retrig (2x, 4x, 8x) y trig % (chance) en cada step.
 - Parameter lock (limitado: 3 knobs por track en cada pattern).
 - Record automation (limitado: 3 knobs por track).
 - Grabación en vivo, quantized o unquantized. Swing, quantization y tempo.
 - Teclado (ARP): toca un track como un teclado y graba las notas en los steps (un piano roll).
 - Copiar y pegar un pattern, un track, y un pattern al vuelo mientras suena la canción.
-- Mute y solo.
+- Mute y solo (en PERFORM y en el mixer de GLO; el modo se queda activado al salir de la página).
 - Undo y redo.
 
 **Mezcla e interpretación**
@@ -32,6 +32,7 @@ Inspirado en Microtonic VST de Sonic Charge, FM1 TONIC es un sintetizador de bat
 - Compresor master.
 - Página Performance: 2 efectos master (reverb y delay), un low cut y ALL FX OFF.
 - Página Memory: cuánta memoria del proyecto está ocupada.
+- Indicador de batería (tres niveles, arriba a la derecha) y un aviso LOW BATTERY a pantalla completa.
 
 **Proyectos y guardado**
 
@@ -60,7 +61,7 @@ Inspirado en Microtonic VST de Sonic Charge, FM1 TONIC es un sintetizador de bat
 - **Knobs.** MASTER es el volumen. SELECT cambia de página (en una lista: arriba y abajo). PRESETS elige uno de los 40 presets. KNOB 1 a 4 ajustan los cuatro valores de la página que se ve en la pantalla (el que giras se muestra más grande). ALGORITHM pasa a una segunda página o elige una voz, según la página (las tablas de páginas lo indican). Un pequeño triángulo azul en una esquina inferior de la pantalla significa que hay una segunda página detrás de ALGORITHM: triángulo derecho = gira ALGORITHM a la derecha, triángulo izquierdo = gíralo a la izquierda para volver.
 - **Teclas negras.** 1 a 8 son TRACK 1 a 8, 9 es ACCENT, 10 es FILL, 11 es FUNC.
 - **Teclas blancas 1 a 16** son los 16 steps de la pista seleccionada. Un pattern puede tener hasta 64 steps, que se muestran de 16 en 16 (ver SEQ).
-- **OCT- / OCT+** suben o bajan una octava el tono de la pista seleccionada (en ARP: la octava del teclado). En una pregunta, OCT+ = YES, OCT- = NO.
+- **OCT- / OCT+** suben o bajan una octava el tono de la pista seleccionada (en ARP: la octava del teclado). En una pregunta, OCT+ = YES, OCT- = NO. En la pantalla SONG: OCT- borra la línea, OCT+ añade una línea.
 
 ### Contenido
 
@@ -69,6 +70,7 @@ Inspirado en Microtonic VST de Sonic Charge, FM1 TONIC es un sintetizador de bat
 3. Páginas, botón por botón {#s3}
   - Combinaciones de botones
 4. Tocar {#s4}
+  - Hoja rápida del modo song
 5. Presets y guardado {#s5}
 6. Luces, MIDI y USB {#s6}
 7. Instalar, copia de seguridad, recuperación {#s7}
@@ -100,16 +102,16 @@ Inspirado en Microtonic VST de Sonic Charge, FM1 TONIC es un sintetizador de bat
 | GLO + ACCENT / GLO + FILL | Deshacer / rehacer (en cualquier página). |
 | REC + PLAY, luego teclas y knobs | Grabación en vivo: las teclas negras 1 a 8 escriben trigs, los knobs escriben automatización (3 knobs por pista). |
 | PLAY | Inicia y detiene el pattern. |
-| OCT- / OCT+ | El tono de la pista una octava abajo / arriba. En una pregunta: NO / YES. |
+| OCT- / OCT+ | El tono de la pista una octava abajo / arriba. En una pregunta: NO / YES. En la pantalla SONG: OCT- borra la línea, OCT+ añade una línea. |
 
-Excepciones: en PERFORM, MUTE / SOLO y en la página de patterns las teclas negras son botones de mute; en ARP todas las teclas son teclas de teclado. Están todas en la lista siguiente.
+Excepciones: en PERFORM, MUTE / SOLO, en la página de patterns y en el mixer GLO las teclas negras son botones de mute; en ARP todas las teclas son teclas de teclado. Están todas en la lista siguiente.
 
 **Donde las teclas hacen otra cosa.** Las teclas del panel (teclas negras 1 a 8 = pistas, ACCENT, FILL, FUNC, teclas blancas 1 a 16 = steps) y los atajos de arriba valen en todas las páginas de este manual, salvo en las páginas de esta lista, donde las teclas tienen otra función:
 
 | Página | Qué hacen las teclas ahí |
 |---|---|
 | **ARP** | Todas las teclas, blancas y negras, son teclas de teclado que tocan la voz seleccionada. |
-| **PERFORM, MUTE / SOLO, PATTERN** (SEQ, 2ª pulsación) | Las teclas negras 1 a 8 son botones de mute (botones de solo en modo SOLO), no seleccionan la pista. Las teclas blancas 1 a 16 eligen el siguiente pattern. FUNC y FILL, con un toque, cambian entre el modo MUTE y el modo SOLO. |
+| **PERFORM, MUTE / SOLO, PATTERN** (SEQ, 2ª pulsación), **MIXER GLO** | Las teclas negras 1 a 8 son botones de mute (botones de solo en modo SOLO), no seleccionan la pista. Las teclas blancas 1 a 16 eligen el siguiente pattern. FUNC y FILL, con un toque, cambian entre el modo MUTE y el modo SOLO. |
 | **DUCK** (SENDS, ALGORITHM a la derecha) | Las teclas negras 1 a 8 eligen qué pistas reciben el duck. |
 | **CHOKE** (EDIT, ALGORITHM a la derecha) | Las teclas negras 1 a 8 eligen qué pistas están en el grupo choke. |
 | **Pantallas SONG y PATTERNS** (modo song) | Las teclas blancas 1 a 16 escriben un pattern en el compás. FILL borra el compás. |
@@ -121,11 +123,12 @@ Excepciones: en PERFORM, MUTE / SOLO y en la página de patterns las teclas negr
 | Página | Teclas | Qué hace |
 |---|---|---|
 | Páginas de sonido: MIX 1, SEL, ENV, LFO, EDIT, VEL | Tecla blanca mantenida + knob 1 a 4 | **P-lock**: ese step recibe su propio valor del knob. Tecla blanca mantenida + SAVE + el mismo knob lo quita. Una pista guarda 3 knobs con p-lock por pattern. |
-| Todas las páginas menos PERFORM, HOME, SONG, COMP y las listas | Tecla blanca mantenida + SELECT | La **chance** de ese step: de 5 a 100 %, luego 1:2, 2:2, 1:3 ... 8:8. |
+| Todas las páginas menos PERFORM, el mixer GLO, HOME, SONG, COMP y las listas | Tecla blanca mantenida + SELECT | La **chance** de ese step: de 5 a 100 %, luego 1:2, 2:2, 1:3 ... 8:8. |
 | ENV | OCT- / OCT+ | La frecuencia del oscilador una octava abajo / arriba. |
 | EDIT | {r:FUNC + knob 2}, {r:FUNC, toque en EDIT}, EDIT o LFO mantenido + {r:FUNC + ACCENT / FILL / PLAY} | Entra / sale del grupo choke; DELETE AUTOMATION?; copia / pega / reinicia esta página de la pista. |
 | SEQ | Knobs, SELECT, ALGORITHM, {o:FILL + SEQ} | Ver la tabla de SEQ en el capítulo 3. |
 | GLO > VEL | {r:FUNC + knob 4} | Un sonido aleatorio nuevo para la pista seleccionada. |
+| SEL | {r:FUNC + knob 4} | Un sonido aleatorio nuevo para TODAS las pistas. |
 | GLOBAL (HOME, 3ª pulsación) | Knob 4 (o HOME mantenido + SELECT) | El tempo. |
 
 ## 2. Ruta de la señal
@@ -147,14 +150,14 @@ Pulsar = MIX 1 → PERFORM → MIX 1. Mantener (medio segundo) = REVERB. Desde l
 | Página | Knob 1 · 2 · 3 · 4 | También en esta página |
 |---|---|---|
 | **MIX 1** (1ª pulsación) | mix OSC / NOISE · EQ FREQ (20 Hz-20 kHz) · DIST · EQ GAIN (64 = plano) | Tecla blanca mantenida + knob: p-lock. SAVE + knob: olvida ese lock o motion. |
-| **PERFORM** (2ª pulsación) | REVERB D/W · DELAY D/W (0-100 %, 0 al encender) · MASTER LOW CUT (20-663 Hz) · ALL FX (derecha activado, izquierda desactivado) | El número grande es el pattern que suena. SELECT: las páginas FX siguientes (se detiene en los extremos). ALGORITHM a la derecha: MUTE / SOLO. Teclas negras 1 a 8: mute. Teclas blancas 1 a 16: siguiente pattern. {r:FUNC toque}: modo MUTE, o quita todos los mutes. {o:FILL toque}: modo SOLO, o quita todos los solos. Sin p-locks. |
+| **PERFORM** (2ª pulsación) | REVERB D/W · DELAY D/W (0-100 %, 0 al encender) · MASTER LOW CUT (20-663 Hz) · ALL FX (derecha activado, izquierda desactivado) | El número grande es el pattern que suena. Cuando hay un pattern en cola, una caja morada que dice PATTERN n (el que viene) parpadea encima. SELECT: las páginas FX siguientes (se detiene en los extremos). ALGORITHM a la derecha: MUTE / SOLO. Teclas negras 1 a 8: mute. Teclas blancas 1 a 16: siguiente pattern (en modo song no hacen nada: manda la song, y la caja morada muestra el siguiente compás de la song). {r:FUNC toque}: modo MUTE, o quita todos los mutes. {o:FILL toque}: modo SOLO, o quita todos los solos. Sin p-locks. |
 | **MUTE / SOLO** (PERFORM, ALGORITHM a la derecha) | igual que PERFORM | Ocho cajas en lugar del número: azul = la pista suena. Las teclas negras 1 a 8 hacen mute (modo MUTE) o añaden / quitan un solo (modo SOLO, varios a la vez). ALGORITHM a la izquierda: volver. |
 | **REVERB** (mantener FX) | DECAY · TONE | ALGORITHM a la derecha: REVERB 2. |
 | **REVERB 2** | LOW CUT (de lo que entra en la reverb) · RETURN (nivel en la mezcla) | ALGORITHM a la izquierda: volver. |
 | **DELAY** (mantener también HOME) | TIME (1/32 ... 1/2, con valores T y con puntillo) · FEEDBACK · TONE · TAPE (el primer octavo = digital limpio, luego cinta con más desgaste) | ALGORITHM a la derecha: DELAY 2. |
 | **DELAY 2** | LOW CUT · RETURN · PING-PONG (off / on) | ALGORITHM a la izquierda: volver. |
 
-ALL FX en off silencia los dos sends D/W de PERFORM y el low cut master; los sends propios de las pistas siguen funcionando. Los mutes y solos los comparten PERFORM y MUTE / SOLO; los solos no se guardan y terminan al cargar un preset. Las páginas de efectos son globales (todas las pistas las comparten): SELECT recorre PERFORM, REVERB, DELAY, REVERB 2, DELAY 2.
+ALL FX en off silencia los dos sends D/W de PERFORM y el low cut master; los sends propios de las pistas siguen funcionando. Los mutes y solos los comparten PERFORM y MUTE / SOLO; los solos no se guardan y terminan al cargar un preset. El modo que elegiste (MUTE o SOLO) se queda al salir de la página y volver. En las teclas negras una pista en mute parpadea y una pista en solo parpadea más rápido; la tecla blanca del pattern que suena parpadea despacio; las teclas no destellan con cada golpe en PERFORM, en la página de patterns ni en el mixer de GLO. Las páginas de efectos son globales (todas las pistas las comparten): SELECT recorre PERFORM, REVERB, DELAY, REVERB 2, DELAY 2.
 
 ### HOME
 
@@ -163,11 +166,11 @@ Pulsar = MIX 2 → SENDS → GLOBAL → MIX 2. Mantener = DELAY.
 | Página | Knob 1 · 2 · 3 · 4 | También en esta página |
 |---|---|---|
 | **MIX 2** | LEVEL · PAN · LOW CUT (20-663 Hz, nunca apagado) · HIGH CUT (de 20 kHz a 1 kHz) | Los dos cuts están en gris en classic. |
-| **SENDS** | REVERB SEND · DELAY SEND · SIDECHAIN THRESHOLD (funciona como el threshold del compresor: todo a la derecha = 100 % = nada hace duck, gíralo a la izquierda para más duck) · SIDECHAIN INPUT (pista 1 a 8, número grande) | ALGORITHM a la derecha: la pantalla DUCK (abajo). Los sends funcionan diga lo que diga el D/W de PERFORM y ALL FX. |
+| **SENDS** | REVERB SEND · DELAY SEND · SIDECHAIN THRESHOLD (en dB, como el de un compresor: todo a la derecha = 0.0 dB = nada hace duck, hacia la izquierda baja hasta -59 dB, y el último paso a la izquierda es -INF) · SIDECHAIN INPUT (pista 1 a 8, número grande) | ALGORITHM a la derecha: la pantalla DUCK (abajo). Los sends funcionan diga lo que diga el D/W de PERFORM y ALL FX. |
 | **DUCK** (SENDS, ALGORITHM a la derecha) | - | Teclas negras 1 a 8: azul = con duck, gris = sin duck, morado = la entrada. La entrada no puede recibir duck. No se hace duck a nada hasta que eliges. ALGORITHM a la izquierda o HOME: volver. |
 | **GLOBAL** | QUANTIZATION (1/8 ... 1/32) · SWING · FILL RATE (2x, 4x, 8x) · TEMPO | - |
 
-El duck sigue el sonido de la pista de entrada (un kick largo hace duck largo; una entrada en mute no hace duck) y también hace duck a los sends de las pistas. Un punto rojo marca una pista con duck, un punto morado la entrada; el punto sigue la pista de entrada en cada golpe, sea cual sea el threshold (con el knob todo a la derecha nada hace duck y el punto queda oscuro). Un solo sidechain para todas las pistas, guardado con el preset.
+El sidechain es un compresor con una entrada lateral: escucha la pista de entrada y baja las pistas con duck mientras la entrada suena más fuerte que el threshold (fijo: ratio 4:1, soft knee, attack 1 ms, release 30 ms). Un kick largo hace duck largo; una entrada en mute no hace duck; los sends de las pistas también reciben el duck. Un kick normal empieza a hacer duck hacia -10 dB y fuerte de -25 dB hacia abajo, así que casi todo el trabajo se hace en los tres cuartos izquierdos del knob; en -INF todo lo que toca la entrada hace el máximo duck que puede el compresor. Un punto rojo marca una pista con duck, un punto morado la entrada; el punto sigue el duck real (con el knob todo a la derecha nada hace duck y el punto queda oscuro). Un solo sidechain para todas las pistas, guardado con el preset (un preset hecho con una versión anterior conserva sus números pero suena distinto: el valor antiguo era una profundidad, ahora es un threshold).
 
 ### SEL, ENV, LFO, EDIT (las páginas de la voz)
 
@@ -175,7 +178,7 @@ Las cuatro son páginas de pista: en ellas funcionan los p-locks y la chance.
 
 | Botón | Knob 1 · 2 · 3 · 4 | También en esta página |
 |---|---|---|
-| **SEL** PITCH MOD | SHAPE (DECAY, SINE, RANDOM) · AMOUNT (64 = nada) · RATE · - | |
+| **SEL** PITCH MOD | SHAPE (DECAY, SINE, RANDOM) · AMOUNT (64 = nada) · RATE · RANDOM ALL | FUNC + knob 4 (el botón morado): un sonido aleatorio nuevo para LAS 8 pistas, igual de seguro que el aleatorio de una pista (el nivel y el pan se quedan, la distorsión nunca llega al máximo). El knob 4 solo muestra un recordatorio. Sin deshacer. |
 | **ENV** OSCILLATOR | WAVE (SINE, TRI, SAW) · FREQUENCY (20 Hz-20 kHz) · ATTACK · DECAY | OCT- / OCT+ mueven la frecuencia una octava. |
 | **LFO** NOISE FILTER | MODE (LP, BP, HP) · Q · FREQUENCY · - | |
 | **EDIT** NOISE ENVELOPE | MODE (EXP, LIN, CLAP) · botón CHOKE · ATTACK · DECAY | {r:FUNC + knob 2 a la derecha}: la pista entra en el choke group; a la izquierda: sale. El knob 2 solo muestra un mensaje. ALGORITHM a la derecha: la pantalla CHOKE. {r:FUNC, toque en EDIT}: ¿DELETE AUTOMATION? (OCT+ sí, OCT- no). |
@@ -190,7 +193,7 @@ Pulsar = VEL → MIXER → COMP → MEMORY → SETTINGS → VEL.
 | Página | Knob 1 · 2 · 3 · 4 | También en esta página |
 |---|---|---|
 | **VEL** | OSC · NOISE · PITCH MOD (cuánto mueve la velocity a cada uno) · RANDOM | {r:FUNC + knob 4}: la pista seleccionada recibe un sonido aleatorio nuevo (solo los 21 ajustes de sonido). El knob 4 solo muestra un recordatorio. Página de pista: los p-locks funcionan. |
-| **MIXER** | LEVEL de las cuatro pistas mostradas | Ocho sliders altos; SELECT cambia entre las pistas 1 a 4 / 5 a 8 y, como dice la pista azul en pantalla, alterna level / pan (pan centro = rojo). Las teclas negras 1 a 8 eligen una pista y su grupo. Un golpe ilumina su slider. {r:FUNC + tecla negra 1 a 8}: mute. Un punto rojo bajo un slider = con duck, morado = entrada del sidechain. Aquí funciona la chance. |
+| **MIXER** | LEVEL de las cuatro pistas mostradas | Ocho sliders altos; SELECT cambia entre las pistas 1 a 4 / 5 a 8 y, como dice la pista azul en pantalla, alterna level / pan (pan centro = rojo). Un golpe ilumina su slider. Las teclas son las de PERFORM: {r:FUNC toque}: modo MUTE, o quitar todos los mutes; {o:FILL toque}: modo SOLO, o borrar todos los solos; las teclas negras 1 a 8 silencian (modo MUTE) o ponen en solo (modo SOLO) esa pista, y una pista que el solo silencia se ve gris; teclas blancas 1 a 16: siguiente pattern (no en modo song). Un punto rojo bajo un slider = con duck, morado = entrada del sidechain. |
 | **COMP** | ATTACK · RELEASE · THRESHOLD · MAKE-UP | Compresor master, ratio 4:1, una aguja muestra la reducción de ganancia. Por defecto: nada comprimido (0.0 dB / 0.0 dB). Solo SAVE lo guarda. |
 | **MEMORY** | - | Una batería muestra cuánta memoria del proyecto está ocupada (patterns, song, motion, notas de ARP). Morado desde el 90 %, FULL al 100 %: entonces se rechaza el guardado. |
 | **SETTINGS** | lista (SELECT mueve) | Filas: clock out, notes out, canal MIDI de Tonic, output level, USB audio, key light, 4/4 LED, tema de color, zoom knob (yes / no), Tonic Engine, name projects, save, autosave, clear pattern, factory reset, performance, cores, about, battery. Las que no son obvias se explican justo debajo. Los cambios se guardan solos más o menos un segundo y medio después de que dejes de tocar (el secuenciador debe estar parado). |
@@ -203,6 +206,7 @@ Los ajustes están en la lista de GLO (SELECT sube y baja, ALGORITHM cambia el v
 |---|---|---|
 | **OUTPUT** | NORMAL / **LOUD** | LOUD (el ajuste de fábrica) hace que las salidas del FM-1 suenen 6 dB más fuertes (el fondo de escala del códec). NORMAL deja 6 dB de margen: úsalo si el sonido es demasiado fuerte y vigila el compresor y el limiter. |
 | **USB AUDIO** | **FOLLOWS KNOB** / FULL | FOLLOWS KNOB: el ordenador recibe lo que oyen los auriculares, después del knob MASTER. FULL: el ordenador recibe siempre el nivel completo y MASTER solo cambia las salidas propias del FM-1 (altavoz, auriculares, line out). Usa FULL para grabar a nivel completo y seguir monitorizando bajito. |
+| **GLOBAL ACCENT** | **+3**, de +1 a +10 | Qué tan fuerte es el acento de la fila de acento TOTAL (la pista AC en SEQ): +10 = completo (cada pista que suena en ese paso va a velocity máxima), +3 = tres décimas del refuerzo sobre un paso normal, +1 = una décima. El acento propio de una pista sigue siendo completo. Se guarda con el proyecto. |
 | **4/4 LED** | OFF / **ON** | ON (el ajuste de fábrica): las teclas blancas 1, 5, 9 y 13 brillan débilmente para marcar los cuatro tiempos del compás (no en PERFORM). |
 | **ZOOM KNOB** | **YES** / NO | YES: el knob que giras se agranda sobre la pantalla. NO: solo se resalta, así toda la página sigue visible. La pantalla SONG nunca hace zoom. |
 | **NAME PROJECTS** | **GENERATE** / MANUAL | GENERATE inventa el nombre de un proyecto guardado (ALGORITHM = otro). MANUAL: la pantalla de nombre es un editor de letras (ver capítulo 5). |
@@ -214,7 +218,7 @@ Los ajustes están en la lista de GLO (SELECT sube y baja, ALGORITHM cambia el v
 | Página | Knob 1 · 2 · 3 · 4 | También en esta página |
 |---|---|---|
 | **SEQ** (1ª pulsación) | FIXED LEN (8, 16, 32, 64) · AUTOSCROLL · FREE LEN (1 a 64) · SWING | Teclas blancas: los steps. SELECT: las páginas de steps (de 16 en 16; AUTOSCROLL off): la página (1-16, 17-32 ...) aparece grande en el tercer knob un momento y luego el knob vuelve a ser FREE LEN. La página nunca se queda en steps que no existen: si el loop se acorta por debajo de la página en que estabas, vuelve a la última página que tiene la longitud. ALGORITHM: la voz (1 a 8, luego AC = el accent global). Mantén un step + ACCENT / FILL: flags (accent = azul oscuro, fill = amarillo, ambos = verde). {r:FUNC + SEQ}: modo song on / off (confirma con OCT+). {o:FILL + SEQ}: la pantalla SONG. |
-| **PATTERN** (SEQ, 2ª pulsación) | SONG ON / OFF | Teclas negras 1 a 8: mute; teclas blancas 1 a 16: eligen el siguiente pattern. Tecla apagada = pattern vacío, luz tenue = tiene notas, parpadeo lento = el actual, parpadeo rápido = el siguiente (en cola). {r:FUNC toque} y {o:FILL toque} como en PERFORM. SEQ otra vez: volver. |
+| **PATTERN** (SEQ, 2ª pulsación) | SONG ON / OFF | Teclas negras 1 a 8: mute; teclas blancas 1 a 16: eligen el siguiente pattern (no en modo song). Tecla apagada = pattern vacío, luz tenue = tiene notas, parpadeo lento = el actual, parpadeo rápido = el siguiente (en cola). {r:FUNC toque} y {o:FILL toque} como en PERFORM. SEQ otra vez: volver. |
 | **ARP** | FIXED LEN · OCTAVE (también OCT- / OCT+, -3 a +3) · PAGE (1-16, 17-32 ...) · - | La pantalla SEQ, pero todas las teclas (blancas y negras) tocan la voz seleccionada como un teclado. Las teclas C (tenues) tocan el pitch propio de la voz en la octava 0. ALGORITHM: la voz. SELECT: las páginas de steps, mostradas en el tercer knob. No se graba nada. SEQ: volver. {r:FUNC + ARP}: borra la song (¿DELETE SONG?). Tecla negra 11 mantenida + PLAY: borra el pattern (¿CLEAR PATTERN?), PLAY no arranca entonces. |
 
 Alargar un pattern copia lo que hay en la parte nueva (de 8 a 16 copia los steps 1 a 8 en el 9 a 16); acortarlo solo lo acorta.
@@ -256,6 +260,7 @@ Todas las combinaciones de botones y teclas, agrupadas por el botón que mantien
 | {r:FUNC + OCT- / OCT+} | Nada. | |
 | {r:FUNC + knob 2 (gira a la derecha / izquierda)} | La pista seleccionada entra / sale del grupo choke. | Solo EDIT, página NOISE ENVELOPE |
 | {r:FUNC + knob 4} | Un sonido aleatorio nuevo para la pista seleccionada. | Solo GLO > VEL |
+| {r:FUNC + knob 4} | Un sonido aleatorio nuevo para TODAS las pistas. | Solo SEL (PITCH MOD) |
 
 **FILL mantenido (tecla negra 10)**
 
@@ -317,7 +322,7 @@ Todas las combinaciones de botones y teclas, agrupadas por el botón que mantien
 | Teclas | Qué hace | Dónde |
 |---|---|---|
 | Tecla blanca mantenida + knob 1 a 4 | **P-lock**: ese step recibe su propio valor del knob (3 knobs con lock por pista y pattern). | Páginas de sonido: MIX 1, SEL, ENV, LFO, EDIT, VEL |
-| Tecla blanca mantenida + SELECT | La chance de ese step: de 5 a 100 %, luego 1:2, 2:2, 1:3 ... 8:8. | Todas las páginas menos PERFORM, HOME, SONG, COMP y las listas |
+| Tecla blanca mantenida + SELECT | La chance de ese step: de 5 a 100 %, luego 1:2, 2:2, 1:3 ... 8:8. | Todas las páginas menos PERFORM, el mixer GLO, HOME, SONG, COMP y las listas |
 | Tecla blanca mantenida + ACCENT / FILL | Flag de accent / fill. | Ver ACCENT y FILL arriba |
 
 **Transporte y otros**
@@ -325,7 +330,7 @@ Todas las combinaciones de botones y teclas, agrupadas por el botón que mantien
 | Teclas | Qué hace | Dónde |
 |---|---|---|
 | REC + PLAY, luego teclas y knobs | Grabación en vivo: las teclas negras 1 a 8 escriben trigs, los knobs escriben automatización. | No en PERFORM ni en la página de patterns |
-| OCT- / OCT+ | El tono de la pista seleccionada una octava abajo / arriba. En una pregunta: NO / YES. En ARP: la octava del teclado. | Todas las páginas |
+| OCT- / OCT+ | El tono de la pista seleccionada una octava abajo / arriba. En una pregunta: NO / YES. En ARP: la octava del teclado. En la pantalla SONG: OCT- borra la línea, OCT+ añade una línea. | Todas las páginas |
 | Un botón mantenido solo (cerca de un segundo) | Una tarjeta dice qué hace el botón en esta página, con sus combinaciones. | Todos los botones salvo FX y HOME |
 
 ## 4. Tocar
@@ -336,7 +341,18 @@ Todas las combinaciones de botones y teclas, agrupadas por el botón que mantien
 - **Mute y solo.** {r:FUNC + tecla negra 1 a 8} hace mute (otra vez = unmute). {o:FILL + tecla negra 1 a 8} deja sola esa pista (otra tecla mueve el solo, la misma tecla lo termina). Los solos no se guardan y terminan al cargar un preset. No en ARP.
 - **P-locks y chance.** Mantén una tecla blanca y gira un knob en una página de voz: ese step recibe su propio valor, todos los demás steps conservan el sonido. Mientras suena, lo oyes la próxima vez que pasa el step. Para quitar uno: mantén el step, mantén SAVE, gira el mismo knob. Una pista guarda 3 knobs con lock por pattern (la pantalla dice MAX 3 PER TRACK, MOTION FULL cuando no queda sitio). Mantén un step y gira SELECT: su chance, bajando desde 100 % de 5 en 5 %, luego 1:2, 2:2, 1:3 ... 8:8. Mientras giras, la chance ocupa toda la pantalla (TRIG % y el step), grande, para leerla de un vistazo.
 - **Chains.** Un pattern puede marcarse para pasar al siguiente cuando termina (después del pattern 8 viene el 1). Un flag solo cuenta en un pattern con notas. Un preset con chains se carga sonando a través de ellas (SONG ON); el knob 1 de la página de patterns de SEQ lo apaga y el pattern se repite en bucle.
-- **Modo song.** {r:FUNC + SEQ}, confirma con OCT+ (OCT- = volver). Si aún no hay song, se abre la pantalla PATTERNS: las teclas blancas 1 a 16 añaden patterns, OCT- (o FUNC + una tecla blanca) quita el último, OCT+ es OK. PLAY toca un compás por pattern, en bucle. El mismo gesto sale del modo song. En la **pantalla SONG** (una fila por compás) el knob 1 = el compás, el knob 2 = su pattern, el knob 3 = repeticiones (x1 a x8); las teclas blancas escriben un pattern en el compás del cursor y avanzan; FILL, pulsado y soltado, borra el compás al instante (borrar el último compás = se borra la song y termina el modo song). {r:FUNC + ARP} borra la song entera.
+- **Modo song.** {r:FUNC + SEQ}, confirma con OCT+ (OCT- = volver). Si aún no hay song, se abre la pantalla PATTERNS: las teclas blancas 1 a 16 añaden patterns, OCT- (o FUNC + una tecla blanca) quita el último, OCT+ es OK. PLAY toca un compás por pattern, en bucle. El mismo gesto sale del modo song. En la **pantalla SONG** (una fila por compás) el knob 1 = el compás, el knob 2 = su pattern, el knob 3 = repeticiones (x1 a x8, luego LOOP = hasta que pares); girar ALGORITHM mueve el compás como el knob 1; las teclas blancas escriben un pattern en el compás del cursor y avanzan (iluminada = el pattern tiene notas, apagada = vacío, la del compás del cursor parpadea); en PERFORM una caja morada que parpadea dice PATTERN n = el pattern que la song toca al final de este compás (las teclas blancas no hacen nada en modo song); OCT+ añade una línea después del cursor; OCT- o FILL (pulsado y soltado) borra la línea al instante (borrar el último compás = se borra la song y termina el modo song). {r:FUNC + ARP} borra la song entera.
+
+#### Hoja rápida del modo song
+
+| QUÉ | BOTONES |
+|---|---|
+| **MODO SONG: ENTRAR** | {r:FUNC + SEQ} (luego OCT+ = sí) |
+| **MODO SONG: SALIR** | {r:FUNC + SEQ} de nuevo (luego OCT+ = sí) |
+| **MODO SONG: EDITAR** | {o:FILL + SEQ} |
+| **EN EDITAR SONG: AÑADIR UNA FILA** | **OCT+** |
+| **EN EDITAR SONG: BORRAR UNA FILA** | **OCT-** |
+| **MODO SONG: BORRAR LA SONG** | {r:FUNC + ARP} (luego OCT+ = sí) |
 
 ## 5. Presets y guardado
 
@@ -351,7 +367,8 @@ Gira **PRESETS** por los 40 lugares: del 01 al 08 son presets de fábrica, del 0
 
 ## 6. Luces, MIDI y USB
 
-- **Luces.** PLAY se enciende en cada 4º step (rojo mientras graba). REC: apagado cuando no graba; fijo cuando está parado (quantized) y parpadeando con el pulso mientras suena; dos parpadeos rápidos y uno lento para unquantized. El botón de la página actual está encendido. Las teclas blancas muestran los steps de la pista seleccionada (el step que suena se invierte); 1, 5, 9 y 13 pueden brillar débilmente (GLO > 4/4 LED). Teclas negras 1 a 8: la pista seleccionada brillante (parpadea si está en mute), las pistas con notas tenues, y mientras suena la tecla de una pista parpadea en cada uno de sus golpes (no en ARP). Con FUNC mantenido las teclas muestran qué patterns y pistas tienen notas.
+- **Luces.** PLAY se enciende en cada 4º step (rojo mientras graba). REC: apagado cuando no graba; fijo cuando está parado (quantized) y parpadeando con el pulso mientras suena; dos parpadeos rápidos y uno lento para unquantized. El botón de la página actual está encendido. Las teclas blancas muestran los steps de la pista seleccionada (el step que suena se invierte); 1, 5, 9 y 13 pueden brillar débilmente (GLO > 4/4 LED). Teclas negras 1 a 8: la pista seleccionada brillante (parpadea si está en mute), las pistas con notas tenues, y mientras suena la tecla de una pista parpadea en cada uno de sus golpes (no en ARP, PERFORM, la página de patterns ni el mixer de GLO, donde las teclas negras muestran mute y solo y quedan fijas). Con FUNC mantenido las teclas muestran qué patterns y pistas tienen notas; la tecla del pattern que suena parpadea despacio, la de una pista en mute más rápido y la de una pista en solo lo más rápido (por el reloj, así que siguen parejas pase lo que pase en la pantalla). En la pantalla SONG las teclas blancas muestran los patterns (iluminado = tiene notas, apagado = vacío).
+- **Batería.** La esquina superior derecha de la pantalla muestra la batería en tres niveles: 3 segmentos verdes = llena, 2 ámbar, 1 = un segmento rojo que parpadea (casi vacía); 3 segmentos azules = alimentada por USB. El nivel baja de inmediato y solo sube después de mantenerse 3 segundos. Cuando cae al nivel 1 aparece un mensaje a pantalla completa **LOW BATTERY (PLUG YOUR DEVICE)**: enchufa, o pulsa **HOME** para cerrarlo. La música sigue sonando debajo, y hasta que pulses HOME no se oyen las teclas, los botones ni los knobs. Solo vuelve después de que la batería haya estado más alta otra vez (o en USB) y caiga de nuevo al nivel 1.
 - **MIDI.** Por USB o por el TRS MIDI IN, el canal 10 por defecto toca las voces con notas de batería General MIDI en el orden de las voces: 36, 38, 41, 45, 50, 37, 39, 42, 46, 49, 51 (velocity = volumen). Se sigue un clock entrante; Start, Stop y Continue controlan el pattern. Ajustes de GLO: TONIC MIDI CH (u OFF), REMOTE MIDI CH (u OFF, ver abajo), CC MODE y CC CH BASE (control changes, ver abajo), CLOCK OUT (clock y start / stop), NOTES OUT (el pattern como notas).
 - **Panel remoto.** GLO > REMOTE MIDI CH (OFF por defecto) hace que un segundo canal MIDI toque las teclas propias del FM-1. Las 27 teclas del panel son las 27 notas de F3 a G5 (notas MIDI 53 a 79, do central = 60), dispuestas como un teclado de piano: la primera tecla, F3, es la nota 53, la última, G5, es la nota 79. Un note on pulsa la tecla, un note off la suelta, así que una nota larga mantiene la tecla pulsada. Todo lo que hace una tecla en el panel funciona igual: las teclas negras 1 a 8 seleccionan o silencian las pistas, las teclas blancas 1 a 16 son los steps o los patterns, y las teclas negras 9, 10 y 11 son ACCENT (nota 73), FILL (nota 75) y FUNC (nota 78). Un acorde vale en cualquier orden de notas: ACCENT, FILL y FUNC se aplican siempre primero, así que FUNC + ACCENT + una tecla blanca funciona cuando las tres notas llegan juntas. All Notes Off (controlador 123) suelta todas las teclas. Las notas del canal remoto no tocan las voces; dale un canal distinto de TONIC MIDI CH. Las notas fuera de 53 a 79 se ignoran.
 
@@ -515,7 +532,7 @@ Los sends salen después de los cuts y del sidechain, antes del pan, y funcionan
 Compartido por todas las pistas:
 
 - **Choke group** (EDIT, ALGORITHM a la derecha): un golpe de una pista del grupo detiene a las demás al instante (el hi-hat cerrado detiene al abierto).
-- **Sidechain** (HOME, 2ª pulsación): una pista de entrada hace que las pistas que elijas en la pantalla DUCK bajen mientras ella suena; el knob de threshold funciona como el del compresor: todo a la derecha = off, a la izquierda hace más duck.
+- **Sidechain** (HOME, 2ª pulsación): una pista de entrada hace que las pistas que elijas en la pantalla DUCK bajen mientras ella suena; es un compresor con entrada lateral; el knob de threshold (SENDS, knob 3) va de 0.0 dB (todo a la derecha = off) hasta -59 dB, y luego -INF.
 - **Low cut master** (PERFORM · knob 3, 20 a 663 Hz): un low cut sobre toda la mezcla, antes del compresor.
 - **Compresor** (GLO · COMP): 4:1, soft knee, attack de 0,1 a 100 ms, release de 10 a 1500 ms, threshold de -48 a 0 dB, make-up de 0 a 24 dB. Un limiter después mantiene la salida por debajo del fondo de escala.
 - **Reverb** (mantener FX): decay, tone, low cut, nivel de return; una sala granulada de los primeros tiempos del digital. **Delay** (mantener HOME): tiempo sincronizado con el tempo (1/32 a 1/2), feedback, tone, TAPE (digital limpio a cinta gastada), low cut, return, ping-pong.

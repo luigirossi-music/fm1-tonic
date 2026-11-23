@@ -42,6 +42,18 @@ static float rms(const float *x, int a, int b)
 }
 static int bad;
 #define CHECK(c, ...) do { if (!(c)) { printf("FAIL: " __VA_ARGS__); printf("\n"); bad = 1; } } while (0)
+static float deepest(tonic_t *t, int sc_int)             /* wip619: the deepest bass dip (ratio to the unducked bass) in the first 40 ms of the kick, at this threshold (stored 0..127 = 0 .. -59 dB, 127 = -INF); the kick is a normal one: about -12 dBFS RMS */
+{
+    static float rf[N];
+    float q, m = 9.0f;
+    int k;
+    setup(t, 20000); tonic_trigger(t, 1, 127); run(t, 4800); tonic_trigger(t, 0, 127); run(t, N); memcpy(rf, r, sizeof r);
+    setup(t, 20000); tonic_trigger(t, 1, 127); run(t, 4800); tonic_trigger(t, 0, 127);
+    tonic_set_sidechain(t, 0, sc_int, 2);
+    run(t, N);
+    for (k = 0; k < 1920; k += 240) { q = rms(r, k, k + 240) / rms(rf, k, k + 240); if (q < m) m = q; }
+    return m;
+}
 int main(void)
 {
     static tonic_t t, u;
@@ -73,7 +85,7 @@ int main(void)
     tonic_trigger(&t, 1, 127);
     run(&t, 4800);
     tonic_trigger(&t, 0, 127);
-    tonic_set_sidechain(&t, 0, 127, 2);
+    tonic_set_sidechain(&t, 0, 100, 2);   /* -46.8 dB */
     run(&t, N);
     duck_rms = 9.0f;                                   /* the deepest 5 ms window in the first 40 ms of the kick */
     for (k = 0; k < 1920; k += 240) { float q = rms(r, k, k + 240) / rms(r_free, k, k + 240); if (q < duck_rms) duck_rms = q; }
@@ -81,6 +93,15 @@ int main(void)
     printf("  the bass at the deepest = %.2f of its level, 0.4 s later %.2f\n", duck_rms, after_rms);
     CHECK(duck_rms < 0.6f, "the bass is not ducked enough while the kick sounds (%.2f)", duck_rms);
     CHECK(after_rms > 0.95f, "the bass does not come back (%.2f)", after_rms);
+    /* wip619: THE THRESHOLD: the lower (the more to the left, the higher the stored value) the deeper the duck; 0 dB = nothing, 4:1 compressor */
+    {
+        float d8 = deepest(&t, 8), d40 = deepest(&t, 40), d80 = deepest(&t, 80), d127 = deepest(&t, 127);
+        printf("  threshold: -3.7 dB dips to %.2f, -18.7 dB %.2f, -37.5 dB %.2f, -INF %.2f of the bass\n", d8, d40, d80, d127);
+        CHECK(d8 >= d40 && d40 > d80 && d80 > d127, "the duck does not deepen with the threshold going down");
+        CHECK(d80 < 0.6f, "-37.5 dB does not duck a normal kick (about -12 dBFS RMS) clearly (%.2f)", d80);
+        CHECK(d127 < 0.35f, "-INF does not duck hard enough (%.2f)", d127);
+        CHECK(deepest(&t, 0) == 1.0f, "threshold 0 dB (off) ducked");
+    }
     /* the duck is as long as the kick: how many ms the bass stays under 70 % of its level */
     {
         int kd[2] = {2000, 50000}, w, ms[2];
@@ -94,13 +115,14 @@ int main(void)
             tonic_trigger(&t, 1, 127);
             run(&t, 4800);
             tonic_trigger(&t, 0, 127);
-            tonic_set_sidechain(&t, 0, 127, 2);
+            tonic_set_sidechain(&t, 0, 100, 2);   /* -46.8 dB */
             run(&t, N);
             ms[w] = 0;
             for (k = 0; k + 480 <= N; k += 480)
                 if (rms(r, k, k + 480) < 0.7f * rms(r_free, k, k + 480)) ms[w] = (k + 480) / 48;
             printf("  kick decay %d: the bass is ducked for ~%d ms\n", kd[w], ms[w]);
         }
+        CHECK(ms[0] >= 25 && ms[0] <= 200, "wip619: a short kick: the duck lasts the kick plus the 30 ms release, about 25-200 ms (%d)", ms[0]);
         dur_short = (float)ms[0]; dur_long = (float)ms[1];
         CHECK(dur_long > 2.0f * dur_short, "a long kick does not duck longer (%.0f vs %.0f ms)", dur_long, dur_short);
     }
@@ -114,7 +136,7 @@ int main(void)
     CHECK(!memcmp(l, l_free, sizeof l) && !memcmp(r, r_free, sizeof r), "a voice outside the mask (or the input) was ducked");
     /* a silent input (not played) does not duck */
     setup(&t, 3000);
-    tonic_set_sidechain(&t, 0, 127, 2);
+    tonic_set_sidechain(&t, 0, 100, 2);   /* -46.8 dB */
     tonic_trigger(&t, 1, 127);
     run(&t, 4800);
     run(&t, N);

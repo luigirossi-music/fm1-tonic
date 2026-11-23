@@ -8,7 +8,7 @@ tap GLO
 tap GLO
 tap GLO
 tap GLO
-turn SELECT 14
+turn SELECT 15
 turn ALGO 1
 expect namemanual 1
 tap HOME

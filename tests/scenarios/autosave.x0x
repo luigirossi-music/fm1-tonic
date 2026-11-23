@@ -39,7 +39,7 @@ tap GLO   # wip130: mixer, COMP, then the settings list
 tap GLO
 tap GLO
 tap GLO   # wip267: ...then MEMORY, then the settings list
-turn SELECT 13
+turn SELECT 14
 turn ALGO -1
 tap HOME
 wait 5000
@@ -58,7 +58,7 @@ tap GLO
 tap GLO
 tap GLO
 tap GLO
-turn SELECT 11
+turn SELECT 12
 turn ALGO -1
 expect zoomoff 1
 wait 1000

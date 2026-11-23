@@ -1,0 +1,38 @@
+# wip625: SONG MODE on the PERFORM page: the white keys do not change the pattern, the purple PATTERN n box shows the song's next bar; both skins; and without song mode a white key still cues
+wait 300
+tapkey w0
+key b10 down
+tapkey w2
+key b10 up
+tapkey w0
+key b10 down
+tap SEQ
+key b10 up
+tap OCT+
+tapkey w0
+tapkey w2
+tap OCT+
+expect songlen 2
+expect songmode 1
+tap PLAY
+wait 100
+expect patcur 1
+expect songnext 3
+tap FX
+tap FX
+wait 100
+expect fxpage 0
+palette 0
+wait 100
+shot perfsong_old_a.png
+palette 6
+wait 100
+shot perfsong_skin_a.png
+wait 130
+shot perfsong_skin_b.png
+tapkey w5
+wait 50
+expect songnext 3
+expect patcur 1
+echo ---LEDs: PERFORM in song mode (1 and 3 have notes)
+leds

@@ -1,0 +1,198 @@
+# wip613: LED dump while playing: SEQ (hit flash expected) vs PERFORM, mute, solo and the GLO mixer (black keys steady; muted = slow blink; solo = fast blink). Read the dumps, no expects but mutes 0 / fxpage 0 / view 3
+wait 300
+tapkey w0
+tapkey w2
+tapkey w4
+tapkey w6
+tapkey w8
+tapkey w10
+tapkey w12
+tapkey w14
+tapkey b1
+tapkey w0
+tapkey w4
+tapkey w8
+tapkey w12
+tapkey b0
+expect mutes 0
+tap PLAY
+wait 100
+echo ---SEQ page (flash expected)
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+tap FX
+tap FX
+expect fxpage 0
+echo ---PERFORM plain
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+tapkey b3
+wait 50
+echo ---PERFORM mute track4 (b3)
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+tapkey b3
+tapkey b9
+tapkey b4
+wait 50
+echo ---PERFORM solo track5
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+tapkey b4
+tapkey b9
+tap GLO
+tap GLO
+expect view 3
+echo ---GLO mixer plain
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30
+leds
+wait 30

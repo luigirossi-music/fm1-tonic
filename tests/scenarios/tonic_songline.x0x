@@ -1,0 +1,46 @@
+# wip608: SONG screen: OCT+ adds a line after the cursor (the same patterns), OCT- deletes the line; K3 REPEAT x1..x8 then LOOP (the bar plays until stopped)
+wait 300
+key b10 down
+tap SEQ
+key b10 up
+tap OCT+
+tapkey w0
+tapkey w1
+tap OCT+
+expect songlen 2
+expect songmode 1
+expect view 5
+# the cursor is on bar 1 (index 0): OCT+ adds a line after it, a copy of bar 1
+tap OCT+
+expect songlen 3
+expect songbar2.1 1
+expect songbar3.1 2
+shot songline_1.png
+# OCT- deletes the line on the cursor (the new one): back to 2 bars
+tap OCT-
+expect songlen 2
+expect songbar2.1 2
+# K3 up past x8 = LOOP (mute bit 4 = 16, plus the repeat bits)
+turn K3 9 60
+expect songbar2.5 240
+shot songline_2.png
+# the loop flag is not copied by OCT+
+tap OCT+
+expect songlen 3
+expect songbar3.5 0
+tap OCT-
+expect songlen 2
+# the cursor is on END after deleting the last line: back to bar 2
+turn K1 -1 100
+# PLAY from bar 2 (LOOP): it never moves on
+tap PLAY
+wait 6000
+expect songpos 2
+expect songlen 2
+tap PLAY
+wait 200
+# K3 back below LOOP: x8, no loop flag
+wait 300
+expect playing 0
+turn K3 -1 200
+expect songbar2.5 224

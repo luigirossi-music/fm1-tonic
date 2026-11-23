@@ -63,6 +63,7 @@ static inline void prob_cond(int k, int *a, int *b)
     *a = k + 1;
     *b = n;
 }
+#define SONG_LOOP(b) (((b)->mute >> 4) & 1u)   /* wip608: LOOP = the bar plays until stopped: a spare bit of mute (only parts 0-2 exist) */
 #define SONG_REP(b) (((b)->mute >> 5) + 1)    /* a bar plays 1-8 times: mute's bits 5-7 (the parts use 0-4) */
 typedef struct {
     uint8_t pat[NTRACKS];             /* each part's pattern */
@@ -97,6 +98,7 @@ typedef struct {                      /* one part's runtime */
     uint8_t fill_n;                   /* drums: FILL retriggers still to play on this step (0..7: FILL RATE 2x / 4x / 8x) */
     uint16_t fill_mask;               /* ... for which tracks (bit v) */
     uint16_t fill_acc;                /* ... of those, the accented ones */
+    uint16_t fill_gac;                /* wip612: ... of the accented ones, those accented only by the TOTAL row (the GLOBAL ACCENT level applies) */
     uint32_t fill_to;                 /* ... samples to the next one, Q8 */
     uint32_t fill_gap;                /* ... and between them (a quarter of the step), Q8 */
     uint32_t since;                   /* wip311: samples (Q8) since this step fired (UNQUANTIZED REC: how late in the step a hit came) */
@@ -132,12 +134,14 @@ typedef struct {
                                        * the others are silent without touching vmute; not saved */
     volatile uint8_t choke;           /* wip328: the CHOKE group of the Tonic voices (bit v): a hit of one cuts the others; saved in the preset (byte 12), not in the project */
     volatile uint8_t accent_q7;       /* drum velocity of a non-accented hit, of 127 */
+    volatile uint8_t gacc;            /* wip612: GLOBAL ACCENT level 10..100 (0 = 100): the share of the accent boost the total row gives */
     float bpm;                        /* internal tempo (UI writes; read per step) */
     float ext_bpm;                    /* tempo measured from the external clock */
     seq_track_t t[NTRACKS];           /* TRK_DRUM.., TRK_BRK */
     late_t late[NLATE];               /* wip311: the late hits (see late_t) */
     uint16_t late_mask;               /* wip311: Tonic voices (bit v) with a late hit waiting on this step ... */
     uint16_t late_acc;                /* ... of those, the accented ones */
+    uint16_t late_gac;                /* wip612: ... of those, accented only by the TOTAL row */
     uint32_t late_to[NDRUM];          /* ... and the samples (Q8) until each one plays */
     uint32_t clk_to_next;             /* internal: samples to the next MIDI clock, Q8 */
     uint32_t ext_since;               /* samples since the last external clock (tempo estimate) */
@@ -159,6 +163,7 @@ void seq_cue(seq_t *s, int pattern);  /* every part, at the end of the bar (now,
 void seq_cue_part(seq_t *s, int part, int pattern);
 void seq_chain(seq_t *s, int a, int b);
 int seq_cue_of(const seq_t *s, int part);   /* the part's cued pattern, or -1 */
+int seq_song_next(const seq_t *s);             /* wip625: the pattern the song plays next bar, or -1 */
 int seq_part_muted(const seq_t *s, int part);
 
 /* steps of one part's rate, in samples Q8 (no swing) at the current tempo */

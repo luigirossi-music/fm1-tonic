@@ -18,8 +18,11 @@ shot gmix_e.png
 turn SELECT 1
 turn K2 -30 80
 shot gmix_f.png
+# wip607: a black key on the mixer is a mute button now (it no longer picks the group): the page stays
 tapkey b2
-expect sel 2
+expect mutes 1
+tapkey b2
+expect mutes 0
 shot gmix_d.png
 tap GLO
 expect view 4
@@ -31,15 +34,15 @@ tap GLO
 expect view 15   # (wip290: back to the first GLO page, VEL)
 tap GLO
 expect view 3
-expect curpage 3
-turn SELECT 1
 expect curpage 4
 turn SELECT 1
 expect curpage 1
+turn SELECT 1
+expect curpage 2
 shot gmix_levels.png
 turn SELECT -1
-expect curpage 4
+expect curpage 1
 shot gmix_wrap_left.png
 turn SELECT -1
-expect curpage 3
+expect curpage 4
 shot gmix_pans.png
