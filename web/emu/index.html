@@ -241,14 +241,14 @@ a.upbtn { text-decoration: none; display: inline-block; }
 </style>
 </head>
 <body>
-<div class="uover" id="nover" hidden><div class="upop" role="dialog" aria-modal="true" aria-labelledby="nptitle"><div class="upop-bar"><span id="nptitle">WHAT&#39;S NEW</span><button type="button" id="nopx" aria-label="Back to the panel">&#x2715;</button></div><div class="upop-body"><p><b>What&#39;s new in version 1.8c</b></p><ul><li><b class="ut">Battery indicator</b><span class="ud">three stages in the top right corner of the screen (3 green = full, 2 amber, 1 = one red segment blinking, blue = on USB power). At the last stage a full-screen LOW BATTERY warning appears: plug your device, and press HOME to close it.</span></li><li><b class="ut">Sidechain is now a real compressor</b><span class="ud">SENDS page (press HOME twice): knob 3 is the THRESHOLD, from 0.0 dB (all the way right, off) down to -59 dB, then -INF at the very end; knob 4 is the INPUT track (the kick). Turn ALGORITHM right on that page to choose which tracks duck. Fixed 4:1, attack 1 ms, release 30 ms, and the dot shows the real duck.</span></li><li><b class="ut">Global accent +1 to +10</b><span class="ud">GLO, press it five times to reach the SETTINGS list, then GLOBAL ACCENT: how strong the accent of the AC track is, from +1 to +10, default +3 (+10 = the old full accent). A track&#39;s own accent stays full.</span></li><li><b class="ut">Random all voices</b><span class="ud">SEL page (first press): the 4th place is a purple RNDM button. Hold FUNC and turn knob 4: a new safe random sound for all 8 tracks at once. Knob 4 alone only shows a reminder.</span></li><li><b class="ut">Mixer mute and solo</b><span class="ud">GLO twice (the mixer): tap FUNC for MUTE mode, tap FILL for SOLO mode, then black keys 1-8 mute or solo the tracks (a track the solo silences turns grey). White keys 1-16 pick the next pattern. Tap FUNC or FILL again to clear all mutes or all solos.</span></li><li><b class="ut">Mute and solo stay on</b><span class="ud">the mode you chose (FUNC = mute, FILL = solo) stays when you leave the page and come back.</span></li><li><b class="ut">Key blinks at the speed you asked for</b><span class="ud">hold FUNC: the key of the playing pattern blinks slowly; a muted track&#39;s key blinks faster and a soloed track&#39;s key the fastest. On PERFORM, the pattern page and the GLO mixer the black keys no longer flash at every hit, so mute and solo are easy to read.</span></li><li><b class="ut">Song screen: LOOP and lines</b><span class="ud">enter song mode with FUNC + SEQ, then OCT+. On the SONG screen knob 3 REPEAT goes from x1 to x8 and then LOOP, which plays that bar until you stop. OCT+ adds a line after the cursor and OCT- deletes the line.</span></li><li><b class="ut">Song screen: ALGORITHM and key lights</b><span class="ud">turn ALGORITHM to move the bar row, like knob 1 (it stops at both ends). The white keys show the patterns: lit = has notes, dark = empty, and the pattern of the bar under the cursor blinks.</span></li><li><b class="ut">PERFORM in song mode</b><span class="ud">press FX twice while the song plays: a purple PATTERN box blinks with the pattern the song plays next, and the big number shows the one playing now. The white keys do nothing in song mode, because the song decides. Outside song mode they cue the next pattern and the same purple box announces it. Same picture in the Grigiotonic skin.</span></li></ul><p><b>What&#39;s new in version 1.8b</b></p><ul><li><b class="ut">SENDS page: cube and circle</b><span class="ud">in the Grigiotonic skin the two faders are gone: a blue cube fills like a liquid for the reverb send, and a blue circle gets more rings, from the middle out, for the delay send. REVERB and DELAY are written under them, and these two knobs no longer zoom.</span></li><li><b class="ut">Sidechain knobs reordered</b><span class="ud">on the SENDS page the third knob is now the sidechain threshold and the fourth the sidechain input, closed together in a blue outline in the Grigiotonic skin.</span></li><li><b class="ut">Footer hints in black</b><span class="ud">in the Grigiotonic skin the hint line at the bottom of every page is now all black, with no blue words.</span></li></ul><p><b>What&#39;s new in version 1.8a</b></p><ul><li><b class="ut">Level and distortion tied in Random</b><span class="ud">the louder a track&#39;s level is, the lower the random distortion goes, so a loud level and a heavy distortion never come together.</span></li><li><b class="ut">Step pages on the third knob</b><span class="ud">turn SELECT on the sequencer and the arp page to see 1-16, 17-32 and so on big on the third knob; a short loop never shows an empty page.</span></li><li><b class="ut">Sidechain threshold like the compressor</b><span class="ud">the sidechain threshold knob now runs like the compressor&#39;s: all the way right is off, turning left ducks more.</span></li></ul><button type="button" class="uback" id="nback">Back to the panel</button></div></div></div>
+<div class="uover" id="nover" hidden><div class="upop" role="dialog" aria-modal="true" aria-labelledby="nptitle"><div class="upop-bar"><span id="nptitle">WHAT&#39;S NEW</span><button type="button" id="nopx" aria-label="Back to the panel">&#x2715;</button></div><div class="upop-body"><p><b>What&#39;s new in version 1.8d</b></p><ul><li><b class="ut">Projects keep patterns 1-16</b><span class="ud">a project you save (SAVE, quick save or rename) now keeps all 16 patterns. Before, only patterns 1-8 were kept and 9-16 came back empty. Older projects and the factory presets load as before.</span></li><li><b class="ut">Clear all patterns</b><span class="ud">hold FUNC and PLAY for 3 seconds: the usual CLEAR PATTERN? appears first, then after 3 seconds it changes to CLEAR ALL PATTERNS? with [OCT-] NO and [OCT+] YES. OCT+ empties every pattern (trigs, accents, fills, notes, microtiming) and keeps your sounds, presets, song and settings. A short tap works as before.</span></li><li><b class="ut">Mixer: solo and audition</b><span class="ud">on the GLO mixer a black key is now SOLO (several at once, FILL clears them all), and FUNC held + a black key 1-8 plays that track so you can hear it, without changing anything. The mixer has no mute any more: mute stays on PERFORM and the pattern page.</span></li><li><b class="ut">Song patterns: see which are empty</b><span class="ud">on the song patterns screen (FUNC + SEQ on an empty song) the white keys 1-16 light up when the pattern has notes and stay dark when it is empty.</span></li><li><b class="ut">30 places</b><span class="ud">the PRESETS knob now turns through 30 places (before: 40). Places 1 and 2 are demo presets; places 3-30 are yours, and you can save over the demos too.</span></li><li><b class="ut">A project keeps its song, knob moves and ARP notes</b><span class="ud">SAVE, quick save and rename now store the song, the recorded knob moves and the per-step ARP notes together with the project, and loading it brings them back. If a project does not fit, the FM-1 shows MEMORY FULL: NOT SAVED and writes nothing.</span></li><li><b class="ut">Back up and restore one file per place</b><span class="ud">on this page, Back up my presets gives one zip with one file per place (01 to 30), the song and notes inside the same file. Restore my presets puts each file back into its place, and Clear all places empties 1-30. Export as .mtpreset works for places 1-30. Old backups numbered 31-40 are skipped with a message.</span></li></ul><p><b>What&#39;s new in version 1.8c</b></p><ul><li><b class="ut">Battery indicator</b><span class="ud">three stages in the top right corner of the screen (3 green = full, 2 amber, 1 = one red segment blinking, blue = on USB power). At the last stage a full-screen LOW BATTERY warning appears: plug your device, and press HOME to close it.</span></li><li><b class="ut">Sidechain is now a real compressor</b><span class="ud">SENDS page (press HOME twice): knob 3 is the THRESHOLD, from 0.0 dB (all the way right, off) down to -59 dB, then -INF at the very end; knob 4 is the INPUT track (the kick). Turn ALGORITHM right on that page to choose which tracks duck. Fixed 4:1, attack 1 ms, release 30 ms, and the dot shows the real duck.</span></li><li><b class="ut">Global accent +1 to +10</b><span class="ud">GLO, press it five times to reach the SETTINGS list, then GLOBAL ACCENT: how strong the accent of the AC track is, from +1 to +10, default +3 (+10 = the old full accent). A track&#39;s own accent stays full.</span></li><li><b class="ut">Random all voices</b><span class="ud">SEL page (first press): the 4th place is a purple RNDM button. Hold FUNC and turn knob 4: a new safe random sound for all 8 tracks at once. Knob 4 alone only shows a reminder.</span></li><li><b class="ut">Mixer mute and solo</b><span class="ud">GLO twice (the mixer): tap FUNC for MUTE mode, tap FILL for SOLO mode, then black keys 1-8 mute or solo the tracks (a track the solo silences turns grey). White keys 1-16 pick the next pattern. Tap FUNC or FILL again to clear all mutes or all solos.</span></li><li><b class="ut">Mute and solo stay on</b><span class="ud">the mode you chose (FUNC = mute, FILL = solo) stays when you leave the page and come back.</span></li><li><b class="ut">Key blinks at the speed you asked for</b><span class="ud">hold FUNC: the key of the playing pattern blinks slowly; a muted track&#39;s key blinks faster and a soloed track&#39;s key the fastest. On PERFORM, the pattern page and the GLO mixer the black keys no longer flash at every hit, so mute and solo are easy to read.</span></li><li><b class="ut">Song screen: LOOP and lines</b><span class="ud">enter song mode with FUNC + SEQ, then OCT+. On the SONG screen knob 3 REPEAT goes from x1 to x8 and then LOOP, which plays that bar until you stop. OCT+ adds a line after the cursor and OCT- deletes the line.</span></li><li><b class="ut">Song screen: ALGORITHM and key lights</b><span class="ud">turn ALGORITHM to move the bar row, like knob 1 (it stops at both ends). The white keys show the patterns: lit = has notes, dark = empty, and the pattern of the bar under the cursor blinks.</span></li><li><b class="ut">PERFORM in song mode</b><span class="ud">press FX twice while the song plays: a purple PATTERN box blinks with the pattern the song plays next, and the big number shows the one playing now. The white keys do nothing in song mode, because the song decides. Outside song mode they cue the next pattern and the same purple box announces it. Same picture in the Grigiotonic skin.</span></li></ul><p><b>What&#39;s new in version 1.8b</b></p><ul><li><b class="ut">SENDS page: cube and circle</b><span class="ud">in the Grigiotonic skin the two faders are gone: a blue cube fills like a liquid for the reverb send, and a blue circle gets more rings, from the middle out, for the delay send. REVERB and DELAY are written under them, and these two knobs no longer zoom.</span></li><li><b class="ut">Sidechain knobs reordered</b><span class="ud">on the SENDS page the third knob is now the sidechain threshold and the fourth the sidechain input, closed together in a blue outline in the Grigiotonic skin.</span></li><li><b class="ut">Footer hints in black</b><span class="ud">in the Grigiotonic skin the hint line at the bottom of every page is now all black, with no blue words.</span></li></ul><p><b>What&#39;s new in version 1.8a</b></p><ul><li><b class="ut">Level and distortion tied in Random</b><span class="ud">the louder a track&#39;s level is, the lower the random distortion goes, so a loud level and a heavy distortion never come together.</span></li><li><b class="ut">Step pages on the third knob</b><span class="ud">turn SELECT on the sequencer and the arp page to see 1-16, 17-32 and so on big on the third knob; a short loop never shows an empty page.</span></li><li><b class="ut">Sidechain threshold like the compressor</b><span class="ud">the sidechain threshold knob now runs like the compressor&#39;s: all the way right is off, turning left ducks more.</span></li></ul><button type="button" class="uback" id="nback">Back to the panel</button></div></div></div>
 <div class="uover" id="uover" hidden><div class="upop" role="dialog" aria-modal="true" aria-labelledby="uptitle"><div class="upop-bar"><span id="uptitle">FUTURE UPDATES</span><button type="button" id="upopx" aria-label="Back to the panel">&#x2715;</button></div><div class="upop-body"><p><b>Coming in future updates</b></p><ul><!--fu--><li><b class="ut">NEROTONIC</b><span class="ud">a dark skin: every colour stays, the labels turn white and the light grey background turns black.</span></li><li><b class="ut">CHORUS</b><span class="ud">a new effect with one amount knob and an animated icon: blue diamonds that open to the left and right as the chorus grows.</span></li><li><b class="ut">Knob zoom: yes / 25 % / no</b><span class="ud">the ZOOM KNOB setting gets a middle choice: 25 % makes the knob you turn only a little bigger instead of filling the screen.</span></li><!--/fu--></ul><button type="button" class="uback" id="uback">Back to the panel</button></div></div></div>
 <main>
 <header>
   <h1><span class="fm">FM1</span> <span class="tn">TONIC</span></h1>
   <p class="insp">Inspired by Microtonic VST by Sonic Charge, FM1 TONIC is an 8-voice drum synthesizer.</p>
   <div class="mtp"><span class="mtp-t">Microtonic &amp; Patternarium Compatible</span><span class="mtp-d">Upload your own Microtonic presets (.mtpreset) to the FM-1, and download more from Patternarium. It works both ways: what you make on the FM1 Tonic can be exported and used in Microtonic too. The sound can be slightly different between the two.</span></div>
-  <div class="hbtns"><button type="button" class="upbtn" id="nbtn" aria-haspopup="dialog">What&#39;s new in 1.8c</button><button type="button" class="upbtn" id="upbtn" aria-haspopup="dialog">Future updates</button><a class="upbtn" href="downloads/FM1-Tonic-manual.html" target="_blank" rel="noopener">User manual <!--mv-->1.8c14<!--/mv--></a></div>
+  <div class="hbtns"><button type="button" class="upbtn" id="nbtn" aria-haspopup="dialog">What&#39;s new in 1.8d</button><button type="button" class="upbtn" id="upbtn" aria-haspopup="dialog">Future updates</button><a class="upbtn" href="downloads/FM1-Tonic-manual.html" target="_blank" rel="noopener">User manual <!--mv-->1.8d2<!--/mv--></a></div>
 </header>
 
 <p class="turn">Press Full screen under the panel: the phone turns sideways and the panel fills the screen.</p>
@@ -318,13 +318,13 @@ a.upbtn { text-decoration: none; display: inline-block; }
 
   <nav class="downloads" aria-label="Downloads">
     <a href="downloads/FM1-Tonic-cheat-sheet.pdf" download>Button combinations cheat sheet (PDF)</a>
-    <a href="downloads/FM1-Tonic-manual.html" target="_blank" rel="noopener">User manual <!--mv-->1.8c14<!--/mv--> (all languages)</a>
-    <a href="downloads/FM1-Tonic-manual.html" download="FM1-Tonic-manual-1.8c14.html">Download the manual <!--mv-->1.8c14<!--/mv--></a>
+    <a href="downloads/FM1-Tonic-manual.html" target="_blank" rel="noopener">User manual <!--mv-->1.8d2<!--/mv--> (all languages)</a>
+    <a href="downloads/FM1-Tonic-manual.html" download="FM1-Tonic-manual-1.8d2.html">Download the manual <!--mv-->1.8d2<!--/mv--></a>
   </nav>
 
 <section class="credits" aria-labelledby="credits-h">
   <h2 id="credits-h">Credits</h2>
-  <p class="note big"><b>FM1 Tonic is made by Luigi Rossi</b>, the developer and creative mind behind this firmware: the Tonic drum machine, its sequencer, screens, presets and the web tools (emulator, installer, backup). It is free software under the GNU General Public License, version 3; if you share the firmware you must share its source code. <a class="dl" href="downloads/FM1-Tonic-manual.html" target="_blank" rel="noopener">User manual <!--mv-->1.8c14<!--/mv--> (all languages)</a> <a class="dl" href="downloads/FM1-Tonic-manual.html" download="FM1-Tonic-manual-1.8c14.html">Download the manual <!--mv-->1.8c14<!--/mv--></a></p>
+  <p class="note big"><b>FM1 Tonic is made by Luigi Rossi</b>, the developer and creative mind behind this firmware: the Tonic drum machine, its sequencer, screens, presets and the web tools (emulator, installer, backup). It is free software under the GNU General Public License, version 3; if you share the firmware you must share its source code. <a class="dl" href="downloads/FM1-Tonic-manual.html" target="_blank" rel="noopener">User manual <!--mv-->1.8d2<!--/mv--> (all languages)</a> <a class="dl" href="downloads/FM1-Tonic-manual.html" download="FM1-Tonic-manual-1.8d2.html">Download the manual <!--mv-->1.8d2<!--/mv--></a></p>
   <p class="note"><b>Luigi Rossi online:</b> <a href="https://linktr.ee/luigirossi" target="_blank" rel="noopener">linktr.ee/luigirossi</a></p>
   <p class="note"><b>With thanks.</b> FM1 Tonic was inspired by <b>Microtonic</b> by <b>Sonic Charge</b>, a drum synthesizer we admire: thank you for the inspiration.</p>
   <p class="note">Presets from <b>Patternarium</b> and Microtonic (.mtpreset) work on the FM-1, and FM1 Tonic presets can be exported back to .mtpreset. Thanks to the Patternarium community for the many presets.</p>
@@ -371,7 +371,7 @@ a.upbtn { text-decoration: none; display: inline-block; }
   <p id="flash-status" role="status">Checking the update file.</p>
   <progress id="pbk-bar" max="100" hidden aria-label="Back up progress"></progress>
   <p id="pbk-status" role="status"></p>
-  <p class="fine">Back Up my Presets downloads one zip with every preset you saved in slots 9-40 (09_name.tnp, 10_name.tnp, and so on).
+  <p class="fine">Back Up my Presets downloads one zip with every preset you saved in places 1-30 (01_name.tnp ... 30_name.tnp, and so on). A place keeps its song, recorded knob moves and ARP notes inside the same file.
     Presets 1-8 are part of the firmware and are not included. Nothing on the FM-1 changes, and it can keep playing.</p>
   <p class="fine">This is custom firmware, version 1.0. The author accepts no responsibility if your FM-1 is damaged or misbehaves because of this
     firmware. If an install fails and the FM-1 no longer starts, recovering it needs a Transporter.
@@ -405,11 +405,11 @@ a.upbtn { text-decoration: none; display: inline-block; }
 <section class="flash" aria-labelledby="xmt-h">
   <h2 id="xmt-h">Export my presets as .mtpreset</h2>
   <p>Reads presets from the FM-1 (USB data cable, Chrome or Edge) and saves them as <b>.mtpreset</b> files, the format of the Patternarium presets.
-    <b>Export all</b> downloads one zip with a file per saved slot (<code>09_name.mtpreset</code>, <code>10_name.mtpreset</code>, and so on);
-    <b>Export one</b> downloads the file of the slot you choose. Nothing on the FM-1 changes, and it can keep playing. Slots 1-8 are part of the firmware and cannot be read from the FM-1.</p>
+    <b>Export all</b> downloads one zip with a file per saved place (<code>01_name.mtpreset</code>, <code>02_name.mtpreset</code>, and so on, places 1-30);
+    <b>Export one</b> downloads the file of the place you choose. Nothing on the FM-1 changes, and it can keep playing. The song and notes of a place are not part of a .mtpreset.</p>
   <p class="fine">A .mtpreset has no place for what the Tonic added, so these are left out: ARP notes, late hits, per-track cuts and sends, compressor, reverb and delay,
     and the muted state. Drum names become &ldquo;Drum n&rdquo;. Only the 8 patterns the FM-1 holds are written. The sounds, tempo, swing and those patterns come across.</p>
-  <p><label>Slot <select id="xmt-slot" aria-label="Slot to export"></select></label></p>
+  <p><label>Place <select id="xmt-slot" aria-label="Place to export"></select></label></p>
   <div class="actions">
     <button id="xmt-all" type="button">Export all as .mtpreset (zip)</button>
     <button id="xmt-one" type="button">Export one as .mtpreset</button>
@@ -422,19 +422,19 @@ a.upbtn { text-decoration: none; display: inline-block; }
   <h2 id="prs-h">Restore my presets</h2>
   <p>Choose what to restore: the zip made by Back up my presets, or <b>.mtpreset</b> files (Patternarium downloads), one or many, or a whole
     folder of them. The page converts the .mtpreset files itself (the same way as the tool that made the factory presets) and shows what it will write
-    into which slot. Each preset in the list has a slot menu (1-40): choose where it goes. A number 9-40 at the start of the file name
-    (<code>09_name.mtpreset</code>) is chosen for you; "first empty" puts it into the first empty slot of the FM-1. Slots 1-8 are the factory presets and cannot be written yet. You confirm, then it sends them to the FM-1 (USB data cable, Chrome or Edge). Each slot it writes replaces what is in that slot now; other
-    slots stay. Press STOP on the FM-1 first: it refuses while playing. A Patternarium preset keeps its 8 sounds, tempo, swing and the first 8 patterns.</p>
+    into which place. Each preset in the list has a place menu (1-30): choose where it goes. A number 1-30 at the start of the file name
+    (<code>09_name.tnp</code>) is chosen for you; "first empty" puts it into the first empty place of the FM-1. A backup file holds one place: the preset and, when it has one, its song and notes. You confirm, then it sends them to the FM-1 (USB data cable, Chrome or Edge). Each place it writes replaces what is in that place now (a file without song and notes also clears the old song and notes there); other
+    places stay. Press STOP on the FM-1 first: it refuses while playing. A Patternarium preset keeps its 8 sounds, tempo, swing and the first 8 patterns.</p>
   <p><label>Files (zip, .tnp, .mtpreset) <input id="prs-file" type="file" multiple accept=".zip,.tnp,.mtpreset" aria-label="Zip, .tnp or .mtpreset files"></label></p>
   <p><label>or a folder <input id="prs-dir" type="file" webkitdirectory multiple aria-label="A folder of .mtpreset or .tnp files"></label></p>
-  <div id="prs-list" hidden aria-label="Presets to upload and their slots"></div>
+  <div id="prs-list" hidden aria-label="Presets to upload and their places"></div>
   <p><button id="prs-go" type="button" disabled>Restore to the FM-1</button></p>
   <progress id="prs-bar" max="100" hidden aria-label="Restore progress"></progress>
   <p id="prs-status" role="status"></p>
-  <h3 id="clr-h">Clear all slots</h3>
-  <p>Empties all 32 user slots (9-40) on the FM-1, to start with a white canvas. It works only after Back up my presets
-    has downloaded a zip on this page, so your presets are safe in a file first. Presets 1-8 stay.</p>
-  <p><button id="clr-go" type="button" disabled>Clear all slots</button></p>
+  <h3 id="clr-h">Clear all places</h3>
+  <p>Empties all 30 places (1-30) on the FM-1, songs and notes included, to start with a white canvas. It works only after Back up my presets
+    has downloaded a zip on this page, so your presets are safe in a file first.</p>
+  <p><button id="clr-go" type="button" disabled>Clear all places</button></p>
   <p id="clr-status" role="status">Back up first: this button is off until a backup was downloaded.</p>
 </section>
 
@@ -674,14 +674,17 @@ const PB = (() => {
     }
   }
 
-  // the 32 user preset slots (9-40; firmware/src/backup.c, cmds 0x44..0x47; tested by tests/host/presets_page_test.mjs)
+  // the user places 1-30 (slots 0..21 = places 9-30, slots 32..39 = places 1-8; firmware/src/backup.c, cmds 0x44..0x47; tested by tests/host/presets_page_test.mjs)
   const PG_REQ = 0x44, PG_LIST = 0x45, PG_DATA = 0x46, PG_END = 0x47, PG_SLOTS = 32;
+  // wip670: places 1-8 are the device's slots 32..39 (list: sub 4); the SECOND SPOT of a place (song, knob moves, ARP notes) = the same requests with bit 0x80 on the slot byte (lists: sub 5 / 6)
+  const PG_X = 0x80;
+  const placeNo = (slot) => (slot >= 32 && slot < 40 ? slot - 31 : slot + 9);   // the number the FM-1 shows (1-30)
   const PG_STATUS = { 1: "the slot is empty or damaged", 2: "the FM-1 could not read its memory", 3: "the FM-1 is busy (another transfer)" };
   // which slots hold a preset -> {mask, lens[32]}; the FM-1 does not answer while it is busy: asked again, 3 times
-  async function presetList(link) {
+  async function presetList(link, ext = false) {
     for (let t = 0; t < 3; t++) {
       link.drain();
-      link.send(frame(PG_REQ, [1, 0]));
+      link.send(frame(PG_REQ, [ext ? 5 : 1, 0]));
       const end = Date.now() + DELAY.first;
       while (Date.now() < end) {
         const pkt = await link.read(end - Date.now());
@@ -696,10 +699,24 @@ const PB = (() => {
     }
     throw fail("stopped", "FM1 Tonic didn't answer. If it is an older firmware without preset backup, install FM1 Tonic again (above).");
   }
-  // one slot's preset (a TNP1 blob), checked: its length and CRC-32 as the FM-1 reports them
-  async function presetGet(link, slot) {
+  // wip670: places 1-8 (slots 32..39): the answer has 17 bytes (u8 mask, 8 x u16 lengths); an older firmware does not answer: null (one try only)
+  async function presetListPlaces(link, ext = false) {
     link.drain();
-    link.send(frame(PG_REQ, [2, slot]));
+    link.send(frame(PG_REQ, [ext ? 6 : 4, 0]));
+    const end = Date.now() + DELAY.first;
+    while (Date.now() < end) {
+      const pkt = await link.read(end - Date.now());
+      if (!pkt) { if (link.lost) throw fail("lost", "The FM-1 was disconnected. Plug it in and try again."); break; }
+      const f = parseFrame(pkt);
+      if (f && f.cmd === PG_LIST && f.body.length === 17) return { mask: f.body[0], lens: Array.from({ length: 8 }, (_, i) => f.body[1 + 2 * i] | f.body[2 + 2 * i] << 8) };
+    }
+    return null;
+  }
+  // one slot's preset (a TNP1 blob), checked: its length and CRC-32 as the FM-1 reports them
+  async function presetGet(link, slot, ext = false) {
+    const wire = slot | (ext ? PG_X : 0), what = ext ? "Song and notes of place " : "Place ";
+    link.drain();
+    link.send(frame(PG_REQ, [2, wire]));
     const got = []; let last = Date.now(), first = true;
     for (;;) {
       const pkt = await link.read(DELAY.poll);
@@ -710,15 +727,15 @@ const PB = (() => {
       }
       const f = parseFrame(pkt);
       if (!f) continue;
-      if (f.cmd === PG_DATA && f.body.length >= 5 && f.body[0] === slot) {
+      if (f.cmd === PG_DATA && f.body.length >= 5 && f.body[0] === wire) {
         last = Date.now(); first = false;
         if (u32(f.body, 1) !== got.length) throw fail("lost", "A piece of a preset went missing on the way. Try again.");
         for (let i = 5; i < f.body.length; i++) got.push(f.body[i]);
-      } else if (f.cmd === PG_END && f.body.length >= 10 && f.body[0] === slot) {
+      } else if (f.cmd === PG_END && f.body.length >= 10 && f.body[0] === wire) {
         const n = u32(f.body, 1), crc = u32(f.body, 5), status = f.body[9];
-        if (status) throw fail("slot" + status, `Slot ${slot + 9}: ${PG_STATUS[status] || "error " + status}.`);
+        if (status) throw fail("slot" + status, `${what}${placeNo(slot)}: ${PG_STATUS[status] || "error " + status}.`);
         const blob = Uint8Array.from(got);
-        if (n !== blob.length || crc !== crc32(blob)) throw fail("lost", `Slot ${slot + 9} arrived damaged. Try again.`);
+        if (n !== blob.length || crc !== crc32(blob)) throw fail("lost", `${what}${placeNo(slot)} arrived damaged. Try again.`);
         return blob;
       }
     }
@@ -730,16 +747,23 @@ const PB = (() => {
     s = s.replace(/[^A-Za-z0-9 _-]+/g, "_").replace(/\s+/g, " ").trim().replace(/^[_ ]+|[_ ]+$/g, "");
     return s || "preset";
   }
-  // every used slot -> [{slot (0..31), number (9..40), name, blob}]
+  // every used place -> [{slot, number (1..30; older firmware: up to 40), name, blob, ext}]: places 1-8 first (slots 32..39, newer firmware), then 9-30;
+  // ext = the place's second spot (song, knob moves, ARP notes; 'TEX2' bytes) or null
   async function presets(link, onProgress = () => {}) {
     const { mask } = await presetList(link);
+    const pl = await presetListPlaces(link);                       // null: an older firmware (no places 1-8, no second spots)
     const slots = [];
+    if (pl) for (let i = 0; i < 8; i++) if (pl.mask >>> i & 1) slots.push(32 + i);
     for (let i = 0; i < PG_SLOTS; i++) if (mask >>> i & 1) slots.push(i);
+    let xmask = 0, xpl = null;
+    if (pl) { xmask = (await presetList(link, true)).mask; xpl = await presetListPlaces(link, true); }
+    const hasExt = (slot) => (slot >= 32 ? !!(xpl && xpl.mask >>> (slot - 32) & 1) : !!(xmask >>> slot & 1));
     const out = [];
     for (const slot of slots) {
       onProgress(out.length, slots.length);
       const blob = await presetGet(link, slot);
-      out.push({ slot, number: slot + 9, name: presetName(blob), blob });
+      const ext = hasExt(slot) ? await presetGet(link, slot, true) : null;
+      out.push({ slot, number: placeNo(slot), name: presetName(blob), blob, ext });
     }
     onProgress(out.length, slots.length);
     return out;
@@ -1064,10 +1088,12 @@ const PB = (() => {
     return L.join("\r\n") + "\r\n";
   }
   // slot 0..31: the FM-1 pulls the blob (answer its reads, twice) and reports -> 0 stored, else its code
-  async function presetPut(link, slot, blob, onEvent = () => {}) {
-    if (!tnpOk(blob)) throw fail("head", "That is not a FM1 Tonic preset (.tnp).");
+  // wip670: ext = true: the place's second spot ('TEX2' bytes, 21..3840) goes to the same slot number with bit 0x80
+  const extOk = (b) => b.length >= 21 && b.length <= 3840 && b[0] === 0x54 && b[1] === 0x45 && b[2] === 0x58 && b[3] === 0x32;
+  async function presetPut(link, slot, blob, onEvent = () => {}, ext = false) {
+    if (ext ? !extOk(blob) : !tnpOk(blob)) throw fail("head", ext ? "That is not a FM1 Tonic song and notes part (TEX2)." : "That is not a FM1 Tonic preset (.tnp).");
     link.drain();
-    link.send(frame(PG_PUT, [slot, ...le32(blob.length), ...le32(crc32(blob))]));
+    link.send(frame(PG_PUT, [slot | (ext ? PG_X : 0), ...le32(blob.length), ...le32(crc32(blob))]));
     let last = Date.now(), idle = DELAY.first, asked = 0;
     for (;;) {
       const pkt = await link.read(DELAY.poll);
@@ -1096,23 +1122,51 @@ const PB = (() => {
     }
   }
   // slot 0..31 cleared -> 0; else a message (playing, failed, no answer). Asked twice: erasing again does no harm.
-  async function presetErase(link, slot) {
+  async function presetErase(link, slot, ext = false) {
+    const wire = slot | (ext ? PG_X : 0);
     for (let t = 0; t < 2; t++) {
       link.drain();
-      link.send(frame(PG_ERASE, [slot]));
+      link.send(frame(PG_ERASE, [wire]));
       const end = Date.now() + DELAY.first;
       while (Date.now() < end) {
         const pkt = await link.read(end - Date.now());
         if (!pkt) { if (link.lost) throw fail("lost", "The FM-1 was disconnected. Plug it in and try again."); break; }
         const f = parseFrame(pkt);
-        if (f && f.cmd === PG_END && f.body.length >= 10 && f.body[0] === slot) {
+        if (f && f.cmd === PG_END && f.body.length >= 10 && f.body[0] === wire) {
           const st = f.body[9];
           if (st === 0) return 0;
-          throw fail("slot" + st, st === 4 ? "FM1 Tonic is playing: press STOP on the FM-1 first." : st === 1 ? `No such slot (${slot + 9}).` : `Clearing slot ${slot + 9} failed.`);
+          throw fail("slot" + st, st === 4 ? "FM1 Tonic is playing: press STOP on the FM-1 first." : st === 1 ? `No such slot (${placeNo(slot)}).` : `Clearing slot ${placeNo(slot)} failed.`);
         }
       }
     }
     throw fail("stopped", "FM1 Tonic didn't answer. If it is an older firmware without preset restore, install FM1 Tonic again (above).");
+  }
+  // wip673: place number (1..30) -> slot (1-8 -> 32..39, 9-30 -> 0..21); anything else -> -1
+  const slotOf = (n) => (n >= 1 && n <= 8 ? 31 + n : n >= 9 && n <= 30 ? n - 9 : -1);
+  // one place of a restore: the preset first, then its second spot (item.ext) or, when the item has none, the old second spot of that place is erased
+  // (newExt = false: an older firmware without second spots: nothing to erase). -> 0 stored, else the FM-1's code of the failed put
+  async function restorePlace(link, slot, item, onEvent = () => {}, newExt = true) {
+    const rc = await presetPut(link, slot, item.blob, onEvent);
+    if (rc) return rc;
+    if (item.ext) {
+      if (!newExt) throw fail("head", `${item.name} has a song and notes part, but this FM-1's firmware cannot take it. Install FM1 Tonic again (above).`);
+      return presetPut(link, slot, item.ext, onEvent, true);
+    }
+    if (newExt) await presetErase(link, slot, true);
+    return 0;
+  }
+  // which slots are filled: [{slot -> true}] as a Set of main-spot slots (0..31 and 32..39) and of second-spot slots, one look at the FM-1
+  async function presetFilled(link) {
+    const { mask } = await presetList(link), pl = await presetListPlaces(link);
+    const main = new Set(), ext = new Set();
+    for (let i = 0; i < PG_SLOTS; i++) if (mask >>> i & 1) main.add(i);
+    if (pl) {
+      for (let i = 0; i < 8; i++) if (pl.mask >>> i & 1) main.add(32 + i);
+      const xm = (await presetList(link, true)).mask, xp = await presetListPlaces(link, true);
+      for (let i = 0; i < PG_SLOTS; i++) if (xm >>> i & 1) ext.add(i);
+      if (xp) for (let i = 0; i < 8; i++) if (xp.mask >>> i & 1) ext.add(32 + i);
+    }
+    return { main, ext, places: !!pl };
   }
   // a .zip (stored or deflate) -> [{name, data}] (folders skipped); throws a plain message on anything else
   async function unzip(bytes) {
@@ -1142,6 +1196,22 @@ const PB = (() => {
     }
     return out;
   }
+  // wip671 / wip672: ONE file per place: NN_name.tnp = the preset (TNP1, its length is the u16 at byte 4) followed by the place's second spot (song, knob moves,
+  // ARP notes: 'TEX2' bytes) when it has one. splitTnp takes such a file apart again; a plain .tnp (no second spot) is the same as before.
+  function splitTnp(b) {
+    if (b.length < 40) return { main: b, ext: null };
+    const n = b[4] | b[5] << 8;
+    if (n >= 40 && n < b.length && extOk(b.subarray(n))) return { main: b.subarray(0, n), ext: b.subarray(n) };
+    return { main: b, ext: null };
+  }
+  function presetBackupFiles(list) {
+    return list.map((p) => {
+      const d = new Uint8Array(p.blob.length + (p.ext ? p.ext.length : 0));
+      d.set(p.blob, 0);
+      if (p.ext) d.set(p.ext, p.blob.length);
+      return { name: `${String(p.number).padStart(2, "0")}_${p.name}.tnp`, data: d };
+    });
+  }
   // zip, .tnp or .mtpreset -> [{number (9..40 or 0 = not in the name), name, blob, notes}] with a reason per skipped file (wip243: .mtpreset is converted here)
   async function presetFiles(fileName, bytes) {
     const items = [], skipped = [];
@@ -1149,10 +1219,11 @@ const PB = (() => {
       const base = nm.split("/").pop();
       if (!base || base[0] === "." || /(^|\/)__MACOSX\//.test(nm)) return;                 // hidden files of a mac zip
       const m = /^(\d{1,2})[_ -]/.exec(base), number = m ? +m[1] : 0;
-      let blob, name, notes = [];
+      let blob, name, notes = [], ext = null;
       if (/\.tnp$/i.test(base)) {
-        if (!tnpOk(data)) { skipped.push(`${base}: not a FM1 Tonic preset`); return; }
-        blob = data; name = presetName(data);
+        const sp = splitTnp(data);
+        if (!tnpOk(sp.main)) { skipped.push(`${base}: not a FM1 Tonic preset`); return; }
+        blob = sp.main; name = presetName(blob); ext = sp.ext;
       } else if (/\.mtpreset$/i.test(base)) {
         try {
           const r = mtpresetToTnp(new TextDecoder().decode(data), base.replace(/\.mtpreset$/i, "").replace(/^\d{1,2}[_ -]/, ""));
@@ -1160,8 +1231,8 @@ const PB = (() => {
         } catch (e) { skipped.push(`${base}: ${(e && e.message) || e}`); return; }
         if (!tnpOk(blob)) { skipped.push(`${base}: the conversion did not give a valid preset`); return; }
       } else { skipped.push(`${base}: not a .tnp or .mtpreset file`); return; }
-      if (m && (number < 9 || number > 40)) { skipped.push(`${base}: the number must be 9 to 40`); return; }
-      items.push({ number, name, file: base, blob, notes });
+      if (m && (number < 1 || number > 30)) { skipped.push(`${base}: the number must be 1 to 30` + (number > 30 && number <= 40 ? " (an old backup: places 31-40 do not exist any more)" : "")); return; }
+      items.push({ number, name, file: base, blob, notes, ext });
     };
     if (/\.zip$/i.test(fileName)) { for (const f of await unzip(bytes)) add(f.name, f.data); }
     else add(fileName, bytes);
@@ -1169,7 +1240,7 @@ const PB = (() => {
   }
 
   return { HS_QUERY, RS_REQ, BU_REQ, BU_END, OK_ADDR, ASK_ADDR, FAIL_ADDR, MAGIC, VERSION, NOBJ, PLAYING, DECLINED, DELAY, ERRORS,
-           pack7, unpack7, crc32, frame, parseFrame, response, parseRequest, parseIdentity, parse, summary, find, backup, restore, presetList, presetGet, presetName, presets, tnpOk, mtpresetToTnp, tnpToMtpreset, presetPut, presetErase, unzip, presetFiles, PUT_ERRORS };
+           pack7, unpack7, crc32, frame, parseFrame, response, parseRequest, parseIdentity, parse, summary, find, backup, restore, presetList, presetListPlaces, placeNo, slotOf, restorePlace, presetFilled, extOk, presetGet, presetName, presets, presetBackupFiles, splitTnp, tnpOk, mtpresetToTnp, tnpToMtpreset, presetPut, presetErase, unzip, presetFiles, PUT_ERRORS };
 })();
 // --- backup protocol: end
 class Link {
@@ -1903,7 +1974,7 @@ $("recv-go").addEventListener("click", async () => {
     recvBusy = false; btn.disabled = false;
   }
 });
-// Back up my presets: the used slots 9-40 from the FM-1 (PB.presets) into one stored zip, NN_name.tnp each.
+// Back up my presets: the used places 1-30 from the FM-1 (PB.presets) into one stored zip, NN_name.tnp each.
 let pbkBusy = false, pbkDone = false, prsBusy = false;
 window.addEventListener("beforeunload", (e) => { if (pbkBusy) { e.preventDefault(); e.returnValue = ""; } });
 $("pbk-go").addEventListener("click", async () => {
@@ -1924,16 +1995,16 @@ $("pbk-go").addEventListener("click", async () => {
       st.textContent = total ? `Receiving presets: ${n} of ${total}.` : "";
       if (total) { bar.max = total; bar.value = n; }
     });
-    if (!list.length) { st.textContent = "No presets saved in slots 9-40 on this FM-1: nothing to back up."; return; }
-    const files = list.map((p) => ({ name: `${String(p.number).padStart(2, "0")}_${p.name}.tnp`, data: p.blob }));
+    if (!list.length) { st.textContent = "No presets saved in places 1-30 on this FM-1: nothing to back up."; return; }
+    const files = PB.presetBackupFiles(list);
     const a = document.createElement("a");
     a.href = URL.createObjectURL(zipStored(files));
     a.download = "fm1-tonic-presets.zip";
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 10000);
     pbkDone = true;
-    $("clr-go").disabled = false; $("clr-status").textContent = "A backup was downloaded: Clear all slots is on. Check the zip first.";
-    st.textContent = `Downloaded fm1-tonic-presets.zip: ${list.length} preset${list.length === 1 ? "" : "s"} (slots ${list.map((p) => p.number).join(", ")}).`;
+    $("clr-go").disabled = false; $("clr-status").textContent = "A backup was downloaded: Clear all places is on. Check the zip first.";
+    st.textContent = `Downloaded fm1-tonic-presets.zip: ${list.length} preset${list.length === 1 ? "" : "s"} (places ${list.map((p) => p.number).join(", ")}), ${list.filter((p) => p.ext).length} with song and notes inside.`;
   } catch (e) {
     st.textContent = (e && e.message) || String(e);
   } finally {
@@ -1942,11 +2013,11 @@ $("pbk-go").addEventListener("click", async () => {
     pbkBusy = false; btn.disabled = false;
   }
 });
-// Export my presets as .mtpreset (wip323): the used slots 9-40 from the FM-1 (PB.presets / PB.presetGet), each turned into a .mtpreset
+// Export my presets as .mtpreset (wip323): the used places 1-30 from the FM-1 (PB.presets / PB.presetGet), each turned into a .mtpreset
 // (PB.tnpToMtpreset) and saved as NN_name.mtpreset: all in one stored zip, or one slot as one file.
 (() => {
   const sel = $("xmt-slot");
-  for (let n = 9; n <= 40; n++) sel.add(new Option(String(n).padStart(2, "0"), String(n)));
+  for (let n = 1; n <= 30; n++) sel.add(new Option(String(n).padStart(2, "0"), String(n)));
   let busy = false;
   function save(blob, name) {
     const a = document.createElement("a");
@@ -1962,16 +2033,16 @@ $("pbk-go").addEventListener("click", async () => {
     busy = true; $("xmt-all").disabled = $("xmt-one").disabled = true;
     let dev = null;
     try {
-      const slot = +sel.value - 9;
+      const slot = PB.slotOf(+sel.value);
       const dev0 = await connectFm1(st); dev = dev0;
       bar.hidden = false; bar.removeAttribute("value");
       if (all) {
-        st.textContent = "Asking the FM-1 which slots hold a preset.";
+        st.textContent = "Asking the FM-1 which places hold a preset.";
         const list = await PB.presets(dev.link, (n, total) => {
           st.textContent = total ? `Receiving presets: ${n} of ${total}.` : "";
           if (total) { bar.max = total; bar.value = n; }
         });
-        if (!list.length) { st.textContent = "No presets saved in slots 9-40 on this FM-1: nothing to export."; return; }
+        if (!list.length) { st.textContent = "No presets saved in places 1-30 on this FM-1: nothing to export."; return; }
         const files = [], skipped = [];
         for (const p of list) {
           try { files.push({ name: fileOf(p.number, p.name), data: textOf(p.blob) }); }
@@ -1982,9 +2053,9 @@ $("pbk-go").addEventListener("click", async () => {
         st.textContent = `Downloaded fm1-tonic-mtpresets.zip: ${files.length} preset${files.length === 1 ? "" : "s"}.` +
           (skipped.length ? ` Not converted: ${skipped.join("; ")}.` : "");
       } else {
-        st.textContent = `Receiving slot ${slot + 9}.`;
+        st.textContent = `Receiving place ${PB.placeNo(slot)}.`;
         const blob = await PB.presetGet(dev.link, slot);
-        const name = fileOf(slot + 9, PB.presetName(blob));
+        const name = fileOf(PB.placeNo(slot), PB.presetName(blob));
         save(new Blob([textOf(blob)], { type: "text/plain" }), name);
         st.textContent = `Downloaded ${name}.`;
       }
@@ -2000,7 +2071,7 @@ $("pbk-go").addEventListener("click", async () => {
   $("xmt-one").addEventListener("click", () => run(false));
 })();
 // Restore my presets: a zip (or one .tnp) -> the slots named in the file names (PB.presetFiles), each put to the FM-1
-// (PB.presetPut), then the FM-1's list checked. Clear all slots: only after a backup was downloaded on this page.
+// (PB.presetPut), then the FM-1's list checked. Clear all places: only after a backup was downloaded on this page.
 let prsItems = [];
 async function connectFm1(st) {
   if (!navigator.requestMIDIAccess) throw new Error("This browser cannot do it. Open the page in Chrome or Edge.");
@@ -2011,15 +2082,15 @@ async function connectFm1(st) {
   return PB.find(access, (i, o) => new Link(i, o));
 }
 
-function prsRender() {                          // one row per preset: its name, notes and a slot menu (first empty, 1-40)
+function prsRender() {                          // one row per preset: its name, notes and a place menu (first empty, 1-30)
   const box = $("prs-list");
   box.textContent = ""; box.hidden = !prsItems.length;
   for (const it of prsItems) {
     const row = document.createElement("div"), lab = document.createElement("span"), sel = document.createElement("select");
-    lab.textContent = `${it.name}${it.notes && it.notes.length ? "  [" + it.notes.join("; ") + "]" : ""}  goes into slot `;
-    sel.setAttribute("aria-label", `Slot for ${it.name}`);
+    lab.textContent = `${it.name}${it.notes && it.notes.length ? "  [" + it.notes.join("; ") + "]" : ""}  goes into place `;
+    sel.setAttribute("aria-label", `Place for ${it.name}`);
     sel.add(new Option("first empty", "0"));
-    for (let n = 1; n <= 40; n++) { const o = new Option(String(n).padStart(2, "0") + (n < 9 ? " (factory, not writable yet)" : ""), String(n)); o.disabled = n < 9; sel.add(o); }
+    for (let n = 1; n <= 30; n++) sel.add(new Option(String(n).padStart(2, "0"), String(n)));
     sel.value = String(it.sel || 0);
     sel.addEventListener("change", () => { it.sel = +sel.value; prsRefresh(); });
     row.append(lab, sel); box.append(row);
@@ -2030,7 +2101,7 @@ function prsRefresh() {
   for (const it of prsItems) if (it.sel) seen.set(it.sel, (seen.get(it.sel) || 0) + 1);
   const dup = [...seen.entries()].filter(([, c]) => c > 1).map(([n]) => n);
   $("prs-go").disabled = prsBusy || !prsItems.length || dup.length > 0;
-  if (dup.length) $("prs-status").textContent = `Two presets want slot ${dup.join(", ")}. Choose a different slot for one of them.`;
+  if (dup.length) $("prs-status").textContent = `Two presets want place ${dup.join(", ")}. Choose a different place for one of them.`;
 }
 async function prsLoad(files, other) {
   const st = $("prs-status");
@@ -2045,7 +2116,7 @@ async function prsLoad(files, other) {
     }
     prsItems.sort((x, y) => (x.number || 99) - (y.number || 99) || x.file.localeCompare(y.file));
     for (const it of prsItems) it.sel = it.number || 0;
-    if (prsItems.length > 32) { skipped.push(`${prsItems.length - 32} more presets than the 32 slots`); prsItems = prsItems.slice(0, 32); }
+    if (prsItems.length > 30) { skipped.push(`${prsItems.length - 30} more presets than the 30 places`); prsItems = prsItems.slice(0, 30); }
     const n = prsItems.length;
     st.textContent = (n ? `${n} preset${n === 1 ? "" : "s"} ready. ` : "No presets found in that. ") + (skipped.length ? `Skipped: ${skipped.join("; ")}.` : "");
   } catch (e) { st.textContent = (e && e.message) || String(e); }
@@ -2078,35 +2149,38 @@ $("prs-go").addEventListener("click", async () => {
   const st = mirror($("prs-status"), $("pb-status"), ["textContent"]), bar = mirror($("prs-bar"), $("pb-bar"), ["hidden", "max", "value"]), btn = $("prs-go");
   const one = prsItems.length === 1, onlyEmpty = prsItems.every((it) => !it.sel);
   $("pb-send").disabled = true;
-  const todo = prsItems.map((it) => ({ ...it, slot: it.sel ? it.sel - 9 : -1 }));
+  const todo = prsItems.map((it) => ({ ...it, slot: it.sel ? PB.slotOf(it.sel) : -1 }));
   prsBusy = true; btn.disabled = true; bar.hidden = false; bar.max = 100; bar.value = 0;
   let dev = null, done = 0, ok = false;
   try {
-    if (todo.some((t) => t.slot < 0)) {          // wip243: files without a number take the first empty slots of the FM-1
+    let filled = null;
+    if (todo.some((t) => t.slot < 0)) {          // files without a number take the first empty places of the FM-1 (place 1 first, then 2 ... 30)
       dev = await connectFm1(st);
-      st.textContent = "Looking for empty slots on the FM-1.";
-      const { mask } = await PB.presetList(dev.link);
+      st.textContent = "Looking for empty places on the FM-1.";
+      filled = await PB.presetFilled(dev.link);
       const taken = new Set(todo.filter((t) => t.slot >= 0).map((t) => t.slot));
-      const free = [];
-      for (let s = 0; s < 32; s++) if (!(mask >>> s & 1) && !taken.has(s)) free.push(s);
+      const order = filled.places ? [...Array(8).keys()].map((i) => 32 + i).concat([...Array(22).keys()]) : [...Array(32).keys()];   // older firmware: no places 1-8
+      const free = order.filter((s) => !filled.main.has(s) && !taken.has(s));
       const need = todo.filter((t) => t.slot < 0);
-      if (need.length > free.length) throw new Error(`${need.length} presets have no slot number but the FM-1 has only ${free.length} empty slot${free.length === 1 ? "" : "s"}. Name some files 09_..., 10_... to choose their slots, or clear slots first.`);
+      if (need.length > free.length) throw new Error(`${need.length} presets have no place number but the FM-1 has only ${free.length} empty place${free.length === 1 ? "" : "s"}. Name some files 01_..., 02_... to choose their places, or clear places first.`);
       need.forEach((t, i) => { t.slot = free[i]; });
     }
-    const names = todo.map((t) => t.slot + 9).join(", ");
-    if (!onlyEmpty && !confirm(`Write ${todo.length} preset${one ? "" : "s"} into slot${one ? "" : "s"} ${names} of the FM-1? What is in ${one ? "that slot" : "those slots"} now is replaced.`)) { st.textContent = "Cancelled. Nothing was written."; return; }
+    const names = todo.map((t) => PB.placeNo(t.slot)).join(", ");
+    if (!onlyEmpty && !confirm(`Write ${todo.length} preset${one ? "" : "s"} into place${one ? "" : "s"} ${names} of the FM-1? What is in ${one ? "that place" : "those places"} now (song and notes too) is replaced.`)) { st.textContent = "Cancelled. Nothing was written."; return; }
     if (!dev) dev = await connectFm1(st);
+    if (!filled) filled = await PB.presetFilled(dev.link);
+    if (todo.some((t) => t.slot >= 32) && !filled.places) throw new Error("This FM-1's firmware has no places 1-8. Install FM1 Tonic again (above), or choose places 9-30.");
     for (const t of todo) {
-      st.textContent = `Sending slot ${t.slot + 9} (${t.name}): ${done} of ${todo.length} done.`;
-      const rc = await PB.presetPut(dev.link, t.slot, t.blob, (ev, pct) => { if (ev === "progress") bar.value = pct; });
-      if (rc) throw new Error(`Slot ${t.slot + 9} (${t.name}) was not written: ${PB.PUT_ERRORS[rc] || "error " + rc}.${done ? ` ${done} slot${done === 1 ? " was" : "s were"} written before.` : ""}`);
+      st.textContent = `Sending place ${PB.placeNo(t.slot)} (${t.name}): ${done} of ${todo.length} done.`;
+      const rc = await PB.restorePlace(dev.link, t.slot, t, (ev, pct) => { if (ev === "progress") bar.value = pct; }, filled.places);
+      if (rc) throw new Error(`Place ${PB.placeNo(t.slot)} (${t.name}) was not written: ${PB.PUT_ERRORS[rc] || "error " + rc}.${done ? ` ${done} place${done === 1 ? " was" : "s were"} written before.` : ""}`);
       done++;
     }
-    st.textContent = "Checking the FM-1's slots.";
-    const { mask } = await PB.presetList(dev.link);
-    const missing = todo.filter((t) => !(mask >>> t.slot & 1));
-    st.textContent = missing.length ? `Sent, but slot${missing.length === 1 ? "" : "s"} ${missing.map((t) => t.slot + 9).join(", ")} did not show up in the FM-1's list. Try again.`
-      : `Restored ${todo.length} preset${one ? "" : "s"} into slot${one ? "" : "s"} ${names}.`;
+    st.textContent = "Checking the FM-1's places.";
+    const after = await PB.presetFilled(dev.link);
+    const missing = todo.filter((t) => !after.main.has(t.slot) || (after.places && !!t.ext !== after.ext.has(t.slot)));
+    st.textContent = missing.length ? `Sent, but place${missing.length === 1 ? "" : "s"} ${missing.map((t) => PB.placeNo(t.slot)).join(", ")} did not show up right in the FM-1's list. Try again.`
+      : `Restored ${todo.length} preset${one ? "" : "s"} into place${one ? "" : "s"} ${names}` + (todo.some((t) => t.ext) ? ` (${todo.filter((t) => t.ext).length} with song and notes).` : ".");
     ok = !missing.length;
   } catch (e) { st.textContent = (e && e.message) || String(e); }
   finally { bar.hidden = true; if (dev) dev.link.close(); prsBusy = false; prsRefresh(); $("pb-send").disabled = ok || !prsItems.length; }
@@ -2115,21 +2189,24 @@ let clrArmed = false;
 $("clr-go").addEventListener("click", async () => {
   if (prsBusy || pbkBusy || recvBusy || !pbkDone) return;
   const st = $("clr-status"), btn = $("clr-go");
-  if (!clrArmed) { clrArmed = true; btn.textContent = "Click again to clear all 32 slots"; st.textContent = "This empties slots 9-40 on the FM-1. Presets 1-8 stay."; return; }
-  clrArmed = false; btn.textContent = "Clear all slots";
+  if (!clrArmed) { clrArmed = true; btn.textContent = "Click again to clear all 30 places"; st.textContent = "This empties places 1-30 on the FM-1, songs and notes too."; return; }
+  clrArmed = false; btn.textContent = "Clear all places";
   prsBusy = true; btn.disabled = true;
   let dev = null;
   try {
     dev = await connectFm1(st);
-    const { mask } = await PB.presetList(dev.link);
+    const f = await PB.presetFilled(dev.link);
     let n = 0;
-    for (let slot = 0; slot < 32; slot++) {
-      if (!(mask >>> slot & 1)) continue;
-      st.textContent = `Clearing slot ${slot + 9}.`;
+    for (const slot of [...f.main].sort((x, y) => PB.placeNo(x) - PB.placeNo(y))) {
+      st.textContent = `Clearing place ${PB.placeNo(slot)}.`;
       await PB.presetErase(dev.link, slot);
       n++;
     }
-    st.textContent = n ? `Cleared ${n} slot${n === 1 ? "" : "s"}. The FM-1 starts with a white canvas.` : "All slots were empty already.";
+    for (const slot of f.ext) {                    // second spots (also of a place whose preset is gone)
+      st.textContent = `Clearing song and notes of place ${PB.placeNo(slot)}.`;
+      await PB.presetErase(dev.link, slot, true);
+    }
+    st.textContent = n || f.ext.size ? `Cleared ${n} place${n === 1 ? "" : "s"}. The FM-1 starts with a white canvas.` : "All places were empty already.";
   } catch (e) { st.textContent = (e && e.message) || String(e); }
   finally { if (dev) dev.link.close(); prsBusy = false; btn.disabled = !pbkDone; prsRefresh(); }
 });

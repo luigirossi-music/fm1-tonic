@@ -106,14 +106,14 @@ expect sound0.3.22 0
 turn PRESET -1
 tap OCT+
 wait 300
-expect presetcur 9
+expect presetcur 3
 expect sound0.0.22 55
 expect sound0.0.23 44
 expect sound0.3.22 66
 turn PRESET 1
 tap OCT+
 wait 300
-expect presetcur 10
+expect presetcur 4
 expect sound0.0.22 11
 expect sound0.0.23 12
 expect sound0.3.22 13

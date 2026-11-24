@@ -60,7 +60,7 @@ tap EDIT
 expect chkscreen 0
 expect view 14
 expect choke 33
-# the group is saved in the preset (byte 12): SAVE AS into place 9, go to the empty place 10 (no group), back to 9 (the group is back)
+# the group is saved in the preset (byte 12): SAVE AS into the first empty place (3), go to the empty place 4 (no group), back to 3 (the group is back)
 turn ALGO 1 80
 wait 200
 tapkey b1
@@ -70,14 +70,14 @@ tap SAVE
 tap OCT+
 tap OCT+
 tap OCT+
-expect presetcur 9
+expect presetcur 3
 turn PRESET 1
 tap OCT+
 wait 100
-expect presetcur 10
+expect presetcur 4
 expect choke 0
 turn PRESET -1
 tap OCT+
 wait 100
-expect presetcur 9
+expect presetcur 3
 expect choke 35

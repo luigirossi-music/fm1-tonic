@@ -92,6 +92,10 @@ static int in_store(uint32_t off, uint32_t n)     /* the six objects' sectors, t
     }
     if (off >= ST_PRESET_BASE && off + n <= ST_PRESET_BASE + ST_PRESET_N * ST_SECTOR)   /* the user preset slots */
         return 1;
+    if (off >= ST_PRESET2_BASE && off + n <= ST_PRESET2_BASE + 8u * ST_SECTOR)   /* wip668: places 1-8 (slots 32..39) */
+        return 1;
+    if ((off >= ST_EXT_BASE_A && off + n <= ST_EXT_BASE_A + 10u * ST_SECTOR) || (off >= ST_EXT_BASE_B && off + n <= ST_EXT_BASE_B + 20u * ST_SECTOR))   /* wip669: the second spots */
+        return 1;
     return off >= RS_REC && off + n <= RS_REC + ST_SECTOR;
 }
 
@@ -137,6 +141,7 @@ static int end_seen, end_status, end_flags, gap;
 static uint8_t pg_list_body[4 + 2 * 32], pg_got[4096], pg_got_slot, pg_end_slot, pg_end_status;
 static uint32_t pg_got_n, pg_end_len, pg_end_crc;
 static int pg_list_n, pg_end_n;
+static uint32_t pg_list_len;                          /* wip667: the LIST frame's body length (must stay 4 + 2 x 32: the web page needs 32 entries) */
 static int bu_room(void)                          /* a frame in the ring: full until the next pass; room -1: USB gone */
 {
     return room < 0 ? -1 : room && !frames_this_pass;
@@ -165,6 +170,7 @@ static int bu_send(const uint8_t *p, uint32_t n)
         got_n += len - 4;
     } else if (u[2] == PG_LIST) {
         pg_list_n++;
+        pg_list_len = len;
         memcpy(pg_list_body, u + 6, len < sizeof pg_list_body ? len : sizeof pg_list_body);
     } else if (u[2] == PG_DATA) {
         if (u[6] != pg_got_slot || bu_rd32(u + 7) != pg_got_n || len - 5u > PG_CHUNK)
@@ -503,6 +509,14 @@ int main(int argc, char **argv)
         check("... the lengths", bu_rd16(pg_list_body + 4) == 3840 && bu_rd16(pg_list_body + 4 + 10) == 1 &&
                                  bu_rd16(pg_list_body + 4 + 42) == 777 && bu_rd16(pg_list_body + 4 + 24) == 0 &&
                                  bu_rd16(pg_list_body + 4 + 2) == 0);
+        {   /* wip667: the frame is always 32 entries (the page rejects a shorter one); slots 22..31 are empty, the mask has no bit there */
+            uint32_t z = 1;
+            for (i = ST_PRESET_N; i < 32; i++)
+                if (bu_rd16(pg_list_body + 4 + 2 * i) != 0)
+                    z = 0;
+            check("list: the frame keeps 32 entries (4 + 64 bytes), slots 22..31 are 0 and not in the mask",
+                  pg_list_len == 4u + 2u * 32u && z && (mask >> ST_PRESET_N) == 0);
+        }
         for (i = 0; i < 3; i++) {
             static const int gs[] = {0, 5, 21};
             uint32_t want = lens[i == 0 ? 0 : i == 1 ? 1 : 2];
@@ -544,13 +558,52 @@ int main(int argc, char **argv)
         }
         check("get of an empty slot: status 1", pg_end_n == 1 && pg_end_status == 1 && pg_got_n == 0);
         pg_end_n = 0;
-        pg_start(2, 32);
+        pg_start(2, 22);
         for (passes = 0; passes < 10 && bpg.kind; passes++) {
             frames_this_pass = 0;
             room = 1;
             pg_step();
         }
-        check("get of slot 32 (out of range): status 1", pg_end_n == 1 && pg_end_status == 1);
+        check("get of slot 22 (not a place): status 1", pg_end_n == 1 && pg_end_status == 1);
+        /* wip668: places 1-8 (slots 32..39) over USB: list (sub 4) and get */
+        {
+            static uint8_t ob[1500];
+            uint32_t k;
+            fill(ob, sizeof ob, 77);
+            check("places 1-8: slot 34 (place 3) saved", st_preset_save(34, ob, sizeof ob) == 0);
+            pg_list_n = 0;
+            pg_start(PG_SUB_LISTX, 0);
+            for (passes = 0; passes < 5 && bpg.kind; passes++) {
+                frames_this_pass = 0;
+                room = 1;
+                pg_step();
+            }
+            check("list of places 1-8: one frame of 17 bytes, only place 3 used, its length 1500",
+                  pg_list_n == 1 && pg_list_len == 17u && pg_list_body[0] == (1u << 2) && bu_rd16(pg_list_body + 1 + 4) == 1500 &&
+                  bu_rd16(pg_list_body + 1) == 0);
+            pg_end_n = 0;
+            pg_got_n = 0;
+            pg_got_slot = 34;
+            gap = 0;
+            pg_start(2, 34);
+            for (passes = 0; passes < 100000 && bpg.kind; passes++) {
+                frames_this_pass = 0;
+                room = 1;
+                pg_step();
+            }
+            check("get of slot 34: the blob byte for byte, end frame ok",
+                  pg_end_n == 1 && pg_end_status == 0 && pg_got_n == 1500 && !memcmp(pg_got, ob, 1500) && !gap);
+            pg_end_n = 0;
+            pg_start(2, 40);
+            for (passes = 0; passes < 10 && bpg.kind; passes++) {
+                frames_this_pass = 0;
+                room = 1;
+                pg_step();
+            }
+            check("get of slot 40 (past the places): status 1", pg_end_n == 1 && pg_end_status == 1);
+            k = (uint32_t)preset_erase_rx(34);
+            check("erase slot 34: status 0, the slot empty again", k == 0 && st_preset_load(34, ob, sizeof ob) < 0);
+        }
         /* busy: a backup streaming */
         pg_end_n = 0;
         got_n = 0;
@@ -614,6 +667,50 @@ int main(int argc, char **argv)
               rc == 0 && nnotes == 1 && notes[0] == RS_OK_ADDR);
         check("... slot 3 loads as sent; the other slots untouched",
               st_preset_load(3, t, sizeof t) == 1960 && !memcmp(t, blobs[0], 1960) && OTHERS_OK());
+        SERVE(blobs[0], 1960u);                           /* wip668: a put into place 4 (slot 35) */
+        rc = PUTB(35, blobs[0], 1960u, bu_crc(0, blobs[0], 1960u));
+        check("put: a preset into slot 35 (place 4): stored, loads as sent, slot 3 untouched",
+              rc == 0 && st_preset_load(35, t, sizeof t) == 1960 && !memcmp(t, blobs[0], 1960) && st_preset_load(3, t, sizeof t) == 1960);
+        st_preset_erase(35);
+        {   /* wip669: the second spots over USB (slot byte bit 7) */
+            static uint8_t xb[900], xg[900];
+            uint32_t xi, xz = 1;
+            int xp;
+            fill(xb, sizeof xb, 55);
+            xb[0] = 'T'; xb[1] = 'E'; xb[2] = 'X'; xb[3] = '2';
+            check("second spots: slot 3 and place 3 (slot 34) saved", st_ext_save(3, xb, sizeof xb) == 0 && st_ext_save(34, xb, 300) == 0);
+            pg_list_n = 0;
+            pg_start(PG_SUB_XLIST, 0);
+            for (xp = 0; xp < 5 && bpg.kind; xp++) { frames_this_pass = 0; room = 1; pg_step(); }
+            check("second spots list (sub 5): 68 bytes, only slot 3 used, length 900",
+                  pg_list_n == 1 && pg_list_len == 68u && bu_rd32(pg_list_body) == (1u << 3) && bu_rd16(pg_list_body + 4 + 6) == 900);
+            pg_list_n = 0;
+            pg_start(PG_SUB_XLISTX, 0);
+            for (xp = 0; xp < 5 && bpg.kind; xp++) { frames_this_pass = 0; room = 1; pg_step(); }
+            check("second spots of places 1-8 (sub 6): 17 bytes, only place 3, length 300",
+                  pg_list_n == 1 && pg_list_len == 17u && pg_list_body[0] == (1u << 2) && bu_rd16(pg_list_body + 1 + 4) == 300);
+            pg_end_n = 0; pg_got_n = 0; pg_got_slot = 0x83; gap = 0;
+            pg_start(2, 0x83);
+            for (xp = 0; xp < 100000 && bpg.kind; xp++) { frames_this_pass = 0; room = 1; pg_step(); }
+            check("get of the second spot of slot 3 (0x83): byte for byte, the end frame says 0x83",
+                  pg_end_n == 1 && pg_end_status == 0 && pg_end_slot == 0x83 && pg_got_n == 900 && !memcmp(pg_got, xb, 900) && !gap);
+            SERVE(xb, 900u);
+            rc = PUTB(0x85, xb, 900u, bu_crc(0, xb, 900u));
+            for (xi = 0; xi < 900; xi++) xg[xi] = 0;
+            check("put of a second spot into slot 5 (0x85): stored, the main spot of slot 5 untouched",
+                  rc == 0 && st_ext_load(5, xg, sizeof xg) == 900 && !memcmp(xg, xb, 900) && st_preset_load(5, t, sizeof t) == 1);
+            SERVE(blobs[0], 1960u);
+            rc = PUTB(0x86, blobs[0], 1960u, bu_crc(0, blobs[0], 1960u));
+            check("put of a main blob as a second spot: RS_E_HEAD, nothing written", rc == RS_E_HEAD && st_ext_load(6, xg, sizeof xg) < 0);
+            SERVE(xb, 900u);
+            rc = PUTB(0x80 | 22, xb, 900u, bu_crc(0, xb, 900u));
+            check("put of a second spot into slot 22: RS_E_OBJ", rc == RS_E_OBJ);
+            rc = preset_erase_rx(0x83);
+            for (xi = 0; xi < 1; xi++) xz = (rc == 0 && pg_end_slot == 0x83 && st_ext_load(3, xg, sizeof xg) < 0 && st_preset_load(5, t, sizeof t) == 1);
+            check("erase of the second spot of slot 3: status 0, only that spot gone, the presets untouched", xz);
+            st_ext_erase(5);
+            st_ext_erase(34);
+        }
         playing = 1;
         SERVE(blobs[1], 588u);
         rc = PUTB(3, blobs[1], 588u, bu_crc(0, blobs[1], 588u));
@@ -635,8 +732,8 @@ int main(int argc, char **argv)
         check("put with a head whose total disagrees: RS_E_HEAD, the slot as it was",
               rc == RS_E_HEAD && st_preset_load(3, t, sizeof t) == 1960 && !memcmp(t, blobs[0], 1960));
         SERVE(blobs[1], 588u);
-        rc = PUTB(32, blobs[1], 588u, bu_crc(0, blobs[1], 588u));
-        check("put into slot 32: RS_E_OBJ", rc == RS_E_OBJ);
+        rc = PUTB(22, blobs[1], 588u, bu_crc(0, blobs[1], 588u));
+        check("put into slot 22: RS_E_OBJ", rc == RS_E_OBJ);
         rc = PUTB(3, blobs[1], 100u, bu_crc(0, blobs[1], 100u));
         check("put of 100 bytes: RS_E_SIZE", rc == RS_E_SIZE);
         rc = PUTB(3, blobs[1], 3841u, 0);
@@ -710,8 +807,8 @@ int main(int argc, char **argv)
         check("erase while playing: status 4, the slot kept", rc == 4 && pg_end_status == 4 && st_preset_load(21, t, sizeof t) == 777);
         pg_end_n = 0;
         frames_this_pass = 0;
-        rc = preset_erase_rx(32);
-        check("erase slot 32: status 1", rc == 1 && pg_end_status == 1);
+        rc = preset_erase_rx(22);
+        check("erase slot 22: status 1", rc == 1 && pg_end_status == 1);
         rc = preset_erase_rx(5);
         check("erase of an empty slot: ok again (idempotent)", rc == 0);
         /* put the preset slots back as the later tests expect: slot 5 as it was (1 byte) is not needed again */

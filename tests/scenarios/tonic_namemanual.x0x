@@ -49,13 +49,13 @@ tap OCT-
 expect nmlen 1
 expect nmcand 63
 expect svstage 1
-# a letter, then SAVE saves into the chosen slot (place 9)
+# a letter, then SAVE saves into the chosen slot (the first empty place, 3)
 turn K4 1
 tap OCT+
 expect nmlen 2
 tap SAVE
 expect svstage -1
-expect presetcur 9
+expect presetcur 3
 # wip325: FUNC + HOME = RENAME in MANUAL: RENAME big on top, the letters normal size
 key b10 down
 tap HOME

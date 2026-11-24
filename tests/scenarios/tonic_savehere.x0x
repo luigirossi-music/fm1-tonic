@@ -5,14 +5,14 @@ tap SAVE
 expect svstage 4
 tap HOME
 expect svstage -1
-# SAVE AS into slot 1 (place 9): CHOOSE SLOT, slot, name
+# SAVE AS into the first empty place (3 since wip655; flash slot 34): CHOOSE SLOT, slot, name
 tap SAVE
 tap OCT+
 tap OCT+
 tap OCT+
-expect presetcur 9
-expect slotused0 1
-# a change, then SAVE: SAVE HERE? with place 9
+expect presetcur 3
+expect slotused34 1
+# a change, then SAVE: SAVE HERE? with place 3
 tapkey b1
 key w8 down
 tapkey b8
@@ -30,17 +30,17 @@ expect dirty 1
 tap SAVE
 tap OCT+
 expect svstage -1
-expect presetcur 9
+expect presetcur 3
 expect dirty 0
 turn PRESET 1
 tap OCT+
 wait 100
-expect presetcur 10
+expect presetcur 4
 expect vacc0.1.8 0
 turn PRESET -1
 tap OCT+
 wait 100
-expect presetcur 9
+expect presetcur 3
 expect vacc0.1.8 1
 # NO: CHOOSE SLOT; OCT+ the slot screen; OCT- back; OCT- EXIT SAVE
 tap SAVE
@@ -52,13 +52,7 @@ tap OCT-
 expect svstage 4
 tap OCT-
 expect svstage -1
-# a factory place (1): SAVE HERE? YES saves over itself (override slot), the place stays 1
-turn PRESET -1
-turn PRESET -1
-turn PRESET -1
-turn PRESET -1
-turn PRESET -1
-turn PRESET -1
+# a demo place (1): SAVE HERE? YES saves over itself (override slot), the place stays 1 (two steps back from place 3)
 turn PRESET -1
 turn PRESET -1
 tap OCT+

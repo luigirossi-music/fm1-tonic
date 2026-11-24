@@ -2424,9 +2424,29 @@ static void saveas_open(void)
  * (wip651 had a separate one: the pool headroom check failed, 5172 B < 8192 B) */
 typedef char pbuf_big_enough[(sizeof pbuf >= TNP_SIZE(TNP_NPAT_SAVE) + TNP_FX3_LEN) ? 1 : -1];
 
+/* wip657 (E2b of "a project = 2 spots"): a project is saved into its place as TWO spots: the main one (the TNP1 blob: sounds, patterns 1-16, FX) and the second
+ * one (project_ext_pack: the song, the motion lanes and the ARP notes, lz-packed, plat_ext_*, same slot number). One buffer only (pbuf: the pool has no room for
+ * a second): 1 the second spot is MEASURED first (a size, no buffer): too big = PLACE_FULL and NOTHING is written, the main spot too; 2 the main spot is packed
+ * into pbuf and written; 3 the second spot is packed into the same pbuf and written. A flash code (-3 NO FLASH SPACE, others) comes back as it is. */
+#define PLACE_FULL (-100)
+static int place_save(int slot, const char *name)
+{
+    uint32_t n, mark;
+    int rc;
+    if (!project_ext_pack(0, PLAT_STORE_MAX, 0))
+        return PLACE_FULL;
+    n = project_preset_pack(pbuf, sizeof pbuf, name, (unsigned)(seq.bpm * 10.0f + 0.5f), (unsigned)((seq.vmute & 0xFFu) | ((unsigned)seq.choke << 8)));
+    if (!n)
+        return -1;
+    mark = project_pair_mark(pbuf, n);                 /* wip659: the second spot carries the main spot's CRC: a half-finished save is recognised on load (project_ext_unpack) */
+    if ((rc = plat_preset_save(slot, pbuf, n)) != 0)
+        return rc;
+    n = project_ext_pack(pbuf, PLAT_STORE_MAX, mark);
+    return n ? plat_ext_save(slot, pbuf, n) : PLACE_FULL;
+}
+
 static void saveas_go(void)                            /* OCT+ on the third screen */
 {
-    uint32_t n;
     int rc, slot = ui.sv_here - 1 < NFACT ? PLAT_NPRESET + ui.sv_here - 1 : ui.sv_here - 1 - NFACT, cur = ui.sv_here;   /* wip343: any of the 40 places (1-8: their override slot) */
     if (ui.sv_rename && ui.preset_cur) {               /* wip317: RENAME: the loaded place; 1-8 are written to their override slot (PLAT_NPRESET + n - 1), preset_cur stays */
         int id = ui.preset_cur - 1;
@@ -2434,10 +2454,11 @@ static void saveas_go(void)                            /* OCT+ on the third scre
         cur = ui.preset_cur;
     }
     /* wip317: no STOP FIRST any more: every SAVE works while playing (the flash write may make the sound hiccup) */
-    n = project_preset_pack(pbuf, sizeof pbuf, ui.sv_name, (unsigned)(seq.bpm * 10.0f + 0.5f), (unsigned)((seq.vmute & 0xFFu) | ((unsigned)seq.choke << 8)));
-    rc = n ? plat_preset_save(slot, pbuf, n) : -1;
+    rc = place_save(slot, ui.sv_name);                 /* wip657: both spots */
     ui.overlay = O_NONE;
-    if (rc == -3)
+    if (rc == PLACE_FULL)
+        warn("MEMORY FULL: NOT SAVED", 0);
+    else if (rc == -3)
         warn("NO FLASH SPACE YET", 0);
     else if (rc)
         warn("SAVE FAILED", 0);
@@ -2456,7 +2477,7 @@ static void saveas_go(void)                            /* OCT+ on the third scre
 /* wip263: FUNC + SAVE = QUICK SAVE: writes the project into the preset place that is loaded now (the same number, the same name), at once,
  * no question. Works while playing too (wip286; the flash write may make the sound hiccup); no place loaded since power on: it says so and saves nothing (SAVE asks for a place). An EMPTY place
  * has no name yet: it gets a made-up one, as SAVE AS does. Places 1-8 are written to their override slot (PLAT_NPRESET + n - 1, wip255). */
-static int untitled_is(int slot, const char *nm)       /* wip308: does the user place hold exactly this name (any case)? */
+static int untitled_is(int slot, const char *nm)       /* wip308: does the storage slot (0-21 user places 9-30, 32-39 places 1-8) hold exactly this name (any case)? */
 {
     uint32_t n;
     const uint8_t *b = preset_blob(NFACT + slot, &n);
@@ -2482,8 +2503,8 @@ static void untitled_name(char *out)                   /* wip308: UNTITLED 01, 0
         if (v < 10)
             *q++ = '0';
         *put_i(q, v) = 0;
-        for (s = 0; s < PLAT_NUSER && !used; s++)
-            used = untitled_is(s, out);
+        for (s = 0; s < PLAT_NUSER + NFACT && !used; s++)   /* wip663: the user slots (places 9-30) AND the override slots (places 1-8: places 3-8 are ordinary user places since 655, a quick save into them is named UNTITLED nn too) */
+            used = untitled_is(s < PLAT_NUSER ? s : PLAT_NPRESET + (s - PLAT_NUSER), out);
         if (!used)
             return;
     }
@@ -2514,9 +2535,10 @@ static void quick_write_to(int num, const char *forced)   /* wip319: num = the p
     name[k] = 0;
     if (!k)                                            /* an empty place: UNTITLED 01, 02, 03 ... (wip308) */
         untitled_name(name);
-    n = project_preset_pack(pbuf, sizeof pbuf, name, (unsigned)(seq.bpm * 10.0f + 0.5f), (unsigned)((seq.vmute & 0xFFu) | ((unsigned)seq.choke << 8)));
-    rc = n ? plat_preset_save(slot, pbuf, n) : -1;
-    if (rc == -3)
+    rc = place_save(slot, name);                       /* wip657: both spots */
+    if (rc == PLACE_FULL)
+        warn("MEMORY FULL: NOT SAVED", 0);
+    else if (rc == -3)
         warn("NO FLASH SPACE YET", 0);
     else if (rc)
         warn("SAVE FAILED", 0);
@@ -2653,6 +2675,7 @@ static void songexit_go(void)                         /* EXIT SONG MODE? confirm
     say("SONG MODE OFF", 0);
 }
 
+static int load_preset_ex(const uint8_t *b, uint32_t n, int ext_slot);   /* wip659: app_load_preset + the place's second spot (ext_slot >= 0) */
 static void run_action(int act, int arg)
 {
     char t[28], *q;
@@ -2660,10 +2683,12 @@ static void run_action(int act, int arg)
     case ACT_PRESET: {
         uint32_t pn = 0;
         const uint8_t *pb = preset_blob(arg, &pn);
-        int rc;
+        int rc, es = -1;
+        if (pb == pbuf)                                /* wip659: a place read from the storage (a user place, or 1-8 with an override) has a second spot: song, lanes, notes. A demo (1-2 never saved), an empty place: none, they load empty as before */
+            es = arg < NFACT ? PLAT_NPRESET + arg : arg - NFACT;
         if (!pb && arg >= NDEMO)                       /* an empty user place: the sound of factory preset (place - 9) mod 8 + 1, no pattern (wip358) */
             pb = preset_blank(&pn, arg);
-        rc = pb ? app_load_preset(pb, pn) : -1;
+        rc = pb ? load_preset_ex(pb, pn, es) : -1;
         if (rc == 10)
             warn("STOP FIRST", 0);
         else if (rc)
@@ -9436,13 +9461,21 @@ void ui_init(void)
  * other: the autosave keeps it (the compressor, reverb and delay come from the preset itself: its saved ones, or the factory ones; only SAVE keeps changes to them). */
 int app_load_preset(const uint8_t *b, uint32_t n)
 {
+    return load_preset_ex(b, n, -1);                   /* a preset on its own (the web page's paste, the simulator): no second spot */
+}
+
+static int load_preset_ex(const uint8_t *b, uint32_t n, int ext_slot)
+{
     char nm[TNP_NAME_LEN + 1];
+    uint32_t mark = 0;
     int rc, i;
     if (seq.playing)
         return 10;
     rc = project_preset_unpack(b, n);
     if (rc)
         return rc;
+    if (ext_slot >= 0)
+        mark = project_pair_mark(b, n);                /* wip659: the main spot's CRC, taken before pbuf (= b) is reused for the second spot */
     for (i = 0; i < (int)TNP_NAME_LEN; i++)
         nm[i] = (char)b[16 + i];
     nm[TNP_NAME_LEN] = 0;
@@ -9454,6 +9487,10 @@ int app_load_preset(const uint8_t *b, uint32_t n)
     for (i = 0; i < NDRUM_TONIC; i++)
         seq.choke |= (uint8_t)((b[TNP_HDR + (uint32_t)i * TNP_VOICE + 43u] & 1u) << i);
     engine_tonic_choke(seq.choke);
+    if (ext_slot >= 0) {                               /* wip659 (E2c): the place's second spot: its song, motion lanes and ARP notes. b is not read any more below (nm, mutes and choke are out), so pbuf can hold the second spot. None, damaged or of another pair (a save cut by a power-off): song, lanes and notes stay empty, as a preset load made them just now */
+        int r = plat_ext_load(ext_slot, pbuf, sizeof pbuf);
+        project_ext_unpack(r > 0 ? pbuf : 0, r > 0 ? (uint32_t)r : 0u, mark);
+    }
     seq.bpm = (float)proj.set.bpm_x10 / 10.0f;
     project_apply_io();
     engine_motion_reset();

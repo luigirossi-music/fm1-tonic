@@ -31,7 +31,7 @@ const slots = { 0: blobOf("Marchiav", 1960, 1), 5: blobOf("A/B: test?", 100, 2),
 
 // the simulated FM-1
 class Dev {
-  constructor(o = {}) { this.slots = { ...slots }; this.o = o; this.put = null; this.requestsSent = 0; this.eraseCalls = 0; this.q = []; this.lost = false; this.requests = 0; }
+  constructor(o = {}) { this.slots = { ...slots, ...(o.extra || {}) }; this.o = o; this.put = null; this.requestsSent = 0; this.eraseCalls = 0; this.q = []; this.lost = false; this.requests = 0; }
   readReq(addr, len) {
     const u = [0, 0x59, 0x30, 8, 0, 0, 0, ...le32(addr), len & 255, len >> 8, 0];
     let sum = 0;
@@ -99,6 +99,22 @@ class Dev {
       for (let i = 0; i < 4; i++) body[i] = mk[i];
       for (const l of lens) body.push(l & 255, l >> 8);
       this.q.push(PB.frame(0x45, body));
+    } else if (sub === 4 || sub === 6) {                                   // wip670: places 1-8 (slots 32..39), or their second spots (wire byte + 0x80)
+      if (this.o.oldFirmware) return true;                                  // an older firmware does not answer
+      const base = sub === 6 ? 0x80 : 0, body = [0];
+      for (let i = 0; i < 8; i++) { const b = this.slots[base + 32 + i]; if (b) body[0] |= 1 << i; }
+      for (let i = 0; i < 8; i++) { const l = (this.slots[base + 32 + i] || []).length; body.push(l & 255, l >> 8); }
+      this.q.push(PB.frame(0x45, body));
+    } else if (sub === 5) {                                                 // the second spots of slots 0..31
+      if (this.o.oldFirmware) return true;
+      const body = [0, 0, 0, 0];
+      let mask = 0;
+      const lens = [];
+      for (let i = 0; i < 32; i++) { const b = this.slots[0x80 + i]; if (b) mask |= 1 << i; lens.push(b ? b.length : 0); }
+      const mk = le32(mask >>> 0);
+      for (let i = 0; i < 4; i++) body[i] = mk[i];
+      for (const l of lens) body.push(l & 255, l >> 8);
+      this.q.push(PB.frame(0x45, body));
     } else if (sub === 2) {
       if (this.o.cutAfterList) { this.lost = true; return true; }
       const b = this.slots[slot];
@@ -146,7 +162,7 @@ const fails_with = async (fn) => { try { await fn(); return null; } catch (e) { 
 }
 {
   const e = await fails_with(() => PB.presetGet(new Dev(), 7));
-  check(e && e.code === "slot1" && /Slot 16/.test(e.message), "get of an empty slot: status 1 named with its number (slot 7 = preset 16)");
+  check(e && e.code === "slot1" && /Place 16/.test(e.message), "get of an empty slot: status 1 named with its number (slot 7 = preset 16)");
   const e2 = await fails_with(() => PB.presetGet(new Dev({ dropAt: 3 }), 0));
   check(e2 && e2.code === "lost", "get: a lost frame is seen (offset gap)");
   const e3 = await fails_with(() => PB.presetGet(new Dev({ badCrc: true }), 0));
@@ -260,10 +276,10 @@ function zipOf(files, deflate) {          // files: [{name, data}]
   const bad = zipOf(files, false); bad[bad.length - 30] ^= 0xFF;
   const e2 = await fails_with(() => PB.unzip(bad.subarray(0, 60)));
   check(e2 && e2.code === "zip", "unzip: a cut zip: a plain message");
-  const z = zipOf([...files, { name: "readme.txt", data: new Uint8Array(5) }, { name: "05_Low.tnp", data: a }, { name: "junk.tnp", data: new Uint8Array(600) }, { name: "dir/10_InDir.tnp", data: b }], false);
+  const z = zipOf([...files, { name: "readme.txt", data: new Uint8Array(5) }, { name: "31_Low.tnp", data: a }, { name: "junk.tnp", data: new Uint8Array(600) }, { name: "dir/10_InDir.tnp", data: b }], false);
   const r = await PB.presetFiles("my.zip", z);
   check(r.items.map((i) => i.number).join() === "9,12,10" && r.items[0].name === "Alpha", "presetFiles: the numbers from the names (9, 12, 10), names from the presets");
-  check(r.skipped.length === 3 && r.skipped.some((x) => /readme/.test(x)) && r.skipped.some((x) => /05_Low.*9 to 40/.test(x)) && r.skipped.some((x) => /junk/.test(x)), "... skipped with a reason: not .tnp, number out of 9-40, not a preset");
+  check(r.skipped.length === 3 && r.skipped.some((x) => /readme/.test(x)) && r.skipped.some((x) => /31_Low.*1 to 30/.test(x)) && r.skipped.some((x) => /junk/.test(x)), "... skipped with a reason: not .tnp, number out of 9-40, not a preset");
   const one = await PB.presetFiles("Alpha.tnp", a), one2 = await PB.presetFiles("22_Alpha.tnp", a);
   check(one.items.length === 1 && one.items[0].number === 0 && one2.items[0].number === 22, "presetFiles: a single .tnp: no number in the name = 0 (the page asks for a slot), 22 from '22_'");
   const bad1 = await PB.presetFiles("x.tnp", new Uint8Array(50));
@@ -337,6 +353,79 @@ function zipOf(files, deflate) {          // files: [{name, data}]
   check(/PB\.tnpToMtpreset/.test(html) && /fm1-tonic-mtpresets\.zip/.test(html), "export page: the buttons call tnpToMtpreset and name the zip");
   const names = ["Marchiav", "A/B: test?", "", "../x\\y"].map((n) => `${String(9).padStart(2, "0")}_${PB.presetName(blobOf(n, 500, 1))}.mtpreset`);
   check(names.every((n) => /^\d\d_[A-Za-z0-9 _-]+\.mtpreset$/.test(n)), `export page: file names are safe (${names.join(" | ")})`);
+}
+// wip670: places 1-8 (slots 32..39) and the second spots (wire byte + 0x80)
+{
+  const ext = (n, seed) => { const b = new Uint8Array(n); for (let i = 0; i < n; i++) b[i] = (i * 3 + seed) & 255; b.set([0x54, 0x45, 0x58, 0x32], 0); return b; };
+  const extra = { 34: blobOf("Third", 700, 9), [0x80]: ext(500, 4), [0x80 | 34]: ext(300, 5) };
+  const pl = await PB.presetListPlaces(new Dev({ extra }));
+  check(pl && pl.mask === (1 << 2) && pl.lens[2] === 700 && pl.lens[0] === 0, "places 1-8: the list (sub 4) has place 3 only, length 700");
+  const xl = await PB.presetListPlaces(new Dev({ extra }), true);
+  check(xl && xl.mask === (1 << 2) && xl.lens[2] === 300, "places 1-8: the second spots list (sub 6): place 3, length 300");
+  const xm = await PB.presetList(new Dev({ extra }), true);
+  check(xm.mask === 1 && xm.lens[0] === 500, "slots 0..31: the second spots list (sub 5): slot 0, length 500");
+  const all = await PB.presets(new Dev({ extra }));
+  check(all.map((p) => p.number).join() === "3,9,14,40", `presets: places 1-8 first, numbers 3, 9, 14, 40 (got ${all.map((p) => p.number).join()})`);
+  check(same(all[0].ext, extra[0x80 | 34]) && same(all[1].ext, extra[0x80 | 0]) && all[2].ext === null, "presets: each place carries its second spot (or null)");
+  check(same(all[0].blob, extra[34]), "presets: place 3's preset byte for byte");
+  const old = await PB.presets(new Dev({ extra, oldFirmware: true }));
+  check(old.map((p) => p.number).join() === "9,14,40" && old.every((p) => p.ext === null), "an older firmware (no answer to sub 4): only the 32 slots, no second spots");
+  const d = new Dev({ extra });
+  const rc = await PB.presetPut(d, 5, ext(450, 8), () => {}, true);
+  check(rc === 0 && d.slots[0x80 | 5] && d.slots[0x80 | 5].length === 450 && same(d.slots[5], slots[5]), "put of a second spot into slot 5: stored under 0x85, the preset itself untouched");
+  const e1 = await fails_with(() => PB.presetPut(new Dev(), 5, blobOf("x", 500, 1), () => {}, true));
+  check(e1 && e1.code === "head", "a preset (TNP1) is refused as a second spot");
+  const e2 = await fails_with(() => PB.presetPut(new Dev(), 5, ext(500, 1)));
+  check(e2 && e2.code === "head", "a second spot is refused as a preset");
+  const d2 = new Dev({ extra });
+  check(await PB.presetErase(d2, 34, true) === 0 && !d2.slots[0x80 | 34] && d2.slots[34], "erase of place 3's second spot: only the second spot is gone");
+  const g = await PB.presetGet(new Dev({ extra }), 34, true);
+  check(same(g, extra[0x80 | 34]), "get of place 3's second spot byte for byte");
+}
+{
+  const third = blobOf("Third", 588, 9); third[9] = 1; third[4] = 588 & 255; third[5] = 588 >> 8;   // a valid one-pattern TNP1 (total 588 at byte 4)
+  const all = await PB.presets(new Dev({ extra: { 34: third, [0x80 | 34]: Uint8Array.from([0x54, 0x45, 0x58, 0x32, ...new Array(30).fill(7)]) } }));
+  const files = PB.presetBackupFiles(all);
+  check(files.map((f) => f.name).join() === "03_Third.tnp,09_Marchiav.tnp,14_A_B_ test.tnp,40_preset.tnp",
+        `backup files: ONE file per place (got ${files.map((f) => f.name).join()})`);
+  const sp = PB.splitTnp(files[0].data);
+  check(same(sp.main, all[0].blob) && same(sp.ext, all[0].ext), "backup files: place 3's file = its preset + its song part, split back byte for byte");
+  const sp2 = PB.splitTnp(files[1].data);
+  check(same(sp2.main, all[1].blob) && sp2.ext === null && files[1].data.length === all[1].blob.length, "a place without a second spot: the plain .tnp, unchanged");
+  const one = await PB.presetFiles("11_Third.tnp", files[0].data);
+  check(one.items.length === 1 && same(one.items[0].blob, all[0].blob) && same(one.items[0].ext, all[0].ext), "restore reading: a .tnp with a song part gives the preset and its second spot");
+}
+// wip673: restore of whole places (E3b-2b)
+{
+  check([0, 1, 8, 9, 30, 31, 40].map((n) => PB.slotOf(n)).join() === "-1,32,39,0,21,-1,-1", "slotOf: places 1-8 -> slots 32..39, 9-30 -> 0..21, 0 / 31 / 40 -> -1");
+  check(PB.slotOf(1) === 32 && PB.placeNo(PB.slotOf(7)) === 7 && PB.placeNo(PB.slotOf(30)) === 30, "slotOf and placeNo are the same map");
+  const third = blobOf("Third", 588, 9); third[9] = 1; third[4] = 588 & 255; third[5] = 588 >> 8;
+  const tex = Uint8Array.from([0x54, 0x45, 0x58, 0x32, ...new Array(30).fill(7)]);
+  const old2 = Uint8Array.from([0x54, 0x45, 0x58, 0x32, ...new Array(40).fill(9)]);
+  // 1 a preset WITH a second spot into place 3: both stored
+  const d = new Dev({ extra: { [0x80 | 34]: old2 } });
+  check(await PB.restorePlace(d, PB.slotOf(3), { name: "Third", blob: third, ext: tex }) === 0 && same(d.slots[34], third) && same(d.slots[0x80 | 34], tex), "restore: place 3 gets the preset and the new second spot");
+  // 2 a plain preset: the old second spot of that place is erased
+  const d2 = new Dev({ extra: { [0x80 | 34]: old2 } });
+  check(await PB.restorePlace(d2, 34, { name: "Third", blob: third, ext: null }) === 0 && same(d2.slots[34], third) && !d2.slots[0x80 | 34], "restore: a plain .tnp erases the place's old second spot");
+  // 3 older firmware: no erase asked, a second spot is refused
+  const d3 = new Dev({ oldFirmware: true });
+  check(await PB.restorePlace(d3, 5, { name: "x", blob: third, ext: null }, () => {}, false) === 0 && d3.eraseCalls === 0, "restore on an older firmware: no erase of a second spot");
+  const e = await fails_with(() => PB.restorePlace(new Dev({ oldFirmware: true }), 5, { name: "x", blob: third, ext: tex }, () => {}, false));
+  check(e && e.code === "head", "restore: a song part on an older firmware is refused with a plain message");
+  // 4 a failed main put stops before the second spot
+  const d4 = new Dev({ failCode: 10 });
+  check(await PB.restorePlace(d4, 34, { name: "Third", blob: third, ext: tex }) === 10 && !d4.slots[0x80 | 34], "restore: the preset failed (code 10): its code is returned, no second spot written");
+  // 5 what is filled
+  const f = await PB.presetFilled(new Dev({ extra: { 34: third, [0x80 | 34]: tex, [0x80]: tex } }));
+  check(f.places && f.main.has(0) && f.main.has(34) && f.main.has(5) && f.ext.has(34) && f.ext.has(0) && !f.ext.has(5), "presetFilled: presets and second spots of slots 0..31 and places 1-8");
+  const fo = await PB.presetFilled(new Dev({ oldFirmware: true }));
+  check(!fo.places && fo.main.has(0) && fo.ext.size === 0, "presetFilled: an older firmware: no places 1-8, no second spots");
+  // 6 file numbers
+  const a = blobOf("Alpha", 588, 1); a[9] = 1; a[4] = 588 & 255; a[5] = 588 >> 8;
+  const r1 = await PB.presetFiles("05_Alpha.tnp", a), r2 = await PB.presetFiles("31_Alpha.tnp", a), r3 = await PB.presetFiles("00_Alpha.tnp", a);
+  check(r1.items.length === 1 && r1.items[0].number === 5, "presetFiles: '05_' is place 5 now");
+  check(!r2.items.length && /31_Alpha.*1 to 30.*31-40/.test(r2.skipped[0]) && !r3.items.length, "presetFiles: 31..40 (old backups) and 00 are skipped with a message");
 }
 console.log(fails ? "PRESETS PAGE TEST FAILED" : "presets page test passed");
 process.exit(fails ? 1 : 0);

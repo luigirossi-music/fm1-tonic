@@ -104,5 +104,8 @@ void ui_redraw(void);                    /* the whole screen drawn again at the 
 void app_restored(void);                 /* a restore wrote the project: loaded again, as at power-on */
 int app_load_preset(const uint8_t *b, uint32_t n);   /* a TNP1 preset (tnp.h) as the working project: 0 = loaded, 10 = playing */
 int project_preset_unpack(const uint8_t *b, uint32_t n);
+uint32_t project_pair_mark(const uint8_t *b, uint32_t n);   /* wip659: the pair mark of a place = the CRC-32 of its main spot's blob */
+uint32_t project_ext_pack(uint8_t *out, uint32_t max, uint32_t mark);   /* wip657: the second spot (song + lanes + ARP notes, lz-packed): its length, out = 0 only measures, 0 = more than max; mark = the pair mark (wip659) */
+int project_ext_unpack(const uint8_t *b, uint32_t n, uint32_t mark);    /* wip657: 0 = loaded; -1 = none / bad / another pair's mark: song, lanes and notes emptied */
 uint32_t project_preset_pack(uint8_t *out, uint32_t max, const char *name, unsigned bpm_x10, unsigned mutes);   /* (mutes: bits 0-7 the muted voices, bits 8-15 the CHOKE group) */   /* the working Tonic project as a TNP1 (patterns 1-8): its length, 0 = no room */
 void ui_save_now(void);                  /* tests: what SAVE used to do (the working project to the flash, stopped) */

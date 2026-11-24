@@ -1,5 +1,7 @@
-# The PRESETS knob on the Tonic picks a factory preset; a question asks first (OCT+ = YES, OCT- = NO).
+# The PRESETS knob on the Tonic picks a place; a question asks first (OCT+ = YES, OCT- = NO).
 # The test bank (tests/fixtures/bank): 01 SYNTH FILL TEST 120 BPM, 02 SYNTH SLOW 90, 03 SYNTH FAST 150.
+# wip665: since 655 only places 1-2 are demo presets (from the bank); places 3-8 are ordinary EMPTY user places: an empty place loads
+# the sound of the bank preset (place - 1) mod 8 mod 3 (the bank has 3) with no steps: place 3 = like 03 (150 BPM), place 4 = like 01 (120 BPM).
 wait 300
 expect tempo 125
 # turn: a question, nothing changes yet
@@ -19,7 +21,7 @@ wait 100
 expect tempo 90
 expect vfill0.0.4 1
 expect dirty 0   # wip310: a loaded place is written to the flash at once (so the place survives power-off)
-# the next one: 03
+# the next one: place 3 = an empty place, it loads like the bank's 03 (150 BPM, no steps)
 turn PRESET 1
 tap OCT+
 wait 100
@@ -32,8 +34,8 @@ turn PRESET -1
 tap OCT+
 wait 100
 expect tempo 120
-# (the test bank has only 3 factory places: 04 is a missing FACTORY place; empty USER places 9-40 are in tonic_bank8)
-# the knob goes round and round through all 40 places; an empty one is "04 EMPTY" and cannot be uploaded
+# the knob goes round and round through all 30 places; an empty user place (04 EMPTY) can be loaded: the sound of the bank's 01 (120 BPM), no steps
+# (only a missing DEMO place, 1-2, can not be uploaded: the test bank has both, so that case is not reachable here)
 turn PRESET 1
 turn PRESET 1
 turn PRESET 1
@@ -42,8 +44,15 @@ shot preset_empty.png
 tap OCT+
 wait 100
 expect tempo 120
+expect presetcur 4
+# back to place 1: three steps down, YES
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+tap OCT+
+wait 100
 expect presetcur 1
-# one turn down from 01 = 40 (the last place, empty): round the end
+# one turn down from 01 = 30 (the last place, empty): round the end
 turn PRESET -1
 wait 100
 shot preset_wrap.png

@@ -1,0 +1,56 @@
+# wip666 (the new scenario of 655): places 1-2 are demo presets, places 3-8 are ordinary EMPTY user places (storage = override slots 34-39).
+# The test bank (tests/fixtures/bank): 01 SYNTH FILL TEST 120 BPM, 02 SYNTH SLOW 90 (steps in track 1), 03 SYNTH FAST 150.
+wait 300
+# the demo place 2 loads its compiled preset: 90 BPM, steps
+turn PRESET 1
+turn PRESET 1
+tap OCT+
+wait 100
+expect presetcur 2
+expect tempo 90
+expect vfill0.0.4 1
+# place 3 is empty: it loads like the bank's 03 (150 BPM) with NO steps, and nothing is stored in it
+turn PRESET 1
+tap OCT+
+wait 100
+expect presetcur 3
+expect tempo 150
+expect vfill0.0.4 0
+expect slotused34 0
+# a change of our own, then FUNC + SAVE (quick save) into the empty place 3: saved at once, no question
+tapkey b1
+key w8 down
+tapkey b8
+tapkey b9
+key w8 up
+expect vacc0.1.8 1
+key b10 down
+tap SAVE
+key b10 up
+expect svstage -1
+expect presetcur 3
+expect slotused34 1
+expect slotused35 0
+expect dirty 0
+# SAVE into the demo place 1: SAVE HERE? shows place 3, ALGORITHM two back = place 1, YES
+tap SAVE
+expect svstage 3
+turn ALGO -2
+expect svhere 1
+tap OCT+
+expect svstage -1
+expect slotused32 1
+# place 2 is still the demo preset
+turn PRESET 1
+tap OCT+
+wait 100
+expect presetcur 2
+expect tempo 90
+expect vfill0.0.4 1
+expect vacc0.1.8 0
+# place 1 is now ours (the override slot wins over the compiled demo)
+turn PRESET -1
+tap OCT+
+wait 100
+expect presetcur 1
+expect vacc0.1.8 1

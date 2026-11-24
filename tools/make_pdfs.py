@@ -54,8 +54,8 @@ def main():
     mv = (ROOT / "docs" / "MANUAL_VERSION").read_text().strip()
     ip = ROOT / "web" / "emu" / "index.html"
     t = ip.read_text(encoding="utf-8")
-    t = re.sub(r"(<!--mv-->)[\d.]+(<!--/mv-->)", rf"\g<1>{mv}\g<2>", t)
-    t = re.sub(r"FM1-Tonic-manual-[\d.]+\.html", f"FM1-Tonic-manual-{mv}.html", t)
+    t = re.sub(r"(<!--mv-->)[\w.]+(<!--/mv-->)", rf"\g<1>{mv}\g<2>", t)
+    t = re.sub(r"FM1-Tonic-manual-[\w.]+\.html", f"FM1-Tonic-manual-{mv}.html", t)
     ip.write_text(t, encoding="utf-8")
     with sync_playwright() as p:
         b = p.chromium.launch()

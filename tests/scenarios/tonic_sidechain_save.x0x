@@ -21,23 +21,23 @@ wait 500
 expect scint 50
 expect scin 3
 expect scmask 65
-# (2) the preset: SAVE AS into place 9, a new place 10 has no sidechain, back to 9 it is back
+# (2) the preset: SAVE AS into the first empty place (3), a new place 4 has no sidechain, back to 3 it is back
 tap SAVE
 tap OCT+
 tap OCT+
 tap OCT+
-expect presetcur 9
+expect presetcur 3
 turn PRESET 1
 tap OCT+
 wait 100
-expect presetcur 10
+expect presetcur 4
 expect scint 0
 expect scin 0
 expect scmask 0
 turn PRESET -1
 tap OCT+
 wait 100
-expect presetcur 9
+expect presetcur 3
 expect scint 50
 expect scin 3
 expect scmask 65

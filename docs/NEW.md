@@ -4,6 +4,8 @@ The newest version first. Install it with the [web installer](../install/); the
 
 ## FM1 Tonic 1.8d · 24 November 2026
 
+- ADDED (wip675, manual 1.8d2 in six languages + web page, firmware 1.8d) **30 places, song and notes saved, backup per place**: the PRESETS knob turns through 30 places (1 and 2 are demos, 3-30 are yours); a project keeps its song, recorded knob moves and ARP notes (MEMORY FULL: NOT SAVED when it does not fit); the web page's Back up my presets makes one file per place (`NN_name.tnp`, song part inside), Restore my presets writes them back, Clear all places empties 1-30, Export as .mtpreset works for places 1-30; old backups numbered 31-40 are skipped with a message.
+- ADDED (wip656, web page + manual number, no firmware change) **What's new in 1.8d** on the web page (button renamed from 1.8c, 1.8d block on top of 1.8c / 1.8b / 1.8a): projects keep patterns 1-16, clear all patterns (FUNC + PLAY 3 s), mixer solo + audition, song patterns key lights. Manual number 1.8d1 (the manual TEXT is not yet updated for these four items). New web-only script whatsnew_site.sh.
 - FIXED (wip652, firmware 1.8d): **a saved project (SAVE AS, QUICK SAVE, RENAME) keeps patterns 1-16** (it kept only 1-8). Old 8-pattern projects and the factory presets load as before (patterns 9-16 empty). Not saved in a slot yet: the per-step ARP notes, the song, motion.
 
 ## FM1 Tonic 1.8c · 23 November 2026

@@ -1,0 +1,163 @@
+# wip660 (E2d of "a project = 2 spots"): a place holds TWO spots: the main one (sounds, patterns 1-16, effects) and a second one (the song, the motion lanes
+# and the ARP notes). SAVE writes both, loading a place reads both. A save cut by the power between the two writes loads with no song / lanes / notes (never the
+# old ones with the new patterns: the pair mark), and a project too dense for the second spot is refused as MEMORY FULL with NOTHING written (the main spot too).
+# (the first empty place is 3 since wip655; place 3 = flash slot 34, place 4 = slot 35: places 1-8 use their override slots 32-39)
+wait 300
+listen
+# --- 1. a project with a hit, two ARP notes, a motion lane (a recorded knob) and a 2-bar song
+tapkey b1
+key w8 down
+tapkey b8
+tapkey b9
+key w8 up
+expect phit0.1.8 1
+notepoke 0 0 0 7
+notepoke 5 2 4 -3
+tapkey w4
+tap ENV
+key w4 down
+spin K1 1
+spin K2 10
+key w4 up
+expect lanes 2
+key b10 down
+tap SEQ
+key b10 up
+tap OCT+
+tapkey w0
+tapkey w1
+tap OCT+
+expect songlen 2
+expect songmode 1
+# leave song mode (FUNC + SEQ, OCT+): the song stays, and FUNC + a white key switches patterns again
+key b10 down
+tap SEQ
+key b10 up
+expect songask 2
+tap OCT+
+expect songmode 0
+expect songlen 2
+expect playing 0
+expect slotused34 0
+expect extused34 0
+# SAVE AS (CHOOSE SLOT, slot 3, name): both spots are written
+tap SAVE
+tap OCT+
+expect svhere 3
+tap OCT+
+tap OCT+
+expect svstage -1
+expect presetcur 3
+expect slotused34 1
+expect extused34 1
+wait 300
+# --- 2. another place (4, empty): no notes, no song, no lanes; the place we left is complete when it is loaded again
+turn PRESET 1
+tap OCT+
+wait 300
+expect presetcur 4
+expect note0.0.0 0
+expect note5.2.4 0
+expect songlen 0
+expect lanes 0
+expect phit0.1.8 0
+turn PRESET -1
+tap OCT+
+wait 300
+expect presetcur 3
+expect phit0.1.8 1
+expect note0.0.0 7
+expect note5.2.4 -3
+expect songlen 2
+expect lanes 2
+# --- 3. a save cut by the power between the two writes: place 4 gets a changed project (new main spot, new second spot); then its main spot is moved over place 3's
+# main spot (presetmove 35 34) = place 3 holds the NEW main spot and its OLD second spot
+notepoke 0 0 0 9
+tap SAVE
+expect svstage 3
+tap OCT-
+expect svstage 4
+tap OCT+
+expect svhere 4
+tap OCT+
+tap OCT+
+expect svstage -1
+expect presetcur 4
+expect slotused35 1
+expect extused35 1
+presetmove 35 34
+expect slotused35 0
+expect slotused34 1
+expect extused34 1
+# load place 3: the patterns come (new main spot), the OLD song / lanes / notes do not (their pair mark is the old main spot's)
+turn PRESET -1
+tap OCT+
+wait 300
+expect presetcur 3
+expect phit0.1.8 1
+expect note0.0.0 0
+expect note5.2.4 0
+expect songlen 0
+expect lanes 0
+# --- 4. MEMORY FULL: a change in pattern 12 (it would be in the main spot) and 2000 ARP notes (they do not fit the second spot, about 5.8 KB packed)
+key b10 down
+tapkey w11
+key b10 up
+expect ppat0 12
+tapkey b1
+key w8 down
+tapkey b8
+tapkey b9
+key w8 up
+expect phit11.1.8 1
+notefill 2000
+expect dirty 1
+tap SAVE
+expect svstage 3
+tap OCT+
+expect svstage -1
+said MEMORY FULL
+expect dirty 1
+expect extused34 1
+expect presetcur 3
+# nothing was written, the main spot neither: load place 4 (empty), then place 3 again: no pattern 12 hit
+turn PRESET 1
+tap OCT+
+wait 300
+expect presetcur 4
+turn PRESET -1
+tap OCT+
+wait 300
+expect presetcur 3
+expect phit11.1.8 0
+# --- 5. the same change with 400 notes (they pack to about 2 KB and fit): saved, and everything is back after another place
+key b10 down
+tapkey w11
+key b10 up
+expect ppat0 12
+tapkey b1
+key w8 down
+tapkey b8
+tapkey b9
+key w8 up
+expect phit11.1.8 1
+notefill 400
+notepoke 0 0 0 7
+notepoke 15 7 63 -9
+tap SAVE
+tap OCT+
+expect svstage -1
+expect dirty 0
+turn PRESET 1
+tap OCT+
+wait 300
+expect presetcur 4
+expect note0.0.0 0
+expect phit11.1.8 0
+turn PRESET -1
+tap OCT+
+wait 300
+expect presetcur 3
+expect phit11.1.8 1
+expect note0.0.0 7
+expect note15.7.63 -9

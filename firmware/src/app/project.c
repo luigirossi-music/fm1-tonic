@@ -132,6 +132,33 @@ static uint32_t crc32_of(const uint8_t *p, uint32_t n)       /* zlib CRC-32, 4 b
     return ~c;
 }
 
+#include "ext_spot.c"                           /* wip657: the second spot of a project (song + motion lanes + ARP notes in ONE object) */
+typedef char ext_contiguous[(__builtin_offsetof(project_t, note) == __builtin_offsetof(project_t, arr) + sizeof proj.arr) ? 1 : -1];
+#define EXT_OFF __builtin_offsetof(project_t, arr)
+#define EXT_RAW (sizeof(project_t) - EXT_OFF)   /* arr + note (the notes are last in the project) */
+
+/* wip659: the PAIR MARK of a place = the CRC-32 of its main spot's blob (b, n); the second spot carries the one of the main spot it was saved with */
+uint32_t project_pair_mark(const uint8_t *b, uint32_t n)
+{
+    return crc32_of(b, n);
+}
+
+/* The second spot's bytes for the working project: out = 0 measures (mark ignored). Returns the length, 0 = more than max bytes. */
+uint32_t project_ext_pack(uint8_t *out, uint32_t max, uint32_t mark)
+{
+    return ext_pack((const uint8_t *)&proj + EXT_OFF, (uint32_t)EXT_RAW, out, max, mark);
+}
+
+/* A second spot read from the flash onto the working project: 0 = song, lanes and notes loaded; -1 = none, damaged or of another pair (mark): they are emptied */
+int project_ext_unpack(const uint8_t *b, uint32_t n, uint32_t mark)
+{
+    if (b && ext_unpack(b, n, (uint8_t *)&proj + EXT_OFF, (uint32_t)EXT_RAW, mark) == 0)
+        return 0;
+    arrange_defaults();
+    notes_clear();
+    return -1;
+}
+
 /* the object is the n bytes of io_buf, format word included; written only if they changed */
 static int save_buf(uint32_t obj, uint32_t n)
 {

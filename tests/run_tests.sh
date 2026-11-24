@@ -42,6 +42,7 @@ run tonic-choke sh -c "$CC -O2 -ffp-contract=off -std=c99 -Wall -Wextra -Wno-unu
 run tonic-sidechain sh -c "$CC -O2 -ffp-contract=off -std=c99 -Wall -Wextra -Wno-unused-function -Ifirmware/src -Ifirmware/src/dsp -Ibuild/gen -o $OUT/tonic_sidechain_test tests/host/tonic_sidechain_test.c firmware/src/dsp/tonic.c firmware/src/dsp/po32/po32_synth.c -lm && $OUT/tonic_sidechain_test"   # wip348: the SIDECHAIN (the input's sound ducks the mask)
 run tonic-note sh -c "$CC -O2 -ffp-contract=off -std=c99 -Wall -Wextra -Wno-unused-function -Ifirmware/src -Ifirmware/src/dsp -Ibuild/gen -o $OUT/tonic_note_test tests/host/tonic_note_test.c firmware/src/dsp/tonic.c firmware/src/dsp/po32/po32_synth.c -lm && $OUT/tonic_note_test"   # wip251: a note = the pitch moved by semitones for one hit
 run lz sh -c "$CC $W -o $OUT/lz_test tests/host/lz_test.c && $OUT/lz_test"
+run ext-spot sh -c "$CC $W -o $OUT/ext_spot_test tests/host/ext_spot_test.c && $OUT/ext_spot_test"   # wip657: the second spot of a project (song + lanes + ARP notes in one object)
 run motion sh -c "$CC $W -o $OUT/motion_test tests/host/motion_test.c firmware/src/seq/motion.c && $OUT/motion_test"
 run stereo sh -c "$CC -O2 -ffp-contract=off -w -Ifirmware/src/dsp -Ifirmware/src -Ibuild/gen -o $OUT/stereo_test tests/host/stereo_test.c firmware/src/dsp/master.c firmware/src/dsp/fxbus.c -lm && $OUT/stereo_test"
 run master sh -c "$CC $W -Wno-double-promotion -o $OUT/master_test tests/host/master_test.c firmware/src/dsp/master.c -lm && $OUT/master_test"

@@ -356,6 +356,64 @@ static int st_ext_erase(int slot)
     return e < 0 ? -1 : st_erase(st_ext_addr(e));
 }
 
+/* wip669: a second spot for backup.c (USB), as st_preset_info / write / commit: 0 = the spot holds a whole blob (header + CRC-32 right) */
+static int st_ext_info(int slot, uint32_t *len, uint32_t *crc, uint32_t *addr)
+{
+    st_hdr_t h;
+    uint32_t a;
+    int e = st_ext_index(slot);
+    if (!ST_PRESET_OK || e < 0)
+        return -1;
+    a = st_ext_addr(e);
+    if (st_read(a, &h, sizeof h))
+        return -1;
+    if (h.magic != ST_MAGIC || h.type != (0x6000u | (uint32_t)e) || !h.len || h.len > ST_PAYLOAD_MAX ||
+        h.hcrc != st_crc32(&h, sizeof h - 4u))
+        return -1;
+    if (st_read(a + ST_PAYLOAD_OFF, st_buf, h.len) || st_crc32(st_buf, h.len) != h.crc)
+        return -1;
+    *len = h.len;
+    *crc = h.crc;
+    *addr = a + ST_PAYLOAD_OFF;
+    return 0;
+}
+
+static int st_ext_write(int slot, uint32_t off, const void *src, uint32_t n)
+{
+    int e = st_ext_index(slot);
+    if (!ST_PRESET_OK)
+        return -3;
+    if (e < 0 || off + n > ST_PAYLOAD_MAX)
+        return -1;
+    return st_prog(st_ext_addr(e) + ST_PAYLOAD_OFF + off, src, n);
+}
+
+static int st_ext_commit(int slot, uint32_t len, uint32_t crc)
+{
+    st_hdr_t h, chk;
+    uint32_t a;
+    int rc, e = st_ext_index(slot);
+    if (!ST_PRESET_OK)
+        return -3;
+    if (e < 0 || !len || len > ST_PAYLOAD_MAX)
+        return -1;
+    a = st_ext_addr(e);
+    h.magic = ST_MAGIC;
+    h.type = (uint16_t)(0x6000u | (uint32_t)e);
+    h.slot = (uint16_t)e;
+    h.seq = 1u;
+    h.len = len;
+    h.crc = crc;
+    h.rsv[0] = h.rsv[1] = 0xFFFFFFFFu;
+    h.hcrc = st_crc32(&h, sizeof h - 4u);
+    if ((rc = st_prog(a, &h, sizeof h)) != 0)
+        return rc;
+    if (st_read(a, &chk, sizeof chk) || chk.hcrc != h.hcrc || st_read(a + ST_PAYLOAD_OFF, st_buf, len) ||
+        st_crc32(st_buf, len) != crc)
+        return -7;
+    return 0;
+}
+
 static int st_ext_save(int slot, const void *src, uint32_t len)
 {
     st_hdr_t h, chk;

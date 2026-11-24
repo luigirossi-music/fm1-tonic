@@ -1,5 +1,6 @@
-# wip255 option B step B1: a preset written over number 1-8 (flash slot 32-39) replaces the factory preset of that number.
-# (SAVE AS can not choose it yet: B2. presetmove puts a user slot there, as the flash would hold it.)
+# wip255 option B step B1: a preset written over number 1-8 (flash slot 32-39) replaces the preset of that number.
+# wip665: places 1-2 are the demo presets, places 3-8 are ordinary user places (their storage is the override slots 34-39).
+# (presetmove puts our project, saved into place 3 = flash slot 34, over the demo place 1 = flash slot 32, as the flash would hold it.)
 wait 300
 tapkey b1
 key w8 down
@@ -12,30 +13,24 @@ tap OCT+
 tap OCT+
 expect svslot 0
 tap OCT+
-expect slotused0 1
-expect presetcur 9
-# before: preset 1 is the factory one (no accent on track 2 step 9)
-turn PRESET -1
-turn PRESET -1
-turn PRESET -1
-turn PRESET -1
-turn PRESET -1
-turn PRESET -1
+expect slotused34 1
+expect presetcur 3
+# before: place 1 is the demo preset (no accent on track 2 step 9): two steps back from place 3
 turn PRESET -1
 turn PRESET -1
 tap OCT+
 expect presetcur 1
 expect vacc0.1.8 0
-# slot 9's preset is now written over preset 1 (flash 32): the same turn finds OUR preset at 1, and the slot 9 is empty
-presetmove 0 32
-expect slotused0 0
+# place 3's project is now written over place 1 (flash 32): the same turn finds OUR project at 1, and place 3 (flash 34) is empty
+presetmove 34 32
+expect slotused34 0
 turn PRESET 1
 turn PRESET -1
 tap OCT+
 expect presetcur 1
 expect vacc0.1.8 1
 expect vfill0.1.8 1
-# preset 2 is still the factory one
+# place 2 is still the demo preset
 turn PRESET 1
 tap OCT+
 expect presetcur 2

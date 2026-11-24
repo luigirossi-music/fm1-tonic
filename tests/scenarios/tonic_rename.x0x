@@ -5,13 +5,13 @@ key b10 down
 tap HOME
 key b10 up
 expect svstage -1
-# SAVE AS puts the project into user slot 1 (place 9)
+# SAVE AS puts the project into the first empty place (3 since wip655; flash slot 34)
 tap SAVE
 tap OCT+
 tap OCT+
 tap OCT+
-expect presetcur 9
-expect slotused0 1
+expect presetcur 3
+expect slotused34 1
 # a change of our own (track 1, step 9: accent and fill)
 tapkey b1
 key w8 down
@@ -28,7 +28,7 @@ shot rename_1.png
 turn ALGO 1
 tap OCT-
 expect svstage -1
-expect plmatch8 0
+expect plmatch2 0
 # HOME cancels too
 key b10 down
 tap HOME
@@ -36,34 +36,28 @@ key b10 up
 expect svstage 1
 tap HOME
 expect svstage -1
-expect plmatch8 0
-# OCT+ saves under the new name into the same place; the place stays 9; the change is saved with it
+expect plmatch2 0
+# OCT+ saves under the new name into the same place; the place stays 3; the change is saved with it
 key b10 down
 tap HOME
 key b10 up
 turn ALGO 1
 tap OCT+
 expect svstage -1
-expect presetcur 9
-expect plmatch8 1
+expect presetcur 3
+expect plmatch2 1
 expect dirty 0
 turn PRESET 1
 tap OCT+
 wait 100
-expect presetcur 10
+expect presetcur 4
 expect vacc0.1.8 0
 turn PRESET -1
 tap OCT+
 wait 100
-expect presetcur 9
+expect presetcur 3
 expect vacc0.1.8 1
-# a factory place (1) is renamed in its override slot: it stays place 1, place 9 keeps its name
-turn PRESET -1
-turn PRESET -1
-turn PRESET -1
-turn PRESET -1
-turn PRESET -1
-turn PRESET -1
+# a demo place (1) is renamed in its override slot: it stays place 1, place 3 keeps its name (two steps back from place 3)
 turn PRESET -1
 turn PRESET -1
 tap OCT+
@@ -78,7 +72,7 @@ tap OCT+
 expect svstage -1
 expect presetcur 1
 expect plmatch0 1
-expect plmatch8 0
+expect plmatch2 0
 turn PRESET 1
 tap OCT+
 wait 100

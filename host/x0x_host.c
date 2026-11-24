@@ -39,6 +39,7 @@
  *   listen                       a screen reader listens (announce.c's HELLO, again every 2 s); each SAY is printed
  *                                ("said: ..."; "said!:" cuts off what was being said)
  *   where                        the reader asks for the whole screen
+ *   notefill COUNT               (wip660) COUNT ARP notes at pseudo-random places of patterns 1-16: a dense project (expect extusedN: the second spot)
  *   said TEXT                    some SAY since the last "said" (or "listen") has TEXT in it: else a failure
  *   said_none                    nothing said since the last check (no reader: nothing is sent)
  */
@@ -996,6 +997,8 @@ static int expect(const char *what, const char *val)
         got = ui.sv_slot;
     else if (!strncmp(what, "slotused", 8))         /* slotusedN: user preset slot N (0-31) holds something */
         got = preset_len[atoi(what + 8)] > 0;
+    else if (!strncmp(what, "extused", 7))          /* wip660: extusedN: slot N's SECOND spot (song, lanes, notes) holds something (N = the same number as slotused; 32-39 = places 1-8) */
+        got = ext_len[atoi(what + 7)] > 0;
     else if (!strncmp(what, "plmatch", 7)) {         /* wip317: plmatchN: place N (0-39: 0-7 factory, 8-39 user) holds exactly the name in ui.sv_name (the last made-up / renamed one) */
         uint32_t bn;
         const uint8_t *bb = preset_blob(atoi(what + 7), &bn);
@@ -1480,6 +1483,18 @@ int main(int argc, char **argv)
             mark_dirty();
         } else if (!strcmp(cmd, "notepoke")) {          /* wip252: notepoke P V S N: the note of pattern P track V step S */
             proj.note[atoi(a) & 15][atoi(b) & 7][atoi(c) & 63] = (int8_t)atoi(line_d);
+            mark_dirty();
+        } else if (!strcmp(cmd, "notefill")) {          /* wip660: notefill COUNT: COUNT notes (-12..+12, never 0) at pseudo-random places of patterns 1-16: a dense project, for the second spot's MEMORY FULL (about 400 pack to 2 KB and fit; 2000 pack to 5.8 KB and do not) */
+            uint32_t rs = 12345u;
+            int k, n = atoi(a);
+            for (k = 0; k < n; k++) {
+                uint32_t pos, v;
+                rs = rs * 1664525u + 1013904223u;
+                pos = (rs >> 8) % 8192u;
+                rs = rs * 1664525u + 1013904223u;
+                v = (rs >> 8) % 24u;
+                proj.note[pos >> 9][(pos >> 6) & 7][pos & 63] = (int8_t)((int)v - 12 ? (int)v - 12 : 1);
+            }
             mark_dirty();
         } else if (!strcmp(cmd, "presetmove")) {        /* wip255 presetmove A B: flash preset slot A moved to slot B (B 32-39 = presets 1-8 written over) */
             int sa = atoi(a), sb = atoi(b);

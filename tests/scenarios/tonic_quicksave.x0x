@@ -6,15 +6,15 @@ key b10 down
 tap SAVE
 key b10 up
 expect svstage -1
-expect slotused0 0
-# SAVE AS puts the project into user slot 1 (place 9) first
+expect slotused34 0
+# SAVE AS puts the project into the first empty place (3 since wip655: places 3-8 are empty user places; place 3 = flash slot 34, 4 = 35, 5 = 36) first
 tap SAVE
 tap OCT+
 tap OCT+
 tap OCT+
-expect presetcur 9
-expect slotused0 1
-# a change of our own (track 1, step 9: accent and fill), then FUNC + SAVE keeps it in place 9 without any question
+expect presetcur 3
+expect slotused34 1
+# a change of our own (track 1, step 9: accent and fill), then FUNC + SAVE keeps it in place 3 without any question
 tapkey b1
 key w8 down
 tapkey b8
@@ -26,7 +26,7 @@ key b10 down
 tap SAVE
 key b10 up
 expect svstage -1
-expect presetcur 9
+expect presetcur 3
 # a used place asks OVERWRITE SLOT?: OCT- = EXIT (nothing saved), again + OCT+ = YES
 shot qsave_ask.png
 tap OCT-
@@ -35,36 +35,36 @@ key b10 down
 tap SAVE
 key b10 up
 tap OCT+
-# go to place 10 (empty: no steps), come back to 9: the change is there
+# go to place 4 (empty: no steps), come back to 3: the change is there
 turn PRESET 1
 tap OCT+
 wait 100
-expect presetcur 10
+expect presetcur 4
 expect vacc0.1.8 0
 turn PRESET -1
 tap OCT+
 wait 100
-expect presetcur 9
+expect presetcur 3
 expect vacc0.1.8 1
 expect vfill0.1.8 1
-# place 10 is empty: FUNC + SAVE saves at once (no name screens, no question), named UNTITLED 01 (wip308)
+# place 4 is empty: FUNC + SAVE saves at once (no name screens, no question), named UNTITLED 01 (wip308)
 turn PRESET 1
 tap OCT+
 wait 100
-expect presetcur 10
-expect slotused1 0
-expect slotun1 0
+expect presetcur 4
+expect slotused35 0
+expect slotun35 0
 key b10 down
 tap SAVE
 key b10 up
 expect svstage -1
-expect slotused1 1
-expect slotun1 1
-expect presetcur 10
+expect slotused35 1
+expect slotun35 1
+expect presetcur 4
 turn PRESET -1
 tap OCT+
 wait 100
-expect presetcur 9
+expect presetcur 3
 # wip286: while playing it works too (no STOP FIRST): a used place asks only OVERWRITE, OCT- = no (menu closes, nothing saved), OCT+ saves and the playing goes on
 tap PLAY
 wait 200
@@ -93,7 +93,7 @@ turn PRESET 1
 turn PRESET 1
 tap OCT+
 wait 100
-expect presetcur 11
+expect presetcur 5
 tap PLAY
 wait 200
 expect playing 1
@@ -102,8 +102,8 @@ tap SAVE
 key b10 up
 expect svstage -1
 expect svstage -1
-expect slotused2 1
-expect slotun2 2
+expect slotused36 1
+expect slotun36 2
 expect playing 1
 tap PLAY
 wait 300
@@ -111,14 +111,8 @@ turn PRESET -1
 turn PRESET -1
 tap OCT+
 wait 100
-expect presetcur 9
-# a factory place (1) is saved over itself the same way (its override slot)
-turn PRESET -1
-turn PRESET -1
-turn PRESET -1
-turn PRESET -1
-turn PRESET -1
-turn PRESET -1
+expect presetcur 3
+# a demo place (1) is saved over itself the same way (its override slot): two steps back from place 3
 turn PRESET -1
 turn PRESET -1
 tap OCT+

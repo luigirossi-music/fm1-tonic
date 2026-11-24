@@ -370,6 +370,7 @@ static void backup_service(uint32_t req)
         rc = preset_put_rx(ota_dec[6], ota_rd32(ota_dec + 7), ota_rd32(ota_dec + 11));
         ota_try_ms = 5000u;
         ota_deadline = 0;
+        if (rc || !(ota_dec[6] & PG_EXT))           /* wip669: the second spot of a place says nothing when it worked */
         (rc ? ui_warn : ui_say)(!rc ? "PRESET SAVED FROM USB" : rc == RS_E_PLAYING ? "STOP FIRST, THEN RESTORE" : "PRESET NOT SAVED", 0);
     }
     if (req == 8u && ota_dec[2] == PG_ERASE && flash_ok) {     /* one user preset slot cleared */

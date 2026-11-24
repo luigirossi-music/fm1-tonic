@@ -514,7 +514,7 @@ out:
 /* The 32 user preset slots (9-40) over USB, for "Back up my presets" (wip183, step B1; B2 will add put / erase).
  * Request from the host (cmd 0x44, body u8 sub + u8 slot 0..31):
  *   sub 1 LIST: the device answers one frame, cmd 0x45: u32 mask (bit n: slot n holds a whole preset), then 32 x u16
- *               the blob's length (0: empty or damaged)
+ *               the blob's length (0: empty or damaged; slots 22..31 are always 0 since wip654, the frame keeps its 32 entries)
  *   sub 2 GET:  frames cmd 0x46 (u8 slot, u32 offset, up to PG_CHUNK bytes of the TNP1 blob), one a main-loop pass as
  *               the backup does, then cmd 0x47: u8 slot, u32 length, u32 CRC-32 of the blob, u8 status
  *               (0 ok, 1 the slot is empty / damaged / not 0..31, 2 flash read failed or the CRC differs, 3 busy: a
@@ -526,9 +526,22 @@ out:
 #define PG_DATA 0x46u
 #define PG_END 0x47u
 #define PG_CHUNK 120u
-enum { PG_K_NONE, PG_K_LIST, PG_K_GET };
+#define PG_SUB_XLIST 5u                               /* wip669: sub 5 / 6 = the same lists for the second spots */
+#define PG_SUB_XLISTX 6u
+#define PG_SUB_LISTX 4u                               /* wip668: sub 4 = LIST of places 1-8 (override slots 32..39): cmd 0x45, body u8 mask (bit n: slot 32 + n) + 8 x u16 lengths = 17 bytes (the 32-entry list is 68) */
+#define PG_LISTN 32u                                  /* wip667: the LIST frame always has 32 length entries (the page and the old backups know 32 slots); slots 22..31 are not user places any more (wip654) and answer 0 = empty */
+enum { PG_K_NONE, PG_K_LIST, PG_K_GET, PG_K_LISTX };
+static int pg_slot_ok(uint32_t slot)                  /* wip668: a user place 9-30 (slot 0..21) or a place 1-8 (slot 32..39) */
+{
+    return slot < ST_PRESET_N || (slot >= 32u && slot < 40u);
+}
+/* wip669: the SECOND SPOT of a place (song, motion lanes, ARP notes; project.c ext_spot.c 'TEX2'): the same requests with bit 7 of the slot byte set.
+ * Requests: GET (0x44 sub 2, slot | 0x80): frames 0x46 / 0x47 carry the slot byte with bit 7; LIST sub 5 (slots 0..31, as sub 1) and sub 6 (places 1-8, as sub 4);
+ * PUT (0x48) and ERASE (0x49) with slot | 0x80. A put needs the 'TEX2' head. */
+#define PG_EXT 0x80u
+static int pg_info(uint32_t ext, int slot, uint32_t *l, uint32_t *c, uint32_t *a) { return ext ? st_ext_info(slot, l, c, a) : st_preset_info(slot, l, c, a); }
 static struct {
-    uint8_t kind, slot, status;
+    uint8_t kind, slot, status, ext;
     uint32_t off, len, crc, hcrc, src, last;
 } bpg BU_POOL;
 
@@ -554,14 +567,18 @@ static void pg_start(uint32_t sub, uint32_t slot)
         }
         return;
     }
-    bpg.slot = (uint8_t)slot;
+    bpg.slot = (uint8_t)slot;                          /* the wire byte, bit 7 = the second spot */
+    bpg.ext = (slot & PG_EXT) && sub == 2u ? 1u : (sub == PG_SUB_XLIST || sub == PG_SUB_XLISTX) ? 1u : 0u;
+    slot &= ~PG_EXT;
     bpg.off = bpg.crc = bpg.len = bpg.hcrc = bpg.src = 0;
     bpg.status = 0;
     bpg.last = ota_now_ms();
-    if (sub == 1u) {
+    if (sub == 1u || sub == PG_SUB_XLIST) {
         bpg.kind = PG_K_LIST;
+    } else if (sub == PG_SUB_LISTX || sub == PG_SUB_XLISTX) {
+        bpg.kind = PG_K_LISTX;
     } else if (sub == 2u) {
-        if (slot >= ST_PRESET_N || st_preset_info((int)slot, &l, &c, &a)) {
+        if (!pg_slot_ok(slot) || pg_info(bpg.ext, (int)slot, &l, &c, &a)) {
             bpg.status = 1;
         } else {
             bpg.len = l;
@@ -588,17 +605,33 @@ static void pg_step(void)
         return;
     }
     if (bpg.kind == PG_K_LIST) {
-        uint8_t l[4 + 2 * ST_PRESET_N];
+        uint8_t l[4 + 2 * PG_LISTN];
         uint32_t mask = 0, len, crc, addr;
-        for (i = 0; i < ST_PRESET_N; i++) {
+        for (i = 0; i < PG_LISTN; i++) {
             len = 0;
-            if (st_preset_info((int)i, &len, &crc, &addr) == 0)
+            if (pg_info(bpg.ext, (int)i, &len, &crc, &addr) == 0)
                 mask |= 1u << i;
             else
                 len = 0;
             bu_wr16(l + 4 + 2 * i, len);
         }
         bu_wr32(l, mask);
+        bu_frame(PG_LIST, l, sizeof l);
+        pg_stop();
+        return;
+    }
+    if (bpg.kind == PG_K_LISTX) {
+        uint8_t l[1 + 2 * 8];
+        uint32_t len, crc, addr;
+        l[0] = 0;
+        for (i = 0; i < 8; i++) {
+            len = 0;
+            if (pg_info(bpg.ext, (int)(32 + i), &len, &crc, &addr) == 0)
+                l[0] |= (uint8_t)(1u << i);
+            else
+                len = 0;
+            bu_wr16(l + 1 + 2 * i, len);
+        }
         bu_frame(PG_LIST, l, sizeof l);
         pg_stop();
         return;
@@ -652,20 +685,26 @@ static int pg_tnp_ok(const uint8_t *b, uint32_t len)  /* the head of a TNP1 blob
            && (len == 392u + 196u * npat || len == 392u + 196u * npat + 80u || len == 392u + 196u * npat + 96u || len == 392u + 196u * npat + 112u);   /* wip227 / wip242: with or without the TFX1 / TFX2 trailer (tnp.h TNP_FX_LEN, TNP_FX2_LEN; the tag is checked when the preset loads) */
 }
 
+static int pg_ext_ok(const uint8_t *b, uint32_t len)  /* wip669: the head of a second spot: 'TEX2' (ext_spot.c; its own CRCs are checked when a place loads) */
+{
+    return len >= 21u && b[0] == 'T' && b[1] == 'E' && b[2] == 'X' && b[3] == '2';
+}
+
 static int preset_put(uint32_t slot, uint32_t len, uint32_t crc)
 {
-    uint32_t off, c = 0, n;
+    uint32_t off, c = 0, n, ext = slot & PG_EXT;
     if (rs_playing())
         return RS_E_PLAYING;
-    if (slot >= ST_PRESET_N)
+    slot &= ~PG_EXT;
+    if (!pg_slot_ok(slot))
         return RS_E_OBJ;
-    if (len < PG_TNP_MIN || len > ST_PAYLOAD_MAX)
+    if (len < (ext ? 21u : PG_TNP_MIN) || len > ST_PAYLOAD_MAX)
         return RS_E_SIZE;
     for (off = 0; off < len; off += RS_CHUNK) {       /* 1. fetch and check, write nothing */
         n = len - off > RS_CHUNK ? RS_CHUNK : len - off;
         if (rs_fetch(off, rs_buf, n))
             return RS_E_FETCH;
-        if (off == 0 && !pg_tnp_ok(rs_buf, len))
+        if (off == 0 && !(ext ? pg_ext_ok(rs_buf, len) : pg_tnp_ok(rs_buf, len)))
             return RS_E_HEAD;
         c = bu_crc(c, rs_buf, n);
     }
@@ -673,7 +712,7 @@ static int preset_put(uint32_t slot, uint32_t len, uint32_t crc)
         return RS_E_CRC;
     if (rs_playing())
         return RS_E_PLAYING;
-    if (st_preset_erase((int)slot))                   /* 2. from here the slot is lost if it stops */
+    if (ext ? st_ext_erase((int)slot) : st_preset_erase((int)slot))   /* 2. from here the slot is lost if it stops */
         return RS_E_ERASE;
     for (off = 0, c = 0; off < len; off += RS_CHUNK) {
         uint32_t k;
@@ -682,12 +721,12 @@ static int preset_put(uint32_t slot, uint32_t len, uint32_t crc)
             return RS_E_FETCH;
         c = bu_crc(c, rs_buf, n);
         for (k = 0; k < n; k += 256u)
-            if (st_preset_write((int)slot, off + k, rs_buf + k, n - k > 256u ? 256u : n - k))
+            if ((ext ? st_ext_write : st_preset_write)((int)slot, off + k, rs_buf + k, n - k > 256u ? 256u : n - k))
                 return RS_E_PROG;
     }
     if (c != crc)
         return RS_E_CRC;
-    return st_preset_commit((int)slot, len, crc) ? RS_E_VERIFY : 0;
+    return (ext ? st_ext_commit : st_preset_commit)((int)slot, len, crc) ? RS_E_VERIFY : 0;
 }
 
 /* the host's put request: 0 = stored; the host is told either way (rs_note) */
@@ -703,13 +742,15 @@ static int preset_erase_rx(uint32_t slot)
 {
     uint8_t b[10];
     int st = 0;
-    if (slot >= ST_PRESET_N)
+    uint32_t wire = slot, ext = slot & PG_EXT;
+    slot &= ~PG_EXT;
+    if (!pg_slot_ok(slot))
         st = 1;
     else if (rs_playing())
         st = 4;
-    else if (st_preset_erase((int)slot))
+    else if (ext ? st_ext_erase((int)slot) : st_preset_erase((int)slot))
         st = 5;
-    b[0] = (uint8_t)slot;
+    b[0] = (uint8_t)wire;
     bu_wr32(b + 1, 0);
     bu_wr32(b + 5, 0);
     b[9] = (uint8_t)st;
