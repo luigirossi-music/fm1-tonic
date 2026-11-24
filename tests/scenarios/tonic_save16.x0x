@@ -1,0 +1,73 @@
+# wip651: SAVE AS keeps patterns 1-16 (it kept only 1-8: patterns 9-16 were lost when a slot was loaded again)
+wait 300
+# a hit with accent + fill in pattern 12 (FUNC + white key 11), track 2, step 9
+key b10 down
+tapkey w11
+key b10 up
+expect ppat0 12
+tapkey b1
+key w8 down
+tapkey b8
+tapkey b9
+key w8 up
+expect phit11.1.8 1
+expect vacc11.1.8 1
+expect vfill11.1.8 1
+# and one in pattern 16 (FUNC + white key 15)
+key b10 down
+tapkey w15
+key b10 up
+expect ppat0 16
+tapkey b1
+key w8 down
+tapkey b8
+tapkey b9
+key w8 up
+expect phit15.1.8 1
+# SAVE AS into the first empty place
+tap SAVE
+tap OCT+
+expect svstage 2
+tap OCT+
+expect svstage 1
+tap OCT+
+expect svstage -1
+wait 300
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+turn PRESET -1
+tap OCT+
+expect phit11.1.8 0
+expect phit15.1.8 0
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+turn PRESET 1
+tap OCT+
+wait 300
+# patterns 12 and 16 came back
+expect phit11.1.8 1
+expect vacc11.1.8 1
+expect vfill11.1.8 1
+expect phit15.1.8 1

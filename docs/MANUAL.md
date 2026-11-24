@@ -72,7 +72,6 @@ Inspired by Microtonic VST by Sonic Charge, FM1 TONIC is an 8-voice drum synthes
 4. Playing
   - Record and sequencer mode
   - Song mode
-  - Song mode cheat sheet
 5. Presets and saving
 6. Lights, MIDI and USB
 7. Install, back up, recover

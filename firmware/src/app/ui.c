@@ -31,7 +31,7 @@ static const char *const PART_S[NPARTS] = {"TNC", "808", "BRK"};   /* 4 chars: l
 enum { O_NONE, O_LIST, O_ASK, O_MEM };   /* O_MEM (wip267): GLO 3rd press, the project memory as a vertical battery */
 enum { ACT_NONE, ACT_SAVE, ACT_CLEAR_PAT, ACT_RESET, ACT_ABOUT, ACT_SONG_INS,
        ACT_SONG_DEL, ACT_SONG_CLR, ACT_PERF, ACT_PERF_TEST, ACT_PRESET, ACT_SAVEAS, ACT_CHAIN, ACT_SONGMODE, ACT_SONGEXIT,
-       ACT_CLEAR_TNPAT, ACT_CLEAR_TNTRK, ACT_PRESETGO, ACT_STOPFIRST, ACT_QSAVE, ACT_SONGKILL, ACT_SONGBAR, ACT_AUTODEL, ACT_PASTE_TNPAT };   /* ACT_PASTE_TNPAT (wip416): FUNC + FILL on the pattern: PASTE PATTERN? yes / no */   /* ACT_AUTODEL (wip367): FUNC + EDIT let go: DELETE AUTOMATION? */   /* ACT_SONGBAR (wip357): FILL on the SONG screen: DELETE BAR? */   /* ACT_SONGKILL (wip314): FUNC + ARP: DELETE SONG? */   /* ACT_QSAVE (wip265): FUNC + SAVE on a used place: OVERWRITE PROJECT? */   /* ACT_PRESETGO: a preset chosen while playing: change it (the playing stops)? */   /* the last two: FUNC + PLAY on the Tonic (the pattern / one track) */
+       ACT_CLEAR_TNPAT, ACT_CLEAR_TNTRK, ACT_PRESETGO, ACT_STOPFIRST, ACT_QSAVE, ACT_SONGKILL, ACT_SONGBAR, ACT_AUTODEL, ACT_PASTE_TNPAT, ACT_CLEAR_ALL };   /* ACT_CLEAR_ALL (wip632): FUNC + PLAY held 3 s: CLEAR ALL PATTERNS? */   /* ACT_PASTE_TNPAT (wip416): FUNC + FILL on the pattern: PASTE PATTERN? yes / no */   /* ACT_AUTODEL (wip367): FUNC + EDIT let go: DELETE AUTOMATION? */   /* ACT_SONGBAR (wip357): FILL on the SONG screen: DELETE BAR? */   /* ACT_SONGKILL (wip314): FUNC + ARP: DELETE SONG? */   /* ACT_QSAVE (wip265): FUNC + SAVE on a used place: OVERWRITE PROJECT? */   /* ACT_PRESETGO: a preset chosen while playing: change it (the playing stops)? */   /* the last two: FUNC + PLAY on the Tonic (the pattern / one track) */
 #define CH_MAX 64                     /* the CHAIN screen: patterns in a chain at most */
 
 typedef struct {
@@ -65,6 +65,7 @@ typedef struct {
     uint8_t ch_n, ch_pat[CH_MAX];      /* CHAIN screen: the patterns chosen so far (0-15) */
     uint8_t songmode;                  /* Tonic: SONG MODE on (FUNC + SEQ, confirmed): PLAY plays the song; not saved */
     int8_t clip;                       /* Tonic: the pattern FUNC + ACCENT copied (0-31), -1 = none yet; not saved */
+    uint8_t ca_hold;                   /* wip632: FUNC + PLAY just asked CLEAR PATTERN?: still held after 3 s it becomes CLEAR ALL PATTERNS? */
     uint8_t mute_pend;                 /* Tonic: FUNC + black key 1-8 held (bit = track): the mute happens when it is let go, */
                                        /* unless the key was used with PLAY / ACCENT / FILL meanwhile */
     uint8_t pst_pg;                    /* Tonic: ... a page key (EDIT / LFO) was held: the release pastes the copied page */
@@ -1545,6 +1546,18 @@ static void tn_clear_pat(void)
     say("PATTERN CLEARED", 0);
 }
 
+static void tn_clear_all(void)                        /* wip632: every pattern of every bank: trigs, accents, fills, notes, late offsets, motion (sounds, presets, song, settings stay) */
+{
+    int p;
+    for (p = 0; p < NPAT; p++) {
+        clear_part(&proj.pat[p], PART_909);
+        clear_lanes(p, PART_909);
+    }
+    chain_after_clear();
+    mark_dirty();
+    say("ALL PATTERNS CLEARED", 0);
+}
+
 static void tn_clear_track(int v)
 {
     int p = seq.ppat[PART_909], w, k;
@@ -1730,7 +1743,7 @@ static int perf_testing(void);
 static int tonic_part(void);
 static int octask(void)                                /* a question OCT+ confirms and OCT- / HOME go back from */
 {
-    return ui.ask_act == ACT_SONGMODE || ui.ask_act == ACT_SONGEXIT || ui.ask_act == ACT_SONGKILL || ui.ask_act == ACT_SONGBAR || ui.ask_act == ACT_AUTODEL || ui.ask_act == ACT_CLEAR_TNPAT || ui.ask_act == ACT_CLEAR_TNTRK || ui.ask_act == ACT_PASTE_TNPAT;
+    return ui.ask_act == ACT_SONGMODE || ui.ask_act == ACT_SONGEXIT || ui.ask_act == ACT_SONGKILL || ui.ask_act == ACT_SONGBAR || ui.ask_act == ACT_AUTODEL || ui.ask_act == ACT_CLEAR_TNPAT || ui.ask_act == ACT_CLEAR_TNTRK || ui.ask_act == ACT_PASTE_TNPAT || ui.ask_act == ACT_CLEAR_ALL;
 }
 static const char *const BTN_LABEL[NB] = {"FX", "SEL", "ENV", "LFO", "EDIT", "GLO", "HOME", "SAVE", "ARP", "SEQ",
                                           "PLAY / STOP", "REC", "OCT-", "OCT+"};
@@ -2141,7 +2154,8 @@ static void set_view(int v);
 
 /* PRESETS: ids 0-7 are the factory bank, 8-39 the user slots (SAVE AS) that hold something. The PRESETS knob steps
  * through the ones that exist; a question asks first. */
-#define NFACT 8
+#define NFACT 8                                        /* places 1-8 keep their override sectors (PLAT_NPRESET + id); the storage mapping is unchanged */
+#define NDEMO 2                                        /* wip655: only places 1-2 are DEMO presets (editable, from the compiled bank); places 3-8 are ordinary empty places (were factory presets) */
 static uint8_t pbuf[PLAT_STORE_MAX] X0X_POOL;                   /* the user preset being looked at */
 static const uint8_t *preset_blob(int id, uint32_t *n)
 {
@@ -2151,7 +2165,7 @@ static const uint8_t *preset_blob(int id, uint32_t *n)
             *n = (uint32_t)r;
             return pbuf;
         }
-        if (id >= TONIC_BANK_N)
+        if (id >= NDEMO || id >= TONIC_BANK_N)         /* wip655: no demo behind places 3-8 */
             return 0;
         *n = TONIC_BANK[id].n;
         return TONIC_BANK[id].p;
@@ -2173,7 +2187,7 @@ static const uint8_t *preset_blank(uint32_t *n, int place)   /* place = 0-based,
     uint32_t i, hdr = TNP_HDR + 8u * TNP_VOICE, src;
     if (TONIC_BANK_N < 1)
         return 0;
-    src = (uint32_t)(place - NFACT) % 8u % (uint32_t)TONIC_BANK_N;   /* (a bank of fewer than 8 presets, as in the host tests: round again) */
+    src = (uint32_t)place % 8u % (uint32_t)TONIC_BANK_N;     /* wip655: = (place - 8) mod 8 for place >= 8 as before; places 3-8 (place 2-7) take the sound of factory 3-8, which they used to be */   /* (a bank of fewer than 8 presets, as in the host tests: round again) */
     if (TONIC_BANK[src].n < TNP_SIZE(1))
         return 0;
     for (i = 0; i < TNP_SIZE(1); i++)
@@ -2191,7 +2205,7 @@ static const uint8_t *preset_blank(uint32_t *n, int place)   /* place = 0-based,
     return pblank;
 }
 
-#define NPRESETS (NFACT + PLAT_NPRESET)                /* the 40 places: 1-8 factory, 9-40 user slots */
+#define NPRESETS (NFACT + PLAT_NUSER)                  /* wip654: the 30 places: 1-8 factory, 9-30 user slots (were 40) */
 static int preset_next(int from, int dir)              /* the next place, from + dir, round and round (an empty one too) */
 {
     return (from + dir + NPRESETS) % NPRESETS;
@@ -2358,7 +2372,7 @@ static int next_free_place(int from)                    /* from = the loaded pla
     for (k = 1; k <= NPRESETS; k++) {
         uint32_t n;
         p = (from - 1 + k + NPRESETS) % NPRESETS + 1;
-        if (p > NFACT && !preset_blob(p - 1, &n))      /* (1-8 hold the factory presets: never "empty") */
+        if (p > NDEMO && !preset_blob(p - 1, &n))      /* (1-8 hold the factory presets: never "empty") */
             return p;
     }
     return from % NPRESETS + 1;
@@ -2379,7 +2393,7 @@ static void saveas_open(void)
     elf_name(ui.sv_name);
     ui.sv_fixed = 0;
     ui.sv_rename = 0;
-    for (s = 0; s < PLAT_NPRESET && !found; s++) {      /* the first empty slot (else 1) */
+    for (s = 0; s < PLAT_NUSER && !found; s++) {      /* the first empty slot (else 1) */
         uint32_t n;
         if (!preset_blob(NFACT + s, &n)) {
             ui.sv_slot = (uint8_t)s;
@@ -2405,9 +2419,13 @@ static void saveas_open(void)
     ask(ACT_SAVEAS, ui.preset_cur ? SV_HERE : SV_CHOOSE, "", "");   /* ask_arg = the screen: 3 SAVE HERE?, 4 CHOOSE SLOT, 2 the slot, 1 the name (0 not used any more) */
 }
 
+/* wip652: SAVE AS / QUICK SAVE pack into pbuf (the preset-viewing buffer above, 3840 bytes, already in the pool): a save never runs while a
+ * preset is being read (quick_write_to copies the name out of it BEFORE packing and does not touch it afterwards), so no second 3640-byte buffer.
+ * (wip651 had a separate one: the pool headroom check failed, 5172 B < 8192 B) */
+typedef char pbuf_big_enough[(sizeof pbuf >= TNP_SIZE(TNP_NPAT_SAVE) + TNP_FX3_LEN) ? 1 : -1];
+
 static void saveas_go(void)                            /* OCT+ on the third screen */
 {
-    uint8_t blob[TNP_SIZE(TNP_NPAT_SAVE) + TNP_FX3_LEN];
     uint32_t n;
     int rc, slot = ui.sv_here - 1 < NFACT ? PLAT_NPRESET + ui.sv_here - 1 : ui.sv_here - 1 - NFACT, cur = ui.sv_here;   /* wip343: any of the 40 places (1-8: their override slot) */
     if (ui.sv_rename && ui.preset_cur) {               /* wip317: RENAME: the loaded place; 1-8 are written to their override slot (PLAT_NPRESET + n - 1), preset_cur stays */
@@ -2416,8 +2434,8 @@ static void saveas_go(void)                            /* OCT+ on the third scre
         cur = ui.preset_cur;
     }
     /* wip317: no STOP FIRST any more: every SAVE works while playing (the flash write may make the sound hiccup) */
-    n = project_preset_pack(blob, sizeof blob, ui.sv_name, (unsigned)(seq.bpm * 10.0f + 0.5f), (unsigned)((seq.vmute & 0xFFu) | ((unsigned)seq.choke << 8)));
-    rc = n ? plat_preset_save(slot, blob, n) : -1;
+    n = project_preset_pack(pbuf, sizeof pbuf, ui.sv_name, (unsigned)(seq.bpm * 10.0f + 0.5f), (unsigned)((seq.vmute & 0xFFu) | ((unsigned)seq.choke << 8)));
+    rc = n ? plat_preset_save(slot, pbuf, n) : -1;
     ui.overlay = O_NONE;
     if (rc == -3)
         warn("NO FLASH SPACE YET", 0);
@@ -2464,7 +2482,7 @@ static void untitled_name(char *out)                   /* wip308: UNTITLED 01, 0
         if (v < 10)
             *q++ = '0';
         *put_i(q, v) = 0;
-        for (s = 0; s < PLAT_NPRESET && !used; s++)
+        for (s = 0; s < PLAT_NUSER && !used; s++)
             used = untitled_is(s, out);
         if (!used)
             return;
@@ -2479,7 +2497,6 @@ static void quick_write(void)
 
 static void quick_write_to(int num, const char *forced)   /* wip319: num = the place (1-40); forced = the name to give it (0: the place's own name) */
 {
-    uint8_t blob[TNP_SIZE(TNP_NPAT_SAVE) + TNP_FX3_LEN];
     char name[TNP_NAME_LEN + 1];
     uint32_t n;
     int id, slot, k = 0, rc;
@@ -2497,8 +2514,8 @@ static void quick_write_to(int num, const char *forced)   /* wip319: num = the p
     name[k] = 0;
     if (!k)                                            /* an empty place: UNTITLED 01, 02, 03 ... (wip308) */
         untitled_name(name);
-    n = project_preset_pack(blob, sizeof blob, name, (unsigned)(seq.bpm * 10.0f + 0.5f), (unsigned)((seq.vmute & 0xFFu) | ((unsigned)seq.choke << 8)));
-    rc = n ? plat_preset_save(slot, blob, n) : -1;
+    n = project_preset_pack(pbuf, sizeof pbuf, name, (unsigned)(seq.bpm * 10.0f + 0.5f), (unsigned)((seq.vmute & 0xFFu) | ((unsigned)seq.choke << 8)));
+    rc = n ? plat_preset_save(slot, pbuf, n) : -1;
     if (rc == -3)
         warn("NO FLASH SPACE YET", 0);
     else if (rc)
@@ -2551,7 +2568,7 @@ static void quick_save(void)
     }
     id = ui.preset_cur - 1;
     b = preset_blob(id, &n);
-    if (!b && id >= NFACT) {                           /* wip307/308: empty: saved at once (no name screens, no question), named UNTITLED nn */
+    if (!b && id >= NDEMO) {                           /* wip307/308: empty: saved at once (no name screens, no question), named UNTITLED nn */
         quick_write();
     } else {
         char t[TNP_NAME_LEN + 1];
@@ -2644,7 +2661,7 @@ static void run_action(int act, int arg)
         uint32_t pn = 0;
         const uint8_t *pb = preset_blob(arg, &pn);
         int rc;
-        if (!pb && arg >= NFACT)                       /* an empty user place: the sound of factory preset (place - 9) mod 8 + 1, no pattern (wip358) */
+        if (!pb && arg >= NDEMO)                       /* an empty user place: the sound of factory preset (place - 9) mod 8 + 1, no pattern (wip358) */
             pb = preset_blank(&pn, arg);
         rc = pb ? app_load_preset(pb, pn) : -1;
         if (rc == 10)
@@ -2664,6 +2681,7 @@ static void run_action(int act, int arg)
     }
     case ACT_SAVE: save_project(); break;
     case ACT_CLEAR_TNPAT: tn_clear_pat(); break;
+    case ACT_CLEAR_ALL: tn_clear_all(); break;
     case ACT_PASTE_TNPAT: tn_paste(arg); break;       /* wip416: PASTE PATTERN? yes (arg = the pattern pasted into) */
     case ACT_SONGBAR: song_del_cur(); break;           /* wip357: DELETE BAR? yes */
     case ACT_SONGKILL:                                /* wip314: DELETE SONG? yes: the song is gone and song mode is left */
@@ -3375,7 +3393,7 @@ static void msp_voice(int v)                          /* wip272: a black key 1-8
 {
     uint32_t sb = 1u << (PART_909 * NDRUM + v);
     char tn[2] = {(char)('1' + v), 0};
-    if (!ui.msmode) {
+    if (!ui.msmode && ui.view != V_MIX) {                /* wip630: the GLO mixer has no mute: its black keys only solo */
         mute_track(PART_909, v);
         return;
     }
@@ -3519,6 +3537,8 @@ static void key_event(int k, int down)
         if (bl == 10) {                                     /* FUNC: mutes active = all unmuted (like FILL with solos); none = MUTE mode */
             if (down && ui.view == V_MIX)
                 ui.mod_held |= 4u;                          /* wip607: on the GLO mixer FUNC is still the modifier of the combinations too (FUNC + HOME = RENAME, FUNC + REC, ...) */
+            if (ui.view == V_MIX)
+                return;                                     /* wip630: on the GLO mixer FUNC does not mute / unmute: it is only the modifier (FUNC + black key 1-8 = audition) */
             if (down) {
                 uint32_t mm = seq.vmute & (((1u << NDRUM_TONIC) - 1u) << (PART_909 * NDRUM));   /* wip284: the Tonic voices that are muted now */
                 ui.msmode = 0;
@@ -3532,6 +3552,13 @@ static void key_event(int k, int down)
         }
         if (bl == 9) {                                      /* FILL: solos active = all off (and back to MUTE mode); none = SOLO mode on / off */
             if (down) {
+                if (ui.view == V_MIX) {                     /* wip630: GLO mixer: solo is the only mode: FILL clears every solo */
+                    if (seq.vsolo) {
+                        seq.vsolo = 0;
+                        say("SOLO OFF", 0);
+                    }
+                    return;
+                }
                 if (seq.vsolo) {
                     seq.vsolo = 0;
                     ui.msmode = 0;
@@ -3544,6 +3571,11 @@ static void key_event(int k, int down)
             return;
         }
         if (bl >= 0 && bl < NDRUM_TONIC) {
+            if (ui.view == V_MIX && (ui.mod_held & 4u)) {   /* wip630: GLO mixer, FUNC held + black key 1-8: AUDITION (the voice sounds; no solo, no selection, nothing recorded) */
+                if (down)
+                    engine_drum(PART_909, bl, 0.75f);
+                return;
+            }
             if (down)
                 msp_voice(bl);
             return;
@@ -3824,6 +3856,7 @@ static int shift_combo(int b)
     if (b == B_PLAY && ui.view == V_SEQ && ui.arp && tonic_part() && ui.overlay == O_NONE && !perf_testing() && (ui.keys & (1u << BLACK_KEY[10]))) {
         /* wip430: the ARP page: black key 11 (FUNC, but a piano key here) held + PLAY = CLEAR PATTERN? as everywhere else (PLAY does not start / stop then) */
         ask(ACT_CLEAR_TNPAT, 0, "CLEAR PATTERN?", OK);
+        ui.ca_hold = 1;                           /* wip632: held 3 s: CLEAR ALL PATTERNS? */
         return 1;
     }
     if (!tonic_part() || !(ui.mod_held & 4u) || ui.overlay == O_ASK || perf_testing())
@@ -3849,8 +3882,10 @@ static int shift_combo(int b)
         else if (v >= 0) {
             ui.mute_pend = 0;
             ask(ACT_CLEAR_TNTRK, v, "CLEAR TRACK PATTERN?", OK);
-        } else
+        } else {
             ask(ACT_CLEAR_TNPAT, 0, "CLEAR PATTERN?", OK);
+            ui.ca_hold = 1;                       /* wip632: still held after 3 s: CLEAR ALL PATTERNS? */
+        }
         return 1;
     case B_SEQ:                                   /* (wip211) SONG MODE: on (asks), again: off (asks) */
         if (ui.songmode)
@@ -3987,7 +4022,7 @@ static void button_tap(int b)
             ui.overlay = O_NONE;
             if (b == B_OCTDN)
                 say("PRESET KEPT", 0);
-            else if (!preset_blob(ui.ask_arg, &pn) && ui.ask_arg < NFACT)
+            else if (!preset_blob(ui.ask_arg, &pn) && ui.ask_arg < NDEMO)
                 warn("PRESET EMPTY", 0);
             else if (seq.playing || seq.req_stop) {      /* playing: ask again, the playing would stop */
                 char t[28];
@@ -8717,6 +8752,10 @@ static void leds(void)
                 if (ui.frame & 2u)
                     k |= 1u << WHITE_KEY[ui.blink_pat];
             }
+        } else if (ui.overlay == O_ASK && ui.ask_act == ACT_CHAIN && tonic_part()) {   /* wip628: the SONG PATTERNS screen (empty song): white keys = patterns, with notes LIT, empty DARK (the keys write patterns 1-16 of the first bank) */
+            for (i = 0; i < 16; i++)
+                if (pattern_used(&proj.pat[i]))
+                    k |= 1u << WHITE_KEY[i];
         } else if (ui.view == V_SEQ && ui.arp && tonic_part()) {   /* wip251: the ARP page: the two C keys dim (C = the voice's own pitch at octave 0) */
             d |= 1u << WHITE_KEY[KEY_WHITE[ARP_C_KEY]];
             d |= 1u << WHITE_KEY[KEY_WHITE[ARP_C_KEY + 12]];
@@ -8791,7 +8830,7 @@ static void leds(void)
                 else if (msp_on() && track_muted(PART_909, (int)i))   /* wip615: a muted voice's key blinks at 150 BPM, by the clock (lq.mute) */
                     lq.mute |= 1u << BLACK_KEY[i];
             if (msp_on()) {                               /* wip272 (both PERFORM pages): the mode's key is lit: FUNC = MUTE, FILL = SOLO */
-                k |= 1u << BLACK_KEY[ui.msmode ? 9 : 10];
+                k |= 1u << BLACK_KEY[ui.msmode || ui.view == V_MIX ? 9 : 10];   /* wip630: the GLO mixer is always SOLO: FILL lit */
                 {                                         /* wip375: the white keys = the 16 patterns: empty = no light, with notes = low light, the CURRENT one blinks slowly, the cued (next) one blinks (fast) */
                     int cp = seq.ppat[PART_909] - ui.pbank * 16;
                     int cu = pat_next() - ui.pbank * 16;
@@ -9385,7 +9424,7 @@ void ui_init(void)
     ui.overlay = O_NONE;
     ui.outline_ok = 0;
     palette_set(proj.set.palette);
-    ui.preset_cur = proj.set.preset_cur;            /* wip309: the place loaded before power-off (0 = none) */
+    ui.preset_cur = proj.set.preset_cur > NPRESETS ? 0 : proj.set.preset_cur;   /* wip309: the place loaded before power-off (0 = none); wip654: a place 31-40 of the old 40 is gone: none */
     for (i = 0; i < 6; i++)
         blit_hash[i] = 0;
     build_pages();
@@ -9834,6 +9873,14 @@ void ui_frame(void)
         int id = ui.preset_pend - 1;
         ui.preset_pend = 0;
         run_action(ACT_PRESET, id);
+    }
+    if (ui.ca_hold) {                                  /* wip632: FUNC + PLAY held 3 s since CLEAR PATTERN? came: it turns into CLEAR ALL PATTERNS? */
+        if (ui.overlay != O_ASK || ui.ask_act != ACT_CLEAR_TNPAT || !(ui.btn & (1u << B_PLAY)) || !(ui.keys & (1u << BLACK_KEY[10])))
+            ui.ca_hold = 0;
+        else if ((int32_t)(plat_ms() - ui.down_t[B_PLAY]) >= 3000) {
+            ui.ca_hold = 0;
+            ask(ACT_CLEAR_ALL, 0, "CLEAR ALL PATTERNS?", "[OCT-] NO [OCT+] YES");
+        }
     }
     undo_tick();
     autosave();

@@ -179,7 +179,7 @@ function tnpBlob(name, npat = 1, seed = 1) {
 }
 {
   const tb = tnpBlob("My Beat", 8, 4);
-  check(PB.tnpOk(tb) && !PB.tnpOk(tb.subarray(0, 500)) && !PB.tnpOk(tnpBlob("x", 13)) && !PB.tnpOk(new Uint8Array(588)), "tnpOk: a TNP1 blob of the right size only");
+  check(PB.tnpOk(tb) && !PB.tnpOk(tb.subarray(0, 500)) && !PB.tnpOk(tnpBlob("x", 17)) && !PB.tnpOk(new Uint8Array(588)), "tnpOk: a TNP1 blob of the right size only");
   {                                              // wip227: a preset with the 'TFX1' compressor / reverb / delay trailer (SAVE AS makes these)
     const base = 392 + 196 * 8, fx = new Uint8Array(base + 80);
     fx.set(tnpBlob("With FX", 8, 9));

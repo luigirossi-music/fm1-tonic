@@ -50,10 +50,14 @@ enum { OBJ_SET, OBJ_SOUND, OBJ_PAT0, OBJ_PAT1, OBJ_PANEL, OBJ_SONG, OBJ_MOTION, 
  * OBJ_MOTION 0xDE000 (all inside Felucca's data area, 0x97000..0xDFFFF) */
 
 /* USER PRESET SLOTS (SAVE AS): 32 slots, each one TNP1 blob (tnp.h, up to PLAT_STORE_MAX bytes) */
-#define PLAT_NPRESET 32
+#define PLAT_NPRESET 32                /* wip654: the flash index where the override slots (places 1-8) start; user slots are 0..PLAT_NUSER-1 */
+#define PLAT_NUSER 22                  /* wip654: user places 9-30 (was 32: 9-40): each project has a SECOND spot (plat_ext_*) for the notes, song and motion */
 #define PLAT_NPRESET_ALL 40            /* wip255: + 8 flash slots (index 32-39) that replace the factory presets 1-8 once written (option B) */
 int plat_preset_load(int slot, void *dst, uint32_t max);          /* bytes loaded, < 0 = empty / bad */
 int plat_preset_save(int slot, const void *src, uint32_t len);    /* 0 = saved and verified */
+int plat_ext_load(int slot, void *dst, uint32_t max);            /* wip654: the project's second spot (same slot number as plat_preset_*): bytes, < 0 = none */
+int plat_ext_save(int slot, const void *src, uint32_t len);       /* 0 = saved and verified */
+int plat_ext_erase(int slot);                                      /* the second spot of a project that has none (an old one) is emptied */
 
 /* user sample slots (break loops), read in place; 0 = empty slot */
 #define PLAT_NSLOTS 3

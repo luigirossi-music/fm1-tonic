@@ -49,15 +49,15 @@ expect svhere 9   # wip343: nothing loaded: the first empty place
 # ALGORITHM cycles the 32 slots, both ways
 turn ALGO 8
 expect svslot 8
-# wip343: the slot screen covers all 40 places (1-8 too) and cycles round: place 17 - 9 = 8 (factory), + 1 = 9, - 9 = 40 (round), + 9 = 9 again
+# wip343 / wip654: the slot screen covers all 30 places (1-8 too) and cycles round: place 17 - 9 = 8 (factory), + 1 = 9, - 9 = 30 (round), + 9 = 9 again
 turn ALGO -9
 expect svhere 8
 turn ALGO 1
 expect svhere 9
 expect svslot 0
 turn ALGO -9
-expect svhere 40
-expect svslot 31
+expect svhere 30
+expect svslot 21
 turn ALGO 9
 expect svhere 9
 turn ALGO 8

@@ -108,6 +108,9 @@ int plat_store_load(uint32_t obj, void *dst, uint32_t max) { return flash_ok ? s
 int plat_store_save(uint32_t obj, const void *src, uint32_t len) { return flash_ok ? st_save(obj, src, len) : -9; }
 int plat_preset_load(int slot, void *dst, uint32_t max) { return flash_ok ? st_preset_load(slot, dst, max) : -1; }
 int plat_preset_save(int slot, const void *src, uint32_t len) { return flash_ok ? st_preset_save(slot, src, len) : -9; }
+int plat_ext_load(int slot, void *dst, uint32_t max) { return flash_ok ? st_ext_load(slot, dst, max) : -1; }
+int plat_ext_save(int slot, const void *src, uint32_t len) { return flash_ok ? st_ext_save(slot, src, len) : -9; }
+int plat_ext_erase(int slot) { return flash_ok ? st_ext_erase(slot) : -9; }
 int plat_store_load_prev(uint32_t obj, void *dst, uint32_t max) { return flash_ok ? st_load_prev(obj, dst, max) : -1; }
 
 int plat_slot_zones(int k) { return (k >= 0 && k < SMP_USER_SLOTS) ? usr_nz[k] : 0; }

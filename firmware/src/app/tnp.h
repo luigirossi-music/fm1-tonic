@@ -18,11 +18,11 @@
 #define TNP_VOICE 44u
 #define TNP_PAT_HDR 4u
 #define TNP_PAT (TNP_PAT_HDR + 8u * 24u)
-#define TNP_NPAT_MAX 12u
+#define TNP_NPAT_MAX 16u
 #define TNP_SIZE(npat) (TNP_HDR + 8u * TNP_VOICE + (npat) * TNP_PAT)
 #define TNP_NAME_LEN 24u
-#define TNP_NPAT_SAVE 8u            /* SAVE AS keeps patterns a-h (1-8), the ones the firmware loads (user slots; 1960 bytes < PLAT_STORE_MAX) */
-#define TNP_NPAT_LOAD 8u            /* the firmware keeps patterns a-h (1-8); a file's others are not loaded, 9-32 stay empty */
+#define TNP_NPAT_SAVE 16u           /* wip651: SAVE AS keeps patterns 1-16 (was 1-8 only: patterns 9-16 were lost in a slot); 392 + 16 x 196 + 112 (TFX3) = 3640 bytes < PLAT_STORE_MAX 3840 */
+#define TNP_NPAT_LOAD 16u           /* wip651: the firmware loads patterns 1-16 (a file's others are not loaded, 17-32 stay empty); the CHAIN flags only count on 1-8 (NPAT_TONIC) */
 
 /* wip227: OPTIONAL TRAILER after the patterns (a preset made by SAVE AS has it; a Microtonic conversion and the factory presets do not): the
  * compressor, reverb and delay as the user left them. The u16 total at 4 then is TNP_SIZE(npat) + TNP_FX_LEN. Without it the preset starts

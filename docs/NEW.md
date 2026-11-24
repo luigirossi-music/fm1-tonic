@@ -2,6 +2,10 @@
 The newest version first. Install it with the [web installer](../install/); the
 [manual](../manual/) covers everything in detail.
 
+## FM1 Tonic 1.8d · 24 November 2026
+
+- FIXED (wip652, firmware 1.8d): **a saved project (SAVE AS, QUICK SAVE, RENAME) keeps patterns 1-16** (it kept only 1-8). Old 8-pattern projects and the factory presets load as before (patterns 9-16 empty). Not saved in a slot yet: the per-step ARP notes, the song, motion.
+
 ## FM1 Tonic 1.8c · 23 November 2026
 
 - DECLARED (wip626, firmware + manual + web): **version 1.8c**. The welcome screen says VER. 1.8C, the package is fm1-tonic-1.8c.fwsc with identity FM-1_77010803, the manual is **1.8c11** in all six languages and the web page's What's new in 1.8c and Future updates are rewritten (every new function says how to use it).

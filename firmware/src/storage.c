@@ -181,21 +181,23 @@ static int st_save(uint32_t obj, const void *src, uint32_t len)
  * save into a sector erases it. Sectors 0xA0000..0xBFFFF; the panel calibration at 0xDC000 is untouched. */
 #define ST_PRESET_BASE 0xA0000u
 #define ST_PRESET_OK 1
-#define ST_PRESET_N 32                         /* the user slots (presets 9-40): the USB backup (backup.c) knows these only, until option B step B3 */
+#define ST_PRESET_N 22                         /* wip654: the user slots (places 9-30; were 32 = 9-40): the USB backup (backup.c) knows these only */
+#define ST_PRESET_USERSPAN 32                  /* wip654: the override slots keep their flash index (32-39) and sector (0xC0000..), so the old ones still read: indexes 22-31 are not slots any more */
 /* wip255 (option B, step B1): 8 more slots, flash index 32-39, = presets 1-8 written over (they replace the factory preset of that number).
  * Sectors 0xC0000..0xC7FFF: free (nothing in the source uses 0xC0000..0xDBFFF; the panel calibration is at 0xDC000). */
 #define ST_PRESET2_BASE 0xC0000u
 #define ST_PRESET_NALL 40
 static uint32_t st_preset_addr(int slot)
 {
-    return slot < ST_PRESET_N ? ST_PRESET_BASE + (uint32_t)slot * ST_SECTOR : ST_PRESET2_BASE + (uint32_t)(slot - ST_PRESET_N) * ST_SECTOR;
+    return slot < ST_PRESET_USERSPAN ? ST_PRESET_BASE + (uint32_t)slot * ST_SECTOR : ST_PRESET2_BASE + (uint32_t)(slot - ST_PRESET_USERSPAN) * ST_SECTOR;
 }
+#define ST_SLOT_BAD(slot) ((slot) < 0 || (slot) >= ST_PRESET_NALL || ((slot) >= ST_PRESET_N && (slot) < ST_PRESET_USERSPAN))
 
 static int st_preset_load(int slot, void *dst, uint32_t max)
 {
     st_hdr_t h;
     uint32_t i, a = st_preset_addr(slot);
-    if (!ST_PRESET_OK || slot < 0 || slot >= ST_PRESET_NALL || st_read(a, &h, sizeof h))
+    if (!ST_PRESET_OK || ST_SLOT_BAD(slot) || st_read(a, &h, sizeof h))
         return -1;
     if (h.magic != ST_MAGIC || h.type != (0x5000u | (uint32_t)slot) || !h.len || h.len > ST_PAYLOAD_MAX ||
         h.hcrc != st_crc32(&h, sizeof h - 4u))
@@ -215,7 +217,7 @@ static int st_preset_info(int slot, uint32_t *len, uint32_t *crc, uint32_t *addr
 {
     st_hdr_t h;
     uint32_t a = st_preset_addr(slot);
-    if (!ST_PRESET_OK || slot < 0 || slot >= ST_PRESET_NALL || st_read(a, &h, sizeof h))
+    if (!ST_PRESET_OK || ST_SLOT_BAD(slot) || st_read(a, &h, sizeof h))
         return -1;
     if (h.magic != ST_MAGIC || h.type != (0x5000u | (uint32_t)slot) || !h.len || h.len > ST_PAYLOAD_MAX ||
         h.hcrc != st_crc32(&h, sizeof h - 4u))
@@ -235,7 +237,7 @@ static int st_preset_erase(int slot)
 {
     if (!ST_PRESET_OK)
         return -3;
-    if (slot < 0 || slot >= ST_PRESET_NALL)
+    if (ST_SLOT_BAD(slot))
         return -1;
     return st_erase(st_preset_addr(slot));
 }
@@ -244,7 +246,7 @@ static int st_preset_write(int slot, uint32_t off, const void *src, uint32_t n)
 {
     if (!ST_PRESET_OK)
         return -3;
-    if (slot < 0 || slot >= ST_PRESET_NALL || off + n > ST_PAYLOAD_MAX)
+    if (ST_SLOT_BAD(slot) || off + n > ST_PAYLOAD_MAX)
         return -1;
     return st_prog(st_preset_addr(slot) + ST_PAYLOAD_OFF + off, src, n);
 }
@@ -256,7 +258,7 @@ static int st_preset_commit(int slot, uint32_t len, uint32_t crc)
     int rc;
     if (!ST_PRESET_OK)
         return -3;
-    if (slot < 0 || slot >= ST_PRESET_NALL || !len || len > ST_PAYLOAD_MAX)
+    if (ST_SLOT_BAD(slot) || !len || len > ST_PAYLOAD_MAX)
         return -1;
     h.magic = ST_MAGIC;
     h.type = (uint16_t)(0x5000u | (uint32_t)slot);
@@ -281,7 +283,7 @@ static int st_preset_save(int slot, const void *src, uint32_t len)
     int rc;
     if (!ST_PRESET_OK)
         return -3;
-    if (slot < 0 || slot >= ST_PRESET_NALL || !len || len > ST_PAYLOAD_MAX)
+    if (ST_SLOT_BAD(slot) || !len || len > ST_PAYLOAD_MAX)
         return -1;
     for (off = 0; off < len; off++)
         st_buf[off] = ((const uint8_t *)src)[off];
@@ -301,6 +303,87 @@ static int st_preset_save(int slot, const void *src, uint32_t len)
     h.rsv[0] = h.rsv[1] = 0xFFFFFFFFu;
     h.hcrc = st_crc32(&h, sizeof h - 4u);
     if ((rc = st_prog(a, &h, sizeof h)) != 0)          /* the commit record, last */
+        return rc;
+    if (st_read(a, &chk, sizeof chk) || chk.hcrc != h.hcrc || st_read(a + ST_PAYLOAD_OFF, st_buf, len) ||
+        st_crc32(st_buf, len) != h.crc)
+        return -7;
+    return 0;
+}
+
+/* wip654: THE SECOND SPOT of a project (the per-step ARP notes, the song, the motion lanes; project.c packs them): one more sector per place,
+ * 30 places = 22 user + 8 override. Spot e (0-29: user slot 0-21, override slot 32-39 = e 22-29): e 0-9 at 0xB6000..0xBFFFF (the sectors of the old
+ * user places 31-40, which are gone), e 10-29 at 0xC8000..0xDBFFF (free until now). Header type 0x6000 | e (the presets are 0x5000 | slot), so an old
+ * preset left in one of these sectors is never read as a second spot. */
+#define ST_EXT_BASE_A 0xB6000u
+#define ST_EXT_BASE_B 0xC8000u
+static int st_ext_index(int slot)
+{
+    if (slot >= 0 && slot < ST_PRESET_N)
+        return slot;
+    if (slot >= ST_PRESET_USERSPAN && slot < ST_PRESET_NALL)
+        return ST_PRESET_N + (slot - ST_PRESET_USERSPAN);
+    return -1;
+}
+static uint32_t st_ext_addr(int e) { return e < 10 ? ST_EXT_BASE_A + (uint32_t)e * ST_SECTOR : ST_EXT_BASE_B + (uint32_t)(e - 10) * ST_SECTOR; }
+
+static int st_ext_load(int slot, void *dst, uint32_t max)
+{
+    st_hdr_t h;
+    uint32_t i, a;
+    int e = st_ext_index(slot);
+    if (!ST_PRESET_OK || e < 0)
+        return -1;
+    a = st_ext_addr(e);
+    if (st_read(a, &h, sizeof h))
+        return -1;
+    if (h.magic != ST_MAGIC || h.type != (0x6000u | (uint32_t)e) || !h.len || h.len > ST_PAYLOAD_MAX ||
+        h.hcrc != st_crc32(&h, sizeof h - 4u))
+        return -1;
+    if (st_read(a + ST_PAYLOAD_OFF, st_buf, h.len) || st_crc32(st_buf, h.len) != h.crc)
+        return -1;
+    if (h.len > max)
+        h.len = max;
+    for (i = 0; i < h.len; i++)
+        ((uint8_t *)dst)[i] = st_buf[i];
+    return (int)h.len;
+}
+
+static int st_ext_erase(int slot)
+{
+    int e = st_ext_index(slot);
+    if (!ST_PRESET_OK)
+        return -3;
+    return e < 0 ? -1 : st_erase(st_ext_addr(e));
+}
+
+static int st_ext_save(int slot, const void *src, uint32_t len)
+{
+    st_hdr_t h, chk;
+    uint32_t off, a;
+    int rc, e = st_ext_index(slot);
+    if (!ST_PRESET_OK)
+        return -3;
+    if (e < 0 || !len || len > ST_PAYLOAD_MAX)
+        return -1;
+    a = st_ext_addr(e);
+    for (off = 0; off < len; off++)
+        st_buf[off] = ((const uint8_t *)src)[off];
+    if ((rc = st_erase(a)) != 0)
+        return rc;
+    for (off = 0; off < len; off += 256u) {
+        uint32_t n = len - off > 256u ? 256u : len - off;
+        if ((rc = st_prog(a + ST_PAYLOAD_OFF + off, st_buf + off, n)) != 0)
+            return rc;
+    }
+    h.magic = ST_MAGIC;
+    h.type = (uint16_t)(0x6000u | (uint32_t)e);
+    h.slot = (uint16_t)e;
+    h.seq = 1u;
+    h.len = len;
+    h.crc = st_crc32(st_buf, len);
+    h.rsv[0] = h.rsv[1] = 0xFFFFFFFFu;
+    h.hcrc = st_crc32(&h, sizeof h - 4u);
+    if ((rc = st_prog(a, &h, sizeof h)) != 0)
         return rc;
     if (st_read(a, &chk, sizeof chk) || chk.hcrc != h.hcrc || st_read(a + ST_PAYLOAD_OFF, st_buf, len) ||
         st_crc32(st_buf, len) != h.crc)

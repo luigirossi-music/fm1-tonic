@@ -630,7 +630,7 @@ static void pg_step(void)
 /* ------------------------------------------- the user presets: put, erase --- */
 /* Step B2 (wip185). PUT (cmd 0x48, body u8 slot + u32 length + u32 CRC-32 of the blob): refused while playing. Like
  * the restore the device pulls the blob with read requests (rs_fetch; addresses are the blob's offsets), TWICE:
- *   1. checks it whole (TNP1 head: magic, npat 1..12, the u16 total == the length == 392 + 196 x npat, or + 80 with the 'TFX1' trailer; the CRC-32)
+ *   1. checks it whole (TNP1 head: magic, npat 1..16, the u16 total == the length == 392 + 196 x npat, or + 80 with the 'TFX1' trailer; the CRC-32)
  *      before anything is written: a bad blob, a cut cable or a wrong CRC leaves the slot as it was;
  *   2. erases the slot, programs the pieces as they arrive (their CRC-32 checked again), the header last, read back.
  *      From the erase on, a cut cable or a power cut loses THAT slot only (32 slots, no A/B copies, as SAVE AS).
@@ -648,7 +648,7 @@ static int pg_tnp_ok(const uint8_t *b, uint32_t len)  /* the head of a TNP1 blob
     if (b[0] != 'T' || b[1] != 'N' || b[2] != 'P' || b[3] != '1')
         return 0;
     npat = b[9];
-    return npat >= 1u && npat <= 12u && bu_rd16(b + 4) == len
+    return npat >= 1u && npat <= 16u && bu_rd16(b + 4) == len
            && (len == 392u + 196u * npat || len == 392u + 196u * npat + 80u || len == 392u + 196u * npat + 96u || len == 392u + 196u * npat + 112u);   /* wip227 / wip242: with or without the TFX1 / TFX2 trailer (tnp.h TNP_FX_LEN, TNP_FX2_LEN; the tag is checked when the preset loads) */
 }
 

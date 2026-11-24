@@ -478,7 +478,7 @@ int main(int argc, char **argv)
     /* ---- the user preset slots over USB: list and get one (step B1) */
     {
         static uint8_t blob[ST_PRESET_N][ST_PAYLOAD_MAX];
-        static const int slots[] = {0, 5, 31, 12};
+        static const int slots[] = {0, 5, 21, 12};
         static const uint32_t lens[] = {3840, 1, 777, 120};
         uint32_t i, mask, ok_all = 1, hold_seen = 0;
         int rc, passes;
@@ -488,7 +488,7 @@ int main(int argc, char **argv)
             if (rc)
                 ok_all = 0;
         }
-        check("presets: 4 slots saved (0, 5, 12, 31; 1 to 3840 bytes)", ok_all);
+        check("presets: 4 slots saved (0, 5, 12, 21; 1 to 3840 bytes)", ok_all);
         /* slot 12 damaged: one payload byte flipped (a program only clears bits) */
         nor[ST_PRESET_BASE + 12 * ST_SECTOR + ST_PAYLOAD_OFF + 3] = 0x00;
         pg_list_n = 0;
@@ -499,12 +499,12 @@ int main(int argc, char **argv)
             pg_step();
         }
         mask = bu_rd32(pg_list_body);
-        check("list: one frame; used slots 0, 5, 31 (the damaged 12 is not)", pg_list_n == 1 && mask == ((1u << 0) | (1u << 5) | (1u << 31)));
+        check("list: one frame; used slots 0, 5, 21 (the damaged 12 is not)", pg_list_n == 1 && mask == ((1u << 0) | (1u << 5) | (1u << 21)));
         check("... the lengths", bu_rd16(pg_list_body + 4) == 3840 && bu_rd16(pg_list_body + 4 + 10) == 1 &&
-                                 bu_rd16(pg_list_body + 4 + 62) == 777 && bu_rd16(pg_list_body + 4 + 24) == 0 &&
+                                 bu_rd16(pg_list_body + 4 + 42) == 777 && bu_rd16(pg_list_body + 4 + 24) == 0 &&
                                  bu_rd16(pg_list_body + 4 + 2) == 0);
         for (i = 0; i < 3; i++) {
-            static const int gs[] = {0, 5, 31};
+            static const int gs[] = {0, 5, 21};
             uint32_t want = lens[i == 0 ? 0 : i == 1 ? 1 : 2];
             pg_got_n = 0;
             pg_got_slot = (uint8_t)gs[i];
@@ -607,7 +607,7 @@ int main(int argc, char **argv)
 #define SERVE(b, n) do { memset(img, 0, sizeof img); memcpy(img, (b), (n)); img_n = (n); } while (0)
 #define PUTB(slot, b, n, crc) (nnotes = 0, fetches = 0, preset_put_rx((slot), (n), (crc)))
 #define OTHERS_OK() (st_preset_load(0, t, sizeof t) == 3840 && st_preset_load(5, t, sizeof t) == 1 && \
-                     st_preset_load(31, t, sizeof t) == 777)
+                     st_preset_load(21, t, sizeof t) == 777)
         SERVE(blobs[0], 1960u);
         rc = PUTB(3, blobs[0], 1960u, bu_crc(0, blobs[0], 1960u));
         check("put: a 1960-byte preset into slot 3: stored (0), the host told OK",
@@ -701,13 +701,13 @@ int main(int argc, char **argv)
         rc = preset_erase_rx(5);
         check("erase slot 5: status 0 in one frame, the slot empty, the others untouched",
               rc == 0 && pg_end_n == 1 && pg_end_slot == 5 && pg_end_status == 0 && st_preset_load(5, t, sizeof t) < 0 &&
-              st_preset_load(0, t, sizeof t) == 3840 && st_preset_load(31, t, sizeof t) == 777);
+              st_preset_load(0, t, sizeof t) == 3840 && st_preset_load(21, t, sizeof t) == 777);
         pg_end_n = 0;
         frames_this_pass = 0;
         playing = 1;
-        rc = preset_erase_rx(31);
+        rc = preset_erase_rx(21);
         playing = 0;
-        check("erase while playing: status 4, the slot kept", rc == 4 && pg_end_status == 4 && st_preset_load(31, t, sizeof t) == 777);
+        check("erase while playing: status 4, the slot kept", rc == 4 && pg_end_status == 4 && st_preset_load(21, t, sizeof t) == 777);
         pg_end_n = 0;
         frames_this_pass = 0;
         rc = preset_erase_rx(32);
@@ -770,7 +770,7 @@ int main(int argc, char **argv)
         uint8_t t[ST_PAYLOAD_MAX];
         check("the user presets untouched by backups, restores and the power cuts",
               st_preset_load(0, t, sizeof t) == 3840 && st_preset_load(5, t, sizeof t) < 0 &&
-              st_preset_load(31, t, sizeof t) == 777);
+              st_preset_load(21, t, sizeof t) == 777);
     }
     printf("%s\n", fails ? "BACKUP TEST FAILED" : "backup test passed");
     return fails != 0;

@@ -69,7 +69,6 @@ Nach dem Vorbild von Microtonic VST von Sonic Charge ist FM1 TONIC ein Drum-Synt
 2. Signalweg {#s2}
 3. Seiten, Button für Button {#s3}
 4. Spielen {#s4}
-  - Song-mode-Spickzettel
 5. Presets und Speichern {#s5}
 6. Lichter, MIDI und USB {#s6}
 7. Installieren, Backup, Wiederherstellen {#s7}

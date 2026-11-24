@@ -1,0 +1,11 @@
+# FUTURE UPDATES LIST (the "Future updates" pop-up of the web page)
+#
+# Edit this file, then run   python3 tools/future_updates.py   to put it on the page.
+# One line = one item:   TITLE | what it does
+# Lines starting with # and empty lines are ignored.
+# To remove an item (done, or dropped) delete its line. To add one, add a line.
+# Keep the " | " (a space, a bar, a space) between the title and the text.
+
+NEROTONIC | a dark skin: every colour stays, the labels turn white and the light grey background turns black.
+CHORUS | a new effect with one amount knob and an animated icon: blue diamonds that open to the left and right as the chorus grows.
+Knob zoom: yes / 25 % / no | the ZOOM KNOB setting gets a middle choice: 25 % makes the knob you turn only a little bigger instead of filling the screen.

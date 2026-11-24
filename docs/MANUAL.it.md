@@ -70,7 +70,6 @@ Ispirato a Microtonic VST di Sonic Charge, FM1 TONIC è un sintetizzatore di bat
 3. Le pagine, pulsante per pulsante {#s3}
   - Combinazioni di pulsanti
 4. Suonare {#s4}
-  - Promemoria del modo song
 5. Preset e salvataggio {#s5}
 6. Luci, MIDI e USB {#s6}
 7. Installare, backup, ripristino {#s7}

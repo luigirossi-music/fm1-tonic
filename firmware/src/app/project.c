@@ -291,13 +291,13 @@ int project_preset_unpack(const uint8_t *b, uint32_t n)
         proj.pat[i].drum[0].rate = b[10] < NRATES ? b[10] : RATE_16;
         proj.pat[i].swing = b[8] > 100 ? 100 : b[8];
     }
-    if (npat > TNP_NPAT_LOAD)                          /* ... but only patterns 1-8 carry steps: 9-32 stay empty */
+    if (npat > TNP_NPAT_LOAD)                          /* ... but only patterns 1-16 carry steps (wip651): 17-32 stay empty */
         npat = TNP_NPAT_LOAD;
     for (i = 0; i < npat; i++) {
         const uint8_t *pp = b + TNP_HDR + 8u * TNP_VOICE + i * TNP_PAT;
         dpart_t *d = &proj.pat[i].drum[0];
         d->len = pp[0];
-        d->chain = pp[1] ? 1 : 0;                      /* the preset's "Chained" flag */
+        d->chain = (i < NPAT_TONIC && pp[1]) ? 1 : 0;  /* the preset's "Chained" flag (wip651: only patterns 1-8 chain) */
         for (v = 0; v < TN_VOICES; v++) {
             const uint8_t *r = pp + TNP_PAT_HDR + 24u * (uint32_t)v;
             for (k = 0; k < NSW; k++) {
@@ -340,7 +340,7 @@ int project_preset_unpack(const uint8_t *b, uint32_t n)
     return 0;
 }
 
-/* The working Tonic project as a TNP1 preset of patterns 1-8 (TNP_NPAT_SAVE) with their chain flags (what SAVE AS stores in a user slot). The caller gives the
+/* The working Tonic project as a TNP1 preset of patterns 1-16 (TNP_NPAT_SAVE, wip651) with their chain flags (what SAVE AS stores in a user slot). The caller gives the
  * tempo and the per-voice mute bits (they live in the sequencer, not the project). Returns the length, 0 = no room. */
 static void wr16(uint8_t *p, uint32_t v) { p[0] = (uint8_t)v; p[1] = (uint8_t)(v >> 8); }
 uint32_t project_preset_pack(uint8_t *out, uint32_t max, const char *name, unsigned bpm_x10, unsigned mutes)
@@ -371,7 +371,7 @@ uint32_t project_preset_pack(uint8_t *out, uint32_t max, const char *name, unsig
         uint8_t *pp = out + TNP_HDR + 8u * TNP_VOICE + i * TNP_PAT;
         const dpart_t *d = &proj.pat[i].drum[0];
         pp[0] = d->len;
-        pp[1] = d->chain ? 1 : 0;
+        pp[1] = (i < NPAT_TONIC && d->chain) ? 1 : 0;      /* wip651: a chain flag only exists on patterns 1-8 */
         for (v = 0; v < TN_VOICES; v++) {
             uint8_t *r = pp + TNP_PAT_HDR + 24u * (uint32_t)v;
             for (k = 0; k < NSW; k++) {

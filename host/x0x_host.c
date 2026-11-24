@@ -178,6 +178,30 @@ int plat_preset_save(int slot, const void *src, uint32_t len)
     preset_len[slot] = (int)len;
     return 0;
 }
+static uint8_t ext_slot[PLAT_NPRESET_ALL][PLAT_STORE_MAX];         /* wip654: the second spot of each place */
+static int ext_len[PLAT_NPRESET_ALL];
+int plat_ext_load(int slot, void *dst, uint32_t max)
+{
+    if (slot < 0 || slot >= PLAT_NPRESET_ALL || ext_len[slot] <= 0)
+        return -1;
+    memcpy(dst, ext_slot[slot], (uint32_t)ext_len[slot] < max ? (uint32_t)ext_len[slot] : max);
+    return ext_len[slot];
+}
+int plat_ext_save(int slot, const void *src, uint32_t len)
+{
+    if (slot < 0 || slot >= PLAT_NPRESET_ALL || !len || len > PLAT_STORE_MAX)
+        return -1;
+    memcpy(ext_slot[slot], src, len);
+    ext_len[slot] = (int)len;
+    return 0;
+}
+int plat_ext_erase(int slot)
+{
+    if (slot < 0 || slot >= PLAT_NPRESET_ALL)
+        return -1;
+    ext_len[slot] = 0;
+    return 0;
+}
 int plat_store_load_prev(uint32_t obj, void *dst, uint32_t max)
 {
     int n = obj < OBJ_NOBJ ? store_prev_len[obj] : -1;
