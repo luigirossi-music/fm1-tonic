@@ -2,6 +2,13 @@
 The newest version first. Install it with the [web installer](../install/); the
 [manual](../manual/) covers everything in detail.
 
+## FM1 Tonic 1.8e · 25 November 2026
+
+- DECLARED (wip694, firmware + manual number 1.8e1 + web page): **version 1.8e**. What's new in 1.8e on the web page: the ARP page's new look, the pattern bank (beta), the new top bar, the blinking REC dot; Future updates: pattern bank saved with the project, p-lock marks, a light spot on the ARP balls.
+- DONE (wip677-684, firmware 1.8e) **ARP page new look**: a piano keyboard on the left, notes as round balls with soft tails in the sequencer colours, the big TRACK chip, the octave you see moves with OCT- / OCT+ (K2 too), notes of another octave pale with +1 / -1.
+- DONE (wip685-687, firmware 1.8e) **Pattern bank (beta)**: FUNC + SELECT = patterns 1-16 / 17-32 on SEQ, ARP, SONG and HOME; the top bar shows PATTERN BANK 1 / 2 (red in bank 2). A saved project still keeps only patterns 1-16.
+- DONE (wip687-692, firmware 1.8e) **New top bar on SEQ and ARP**: three chips (pattern, PATTERN BANK n, TRACK n); the REC dot in the top bar blinks like the REC button on every page; the OCT help card says what OCT does on the Tonic.
+
 ## FM1 Tonic 1.8d · 24 November 2026
 
 - ADDED (wip675, manual 1.8d2 in six languages + web page, firmware 1.8d) **30 places, song and notes saved, backup per place**: the PRESETS knob turns through 30 places (1 and 2 are demos, 3-30 are yours); a project keeps its song, recorded knob moves and ARP notes (MEMORY FULL: NOT SAVED when it does not fit); the web page's Back up my presets makes one file per place (`NN_name.tnp`, song part inside), Restore my presets writes them back, Clear all places empties 1-30, Export as .mtpreset works for places 1-30; old backups numbered 31-40 are skipped with a message.

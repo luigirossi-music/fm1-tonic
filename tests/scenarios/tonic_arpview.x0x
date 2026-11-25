@@ -1,0 +1,29 @@
+# wip677: the ARP page's new look, part 1: a keyboard on the left, the 8 white-key rows, balls at the notes of the SELECTED voice.
+# Steps are put on voice 1 with notes (sequencer page, then REC + PLAY on ARP is not needed: the scenario writes them with keys).
+wait 300
+tap ARP
+expect arp 1
+shot arp_view_empty.png
+tap PLAY
+tap REC
+wait 120
+shot arp_view_rec.png
+tapkey 7
+wait 400
+tapkey 11
+wait 400
+tapkey 19
+wait 400
+tapkey 0
+wait 700
+tap REC
+tap PLAY
+wait 100
+shot arp_view_notes.png
+tap OCT+
+shot arp_view_oct1.png
+# wip680: the same notes in the old DARK skin (palette 0): the 'no note' ball (the C key at octave 0) gets a hollow white ring, the normal balls are white too
+tap OCT-
+palette 0
+shot arp_view_dark.png
+palette 6

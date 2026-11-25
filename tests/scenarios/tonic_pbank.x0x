@@ -1,0 +1,25 @@
+# wip685: FUNC + SELECT = the pattern bank (1-16 / 17-32); on the ARP page the header chip says PATTERN BANK n
+wait 300
+tap ARP
+expect arp 1
+shot pbank_arp_1.png
+key b10 down
+turn SELECT 1
+wait 100
+expect pbank 1
+shot pbank_arp_2.png
+turn SELECT -1
+wait 100
+expect pbank 0
+key b10 up
+shot pbank_arp_back.png
+# wip686: in bank 2 the top chip is RED (ARP page chip, SEQ page TRACK chip)
+key b10 down
+turn SELECT 1
+wait 100
+key b10 up
+wait 2000
+shot pbank_arp_red.png
+tap SEQ
+wait 200
+shot pbank_seq_red.png

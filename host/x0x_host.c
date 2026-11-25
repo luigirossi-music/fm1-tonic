@@ -921,6 +921,8 @@ static int expect(const char *what, const char *val)
         got = proj.set.autoscroll;
     else if (!strcmp(what, "arp"))                  /* wip251: 1 = the SEQ view is the ARP page */
         got = ui.arp;
+    else if (!strcmp(what, "pbank"))                /* wip685: the pattern bank, 0 = 1-16, 1 = 17-32 */
+        got = ui.pbank;
     else if (!strcmp(what, "arpoct"))               /* the ARP keyboard's octave, -3..+3 */
         got = ui.arp_oct;
     else if (!strcmp(what, "seqnote"))              /* wip253: the note of the last hit the sequencer played */

@@ -1795,8 +1795,10 @@ static int help_lines(int b, const char *l[HELP_LINES])
         break;
     case B_OCTDN:
     case B_OCTUP:
-        if (ui.view == V_SONG) L(b == B_OCTUP ? "ADD A LINE AFTER THE CURSOR" : "DELETE THE LINE");
-        else if (ui.view == V_HOME) L(b == B_OCTUP ? "PATTERNS 17-32" : "PATTERNS 1-16");
+        if (tonic_part() && ui.view == V_SEQ && ui.arp) { L(b == B_OCTUP ? "KEYBOARD OCTAVE UP" : "KEYBOARD OCTAVE DOWN"); L("THE VOICE PITCH STAYS"); }   /* wip693 */
+        else if (tonic_part() && ui.view != V_SONG) { L(b == B_OCTUP ? "VOICE PITCH: OCTAVE UP" : "VOICE PITCH: OCTAVE DOWN"); L("THE SELECTED TRACK"); }
+        else if (ui.view == V_SONG) L(b == B_OCTUP ? "ADD A LINE AFTER THE CURSOR" : "DELETE THE LINE");
+        else if (ui.view == V_HOME) { L(b == B_OCTUP ? "VOICE PITCH: OCTAVE UP" : "VOICE PITCH: OCTAVE DOWN"); L("FUNC + SELECT: PATTERN BANK 1 / 2"); }   /* wip689: the bank is FUNC + SELECT now */
         else {
             L(b == B_OCTUP ? "THE NEXT 16 STEPS" : "THE 16 STEPS BEFORE"); L("PAGES: 1-16 17-32 33-48 49-64");
         }
@@ -4202,7 +4204,7 @@ static void button_tap(int b)
     case B_OCTUP:
     case B_OCTDN: {
         int up = b == B_OCTUP;
-        if (ui.view == V_SEQ && ui.arp && tonic_part() && ui.overlay == O_NONE) {   /* wip251: the ARP page: the keyboard's octave (the voice's pitch stays) */
+        if (ui.view == V_SEQ && ui.arp && tonic_part() && ui.overlay == O_NONE) {   /* wip251 (back in wip693): the ARP page: OCT- / OCT+ = the keyboard's octave (the voice's pitch stays) */
             int o = ui.arp_oct + (up ? 1 : -1);
             char t[20];
             ui.arp_oct = (int8_t)(o < -3 ? -3 : o > 3 ? 3 : o);
@@ -4360,7 +4362,11 @@ static void input(void)
         return;
     }
     if ((e = enc(EN_SELECT)) != 0) {             /* SELECT: move; with HOME held: tempo */
-        if (held_any_step() >= 0 && !(ui.btn & (1u << B_HOME))) {
+        if (((ui.mod_held & 4u) || (ui.view == V_SEQ && ui.arp && (ui.keys & (1u << BLACK_KEY[10])))) && tonic_part() && ui.overlay == O_NONE && !ui.help &&
+            (ui.view == V_SEQ || ui.view == V_SONG || ui.view == V_HOME)) {   /* (on the ARP page every key is a piano key, so FUNC is read from the held keys, as FUNC + PLAY does) */
+            ui.pbank = (uint8_t)(e > 0);              /* wip685: FUNC + SELECT: the pattern bank, right = bank 2 (patterns 17-32), left = bank 1 (1-16), on SEQ, ARP, the song screen and HOME */
+            say(ui.pbank ? "PATTERN BANK 2" : "PATTERN BANK 1", 0);
+        } else if (held_any_step() >= 0 && !(ui.btn & (1u << B_HOME))) {
             prob_turn(e);                             /* a step held: its chance */
         } else if (ui.btn & (1u << B_HOME)) {
             float bpm = seq.bpm + (float)accel(EN_SELECT, e, 200);
@@ -5033,10 +5039,12 @@ static void draw_batt(void)
     for (i = 0; i < 3; i++)
         cv_rect(219 + 5 * i, 6, 4, 7, i < n && !blink_off ? on : C_LINE);
 }
+static int rec_blink_on(void);                     /* wip690: defined below, the header's REC dot uses it too */
 static void draw_header(void)
 {
     char b[24];
     int32_t x = 4;
+    int chips3 = 0;                                   /* wip687: SEQ and ARP: the header is three chips [P1] [PATTERN BANK n] [TRACK n] */
     cv_begin(240, HDR_H, C_BG);
     cv_rect(0, HDR_H - 1, 240, 1, C_LINE);
     if (ui.msg_until && (int32_t)(ui.msg_until - plat_ms()) > 0) {   /* what a button just did */
@@ -5048,15 +5056,46 @@ static void draw_header(void)
     ui.msg_until = 0;
     if (tonic_part() && (ui.view != V_GLOB || grigio()) && (!fx_comp_page() || grigio())) {   /* the Tonic, any page: the selected track at the left ("TRACK 3"); GLOBAL and the master's COMP have none */
         char pn[12];
+        uint16_t chip_col = ui.pbank && (ui.view == V_SEQ || ui.view == V_SONG || ui.view == V_HOME) ? RGB(222, 58, 58) : part_col();   /* wip686: PATTERN BANK 2: the top chip is RED */
         const char *tn = ui.view == V_MIX && !grigio() ? preset_name_cur(pn) : engine_voice_name(T_909, ui.sel[PART_909]);   /* wip229: the GLO mixer is the master mix: the project's name, not "TRACK n" */
         int32_t w = htw(&FONT_B, tn) + 12;
-        if (grigio()) {                              /* wip550: the mockup's chip: 56 wide at least, radius 3, text centred, the title 8 px after it */
+        if (ui.view == V_SEQ) {                      /* wip687: [P1] [PATTERN BANK n] [TRACK n] (the track chip only on SEQ: ARP has the big one); all RED in bank 2 */
+            int part = PART_909, cue = seq_cue_of(&seq, part);
+            char pt[12], *q = pt;
+            int32_t cx = 2, cw;
+            chips3 = 1;
+            if (seq.song_on) {
+                *q++ = 'S';
+                q = put_i(q, (seq.playing ? seq.song_pos : ui.song_sel) + 1);
+            } else {
+                *q++ = 'P';
+                q = put_i(q, seq.ppat[part] + 1);
+                if (cue >= 0 && cue != seq.ppat[part] && (ui.frame & 16u)) {   /* the cue blinks inside the chip: P1>2 */
+                    *q++ = '>';
+                    q = put_i(q, cue + 1);
+                }
+            }
+            *q = 0;
+            cw = htw(&FONT_B, pt) + 10;
+            rbox(cx, 2, cw, 15, 3, chip_col);
+            htext(cx + 5, &FONT_B, pt, C_BLACK);
+            cx += cw + 3;
+            cw = htw(&FONT_S, ui.pbank ? "PATTERN BANK 2" : "PATTERN BANK 1") + 10;
+            rbox(cx, 2, cw, 15, 3, chip_col);
+            htext(cx + 5, &FONT_S, ui.pbank ? "PATTERN BANK 2" : "PATTERN BANK 1", C_BLACK);
+            cx += cw + 3;
+            cw = htw(&FONT_B, tn) + 10;                /* wip692: the TRACK chip on ARP too (3 chips on both pages) */
+            rbox(cx, 2, cw, 15, 3, chip_col);
+            htext(cx + 5, &FONT_B, tn, C_BLACK);
+            cx += cw + 3;
+            x = cx;
+        } else if (grigio()) {                       /* wip550: the mockup's chip: 56 wide at least, radius 3, text centred, the title 8 px after it */
             int32_t cw = w + 6 < 56 ? 56 : w + 6;
-            rbox(2, 2, cw, 15, 3, part_col());
+            rbox(2, 2, cw, 15, 3, chip_col);
             htext(2 + (cw - (w - 12)) / 2, &FONT_B, tn, C_BLACK);
             x = cw + 8;
         } else {
-            box(0, 1, w, 17, part_col());
+            box(0, 1, w, 17, chip_col);
             htext(6, &FONT_B, tn, C_BLACK);
             x = w + 6;
         }
@@ -5068,8 +5107,8 @@ static void draw_header(void)
             htext(6, &FONT_B, PART_N[ui.part], C_BLACK);
             x = w + 6;
         }
-        if (ui.view == V_SEQ)
-            x = htext(x, &FONT_S, view_title(), C_HI) + 6;
+        if (ui.view == V_SEQ && !chips3)
+            x = htext(x, &FONT_S, view_title(), C_HI) + 6;   /* (wip687: SEQ and ARP: no page name, three chips) */
     } else {
         {
             const felucca_font_t *vf = ui.view == V_MIX2 || ui.view == V_GLOB || ui.view == V_PMOD || ui.view == V_OSC || ui.view == V_NOISE || ui.view == V_NEV || ui.view == V_VEL ? &FONT_XS : &FONT_B;   /* (the long "MIX PAGE 2" must stop before the pattern tag) */
@@ -5078,7 +5117,7 @@ static void draw_header(void)
                 x = htext(tonic_part() && (ui.view != V_GLOB || grigio()) && (!fx_comp_page() || grigio()) ? x : 4, vf, vt, C_HI) + 6;
         }
     }
-    {   /* the pattern of the part on screen (else the 909's), its cue; in SONG mode the bar */
+    if (!chips3) {   /* the pattern of the part on screen (else the 909's), its cue; in SONG mode the bar (wip687: SEQ and ARP show it in the first chip) */
         int part = part_view() ? ui.part : PART_909, cue = seq_cue_of(&seq, part);
         if (seq.song_on) {
             b[0] = 'S';
@@ -5116,7 +5155,7 @@ static void draw_header(void)
     if (seq.playing)
         play_icon(196, 4, (eng_step[TRK_DRUM] & 3) == 0 ? C_WHITE : C_HI);
     if (ui.rec)
-        dot(210, 9, 4, RGB(255, 50, 50));
+        dot(210, 9, 4, rec_blink_on() ? RGB(222, 30, 30) : RGB(150, 120, 125));   /* wip690: blinks exactly like the REC LED (same test as the ARP chip's dot) */
     else if (ui.dirty)
         dot(212, 9, 1, C_GRAY);
     draw_batt();
@@ -5138,6 +5177,126 @@ static int32_t col_x(int c) { return GX + c * 13 + (c >> 2); }   /* a pixel betw
 #define C_SQFIL RGB(250, 215, 40)        /* fill = yellow */
 #define C_SQBOTH_G RGB(222, 58, 58)      /* wip575: GRIGIOTONIC: accent + fill = RED (the same red as the centred pan of the GLO mixer) */
 #define C_SQBOTH RGB(60, 190, 90)        /* accent + fill = green, not too dark, not too light (the messages keep C_TBOTH) */
+/* wip677: the ARP page's NEW LOOK, part 1 (docs/arp_look/arp_v8_final.png). The 8 rows are the 8 WHITE keys of ONE octave (C at the bottom,
+ * C' on top); a black-key note sits half a row between its two white keys; the keyboard is on the left. Only the SELECTED voice shows: every
+ * hit of it is a round ball at its note, in the sequencer's colours (white, accent dark blue, fill yellow, both green). FOLDED view: no note
+ * ever leaves the grid; the octave you SEE (arp_oct: semitones 12 * arp_oct .. 12 * arp_oct + 12) is full colour, a note of another octave is
+ * PALE with a ring and a small +1 / -1 (octaves away). A hit with no note (0) and no flag is pure white. Tails, lanes, the TRACK chip: next parts. */
+static const uint8_t ARP_HALF[13] = {0, 1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 14};   /* semitone 0..12 -> half rows above the C (0, .5, 1, 1.5, 2, 3, 3.5 ...) */
+static float arp_yc(int half) { return 7.5f + (float)(14 - half) * 7.5f; }          /* its centre y in the main area (rows 15 px, the first at y 1) */
+/* wip684: THE one REC blink test: the REC button's LED and the REC dot of the ARP chip both use it (so they always agree) */
+static int rec_blink_on(void)
+{
+    if (!ui.rec)
+        return 0;
+    if (ui.unq) {                                      /* wip300: UNQUANTIZED REC: two fast blinks then one slow, over and over (stopped or playing) */
+        uint32_t p = ui.frame & 63u;
+        return p < 6u || (p >= 12u && p < 18u) || (p >= 24u && p < 40u);
+    }
+    if (!seq.playing)
+        return 1;                                      /* QUANTIZED, armed, stopped: steady */
+    return eng_step[TRK_DRUM] % 4 == 0;                /* QUANTIZED, recording: blinks with PLAY (on the beat) */
+}
+/* wip683: the soft glow TAIL: from the ball (x0) to x1, strongest at the ball and fading out to the right; the edges are soft too */
+static void arp_tail(int x0, int x1, int yc, uint16_t col)
+{
+    int x, dy;
+    for (x = x0; x < x1; x++) {
+        int L = x1 - x0 > 0 ? x1 - x0 : 1, d = x - x0, fade = 15 - (15 * d * d) / (L * L);   /* 15 .. 0 of 16, stays strong for the first half */
+        for (dy = -4; dy <= 4; dy++) {
+            int ad = dy < 0 ? -dy : dy, ca = ad <= 1 ? 16 : ad == 2 ? 13 : ad == 3 ? 8 : 3;
+            px_blend(x, yc + dy, col, (uint32_t)((fade * ca) >> 4));
+        }
+    }
+}
+/* the BIG track chip of the mockup (screen x 112..232, y 144..170): it starts in the main canvas and ends in the knob canvas, so it is drawn in both (main coords, oy = the offset of the canvas) */
+static void arp_chip(int oy)
+{
+    int v = ui.sel[PART_909];
+    if (v < 0 || v >= NDRUM)
+        return;
+    rbox(112, 124 + oy, 120, 26, 7, RGB(125, 200, 255));
+    if (ui.rec) {                                      /* wip684: a RED DOT (blinks like the REC LED) and the word REC on the left, the track name moves right */
+        disc(120.5f, (float)(137 + oy), 4.5f, rec_blink_on() ? RGB(222, 30, 30) : RGB(150, 120, 125));
+        cv_text(127, vc(&FONT_XS, 124 + oy, 26), &FONT_XS, "REC", RGB(15, 35, 70));
+    }
+    text_c(ui.rec ? 189 : 172, vc(&FONT_M, 124 + oy, 26), &FONT_M, engine_voice_name(T_909, v), RGB(15, 35, 70));
+}
+static void draw_arp_roll(int band)
+{
+    static const char *const WN[8] = {"C'", "B", "A", "G", "F", "E", "D", "C"};
+    static const uint8_t BLK[5] = {1, 3, 6, 8, 10};
+    int v = ui.sel[PART_909], pn = seq.ppat[PART_909], oy = -band * BAND_H, r, c, i;
+    const dpart_t *d = &cur_pat()->drum[PART_909];
+    int len = d->len, ph = seq.playing ? eng_step[TRK_DRUM + PART_909] - ui.spage * 16 : -1;
+    for (r = 0; r < 8; r++) {                          /* the white keys, then the black ones on top */
+        int y = 1 + r * 15 + oy;
+        rbox(3, y, 20, 13, 2, RGB(252, 252, 252));
+        rframe(3, y, 20, 13, 2, RGB(110, 110, 115));
+        text_r(21, vc(&FONT_XS, y, 13), &FONT_XS, WN[r], RGB(120, 120, 125));
+    }
+    for (i = 0; i < 5; i++)
+        rbox(3, (int)(arp_yc(ARP_HALF[BLK[i]]) - 4.5f) + oy, 12, 9, 2, RGB(34, 34, 44));
+    for (i = 0; i < 5; i++)                            /* wip678: a faint dark LANE at every black-key position, like a piano roll */
+        rbox(GX, (int)(arp_yc(ARP_HALF[BLK[i]]) - 3.5f) + oy, col_x(15) + 12 - GX, 7, 3, blend(C_BG, RGB(0, 0, 0), 2));
+    if (ph >= 0 && ph < 16)                            /* the playing step: a pale band */
+        box(col_x(ph), 1 + oy, 12, 119, blend(C_BG, RGB(255, 255, 255), 4));
+    for (r = 0; r < 8; r++)                            /* the grid dots: a row per white key */
+        for (c = 0; c < 16; c++)
+            if (step_of(c) < len)
+                disc((float)col_x(c) + 6.0f, 1.0f + (float)r * 15.0f + 6.5f + (float)oy, 1.3f, C_DIM);
+    arp_chip(oy);                                      /* wip682 / 683: the big track chip (its lower part is drawn with the knob row) */
+    if (v < 0 || v >= NDRUM || v >= NTRK_NOTE)
+        return;
+    for (c = 0; c < 16; c++) {                         /* the balls */
+        int s = step_of(c), n, rel, sc, off = 0, acc, fil, black, muted;
+        uint16_t col;
+        float cx, cy, rad;
+        if (s >= len || s >= NSTEPS || !sm_get(d->hit[v], s))
+            continue;
+        n = pn < NPAT_NOTE ? proj.note[pn][v][s] : 0;
+        rel = n - 12 * ui.arp_oct;
+        if (rel >= 0 && rel <= 12)
+            sc = rel;                                  /* in the octave you see */
+        else {
+            sc = ((n % 12) + 12) % 12;                 /* folded: its pitch name, pale, with the octaves away */
+            off = rel > 0 ? (rel - 1) / 12 : -((-rel + 11) / 12);
+            off += rel > 0 ? 1 : 0;
+        }
+        acc = sm_get(d->vacc[v], s) || sm_get(d->accent, s);
+        fil = sm_get(d->vfill[v], s);
+        muted = ((seq.mute | seq.vmute) & (1u << (PART_909 * NDRUM + v))) != 0;
+        col = muted ? C_DIM : acc && fil ? (grigio() ? C_SQBOTH_G : C_SQBOTH) : acc ? C_SQACC : fil ? C_SQFIL : n == 0 ? RGB(255, 255, 255) : C_WHITE;
+        black = sc == 1 || sc == 3 || sc == 6 || sc == 8 || sc == 10;
+        cx = (float)col_x(c) + 6.0f;
+        cy = arp_yc(ARP_HALF[sc]) + (float)oy;
+        rad = black ? 4.2f : 5.2f;
+        {                                              /* wip681: the glow TAIL to the RIGHT: on to the next hit of this voice (4 steps at most; a note has no stored length) */
+            int nc = c + 1, x1, xe = col_x(15) + 12;
+            while (nc < 16 && nc - c <= 4 && !(step_of(nc) < len && sm_get(d->hit[v], step_of(nc))))
+                nc++;
+            x1 = (nc < 16 && nc - c <= 4) ? col_x(nc) : (int)cx + 4 * 13;
+            if (x1 > xe)
+                x1 = xe;
+            if (step_of(15) >= len && x1 > col_x(len - 1 - ui.spage * 16) + 12)
+                x1 = col_x(len - 1 - ui.spage * 16) + 12;   /* a short pattern: stop at its last step */
+            if (x1 - (int)cx >= 4)
+                arp_tail((int)cx, x1, (int)cy, col);
+        }
+        if (!off && n == 0 && !muted && !acc && !fil && C_WHITE == RGB(255, 255, 255)) {   /* wip680: a hit with NO note in a DARK skin (the normal ball is white too): a HOLLOW white ring (a dark ring would vanish on the black page) */
+            disc(cx, cy, rad + 0.3f, col);
+            disc(cx, cy, rad - 1.6f, C_BG);
+        } else if (!off)
+            disc(cx, cy, rad, col);
+        else {                                         /* another octave: pale, a ring, +1 / -1 */
+            char t[4] = {off > 0 ? '+' : '-', (char)('0' + (off > 0 ? off : -off)), 0, 0};
+            disc(cx, cy, rad, col);
+            disc(cx, cy, rad - 1.2f, dim(col, 6));
+            text_c((int)cx, vc(&FONT_XS, (int)(cy - 4.5f), 9), &FONT_XS, t, col);
+        }
+    }
+}
+
 static void draw_drum(int band)
 {
     int k = ui.part, r, v, c, len = cur_pat()->drum[k].len, tonic = k == PART_909;
@@ -5148,6 +5307,10 @@ static void draw_drum(int band)
     uint16_t col = part_col(), on_dim = dim(col, 8);
     uint32_t lmarks = lock_marks(T_909, ui.sel[k], ui.spage * 16) |
                       lock_marks(T_PROB, k << 4 | ui.sel[k], ui.spage * 16);
+    if (tonic && ui.arp) {                             /* wip677: the ARP page has its own look (a keyboard and balls) */
+        draw_arp_roll(band);
+        return;
+    }
     for (r = 0; r < nrows; r++) {
         int y = r * dr + 1 - band * BAND_H, sel;
         const char *nm;
@@ -6501,6 +6664,8 @@ static uint32_t knobs_sig(void)
 #define MIXIN(v) (h = (h ^ (uint32_t)(v)) * 16777619u)
     MIXIN(ui.view);
     MIXIN(ui.part);
+    MIXIN(ui.arp);
+    MIXIN(ui.arp ? (uint32_t)ui.rec | (uint32_t)rec_blink_on() << 1 : 0u);   /* wip684: the lower half of the ARP chip carries the REC dot */
     MIXIN(pgi);
     MIXIN(ui.touched);
     MIXIN(ui.spage | proj.set.autoscroll << 8 | spage_spot() << 9);   /* wip567: the SEQ page spot follows the playhead (wip583: and it shows after SELECT) */
@@ -6596,14 +6761,21 @@ static void draw_knobs(void)
         knob_tag(t);
         if (ui.view == V_SONG)                         /* wip357: the SONG screen has no tag (BAR) */
             t[0] = 0;
+        if (ui.arp && tonic_part() && ui.view == V_SEQ)   /* wip683: the ARP page: no tag, no dots, the rule stops before the big chip */
+            t[0] = 0, dots = 0, xd = 237;
         xt = xd - (dots ? 5 : 0) - tw(&FONT_XS, t);
-        cv_rect(0, 5, xt - 5, 1, C_LINE);
+        cv_rect(0, 5, (ui.arp && tonic_part() && ui.view == V_SEQ ? 100 : xt - 5), 1, C_LINE);
         cv_text(xt, vc(&FONT_XS, 0, 11), &FONT_XS, t, C_HI);
         if (dots) {
             int k;
             for (k = 0; k < pg.n; k++)
                 cv_rect(xd + k * 5, 4, 3, 3, k == cur_page() ? C_HI : C_LINE);
         }
+    }
+    if (ui.arp && tonic_part() && ui.view == V_SEQ) {  /* wip683: the lower part of the big track chip */
+        cv_oy = -(KNOB_Y - MAIN_Y);
+        arp_chip(0);
+        cv_oy = 0;
     }
     draw_footer();
     for (i = 0; i < 4; i++) {
@@ -8694,14 +8866,8 @@ static void leds(void)
     int slow = (ui.frame & 16u) != 0;                 /* wip230: the muted track's key blinks slowly (as the FUNC lights do) */
     if (seq.playing && eng_step[TRK_DRUM] % 4 == 0)
         b |= 1u << B_PLAY;
-    if (ui.rec && ui.unq) {                            /* wip300: UNQUANTIZED REC: two fast blinks then one slow, over and over (stopped or playing) */
-        uint32_t p = ui.frame & 63u;
-        if (p < 6u || (p >= 12u && p < 18u) || (p >= 24u && p < 40u))
-            b |= 1u << B_REC;
-    } else if (ui.rec && !seq.playing)
-        b |= 1u << B_REC;                              /* QUANTIZED, armed, stopped: steady */
-    else if (ui.rec && eng_step[TRK_DRUM] % 4 == 0)
-        b |= 1u << B_REC;                              /* QUANTIZED, recording: blinks with PLAY (on the beat) */
+    if (rec_blink_on())                                /* wip684: the same test as the REC dot of the ARP chip */
+        b |= 1u << B_REC;
     if (ui.view == V_HOME || ui.view == V_SONG || ui.view == V_MIX2 || ui.view == V_GLOB || (seq.song_on && blink))
         b |= 1u << B_HOME;
     if (ui.view == V_SEQ && ui.arp)
