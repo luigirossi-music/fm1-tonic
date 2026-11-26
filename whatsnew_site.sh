@@ -35,7 +35,7 @@ cd "$W/site" || die "cannot enter the site folder"
 if git diff --quiet && [ -z "$(git status --porcelain)" ]; then echo "Nothing changed: the page already shows this."; exit 0; fi
 echo "== 3/3 Sending it"
 git add -A
-git -c user.name="Luigi Rossi" -c user.email="$OWNER@users.noreply.github.com" commit -q -m "What's new in 1.8e + manual" || die "git commit failed"
+git -c user.name="Luigi Rossi" -c user.email="$OWNER@users.noreply.github.com" commit -q -m "What's new in 1.8f + manual" || die "git commit failed"
 git push -q origin HEAD:gh-pages || die "git push failed (if it says authentication, run: gh auth login)"
 [ -z "$SKIPGH" ] && gh api -X POST "repos/$OWNER/$REPO/pages/builds" >/dev/null 2>&1
-echo; echo "DONE. In 1-3 minutes: https://$OWNER.github.io/$REPO/emu/   (press What's new in 1.8e)"
+echo; echo "DONE. In 1-3 minutes: https://$OWNER.github.io/$REPO/emu/   (press What's new in 1.8f)"
