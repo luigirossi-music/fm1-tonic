@@ -102,6 +102,25 @@ else
     say "4/4 No firmware file ($PKG): run  bash ~/tonic_site.sh  first, then this again"
 fi
 
+# 5. VERSION CHECK (handoff 724, MANDATORY): the firmware hub takes its version from the NEWEST GitHub RELEASE (the tag v<version> +
+#    the .fwsc file in it), NOT from the VERSION file and NOT from fmhub.json (it has no version field: never add one). So after
+#    every publish the Latest release must be v$VER and must carry fm1-tonic-$VER.fwsc. This step looks and says OK or WRONG.
+if [ -z "$SKIPGH" ]; then
+    say "5/5 Version check (what the firmware hub will read)"
+    LATEST="$(gh release view -R "$OWNER/$REPO" --json tagName -q .tagName 2>/dev/null)"
+    ASSETS="$(gh release view "v$VER" -R "$OWNER/$REPO" --json assets -q '.assets[].name' 2>/dev/null)"
+    echo "  VERSION file ....... $VER"
+    echo "  Latest release ..... ${LATEST:-(none found)}"
+    echo "  File in v$VER ...... ${ASSETS:-(none)}"
+    if [ "$LATEST" = "v$VER" ] && echo "$ASSETS" | grep -qx "fm1-tonic-$VER.fwsc"; then
+        echo "  OK: the hub will show $VER at its next read (it re-reads about every 3 hours; the card can lag until then)."
+    else
+        echo "  WRONG: the Latest release is not v$VER with fm1-tonic-$VER.fwsc, so the hub would keep showing the OLD version."
+        echo "  Fix: bash ~/tonic_site.sh (wait until it says ready, THEN Ctrl+C), then run this script again."
+        echo "  If v$VER exists with a wrong file: gh release delete v$VER -R $OWNER/$REPO --yes --cleanup-tag   and run this script again."
+    fi
+fi
+
 echo
 echo "DONE."
 echo "  Source:   https://github.com/$OWNER/$REPO"
