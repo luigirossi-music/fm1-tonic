@@ -1,4 +1,4 @@
-# REPEAT (#7): a song bar plays 1-8 times (the SONG screen's second page, KNOB 4). Bar 1 x3 (P1),
+# REPEAT (#7): a song bar plays 1-16 times (1.8f2) (the SONG screen's second page, KNOB 4). Bar 1 x3 (P1),
 # bar 2 (P2) (songpos and ppat count from 1): the song plays P1 three bars, then P2, then loops.
 wait 300
 tapkey w0

@@ -296,7 +296,7 @@ static const char *const ENGMODE_N[] = {"ENHANCED", "CLASSIC"};
 static const x0x_param_t ENGMODE_P = {"TONIC ENGINE", 1, 0, ENGMODE_N};   /* wip302: GLO > SYSTEM: ENHANCED (default) / CLASSIC (= what Microtonic can read) */
 static const char *const CORES_N[] = {"ON", "OFF"};
 static const x0x_param_t CORES_P = {"2ND CORE", 1, 0, CORES_N};   /* proj.set.one_core: at the next power-on */
-static const x0x_param_t SREP_P = {"REPEAT", 8, 0, 0};    /* the bar plays 1-8 times; 8 = LOOP (wip608) */
+static const x0x_param_t SREP_P = {"REPEAT", 16, 0, 0};   /* the bar plays 1-16 times; 16 = LOOP (wip608; 1.8f2: 16 repeats, was 8) */
 static const char *const BATT_N[] = {"EMPTY", "1/3", "2/3", "FULL", "USB POWER", "..."};
 static const x0x_param_t BATT_P = {"BATTERY", 5, 0, BATT_N};   /* read only (plat_battery) */
 static const x0x_param_t SONG_P[] = {
@@ -320,7 +320,7 @@ static void song_fill(int k)
             b->mute = 0;
         }
         if (SONG_LOOP(b))                                  /* wip608: a copy of a LOOP bar is a plain bar, played once */
-            b->mute &= 0x0Fu;
+            b->mute &= SONG_MUTE_MASK;
         sg->len++;
     }
 }
@@ -342,7 +342,7 @@ static void song_add_cur(void)
             sg->bar[i] = sg->bar[i - 1];
         sg->bar[k + 1] = sg->bar[k];
         if (SONG_LOOP(&sg->bar[k + 1]))
-            sg->bar[k + 1].mute &= 0x0Fu;
+            sg->bar[k + 1].mute &= SONG_MUTE_MASK;
         sg->len++;
         ui.song_sel = (uint8_t)(k + 1);
     }
@@ -491,7 +491,7 @@ static int pref_get(pref_t r)
     case R_FIXLEN: { int n = pat_of(r.a)->drum[r.a].len; return n <= 8 ? 0 : n <= 16 ? 1 : n <= 32 ? 2 : 3; }   /* the block the length lives in */
     case R_CORES: return proj.set.one_core;
     case R_CLASSIC: return proj.set.classic;
-    case R_SREP: return ui.song_sel < song()->len ? (SONG_LOOP(&song()->bar[ui.song_sel]) ? 8 : song()->bar[ui.song_sel].mute >> 5) : 0;
+    case R_SREP: return ui.song_sel < song()->len ? (SONG_LOOP(&song()->bar[ui.song_sel]) ? 16 : SONG_REP1(&song()->bar[ui.song_sel])) : 0;
     case R_BATT: return plat_battery() < 0 ? 5 : plat_battery();
     case R_SLEN: return song()->len;
     case R_STALLS: return perf.stalls_on;
@@ -678,7 +678,7 @@ static void pref_set(pref_t r, int v)
             song_bar_t *b;
             song_fill(ui.song_sel);
             b = &song()->bar[ui.song_sel];
-            b->mute = (uint8_t)((b->mute & 0x0Fu) | (v >= 8 ? 0x10u | 7u << 5 : (unsigned)v << 5));   /* wip608: 8 = LOOP */
+            b->mute = (uint8_t)((b->mute & SONG_MUTE_MASK) | (v >= 16 ? 0x10u : (((unsigned)v & 7u) << 5) | (((unsigned)v >> 3 & 1u) << 3)));   /* wip608: 16 = LOOP (1.8f2: 0-15 = x1 .. x16) */
         }
         break;
     case R_TAPE: {                                    /* 0..15 the clean digital delay; above, tape, wearing */
@@ -1000,7 +1000,7 @@ static void pref_value_of(pref_t r, int v, char *num, char *unit)
         return;
     }
     case R_SREP:
-        if (v >= 8)
+        if (v >= 16)
             put_s(num, "LOOP");
         else {
             num[0] = 'x';
@@ -5643,7 +5643,7 @@ static void draw_song(int band)
         }
         if (SONG_LOOP(&sg->bar[k]))                    /* wip608: LOOP */
             text_r(230, vc(&FONT_B, y, 21), &FONT_B, "LOOP", C_WHITE);
-        else if (SONG_REP(&sg->bar[k]) > 1) {          /* a bar played more than once: x2 .. x8 */
+        else if (SONG_REP(&sg->bar[k]) > 1) {          /* a bar played more than once: x2 .. x16 */
             t[0] = 'x';
             put_i(t + 1, SONG_REP(&sg->bar[k]));
             text_r(230, vc(&FONT_B, y, 21), &FONT_B, t, C_WHITE);

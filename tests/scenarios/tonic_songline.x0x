@@ -1,4 +1,4 @@
-# wip608: SONG screen: OCT+ adds a line after the cursor (the same patterns), OCT- deletes the line; K3 REPEAT x1..x8 then LOOP (the bar plays until stopped)
+# wip608: SONG screen: OCT+ adds a line after the cursor (the same patterns), OCT- deletes the line; K3 REPEAT x1..x16 then LOOP (1.8f2) (the bar plays until stopped)
 wait 300
 key b10 down
 tap SEQ
@@ -20,9 +20,12 @@ shot songline_1.png
 tap OCT-
 expect songlen 2
 expect songbar2.1 2
-# K3 up past x8 = LOOP (mute bit 4 = 16, plus the repeat bits)
-turn K3 9 60
-expect songbar2.5 240
+# 1.8f2: K3 up to x16 (repeats - 1 = 15: bits 5-7 = 7 and bit 3), then one more = LOOP (mute bit 4 = 16 only)
+turn K3 15 60
+expect songbar2.5 232
+shot songline_x16.png
+turn K3 1 60
+expect songbar2.5 16
 shot songline_2.png
 # the loop flag is not copied by OCT+
 tap OCT+
@@ -39,8 +42,8 @@ expect songpos 2
 expect songlen 2
 tap PLAY
 wait 200
-# K3 back below LOOP: x8, no loop flag
+# K3 back below LOOP: x16, no loop flag
 wait 300
 expect playing 0
 turn K3 -1 200
-expect songbar2.5 224
+expect songbar2.5 232

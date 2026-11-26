@@ -64,7 +64,9 @@ static inline void prob_cond(int k, int *a, int *b)
     *b = n;
 }
 #define SONG_LOOP(b) (((b)->mute >> 4) & 1u)   /* wip608: LOOP = the bar plays until stopped: a spare bit of mute (only parts 0-2 exist) */
-#define SONG_REP(b) (((b)->mute >> 5) + 1)    /* a bar plays 1-8 times: mute's bits 5-7 (the parts use 0-4) */
+#define SONG_REP1(b) ((((b)->mute >> 5) & 7u) | (((b)->mute >> 3 & 1u) << 3))   /* 1.8f2: repeats - 1 (0-15): mute's bits 5-7 + bit 3 (old songs: bit 3 = 0, the same) */
+#define SONG_REP(b) (SONG_REP1(b) + 1)        /* a bar plays 1-16 times (1.8f2, was 1-8); LOOP is the next value after 16 */
+#define SONG_MUTE_MASK 0x07u                   /* mute's bits 0-2 = the parts; bit 3 + bits 5-7 = repeats, bit 4 = LOOP */
 typedef struct {
     uint8_t pat[NTRACKS];             /* each part's pattern */
     uint8_t mute;                     /* bit p = part p muted */

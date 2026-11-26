@@ -2,7 +2,7 @@
 The newest version first. Install it with the [web installer](../install/); the
 [manual](../manual/) covers everything in detail.
 
-## FM1 Tonic 1.8f · 26 November 2026
+## FM1 Tonic 1.8g · 26 November 2026
 
 - DONE (wip708, firmware 1.8f) **Simple SAVE: one screen.** SAVE shows SAVE HERE? with the place number and the project's name. SELECT picks another place (1-30), ALGORITHM makes another name (or opens the letter editor with NAME PROJECTS on MANUAL), OCT+ saves, OCT- cancels, HOME leaves. The old CHOOSE SLOT step is gone. QUICK SAVE (FUNC + SAVE) and RENAME (FUNC + HOME) are as before.
 - DONE (wip699, firmware 1.8f) **SELECT and ALGORITHM swapped on the SEQ and ARP pages.** SELECT = the track, ALGORITHM = the step page (AUTOSCROLL off).

@@ -16,7 +16,7 @@ Inspired by Microtonic VST by Sonic Charge, FM1 TONIC is an 8-voice drum synthes
 **Sequencer**
 
 - 64-step sequencer, 16 patterns per project (plus a pattern bank 2, patterns 17-32, as a beta: FUNC + SELECT; a saved project still keeps only patterns 1-16). Fixed length 8, 16, 32 or 64 steps, or a free length of 1 to 64.
-- Song mode: bars with repeats (x1 to x8 or LOOP), edited on the SONG screen.
+- Song mode: bars with repeats (x1 to x16 or LOOP), edited on the SONG screen.
 - Global accent (+1 to +10) and per-track accent, fill with retrig (2x, 4x, 8x), and trig % (chance) on every step.
 - Parameter lock (limited: 3 knobs per track in each pattern).
 - Record automation (limited: 3 knobs per track).
@@ -354,7 +354,7 @@ Every combination of buttons and keys, grouped by the button you hold first. Bla
 - **Mute and solo.** {r:FUNC + black key 1 to 8} mutes (again = unmute). {o:FILL + black key 1 to 8} solos that track (another key moves the solo, the same key ends it). Solos are not saved and end when a preset loads. Not on ARP.
 - **P-locks and chance.** Hold a white key and turn a knob on a voice page: that step gets its own value, every other step keeps the sound. While playing, you hear it next time the step comes round. To remove one: hold the step, hold SAVE, turn the same knob. A track holds 3 locked knobs per pattern (the screen says MAX 3 PER TRACK, MOTION FULL when no room is left). Hold a step and turn SELECT: its chance, down from 100 % in 5 % steps, then 1:2, 2:2, 1:3 ... 8:8. While you turn, the chance fills the whole screen (TRIG % and the step), big, so you can read it at once.
 - **Chains.** A pattern can be flagged to run into the next one when it ends (after pattern 8 comes 1). A flag only counts on a pattern with notes. A preset with chains loads playing through them (SONG ON); SEQ's pattern page knob 1 turns it off and the pattern loops.
-- **Song mode.** {r:FUNC + SEQ}, confirm with OCT+ (OCT- = back). With no song yet, the PATTERNS screen opens: white keys 1 to 16 add patterns, OCT- (or FUNC + a white key) takes the last off, OCT+ is OK. PLAY plays one bar per pattern, looping. The same gesture leaves song mode. On the **SONG screen** (one row per bar) knob 1 = the bar, knob 2 = its pattern, knob 3 = repeats (x1 to x8, then LOOP = until you stop); turning ALGORITHM moves the bar like knob 1; white keys write a pattern into the bar on the cursor and move on (lit = the pattern has notes, dark = empty, the cursor bar's pattern blinks); OCT+ adds a line after the cursor; OCT- or FILL (pressed and let go) deletes the line at once (the last bar deleted = the song is deleted and song mode ends). {r:FUNC + ARP} deletes the whole song.
+- **Song mode.** {r:FUNC + SEQ}, confirm with OCT+ (OCT- = back). With no song yet, the PATTERNS screen opens: white keys 1 to 16 add patterns, OCT- (or FUNC + a white key) takes the last off, OCT+ is OK. PLAY plays one bar per pattern, looping. The same gesture leaves song mode. On the **SONG screen** (one row per bar) knob 1 = the bar, knob 2 = its pattern, knob 3 = repeats (x1 to x16, then LOOP = until you stop); turning ALGORITHM moves the bar like knob 1; white keys write a pattern into the bar on the cursor and move on (lit = the pattern has notes, dark = empty, the cursor bar's pattern blinks); OCT+ adds a line after the cursor; OCT- or FILL (pressed and let go) deletes the line at once (the last bar deleted = the song is deleted and song mode ends). {r:FUNC + ARP} deletes the whole song.
 
 ### Patterns
 
@@ -458,7 +458,7 @@ Recording only adds: a trig you play is put on, but no existing trig is taken of
 
 ### Song mode
 
-Song mode plays your patterns in a chosen order, one bar after another. A song is a list of **bars**: each bar says which pattern plays and how many times (x1 to x8, or LOOP). A song has up to 192 bars and is saved with the project (it uses project memory, see GLO > MEMORY).
+Song mode plays your patterns in a chosen order, one bar after another. A song is a list of **bars**: each bar says which pattern plays and how many times (x1 to x16, or LOOP). A song has up to 192 bars and is saved with the project (it uses project memory, see GLO > MEMORY).
 
 #### Enter and leave song mode
 
@@ -478,7 +478,7 @@ The SONG screen shows five bars at a time, one row per bar: the bar number, the 
 |---|---|
 | **1 BAR** | Moves the cursor to a bar. |
 | **2 PATTERN** | The pattern of the bar on the cursor (a bar on END becomes a new bar). |
-| **3 REPEAT** | How many times the bar plays: x1 to x8, then **LOOP**: the bar plays again and again until you stop, and the song never goes on to the next bar. |
+| **3 REPEAT** | How many times the bar plays: x1 to x16, then **LOOP**: the bar plays again and again until you stop, and the song never goes on to the next bar. |
 | **ALGORITHM** (turn) | Moves the cursor to a bar, like knob 1 (it stops at bar 1 and at END, it does not wrap round). |
 
 | You want to | You do |
