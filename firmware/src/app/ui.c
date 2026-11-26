@@ -9861,9 +9861,10 @@ static int full_kind(void)                            /* 0 none, 1 a warning, 2 
     if (ui.msg_warn && ui.msg_until && (int32_t)(ui.msg_until - plat_ms()) > 0)
         return 1;
     if (pc_on) {                                     /* wip433: TRIG % turned: big on the whole screen */
-        if (ui.overlay == O_NONE && ui.msg_until && (int32_t)(ui.msg_until - plat_ms()) > 0)
-            return 4;
+        if (ui.overlay == O_NONE && held_any_step() >= 0 && ui.msg_until && (int32_t)(ui.msg_until - plat_ms()) > 0)
+            return 4;                                /* wip722: only while the step is still held */
         pc_on = 0;
+        ui.msg_until = 0;                            /* wip722: let go of the step = the TRIG % is gone at once (also the header text) */
     }
     if (ui.overlay == O_ASK)                         /* wip205: SAVE AS and CHAIN too */
         return 2;

@@ -17,6 +17,8 @@ turn SELECT -20
 wait 100
 shot chance_cond.png
 key w0 up
+wait 100
+shot chance_released.png
 wait 2000
 shot chance_gone.png
 welcomever
