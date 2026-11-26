@@ -1,0 +1,2509 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FM1 TONIC · firmware emulator</title>
+<meta name="description" content="FM1 Tonic: drum machine firmware for the M-VAVE FM-1, in your browser: the same code the FM-1 runs.">
+<style>
+@font-face { font-family: DotGothic16; src: url("fonts/DotGothic16-subset.woff") format("woff"); font-display: swap; }
+:root { --ground: #2e2e32; --ink: #ececee; --muted: #b9b9be; --rule: #5a5a5e; --accent: #8fb8e0; --card: #d6d6d8; --body: #1d1d1f; --tray: #141415; --part: #2a2a2d; --edge: #3a3a3e; --label: #d6d6d8; color-scheme: light; }
+body { background: var(--ground); color: var(--ink); margin: 0; padding-inline: 16px; padding-block: 28px 48px;
+       font: 400 14px/1.5 -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
+main { max-width: 1040px; margin: 0 auto; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; gap: .4rem 1.2rem; margin: 0 0 1rem; }
+h1 { font: 700 2rem/1.1 -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; margin: 0;
+     background: linear-gradient(#cdcdcd, #a9a9a9); padding: .2em .55em; border-radius: 10px; }
+h1 .fm { color: #3d6f9e; }
+h1 .tn { color: #2f2f2f; }
+header p { margin: 0; color: var(--muted); }
+header nav { margin-left: auto; display: flex; gap: 1rem; }
+a { color: var(--accent); }
+/* at phone width the drawn panel keeps its controls 24 px or more (WCAG 2.5.8): it keeps a minimum width and
+   scrolls sideways in its own box, not the page */
+.devicebox { overflow-x: auto; overscroll-behavior-x: contain; }
+.device { position: relative; width: 100%; min-width: 560px; aspect-ratio: 1000 / 700; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: manipulation; }
+.device svg { pointer-events: none; }
+.controls { position: absolute; inset: 0; pointer-events: none; }
+.hit { position: absolute; touch-action: none; cursor: pointer; -webkit-tap-highlight-color: transparent; border-radius: 12px;
+       pointer-events: auto; margin: 0; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; appearance: none; }
+.hit.knob { cursor: ns-resize; border-radius: 50%; }
+.hit:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+.device:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; border-radius: 4.4% / 6.3%; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+.device svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.device canvas { position: absolute; left: 30%; top: 7.4286%; width: 24%; height: 34.2857%; image-rendering: auto; background: #000; border-radius: 2px; }
+.ctl { cursor: pointer; }
+.ctl.knob { cursor: ns-resize; }
+.btnface, .glow { transition: opacity .05s; }
+.glow { opacity: 0; }
+.lit .glow { opacity: .42; }
+.dim .glow { opacity: .18; }
+.held .btnface { stroke: #fff; stroke-width: 3; }
+.latched .btnface { stroke: #fff; stroke-width: 3; stroke-dasharray: 6 4; }
+.slit { fill: #5d86d6; }
+.dim .slit { fill: #bcc2c7; filter: drop-shadow(0 0 2px rgba(255,255,255,.35)); }
+.lit .slit, .held .slit { fill: #fff; filter: drop-shadow(0 0 4px rgba(255,255,255,.9)); }
+.held .keyface { stroke: #fff; stroke-width: 2.5; }
+.start { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(0, 0, 0, .58); border-radius: 4.4% / 6.3%; }
+.start button { position: absolute; left: 42%; top: 24.6%; transform: translate(-50%, -50%); font: inherit; font-size: 18px; font-weight: 700; padding: 12px 28px; background: linear-gradient(#cdcdcd, #a9a9a9); color: #1d1d1f;
+                border: 2px solid #6a6a6a; border-radius: 10px; cursor: pointer; }
+.start[hidden] { display: none; }
+.turn { display: none; margin: 0 0 .8rem; color: var(--muted); font-size: .92rem; }
+/* wip441: APP MODE (full screen). The panel fills the screen without zoom: width = min(screen width, screen height x 1000/700), centred on black.
+   On a phone turned sideways it starts by itself at "Switch on"; the Full screen button in the bar does it on any device. */
+.devicebox.app { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; overflow: hidden; background: #0b0b0c; border-radius: 0; box-shadow: none; }
+.devicebox.app .device { width: min(100vw, calc(100vh * 1.4286)); width: min(100vw, calc(100dvh * 1.4286)); min-width: 0; }
+body.appmode { overflow: hidden; }
+.appx { display: none; position: absolute; top: 8px; right: 8px; z-index: 5; min-width: 44px; min-height: 44px; font: 700 1.2rem/1 system-ui, sans-serif; color: #ececee; background: rgba(40,40,44,.75); border: 1px solid #777; border-radius: 10px; cursor: pointer; }
+.devicebox.app .appx { display: block; }
+@media (orientation: portrait) and (max-width: 700px) { .turn { display: block; }
+  /* wip448: phone upright, not full screen: the panel goes from the left edge to the right edge of the screen */
+  .devicebox:not(.app) { margin-inline: -16px; border-radius: 0; box-shadow: none; }
+  .devicebox:not(.app) .device { min-width: 0; } }
+/* wip448b: full screen while the screen is still upright (iPhone cannot lock the orientation): the PANEL is turned a quarter turn
+   (not the box: the browser's own full screen style forbids a transform on the box) so it is horizontal and as big as a sideways
+   screen. When the phone is really turned sideways this rule stops by itself. */
+@media (orientation: portrait) { .devicebox.app .device { width: min(100vh, calc(100vw * 1.4286)); width: min(100dvh, calc(100dvw * 1.4286)); position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(90deg); } }
+.start button:disabled { opacity: .6; cursor: progress; }
+.bar { display: flex; flex-wrap: wrap; gap: .5rem 1.2rem; align-items: center; margin: .9rem 0 0; color: var(--muted); font-size: .92rem; }
+.bar button { font: inherit; color: var(--ink); background: var(--card); border: 1px solid #777; border-radius: 2px; padding: .3em .8em; cursor: pointer; }
+.bar button[aria-pressed="true"] { background: var(--ink); color: var(--card); border-color: var(--ink); }
+.bar .cpu { font-variant-numeric: tabular-nums; }
+#alert:empty { display: none; }
+#alert { color: var(--ink); font-weight: 600; }
+input[type="radio"], input[type="checkbox"] { accent-color: var(--accent); width: 1.05rem; height: 1.05rem; margin: 0; }
+.help { margin: 1.6rem 0 0; }
+.help > div { margin: 0 0 1.6rem; }
+.help h2 { font: 600 1.1rem -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; margin: 0 0 .3rem; }
+.help p, .help ul { margin: 0; color: var(--muted); max-width: none; }
+.help ul { padding-left: 1.1rem; }
+.help li { margin: 0 0 .35rem; }
+.help label { display: inline-flex; gap: .4rem; align-items: center; margin: .5rem 0 0; color: var(--ink); cursor: pointer; }
+@media (prefers-reduced-motion: reduce) { .btnface, .glow { transition: none; } }
+.cheat, .credits { margin: 1.6rem 0 0; }
+.cheat h2, .credits h2 { font: 600 1.1rem -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; margin: 0 0 .3rem; }
+/* the headings carry the logo's blue, a short bar on the left */
+.help h2, .cheat h2, .credits h2 { border-left: 5px solid #3d6f9e; padding-left: .55rem; }
+.cheat h3, .credits h3 { font: 600 .95rem -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; margin: 0 0 .25rem; color: var(--ink); }
+.cheat .note, .credits .note { margin: 0 0 .6rem; color: var(--muted); }
+.credits .note.big { margin: 0 0 1.4rem; }
+.credits ul { margin: 0 0 1.2rem; }
+.credits li { margin: 0 0 .35rem; }
+.credits .note, .credits li { max-width: none; }
+.credits .note.fine { margin-top: 1.2rem; }
+.dl { margin-left: .6rem; font-weight: 600; }
+header nav a { font-weight: 600; }
+.cheat .cards, .credits .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 1rem; }
+.cheat .cards > div, .credits .cards > div { background: var(--card); border-radius: 10px; padding: .7rem .9rem; }
+.cheat ul, .credits ul { margin: 0; padding-left: 1.1rem; color: var(--muted); }
+kbd { font: 600 .85em ui-monospace, Menlo, monospace; background: var(--card); border: 1px solid var(--rule); border-radius: 4px; padding: 0 .3em; color: var(--ink); }
+/* the small buttons are little logo boxes: grey gradient, dark border (Mute keeps its dark "pressed" look) */
+.bar button:not([aria-pressed="true"]) { background: linear-gradient(#cdcdcd, #a9a9a9); color: #1d1d1f;
+       border: 1px solid #6a6a6a; border-radius: 8px; }
+/* the cheat-sheet cards: the logo box, rounded, with a dark border */
+.cheat .cards > div, .credits .cards > div { background: linear-gradient(#d6d6d8, #bcbcbe); border: 1px solid #6a6a6a; border-radius: 14px; }
+/* a dark page, as the logo's ground: the text on it is light; the light boxes (cards, keys) keep dark text */
+.cheat .cards > div, .credits .cards > div, kbd { --ink: #111; --muted: #2c2c2e; --accent: #1d1d1f; }
+.bar button[aria-pressed="true"] { background: #1d1d1f; color: #ececee; border-color: #ececee; }
+/* the panel buttons and keys are coloured as in the manual's drawing; lit = a white veil (.glow) over the colour */
+/* the cheat sheet: tables on the dark page (wip389), red = with FUNC, orange = with FILL (as in the manual) */
+.cheat h3 { margin: 1.4rem 0 .3rem; font-size: 1.02rem; }
+.cheat h4 { font: 600 .85rem -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; color: var(--muted); margin: 1rem 0 .2rem; text-transform: uppercase; letter-spacing: .05em; }
+.cheat .tbl { overflow-x: auto; margin: 0 0 .5rem; }
+.cheat table { border-collapse: collapse; width: 100%; font-size: .93rem; }
+.cheat th { text-align: left; font-weight: 600; font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); padding: .45rem 1rem .4rem 0; border-bottom: 1px solid var(--rule); }
+.cheat td { padding: .5rem 1rem .5rem 0; border-bottom: 1px solid var(--edge); vertical-align: top; }
+.cheat td:first-child { width: 34%; }
+.cheat .t1 td:first-child { width: 42%; }
+.cheat table.g td.pg { width: 26%; border-right: 1px solid var(--edge); }
+.cheat table.g td.ky { width: 30%; }
+.cheat table.g tr.gs td { border-top: 1px solid var(--rule); }
+.cheat .r { color: #ff7a70; font-weight: 600; }
+.cheat .o { color: #f0a043; font-weight: 600; }
+.cheat .exc { margin: .2rem 0 0; color: var(--muted); }
+/* wip518: paste a preset anywhere on the page (Ctrl+V / Cmd+V) -> this bar with SEND TO FM1 TONIC */
+.pastebar { position: relative; margin: .6rem auto .8rem; width: min(26rem, calc(100vw - 2rem)); box-sizing: border-box; background: #1f2a36; color: #f2f2f2; border: 2px solid #5aa2f5; border-radius: 14px; padding: .8rem 1rem .9rem; text-align: center; }   /* wip519: above the panel, in the page flow: it covers and greys nothing */
+.pastebar[hidden] { display: none; }
+.pbname { font: 600 .95rem -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; margin: 0 1.6rem .5rem; overflow-wrap: anywhere; }
+.pbsend { font: 800 1.05rem -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; letter-spacing: .04em; color: #fff; background: #2f7de0; border: 0; border-radius: 10px; padding: .65em 1.3em; cursor: pointer; width: 100%; }
+.pbsend:hover:not(:disabled) { background: #4a93f0; }
+.pbsend:disabled { opacity: .55; cursor: progress; }
+.pastebar progress { width: 100%; height: 8px; display: block; accent-color: #5aa2f5; margin: .6rem 0 0; }
+.pastebar progress[hidden] { display: none; }
+.pbst { min-height: 1.3em; margin-top: .45rem; font-size: .85rem; color: #cfd8e3; }
+.pbx { position: absolute; top: .25rem; right: .4rem; background: none; border: 0; color: #cfd8e3; font-size: 1.4rem; line-height: 1; cursor: pointer; padding: .1rem .4rem; }
+/* Put FM1 Tonic on the FM-1 (wip178) */
+.flash { margin: 1.6rem 0 0; }
+.flash h2 { font: 600 1.1rem -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; margin: 0 0 .3rem; border-left: 5px solid #3d6f9e; padding-left: .55rem; }
+.flash > p { margin: 0 0 .6rem; color: var(--muted); }
+.flash button { font: inherit; font-size: .92rem; font-weight: 600; color: #1d1d1f; background: linear-gradient(#cdcdcd, #a9a9a9); border: 1px solid #6a6a6a; border-radius: 8px; padding: .4em 1.2em; cursor: pointer; }
+.flash button:disabled { opacity: .5; cursor: default; }
+.flash progress { width: 100%; max-width: 30rem; height: 6px; display: block; accent-color: #5aa2f5; margin: .6rem 0 0; }
+.flash #flash-status { min-height: 1.6em; color: var(--ink); }
+.flash progress[hidden] { display: none; }
+.flash pre { color: var(--muted); font-size: .8rem; white-space: pre-wrap; margin: .4rem 0 0; }
+/* the install / backup / restore blocks are cards on the dark page */
+.flash { background: var(--part); border: 1px solid var(--edge); border-radius: 14px; padding: 1.1rem 1.3rem 1.2rem; }
+.flash h2 { margin-top: 0; }
+.flash h3 { font: 600 .95rem -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; margin: 1.2rem 0 .3rem; color: var(--ink); }
+.flash .actions, dialog .actions { display: flex; flex-wrap: wrap; gap: .6rem; margin: 0 0 .8rem; }
+.flash .actions button, dialog .actions button { flex: 1 1 11rem; max-width: 16rem; padding: .65em 1.2em; font: inherit; font-size: 1rem; font-weight: 600; color: #1d1d1f;
+       background: linear-gradient(#cdcdcd, #a9a9a9); border: 1px solid #6a6a6a; border-radius: 10px; cursor: pointer; }
+.flash .actions button.primary, dialog .actions button.primary { background: linear-gradient(#8fb8e0, #5f93c4); border-color: #3d6f9e; }
+.flash .actions button:disabled { opacity: .5; cursor: default; }
+.flash .warn { padding: .6rem .85rem; border: 1px solid #c9a227; border-left-width: 5px; border-radius: 8px; background: #3a3320; color: var(--ink); }
+.flash .fine { font-size: .85rem; }
+.flash .fine a, .flash a { color: var(--accent); }
+dialog { max-width: 38rem; width: calc(100% - 32px); border: 1px solid #6a6a6a; border-radius: 14px; background: var(--part); color: var(--ink); padding: 1.2rem 1.4rem; }
+dialog::backdrop { background: rgba(0, 0, 0, .65); }
+dialog h2 { margin: 0 0 .5rem; font: 600 1.2rem -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
+
+/* wip426: a little more polish for the page */
+body { background: radial-gradient(1200px 500px at 50% -120px, #3b3b41, var(--ground) 70%) no-repeat, var(--ground); }
+header { padding: 0 0 1rem; margin: 0 0 1.2rem; border-bottom: 1px solid var(--edge); align-items: center; }
+h1 { box-shadow: 0 2px 10px rgba(0,0,0,.35); }
+header p { flex: 1 1 22rem; max-width: 46rem; line-height: 1.45; }
+header nav { gap: .5rem; flex-wrap: wrap; }
+header nav a { text-decoration: none; font-weight: 600; font-size: .88rem; color: var(--ink); background: var(--part); border: 1px solid var(--edge); border-radius: 999px; padding: .4em 1em; }
+header nav a:hover { border-color: var(--accent); color: var(--accent); }
+.devicebox { border-radius: 16px; box-shadow: 0 8px 28px rgba(0,0,0,.4); }
+.bar { background: var(--part); border: 1px solid var(--edge); border-radius: 12px; padding: .6rem .9rem; }
+.help { display: grid; grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr)); gap: 1rem; margin: 1.4rem 0 0; }
+.help > div { margin: 0; background: var(--part); border: 1px solid var(--edge); border-radius: 14px; padding: .9rem 1.1rem 1rem; }
+.credits { background: var(--part); border: 1px solid var(--edge); border-radius: 14px; padding: 1.1rem 1.3rem 1.2rem; }
+.credits h2 { margin-top: 0; }
+.credits ul { line-height: 1.55; }
+.credits li { margin: 0 0 .35rem; }
+.flash { margin-top: 1.4rem; box-shadow: 0 2px 10px rgba(0,0,0,.2); }
+kbd { border-radius: 4px; }
+details.cheat { margin: .4rem 0 1rem; border: 1px solid var(--rule); border-radius: 12px; background: var(--ground); }
+details.cheat > summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: .55rem; padding: .65rem 1rem; font-weight: 600; color: var(--accent); }
+details.cheat > summary::-webkit-details-marker { display: none; }
+details.cheat > summary::before { content: "\25B8"; display: inline-block; transition: transform .15s; }
+details.cheat[open] > summary::before { transform: rotate(90deg); }
+details.cheat > summary:hover { text-decoration: underline; }
+details.cheat .cheat-in { padding: 0 1rem 1rem; }
+@media (prefers-reduced-motion: reduce) { details.cheat > summary::before { transition: none; } }
+
+/* wip438: the blinking note under the panel (preset 9 = no trigs); still when the person asks for less motion */
+.canvas { margin: .9rem 0 0; padding: .55rem .9rem; border: 1px solid var(--accent); border-radius: 12px; color: var(--ink); background: var(--part); font-size: .95rem; text-align: center; animation: canvasblink 1.8s ease-in-out infinite; }
+.canvas b { color: var(--accent); }
+@keyframes canvasblink { 0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(143,184,224,.55); } 50% { opacity: .45; box-shadow: 0 0 0 4px rgba(143,184,224,0); } }
+/* wip515: Clear pattern button between PLAY and the keys: hidden until PLAY is pressed the first time, then blinks until clicked */
+.clrpat { position: absolute; left: 78.8%; top: 45.4%; width: 17.6%; height: 6.6%; z-index: 3; display: none; font: 700 clamp(.7rem, 1.9vw, 1.05rem)/1.1 -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; color: #fff; background: linear-gradient(#e0483e, #a32a24); border: 2px solid #ff8a80; border-radius: 10px; cursor: pointer; padding: 0 .3em; touch-action: manipulation; }
+.clrpat.on { display: block; }
+.clrpat.blink { animation: clrblink .9s ease-in-out infinite; }
+@keyframes clrblink { 0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(255,106,96,.9); } 50% { opacity: .55; box-shadow: 0 0 0 7px rgba(255,106,96,0); } }
+@media (prefers-reduced-motion: reduce) { .clrpat.blink { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .canvas { animation: none; } }
+
+/* wip505: downloads moved down; a pop-up window in their old place */
+.mtp { flex: 1 1 100%; max-width: none; margin: .2rem 0 0; font-size: 1.05rem; color: var(--accent); }
+.upop { flex: 0 0 auto; min-width: 14rem; border: 1px solid var(--accent); border-radius: 12px; background: var(--part); box-shadow: 0 6px 20px rgba(0,0,0,.45); overflow: hidden; }
+.upop-bar { display: flex; justify-content: space-between; align-items: center; padding: .25rem .5rem .25rem .8rem; background: var(--accent); color: #111; font-weight: 700; font-size: .75rem; letter-spacing: .08em; }
+.upop-bar button { background: none; border: 0; color: #111; font-size: .9rem; cursor: pointer; }
+.upop-body { padding: .7rem .9rem; font-size: .92rem; }
+.upop-body p { margin: 0 0 .4rem; text-align: center; }
+.upop-body ul { margin: 0; padding-left: 1.1rem; line-height: 1.4; }
+.upop { max-width: 22rem; }
+nav.downloads { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1.2rem 0; }
+nav.downloads a { text-decoration: none; font-weight: 600; font-size: .88rem; color: var(--ink); background: var(--part); border: 1px solid var(--edge); border-radius: 999px; padding: .4em 1em; }
+nav.downloads a:hover { border-color: var(--accent); color: var(--accent); }
+
+/* wip510: the pop-up is closed; the button opens it over the page, click outside / X / Back / Esc close it */
+.upbtn { font: 600 .88rem -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; color: var(--ink); background: var(--part); border: 1px solid var(--accent); border-radius: 999px; padding: .4em 1em; cursor: pointer; }
+.upbtn:hover { color: var(--accent); }
+.uover { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 1rem; background: rgba(0,0,0,.6); }
+.uover[hidden] { display: none; }
+.uover .upop { width: 100%; max-width: 24rem; max-height: 90vh; overflow: auto; }
+.uback { display: block; margin: .8rem auto 0; font: 600 .88rem -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; color: #111; background: var(--accent); border: 0; border-radius: 999px; padding: .45em 1.2em; cursor: pointer; }
+
+/* wip512: Microtonic & Patternarium Compatible title (soft blink like the canvas hint), grey text, manual link beside Future updates, bigger Inspired line */
+.mtp { flex: 1 1 100%; max-width: none; margin: .3rem 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .9rem; }
+.mtp-t { display: inline-block; padding: .35rem .9rem; border: 1px solid var(--accent); border-radius: 12px; color: var(--accent); font-weight: 700; font-size: 1.05rem; animation: canvasblink 1.8s ease-in-out infinite; }
+.mtp-d { flex: 1 1 22rem; max-width: 46rem; color: var(--muted); font-size: .85rem; line-height: 1.4; }
+@media (prefers-reduced-motion: reduce) { .mtp-t { animation: none; } }
+header p.insp { font-size: 1.15rem; }
+.hbtns { display: flex; flex-wrap: wrap; gap: .5rem; }
+a.upbtn { text-decoration: none; display: inline-block; }
+
+/* wip513: bigger pop-up, each update = a title line + one long line */
+.uover .upop { max-width: 52rem; }
+.uover .upop-bar { padding: .5rem .8rem .5rem 1.2rem; font-size: .85rem; }
+.uover .upop-body { padding: 1.3rem 1.6rem 1.5rem; font-size: 1.1rem; }
+.uover .upop-body > p { font-size: 1.25rem; margin-bottom: 1rem; }
+.uover .upop-body ul { list-style: none; padding: 0; margin: 0; }
+.uover .upop-body li { margin: 0 0 1.1rem; line-height: 1.5; }
+.uover .ut { display: block; color: var(--accent); font-size: 1.12rem; }
+.uover .ud { display: block; color: var(--ink); }
+
+/* wip717: ONE line of square buttons (tools, then What's new / manual / Future updates); on a narrow screen the line slides sideways */
+.hbtns { flex-wrap: nowrap; gap: .25rem; overflow-x: auto; padding: .6rem 0 .5rem; scrollbar-width: thin; align-items: stretch; }
+.hbtns .upbtn { flex: 0 0 auto; border-radius: 4px; padding: .5em .4em; background: transparent; border: 1px solid #5a5e66; color: var(--ink); font: 600 .62rem ui-monospace, "SF Mono", Menlo, Consolas, monospace; letter-spacing: .03em; text-transform: uppercase; white-space: nowrap; }
+.hbtns .upbtn:hover, .hbtns .upbtn:focus-visible { color: var(--accent); border-color: var(--accent); box-shadow: 0 0 10px rgba(255,160,120,.35); }
+.hbtns .upbtn.hglow { color: var(--accent); border-color: var(--accent); animation: hbglow 2.2s ease-in-out infinite; }
+.hbtns .upbtn.hglow + .upbtn.hglow { animation-delay: .5s; }
+.hbtns .upbtn.man { background: var(--accent); color: #111; border-color: var(--accent); }
+.hbtns .upbtn.man:hover { color: #111; box-shadow: 0 0 14px rgba(255,160,120,.6); }
+@keyframes hbglow { 0%, 100% { box-shadow: 0 0 0 0 rgba(255,160,120,0); } 50% { box-shadow: 0 0 12px 1px rgba(255,160,120,.55); } }
+@media (prefers-reduced-motion: reduce) { .hbtns .upbtn.hglow { animation: none; } }
+.hbtns .tsep { flex: 0 0 1px; background: #5a5e66; margin: .2rem .1rem; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<div class="uover" id="nover" hidden><div class="upop" role="dialog" aria-modal="true" aria-labelledby="nptitle"><div class="upop-bar"><span id="nptitle">WHAT&#39;S NEW</span><button type="button" id="nopx" aria-label="Back to the panel">&#x2715;</button></div><div class="upop-body"><p><b>What&#39;s new in version 1.8h</b></p><ul><li><b class="ut">TRIG % only while the step is held</b><span class="ud">the big TRIG % screen goes away as soon as you let go of the step.</span></li><li><b class="ut">Simple SAVE: one screen</b><span class="ud">SAVE shows SAVE HERE? with the place number and the project&#39;s name. SELECT picks another place (1-30), ALGORITHM makes another name, OCT+ saves, OCT- cancels. The old CHOOSE SLOT step is gone.</span></li><li><b class="ut">SELECT and ALGORITHM swapped on SEQ and ARP</b><span class="ud">SELECT is now the track, ALGORITHM is the step page.</span></li><li><b class="ut">ARP knobs</b><span class="ud">K2 is AUTOSCROLL (like on SEQ), K4 is OCTAVE.</span></li><li><b class="ut">Swing is global</b><span class="ud">a new GLO setting SWING: GLOBAL or PER PATTERN. GLOBAL is the default.</span></li><li><b class="ut">Same top bar on every page</b><span class="ud">three chips: the pattern, PATTERN BANK 1 or 2 (red in bank 2) and the track, with no page name. The battery is bigger.</span></li><li><b class="ut">Manual</b><span class="ud">a Patterns section, and quick cheat sheets for Patterns, Song mode and Saving.</span></li></ul><p><b>What&#39;s new in version 1.8e</b></p><ul><li><b class="ut">ARP page: new look</b><span class="ud">a piano keyboard on the left, your notes as round balls with soft tails in the sequencer colours; OCT- / OCT+ move the octave you see, and notes of another octave are pale with +1 or -1.</span></li><li><b class="ut">Pattern bank (beta)</b><span class="ud">hold FUNC and turn SELECT to choose patterns 1-16 or 17-32 on SEQ, ARP, SONG and HOME. Bank 2 is a beta: a saved project still keeps only patterns 1-16, so patterns 17-32 are lost when you save and load.</span></li><li><b class="ut">New top bar on SEQ and ARP</b><span class="ud">three chips: the pattern, PATTERN BANK 1 or 2 (red in bank 2) and the track.</span></li><li><b class="ut">REC dot in the top bar</b><span class="ud">on every page the red dot now blinks like the REC button.</span></li></ul><p><b>What&#39;s new in version 1.8d</b></p><ul><li><b class="ut">Projects keep patterns 1-16</b><span class="ud">a project you save (SAVE, quick save or rename) now keeps all 16 patterns. Before, only patterns 1-8 were kept and 9-16 came back empty. Older projects and the factory presets load as before.</span></li><li><b class="ut">Clear all patterns</b><span class="ud">hold FUNC and PLAY for 3 seconds: the usual CLEAR PATTERN? appears first, then after 3 seconds it changes to CLEAR ALL PATTERNS? with [OCT-] NO and [OCT+] YES. OCT+ empties every pattern (trigs, accents, fills, notes, microtiming) and keeps your sounds, presets, song and settings. A short tap works as before.</span></li><li><b class="ut">Mixer: solo and audition</b><span class="ud">on the GLO mixer a black key is now SOLO (several at once, FILL clears them all), and FUNC held + a black key 1-8 plays that track so you can hear it, without changing anything. The mixer has no mute any more: mute stays on PERFORM and the pattern page.</span></li><li><b class="ut">Song patterns: see which are empty</b><span class="ud">on the song patterns screen (FUNC + SEQ on an empty song) the white keys 1-16 light up when the pattern has notes and stay dark when it is empty.</span></li><li><b class="ut">30 places</b><span class="ud">the PRESETS knob now turns through 30 places (before: 40). Places 1 and 2 are demo presets; places 3-30 are yours, and you can save over the demos too.</span></li><li><b class="ut">A project keeps its song, knob moves and ARP notes</b><span class="ud">SAVE, quick save and rename now store the song, the recorded knob moves and the per-step ARP notes together with the project, and loading it brings them back. If a project does not fit, the FM-1 shows MEMORY FULL: NOT SAVED and writes nothing.</span></li><li><b class="ut">Back up and restore one file per place</b><span class="ud">on this page, Back up my projects gives one zip with one file per place (01 to 30), the song and notes inside the same file. Restore my projects puts each file back into its place, and Clear all places empties 1-30. Export as .mtpreset works for places 1-30. Old backups numbered 31-40 are skipped with a message.</span></li></ul><p><b>What&#39;s new in version 1.8c</b></p><ul><li><b class="ut">Battery indicator</b><span class="ud">three stages in the top right corner of the screen (3 green = full, 2 amber, 1 = one red segment blinking, blue = on USB power). At the last stage a full-screen LOW BATTERY warning appears: plug your device, and press HOME to close it.</span></li><li><b class="ut">Sidechain is now a real compressor</b><span class="ud">SENDS page (press HOME twice): knob 3 is the THRESHOLD, from 0.0 dB (all the way right, off) down to -59 dB, then -INF at the very end; knob 4 is the INPUT track (the kick). Turn ALGORITHM right on that page to choose which tracks duck. Fixed 4:1, attack 1 ms, release 30 ms, and the dot shows the real duck.</span></li><li><b class="ut">Global accent +1 to +10</b><span class="ud">GLO, press it five times to reach the SETTINGS list, then GLOBAL ACCENT: how strong the accent of the AC track is, from +1 to +10, default +3 (+10 = the old full accent). A track&#39;s own accent stays full.</span></li><li><b class="ut">Random all voices</b><span class="ud">SEL page (first press): the 4th place is a purple RNDM button. Hold FUNC and turn knob 4: a new safe random sound for all 8 tracks at once. Knob 4 alone only shows a reminder.</span></li><li><b class="ut">Mixer mute and solo</b><span class="ud">GLO twice (the mixer): tap FUNC for MUTE mode, tap FILL for SOLO mode, then black keys 1-8 mute or solo the tracks (a track the solo silences turns grey). White keys 1-16 pick the next pattern. Tap FUNC or FILL again to clear all mutes or all solos.</span></li><li><b class="ut">Mute and solo stay on</b><span class="ud">the mode you chose (FUNC = mute, FILL = solo) stays when you leave the page and come back.</span></li><li><b class="ut">Key blinks at the speed you asked for</b><span class="ud">hold FUNC: the key of the playing pattern blinks slowly; a muted track&#39;s key blinks faster and a soloed track&#39;s key the fastest. On PERFORM, the pattern page and the GLO mixer the black keys no longer flash at every hit, so mute and solo are easy to read.</span></li><li><b class="ut">Song screen: LOOP and lines</b><span class="ud">enter song mode with FUNC + SEQ, then OCT+. On the SONG screen knob 3 REPEAT goes from x1 to x8 and then LOOP, which plays that bar until you stop. OCT+ adds a line after the cursor and OCT- deletes the line.</span></li><li><b class="ut">Song screen: ALGORITHM and key lights</b><span class="ud">turn ALGORITHM to move the bar row, like knob 1 (it stops at both ends). The white keys show the patterns: lit = has notes, dark = empty, and the pattern of the bar under the cursor blinks.</span></li><li><b class="ut">PERFORM in song mode</b><span class="ud">press FX twice while the song plays: a purple PATTERN box blinks with the pattern the song plays next, and the big number shows the one playing now. The white keys do nothing in song mode, because the song decides. Outside song mode they cue the next pattern and the same purple box announces it. Same picture in the Grigiotonic skin.</span></li></ul><p><b>What&#39;s new in version 1.8b</b></p><ul><li><b class="ut">SENDS page: cube and circle</b><span class="ud">in the Grigiotonic skin the two faders are gone: a blue cube fills like a liquid for the reverb send, and a blue circle gets more rings, from the middle out, for the delay send. REVERB and DELAY are written under them, and these two knobs no longer zoom.</span></li><li><b class="ut">Sidechain knobs reordered</b><span class="ud">on the SENDS page the third knob is now the sidechain threshold and the fourth the sidechain input, closed together in a blue outline in the Grigiotonic skin.</span></li><li><b class="ut">Footer hints in black</b><span class="ud">in the Grigiotonic skin the hint line at the bottom of every page is now all black, with no blue words.</span></li></ul><p><b>What&#39;s new in version 1.8a</b></p><ul><li><b class="ut">Level and distortion tied in Random</b><span class="ud">the louder a track&#39;s level is, the lower the random distortion goes, so a loud level and a heavy distortion never come together.</span></li><li><b class="ut">Step pages on the third knob</b><span class="ud">turn SELECT on the sequencer and the arp page to see 1-16, 17-32 and so on big on the third knob; a short loop never shows an empty page.</span></li><li><b class="ut">Sidechain threshold like the compressor</b><span class="ud">the sidechain threshold knob now runs like the compressor&#39;s: all the way right is off, turning left ducks more.</span></li></ul><button type="button" class="uback" id="nback">Back to the panel</button></div></div></div>
+<div class="uover" id="uover" hidden><div class="upop" role="dialog" aria-modal="true" aria-labelledby="uptitle"><div class="upop-bar"><span id="uptitle">FUTURE UPDATES</span><button type="button" id="upopx" aria-label="Back to the panel">&#x2715;</button></div><div class="upop-body"><p><b>Coming in future updates</b></p><ul><!--fu--><li><b class="ut">Pattern bank saved with the project</b><span class="ud">patterns 17-32 will be saved and loaded with a project, and the bank you were in comes back.</span></li><li><b class="ut">P-lock marks</b><span class="ud">the sequencer will show which steps carry a parameter lock.</span></li><li><b class="ut">Light spot on the ARP balls</b><span class="ud">a small highlight on each ball, for a more 3D look.</span></li><li><b class="ut">NEROTONIC</b><span class="ud">a dark skin: every colour stays, the labels turn white and the light grey background turns black.</span></li><li><b class="ut">CHORUS</b><span class="ud">a new effect with one amount knob and an animated icon: blue diamonds that open to the left and right as the chorus grows.</span></li><li><b class="ut">Knob zoom: yes / 25 % / no</b><span class="ud">the ZOOM KNOB setting gets a middle choice: 25 % makes the knob you turn only a little bigger instead of filling the screen.</span></li><!--/fu--></ul><button type="button" class="uback" id="uback">Back to the panel</button></div></div></div>
+<main>
+<header>
+  <h1><span class="fm">FM1</span> <span class="tn">TONIC</span></h1>
+  <p class="insp">Inspired by Microtonic VST by Sonic Charge, FM1 TONIC is an 8-voice drum synthesizer.</p>
+  <div class="hbtns"><a class="upbtn tl" href="#flash-h">Install</a><a class="upbtn tl" href="#pbk-go">Back up my projects</a><a class="upbtn tl" href="#xmt-h">Upload / export .mtpresets</a><a class="upbtn tl" href="#recv-h">Receive projects</a><a class="upbtn tl" href="#prs-h">Restore projects</a><span class="tsep" aria-hidden="true"></span><button type="button" class="upbtn hglow" id="nbtn" aria-haspopup="dialog">What&#39;s new in 1.8h</button><button type="button" class="upbtn hglow" id="upbtn" aria-haspopup="dialog">Future updates</button><a class="upbtn man" href="downloads/FM1-Tonic-manual.html" target="_blank" rel="noopener">User manual <!--mv-->1.8h1<!--/mv--></a><a class="upbtn tl" href="#cheat" onclick="var d=document.getElementById('cheat');if(d)d.open=true">Cheat sheet</a></div>
+</header>
+
+<p class="turn">Press Full screen under the panel: the phone turns sideways and the panel fills the screen.</p>
+<div id="pastebar" class="pastebar" role="region" aria-label="Preset pasted" hidden>
+  <button type="button" id="pb-x" class="pbx" aria-label="Dismiss">&times;</button>
+  <div id="pb-name" class="pbname"></div>
+  <button type="button" id="pb-send" class="pbsend">SEND TO FM1 TONIC</button>
+  <progress id="pb-bar" max="100" value="0" hidden aria-label="Send progress"></progress>
+  <div id="pb-status" class="pbst" role="status"></div>
+</div>
+<div class="devicebox" id="devicebox">
+<button class="appx" id="appx" type="button" aria-label="Exit full screen">&#x2715;</button>
+<div class="device" id="device" role="group" aria-label="The FM-1" tabindex="-1">
+  <svg id="panel" viewBox="0 0 1000 700" aria-hidden="true" focusable="false"></svg>
+  <canvas id="screen" width="240" height="240" role="img" aria-label="The FM-1's screen."></canvas>
+  <div class="controls" id="controls" inert></div>
+  <button type="button" class="clrpat" id="clrpat">Clear pattern</button>
+  <div class="start" id="start"><button id="go" type="button">Switch on</button></div>
+  <div hidden id="descs"></div>
+</div>
+</div>
+
+<p class="canvas" id="canvas-note"><b>Preset 9 = blank canvas.</b> Turn PRESETS to 09 and press YES / UP: you get the sounds with no trigs at all, to try and build your own beat.</p>
+
+<div class="bar">
+  <span id="status" role="status">Off. Sound starts when you switch it on.</span>
+  <span id="alert" role="alert"></span>
+  <button id="fs" type="button" title="The panel fills the whole screen, like an app">Full screen</button>
+  <button id="mute" type="button" aria-pressed="false">Mute</button>
+  <span class="cpu" id="cpu"></span>
+  <button id="wavs" type="button" disabled title="One hit of each of the 8 voices of the sound playing now, as WAV files in one zip">Download the 8 voices</button>
+  <button id="reset" type="button" title="Forget the saved patterns and sound, and start again from the factory settings">Factory reset</button>
+</div>
+
+<section class="help">
+  <div>
+    <h2>Mouse and touch</h2>
+    <ul>
+      <li>Drag a knob up or down, or use the scroll wheel over it.</li>
+      <li>Click or touch buttons and keys. Several fingers at once work on a touch screen.</li>
+      <li>To hold something down (to try a combination with the mouse): <kbd>Shift</kbd>-click (or right-click) a button or a key, click it again to let go. Black key 11 is the <b>FUNC</b> button.</li>
+    </ul>
+  </div>
+  <div>
+    <h2>Keyboard</h2>
+    <ul>
+      <li><kbd>Tab</kbd> moves between the knobs, buttons and keys. On a knob, the arrow keys turn it
+        (<kbd>Page Up</kbd> / <kbd>Page Down</kbd> faster). On a button or key, <kbd>Space</kbd> or <kbd>Enter</kbd>
+        presses it for as long as you hold it.</li>
+      <li>While the FM-1 has focus, shortcuts play it: white keys 1–8 <kbd>Q</kbd>–<kbd>I</kbd>, 9–16 <kbd>A</kbd>–<kbd>K</kbd>;
+        black keys 1–11 <kbd>1</kbd>–<kbd>0</kbd>, <kbd>-</kbd> (11 = FUNC); <kbd>Space</kbd> PLAY, <kbd>Enter</kbd> REC,
+        <kbd>Esc</kbd> HOME, <kbd>Z</kbd> / <kbd>X</kbd> OCT− / OCT+, <kbd>C</kbd> SEL, <kbd>V</kbd> FX, <kbd>B</kbd> ENV,
+        <kbd>N</kbd> LFO, <kbd>M</kbd> EDIT, <kbd>,</kbd> GLO, <kbd>.</kbd> SAVE, <kbd>/</kbd> SEQ,
+        <kbd>↑</kbd> <kbd>↓</kbd> turn SELECT.</li>
+      <li><b>Computer <kbd>Shift</kbd> = hold down.</b> <kbd>Shift</kbd> + any of those keys (or <kbd>Shift</kbd>+<kbd>Space</kbd> on a
+        focused button) keeps it held until you press it again. Example: <kbd>Shift</kbd>+<kbd>-</kbd> holds FUNC, then press
+        <kbd>9</kbd> (ACCENT) to copy the pattern, or <kbd>/</kbd> (SEQ) for song mode.</li>
+    </ul>
+    <label><input type="checkbox" id="shortcuts" checked> Keyboard shortcuts</label>
+  </div>
+  <div>
+    <h2>Saving</h2>
+    <p>SAVE keeps your patterns in this browser, as the FM-1 keeps them in its memory. Factory reset forgets them.
+      It is the firmware, not a recording: what you hear is FM1 Tonic running, at the FM-1's 44.1 kHz.</p>
+  </div>
+</section>
+
+  <nav class="downloads" aria-label="Downloads">
+    <a href="downloads/FM1-Tonic-cheat-sheet.pdf" download>Button combinations cheat sheet (PDF)</a>
+    <a href="downloads/FM1-Tonic-manual.html" target="_blank" rel="noopener">User manual <!--mv-->1.8h1<!--/mv--> (all languages)</a>
+    <a href="downloads/FM1-Tonic-manual.html" download="FM1-Tonic-manual-1.8h1.html">Download the manual <!--mv-->1.8h1<!--/mv--></a>
+  </nav>
+
+<section class="credits" aria-labelledby="credits-h">
+  <h2 id="credits-h">Credits</h2>
+  <p class="note big"><b>FM1 Tonic is made by Luigi Rossi</b>, the developer and creative mind behind this firmware: the Tonic drum machine, its sequencer, screens, presets and the web tools (emulator, installer, backup). It is free software under the GNU General Public License, version 3; if you share the firmware you must share its source code. <a class="dl" href="downloads/FM1-Tonic-manual.html" target="_blank" rel="noopener">User manual <!--mv-->1.8h1<!--/mv--> (all languages)</a> <a class="dl" href="downloads/FM1-Tonic-manual.html" download="FM1-Tonic-manual-1.8h1.html">Download the manual <!--mv-->1.8h1<!--/mv--></a></p>
+  <p class="note"><b>Luigi Rossi online:</b> <a href="https://linktr.ee/luigirossi" target="_blank" rel="noopener">linktr.ee/luigirossi</a></p>
+  <p class="note"><b>With thanks.</b> FM1 Tonic was inspired by <b>Microtonic</b> by <b>Sonic Charge</b>, a drum synthesizer we admire: thank you for the inspiration.</p>
+  <p class="note">Presets from <b>Patternarium</b> and Microtonic (.mtpreset) work on the FM-1, and FM1 Tonic presets can be exported back to .mtpreset. Thanks to the Patternarium community for the many presets.</p>
+  <details class="cheat" id="cheat">
+    <summary>Read more: the button combinations (cheat sheet)</summary>
+    <div class="cheat-in">
+    <p class="note">Button combinations only, as FM1 Tonic works today. The user manual has the rest. <a class="dl" href="downloads/FM1-Tonic-cheat-sheet.pdf" download>Download the cheat sheet (PDF)</a></p>
+<div class="cheat-body">
+  <h3>1. Works on every page</h3>
+  <p class="note"><span class="r">Red</span> = with FUNC (black key 11) held, <span class="o">orange</span> = with FILL (black key 10) held.</p>
+  <div class="tbl"><table class="t1"><thead><tr><th>Keys</th><th>What it does</th></tr></thead><tbody><tr><td>Black key 1 to 8</td><td>Selects the track and plays it (also while playing).</td></tr><tr><td>White key 1 to 16</td><td>The steps: tap = trig on, tap again = off. A pattern has up to 64 steps, shown 16 at a time.</td></tr><tr><td>White key held + ACCENT / FILL</td><td>That step gets an accent / a fill (again = off).</td></tr><tr><td><span class="r">FUNC + black key 1 to 8</span> / <span class="o">FILL + black key 1 to 8</span></td><td>Mutes the track / solos it (again = back).</td></tr><tr><td><span class="r">FUNC + white key</span></td><td>Changes the pattern (while playing: at the end of the bar).</td></tr><tr><td><span class="r">FUNC + ACCENT</span> / <span class="r">FUNC + FILL</span> / <span class="r">FUNC + PLAY</span></td><td>Copies the pattern / pastes it (it asks PASTE PATTERN?) / clears it (it asks CLEAR PATTERN?). OCT+ = yes, OCT- = no.</td></tr><tr><td><span class="r">FUNC + black key 1 to 8 held, then ACCENT / FILL / PLAY</span></td><td>Copies that track's sound / pastes it / clears that track's pattern (it asks).</td></tr><tr><td><span class="r">FUNC + SEQ</span></td><td>Song mode on / off (it asks).</td></tr><tr><td><span class="r">FUNC + ARP</span></td><td>Deletes the song (it asks).</td></tr><tr><td><span class="r">FUNC + SELECT</span></td><td>Pattern bank 1 / 2 (patterns 1-16 / 17-32). Beta.</td></tr><tr><td><span class="r">FUNC + SAVE</span> / <span class="r">FUNC + HOME</span></td><td>Quick save into the loaded place / renames the project.</td></tr><tr><td><span class="r">FUNC + REC</span></td><td>QUANTIZED REC / UNQUANTIZED REC.</td></tr><tr><td>ENV + a knob</td><td>That knob back to its default.</td></tr><tr><td>GLO + ACCENT / GLO + FILL</td><td>Undo / redo (on every page).</td></tr><tr><td>REC + PLAY, then keys and knobs</td><td>Live recording: black keys 1 to 8 write trigs, the knobs write automation (3 knobs per track).</td></tr><tr><td>PLAY</td><td>Starts and stops the pattern.</td></tr><tr><td>OCT- / OCT+</td><td>The track's pitch one octave down / up. In a question: NO / YES.</td></tr></tbody></table></div>
+  <p class="exc">Exceptions: on PERFORM, MUTE / SOLO and the pattern page the black keys are mute buttons; on ARP every key is a keyboard key. They are all in part 2.</p>
+
+  <h3>2. Only on some pages</h3>
+  <h4>Pages where the keys do something else</h4>
+  <div class="tbl"><table class="g"><thead><tr><th>Page</th><th>Keys</th><th>What they do</th></tr></thead><tbody><tr class="gs"><td class="pg" rowspan="5"><b>ARP</b></td><td class="ky">Every key, white and black</td><td>Keyboard keys for the selected voice (the dim C keys play its own pitch).</td></tr><tr class=""><td class="ky">SELECT</td><td>The voice.</td></tr><tr class=""><td class="ky">ALGORITHM</td><td>The step page (AUTOSCROLL off).</td></tr><tr class=""><td class="ky">OCT- / OCT+</td><td>The keyboard octave (-3 to +3).</td></tr><tr class=""><td class="ky">SEQ</td><td>Back.</td></tr><tr class="gs"><td class="pg" rowspan="5"><b>PERFORM</b>, <b>MUTE / SOLO</b> and the <b>PATTERN</b> page (SEQ, 2nd press)</td><td class="ky">Black keys 1 to 8</td><td>Mute buttons (solo buttons in SOLO mode), not track select.</td></tr><tr class=""><td class="ky">White keys 1 to 16</td><td>The next pattern.</td></tr><tr class=""><td class="ky"><span class="r">FUNC</span>, tapped</td><td>MUTE mode (or unmute all).</td></tr><tr class=""><td class="ky"><span class="o">FILL</span>, tapped</td><td>SOLO mode (or clear all solos).</td></tr><tr class=""><td class="ky">REC + PLAY</td><td>Does not record here.</td></tr><tr class="gs"><td class="pg" rowspan="2"><b>DUCK</b> (SENDS, ALGORITHM right)</td><td class="ky">Black keys 1 to 8</td><td>Choose which tracks are ducked (blue = ducked, purple = the sidechain input).</td></tr><tr class=""><td class="ky">ALGORITHM left or HOME</td><td>Back.</td></tr><tr class="gs"><td class="pg" rowspan="2"><b>CHOKE</b> (EDIT, ALGORITHM right)</td><td class="ky">Black keys 1 to 8</td><td>Choose which tracks are in the choke group (blue = in).</td></tr><tr class=""><td class="ky">ALGORITHM left or HOME</td><td>Back.</td></tr><tr class="gs"><td class="pg" rowspan="3"><b>SONG</b> and <b>PATTERNS</b> screens (song mode)</td><td class="ky">White keys 1 to 16</td><td>Write a pattern into the bar on the cursor and move on.</td></tr><tr class=""><td class="ky"><span class="o">FILL</span>, tapped</td><td>Deletes the bar at once.</td></tr><tr class=""><td class="ky">OCT- / OCT+ (PATTERNS)</td><td>Takes the last pattern off / OK.</td></tr><tr class="gs"><td class="pg" rowspan="3"><b>Copy-paste mode</b> (after <span class="r">FUNC + ACCENT</span>)</td><td class="ky">Pattern keys 1 to 16</td><td>The places to paste into (they blink; an empty pattern blinks dimmer). The screen says PRESS PATTERN TO PASTE.</td></tr><tr class=""><td class="ky"><span class="r">FUNC</span>, tapped alone</td><td>Stay in the mode to paste in many places.</td></tr><tr class=""><td class="ky">SEQ (it blinks) or any button</td><td>Leaves the mode (PRESS SEQ TO EXIT). SEQ opens the sequencer page.</td></tr><tr class="gs"><td class="pg" rowspan="1"><b>FUNC held</b></td><td class="ky">White keys 1 to 16</td><td>Patterns 1 to 16 (17 to 32 in bank 2). The keys light where a pattern or a track has notes.</td></tr></tbody></table></div>
+  <h4>Things that exist only on some pages</h4>
+  <div class="tbl"><table class="g"><thead><tr><th>Page</th><th>Keys</th><th>What it does</th></tr></thead><tbody><tr class="gs"><td class="pg" rowspan="2"><b>Sound pages</b>: MIX 1, SEL, ENV, LFO, EDIT, VEL</td><td class="ky">White key held + knob 1 to 4</td><td><b>P-lock</b>: that step gets its own value of the knob. A track holds 3 locked knobs per pattern (MAX 3 PER TRACK).</td></tr><tr class=""><td class="ky">White key held + SAVE + the same knob</td><td>Removes the p-lock.</td></tr><tr class="gs"><td class="pg" rowspan="1"><b>Every page</b> but PERFORM, HOME, SONG, COMP and the lists</td><td class="ky">White key held + SELECT</td><td>That step's <b>chance</b>: 5 to 100 %, then 1:2, 2:2, 1:3 ... 8:8.</td></tr><tr class="gs"><td class="pg" rowspan="1"><b>ENV</b></td><td class="ky">OCT- / OCT+</td><td>The oscillator frequency one octave down / up.</td></tr><tr class="gs"><td class="pg" rowspan="3"><b>EDIT</b></td><td class="ky"><span class="r">FUNC + knob 2</span></td><td>Right = the track joins the choke group, left = it leaves.</td></tr><tr class=""><td class="ky"><span class="r">FUNC, tap EDIT</span></td><td>DELETE AUTOMATION? (OCT+ yes): the track's p-locks and recorded motion in the playing pattern.</td></tr><tr class=""><td class="ky">EDIT or LFO held + <span class="r">FUNC + ACCENT / FILL / PLAY</span></td><td>Copies / pastes / resets <b>this page</b> of the track (track pages only).</td></tr><tr class="gs"><td class="pg" rowspan="3"><b>SEQ</b></td><td class="ky"><span class="o">FILL + SEQ</span></td><td>The SONG screen (in song mode).</td></tr><tr class=""><td class="ky">SELECT</td><td>The track (1 to 8, then AC).</td></tr><tr class=""><td class="ky">ALGORITHM</td><td>The step page (AUTOSCROLL off).</td></tr><tr class="gs"><td class="pg" rowspan="1"><b>GLO &gt; VEL</b></td><td class="ky"><span class="r">FUNC + knob 4</span></td><td>The selected track gets a new random sound (the 21 sound settings).</td></tr><tr class="gs"><td class="pg" rowspan="1"><b>GLOBAL</b> (HOME, 3rd press)</td><td class="ky">Knob 4 (or HOME held + SELECT)</td><td>The tempo.</td></tr></tbody></table></div>
+
+  <h3>3. Song mode</h3>
+  <div class="tbl"><table class="t1"><thead><tr><th>What</th><th>Buttons</th></tr></thead><tbody><tr><td><b>SONG MODE ENTER</b></td><td><span class="r">FUNC + SEQ</span> (then OCT+ = yes)</td></tr><tr><td><b>SONG MODE EXIT</b></td><td><span class="r">FUNC + SEQ</span> again (then OCT+ = yes)</td></tr><tr><td><b>SONG MODE EDIT</b></td><td><span class="o">FILL + SEQ</span></td></tr><tr><td><b>IN SONG MODE EDIT: ADD A ROW</b></td><td><b>OCT+</b></td></tr><tr><td><b>IN SONG MODE EDIT: DELETE A ROW</b></td><td><b>OCT-</b></td></tr><tr><td><b>SONG MODE DELETE</b></td><td><span class="r">FUNC + ARP</span> (then OCT+ = yes)</td></tr></tbody></table></div>
+
+  <h3>4. Saving</h3>
+  <div class="tbl"><table class="t1"><thead><tr><th>What</th><th>Buttons</th></tr></thead><tbody><tr><td><b>SAVE (it asks SAVE HERE?)</b></td><td><b>SAVE</b></td></tr><tr><td><b>IN SAVE HERE?: OTHER SPOT</b></td><td><b>SELECT</b></td></tr><tr><td><b>IN SAVE HERE?: OTHER NAME</b></td><td><b>ALGORITHM</b></td></tr><tr><td><b>IN SAVE HERE?: SAVE</b></td><td><b>OCT+</b></td></tr><tr><td><b>IN SAVE HERE?: CANCEL</b></td><td><b>OCT-</b> (or <b>HOME</b>)</td></tr><tr><td><b>QUICK SAVE (loaded place)</b></td><td><span class="r">FUNC + SAVE</span></td></tr><tr><td><b>RENAME THE PROJECT</b></td><td><span class="r">FUNC + HOME</span></td></tr><tr><td><b>LOAD A PLACE</b></td><td><b>PRESETS</b> knob, then <b>OCT+</b></td></tr></tbody></table></div>
+</div>
+    </div>
+  </details>
+  <p class="note">LICENSING.md lists every file's origin and licence. It stands on the work of:</p>
+  <ul>
+    <li><b>libpo32</b> by Eric Lewis (MIT): the starting point of the FM1 Tonic drum synthesis code. Nothing is sampled.</li>
+    <li><b>X0X</b> by Charles Vestal, the firmware FM1 Tonic grew from, and the web pages (emulator, installer, backup); X0X is a fork of <b>Felucca</b> by Leo Kuroshita (@kurogedelic), Hügelton Instruments: the platform (hardware layer, USB, update loader, installer, storage) and the recovery board FM-1-transporter.</li>
+    <li>The reverb and delay are ported from <b>9W9</b> by athousanddetails, based on <b>ER-99</b> by Matthew Cieplak (GPL-3.0). The master compressor follows Giannoulis, Massberg and Reiss; the master filter is Vadim Zavalishin's TPT state-variable filter.</li>
+    <li><b>Melodee</b> by keremimo and <b>Jangada</b> by zednaked: what they found about the FM-1's second core.</li>
+    <li>Fonts: Barlow Semi Condensed (The Barlow Project Authors), Terminus (Dimitar Toshkov Zhekov), DotGothic16 (The DotGothic16 Project Authors), all SIL Open Font License.</li>
+  </ul>
+  <p class="note fine">M-VAVE and FM-1 are trademarks of their owners. FM1 Tonic is not connected with, or endorsed by, M-VAVE, Sonic Charge or Luigi Rossi.</p>
+</section>
+
+<section class="flash install" aria-labelledby="flash-h">
+  <h2 id="flash-h">Install FM1 Tonic Latest Version</h2>
+  <p>Connect the FM-1 to the computer with a USB data cable, directly (no hub), and use Chrome or Edge. Do not unplug the cable
+    while it writes: it takes a few minutes and the FM-1 restarts by itself.</p>
+  <p class="warn"><b>The firmware update deletes your presets.</b> Already using FM1 Tonic on your FM-1 and just updating?
+    Press <b>Back Up my Projects</b> first. It saves them to a zip, and the Restore section below puts them back.</p>
+  <div class="actions">
+    <button id="flash-go" type="button" class="primary" disabled>Install</button>
+    <button id="pbk-go" type="button">Back Up my Projects</button>
+  </div>
+  <progress id="flash-bar" max="100" value="0" aria-label="Install progress"></progress>
+  <p id="flash-status" role="status">Checking the update file.</p>
+  <progress id="pbk-bar" max="100" hidden aria-label="Back up progress"></progress>
+  <p id="pbk-status" role="status"></p>
+  <p class="fine">Back Up my Projects downloads one zip with every preset you saved in places 1-30 (01_name.tnp ... 30_name.tnp, and so on). A place keeps its song, recorded knob moves and ARP notes inside the same file.
+    Presets 1-8 are part of the firmware and are not included. Nothing on the FM-1 changes, and it can keep playing.</p>
+  <p class="fine">This is custom firmware, version 1.0. The author accepts no responsibility if your FM-1 is damaged or misbehaves because of this
+    firmware. If an install fails and the FM-1 no longer starts, recovering it needs a Transporter.
+    To go back to the official firmware you need M-VAVE's updater, M-UPGRADE, and the official FM-1 V15 firmware
+    from <a href="https://www.m-vave.com/download">m-vave.com/download</a>.</p>
+  <pre id="flash-log" hidden></pre>
+</section>
+
+<dialog id="sure" aria-labelledby="sure-h">
+  <h2 id="sure-h">Are you sure?</h2>
+  <p>The firmware update <b>deletes your presets</b>. If you came here just to update and you already use FM1 Tonic on your FM-1,
+    press <b>Back Up my Projects</b> first, then Install.</p>
+  <div class="actions">
+    <button type="button" id="sure-backup" class="primary">Back Up my Projects</button>
+    <button type="button" id="sure-install">Install anyway</button>
+    <button type="button" id="sure-cancel">Cancel</button>
+  </div>
+</dialog>
+
+<section class="flash" aria-labelledby="recv-h">
+  <h2 id="recv-h">Receive the project from your FM-1</h2>
+  <p>Connect the FM-1 with FM1 Tonic running (USB data cable, Chrome or Edge) and press Receive. The page reads the whole
+    project from the FM-1: the 8 voices' sounds, the patterns, the song and the knob motion. Then switch on here to play it,
+    and use Download the 8 voices to get its WAV files. This replaces the project kept in this browser. The FM-1 can keep playing;
+    changes on the FM-1 that are not saved yet are left out (stop it first to include them).</p>
+  <p><button id="recv-go" type="button">Receive from the FM-1</button></p>
+  <progress id="recv-bar" max="100" hidden aria-label="Receive progress"></progress>
+  <p id="recv-status" role="status"></p>
+</section>
+
+<section class="flash" aria-labelledby="xmt-h">
+  <h2 id="xmt-h">Export my presets as .mtpreset</h2>
+  <p>Reads presets from the FM-1 (USB data cable, Chrome or Edge) and saves them as <b>.mtpreset</b> files, the format of the Patternarium presets.
+    <b>Export all</b> downloads one zip with a file per saved place (<code>01_name.mtpreset</code>, <code>02_name.mtpreset</code>, and so on, places 1-30);
+    <b>Export one</b> downloads the file of the place you choose. Nothing on the FM-1 changes, and it can keep playing. The song and notes of a place are not part of a .mtpreset.</p>
+  <p class="fine">A .mtpreset has no place for what the Tonic added, so these are left out: ARP notes, late hits, per-track cuts and sends, compressor, reverb and delay,
+    and the muted state. Drum names become &ldquo;Drum n&rdquo;. Only the 8 patterns the FM-1 holds are written. The sounds, tempo, swing and those patterns come across.</p>
+  <p><label>Place <select id="xmt-slot" aria-label="Place to export"></select></label></p>
+  <div class="actions">
+    <button id="xmt-all" type="button">Export all as .mtpreset (zip)</button>
+    <button id="xmt-one" type="button">Export one as .mtpreset</button>
+  </div>
+  <progress id="xmt-bar" max="100" hidden aria-label="Export progress"></progress>
+  <p id="xmt-status" role="status"></p>
+</section>
+
+<section class="flash" aria-labelledby="prs-h">
+  <h2 id="prs-h">Restore my projects</h2>
+  <p>Choose what to restore: the zip made by Back up my projects, or <b>.mtpreset</b> files (Patternarium downloads), one or many, or a whole
+    folder of them. The page converts the .mtpreset files itself (the same way as the tool that made the factory presets) and shows what it will write
+    into which place. Each preset in the list has a place menu (1-30): choose where it goes. A number 1-30 at the start of the file name
+    (<code>09_name.tnp</code>) is chosen for you; "first empty" puts it into the first empty place of the FM-1. A backup file holds one place: the preset and, when it has one, its song and notes. You confirm, then it sends them to the FM-1 (USB data cable, Chrome or Edge). Each place it writes replaces what is in that place now (a file without song and notes also clears the old song and notes there); other
+    places stay. Press STOP on the FM-1 first: it refuses while playing. A Patternarium preset keeps its 8 sounds, tempo, swing and the first 8 patterns.</p>
+  <p><label>Files (zip, .tnp, .mtpreset) <input id="prs-file" type="file" multiple accept=".zip,.tnp,.mtpreset" aria-label="Zip, .tnp or .mtpreset files"></label></p>
+  <p><label>or a folder <input id="prs-dir" type="file" webkitdirectory multiple aria-label="A folder of .mtpreset or .tnp files"></label></p>
+  <div id="prs-list" hidden aria-label="Presets to upload and their places"></div>
+  <p><button id="prs-go" type="button" disabled>Restore to the FM-1</button></p>
+  <progress id="prs-bar" max="100" hidden aria-label="Restore progress"></progress>
+  <p id="prs-status" role="status"></p>
+  <h3 id="clr-h">Clear all places</h3>
+  <p>Empties all 30 places (1-30) on the FM-1, songs and notes included, to start with a white canvas. It works only after Back up my projects
+    has downloaded a zip on this page, so your presets are safe in a file first.</p>
+  <p><button id="clr-go" type="button" disabled>Clear all places</button></p>
+  <p id="clr-status" role="status">Back up first: this button is off until a backup was downloaded.</p>
+</section>
+
+</main>
+<script>(function(){function o(){if(location.hash==="#cheat"){var d=document.getElementById("cheat");if(d){d.open=true;setTimeout(function(){d.scrollIntoView();},50);}}}o();window.addEventListener("hashchange",o);})();</script>
+<script>(function(){var o=document.getElementById("nover"),b=document.getElementById("nbtn");function op(){o.hidden=false;document.getElementById("nback").focus();}function cl(){o.hidden=true;b.focus();}b.addEventListener("click",op);document.getElementById("nopx").addEventListener("click",cl);document.getElementById("nback").addEventListener("click",cl);o.addEventListener("click",function(e){if(e.target===o)cl();});document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!o.hidden)cl();});})();</script>
+<script>(function(){var o=document.getElementById("uover"),b=document.getElementById("upbtn");function op(){o.hidden=false;document.getElementById("uback").focus();}function cl(){o.hidden=true;b.focus();}b.addEventListener("click",op);document.getElementById("upopx").addEventListener("click",cl);document.getElementById("uback").addEventListener("click",cl);o.addEventListener("click",function(e){if(e.target===o)cl();});document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!o.hidden)cl();});})();</script>
+
+<script>
+"use strict";
+// The FM-1 project transfer over USB (SysEx): the protocol of firmware/src/backup.c, copied from web/backup/index.html
+// (tests/host/backup_page_test.mjs tests that page's copy). PB and Link are used by the main script below.
+// --- backup protocol: begin (tools/x0x_backup.py, firmware/src/backup.c; tested by tests/host/backup_page_test.mjs)
+const PB = (() => {
+  const HS_QUERY = [0xF0, 0x00, 0x32, 0x45, 0x00, 0x00, 0x00, 0x40, 0x7F, 0xF7];   // fm1_install.py / fm1ota.js
+  const RS_REQ = 0x41, BU_REQ = 0x42, BU_END = 0x43;
+  const OK_ADDR = 0xC0000000, ASK_ADDR = 0xC1000000, FAIL_ADDR = 0xCF000000;
+  const MAGIC = [0x58, 0x30, 0x58, 0x42], VERSION = 1, NOBJ = 6, HEAD = 16, REC = 8, PAYLOAD_MAX = 3840, MAXDATA = 512;   // "X0XB"
+  const OBJ_IDS = [0, 1, 2, 3, 5, 6];       // OBJ_SET, OBJ_SOUND, OBJ_PAT0, OBJ_PAT1, OBJ_SONG, OBJ_MOTION (not OBJ_PANEL)
+  const PLAYING = 10, DECLINED = 11;
+  const isTonic = (id) => /^FM-1_77\d{6}$/.test(id) || id.startsWith("FM-1_9");   // FM1 Tonic's package identity (from 1.5: FM-1_77XXYYZZ; 1.0-1.4 and X0X: FM-1_9...)
+  const DELAY = { poll: 500, idle: 10000, ask: 75000, first: 3000, hs: 1000 };   // ms, as x0x_backup.py
+  const ERRORS = {
+    1: "the file's size", 2: "the transfer (a piece of the file did not arrive)", 3: "the file's head",
+    4: "a part's header", 5: "a part's check (a byte changed on the way)", 6: "the whole file's check",
+    7: "erasing the FM-1's memory", 8: "writing the FM-1's memory", 9: "reading back what was written",
+    10: "FM1 Tonic is playing", 11: "HOME was pressed on the FM-1",
+    12: "writing the last step (FM1 Tonic finishes it when it's switched on again)",
+  };
+
+  function fail(code, msg) { const e = new Error(msg); e.code = code; return e; }
+
+  function pack7(data) {
+    const out = []; let acc = 0, nb = 0;
+    for (const b of data) { acc |= b << nb; nb += 8; while (nb >= 7) { out.push(acc & 0x7F); acc >>>= 7; nb -= 7; } }
+    if (nb) out.push(acc & 0x7F);
+    return out;
+  }
+  function unpack7(s) {
+    const out = []; let acc = 0, nb = 0;
+    for (const b of s) { acc |= (b & 0x7F) << nb; nb += 7; while (nb >= 8) { out.push(acc & 0xFF); acc >>>= 8; nb -= 8; } }
+    return out;
+  }
+  const CRC_T = (() => {
+    const t = new Uint32Array(256);
+    for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; }
+    return t;
+  })();
+  function crc32(bytes, start = 0, end = bytes.length) {          // zlib's
+    let c = 0xFFFFFFFF;
+    for (let i = start; i < end; i++) c = CRC_T[(c ^ bytes[i]) & 0xFF] ^ (c >>> 8);
+    return (c ^ 0xFFFFFFFF) >>> 0;
+  }
+  const u16 = (b, o) => b[o] | b[o + 1] << 8;
+  const u32 = (b, o) => (b[o] | b[o + 1] << 8 | b[o + 2] << 16 | b[o + 3] << 24) >>> 0;
+  const le32 = (v) => [v & 0xFF, (v >>> 8) & 0xFF, (v >>> 16) & 0xFF, (v >>> 24) & 0xFF];
+
+  // a host message in the update's framing (ota.c ota_take)
+  function frame(cmd, body) {
+    const n = body.length; let s = 0;
+    for (const b of body) s += b;
+    return [0xF0, ...pack7([0x00, 0x59, cmd, n & 0xFF, (n >> 8) & 0xFF, 0, ...body, ~s & 0xFF]), 0xF7];
+  }
+  // a device message -> {cmd, body} or null
+  function parseFrame(pkt) {
+    if (pkt.length < 2 || pkt[0] !== 0xF0 || pkt[pkt.length - 1] !== 0xF7) return null;
+    const u = unpack7(pkt.slice(1, -1));
+    if (u.length < 7 || u[0] !== 0 || u[1] !== 0x59) return null;
+    const n = u[3] | u[4] << 8 | u[5] << 16;
+    if (n + 7 !== u.length) return null;
+    let s = 0;
+    for (let i = 6; i < 6 + n; i++) s += u[i];
+    if ((~s & 0xFF) !== u[6 + n]) return null;
+    return { cmd: u[2], body: u.slice(6, 6 + n) };
+  }
+  // the answer to a read request (fm1_install.py response)
+  function response(addr, data, fl = 0) {
+    const n = data.length;
+    const body = [0x00, 0x59, 0x30, (n + 8) & 0xFF, ((n + 8) >> 8) & 0xFF, 0, fl, ...le32(addr), n & 0xFF, (n >> 8) & 0xFF, 0, ...data];
+    let s = 0;
+    for (let i = 6; i < body.length; i++) s += body[i];
+    body.push(~s & 0xFF);
+    return [0xF0, ...pack7(body), 0xF7];
+  }
+  function parseRequest(pkt) {
+    if (pkt.length < 2 || pkt[0] !== 0xF0 || pkt[pkt.length - 1] !== 0xF7) return null;
+    const u = unpack7(pkt.slice(1, -1));
+    if (u.length !== 15 || u[0] !== 0 || u[1] !== 0x59 || u[2] !== 0x30) return null;
+    let s = 0;
+    for (let i = 6; i < 14; i++) s += u[i];
+    if ((~s & 0xFF) !== u[14]) return null;
+    return { fl: u[6], addr: u32(u, 7), len: u[11] | u[12] << 8 | u[13] << 16 };
+  }
+  function parseIdentity(pkt) {
+    if (pkt.length < 2 || pkt[0] !== 0xF0 || pkt[pkt.length - 1] !== 0xF7) return null;
+    const d = unpack7(pkt.slice(1, -1));
+    if (d.length !== 34 || d[0] !== 0 || d[1] !== 0x59 || d[2] !== 0x11) return null;
+    const txt = String.fromCharCode(...d.slice(6, 33)).replace(/\0+$/, "");
+    return /^[^_]+_\d+$/.test(txt) ? txt : null;
+  }
+
+  // a backup file checked whole -> {flags, objs: [{obj, data}]}; throws (code "file") with what is wrong in plain words
+  function parse(image) {
+    const bad = (m) => fail("file", m);
+    if (image.length >= 4 && [0x50, 0x4C, 0x59, 0x42].every((b, i) => image[i] === b)) throw bad("This is a Polly backup, not an FM1 Tonic one.");
+    if (image.length < HEAD + NOBJ * REC + 4) throw bad("This file is too short to be an FM1 Tonic backup.");
+    if (MAGIC.some((b, i) => image[i] !== b)) throw bad("This file is not an FM1 Tonic backup.");
+    const ver = u16(image, 4), n = u16(image, 6), flags = u32(image, 8);
+    if (ver !== VERSION || n !== NOBJ) {
+      throw bad(`This is a backup from another version of FM1 Tonic (version ${ver}). This FM1 Tonic can't restore it.` +
+                (ver > VERSION ? " Update FM1 Tonic first." : ""));
+    }
+    if (u32(image, 12) !== crc32(image, 0, 12)) throw bad("This backup is damaged (its head).");
+    const objs = []; let pos = HEAD;
+    for (const want of OBJ_IDS) {
+      if (pos + REC > image.length) throw bad("This backup is cut short.");
+      const obj = u16(image, pos), ln = u16(image, pos + 2), crc = u32(image, pos + 4);
+      pos += REC;
+      if (obj !== want || ln > PAYLOAD_MAX || pos + ln + 4 > image.length) throw bad(`This backup is damaged (${nameOf(want)}).`);
+      if (crc32(image, pos, pos + ln) !== crc) throw bad(`This backup is damaged (${nameOf(want)}: a byte changed).`);
+      objs.push({ obj, data: image.subarray(pos, pos + ln) });
+      pos += ln;
+    }
+    if (pos + 4 !== image.length || u32(image, pos) !== crc32(image, 0, pos)) throw bad("This backup is damaged (the whole file's check).");
+    return { flags, objs };
+  }
+  function nameOf(obj) { return ["the settings", "the sound", "patterns 1", "patterns 2", "", "the song", "the motion"][obj] || `part ${obj}`; }
+  function summary(objs) {
+    const has = (o) => objs.some((x) => x.obj === o && x.data.length);
+    const total = objs.reduce((a, o) => a + o.data.length, 0);
+    const parts = [has(0) && "the settings", has(1) && "the sound", has(2) && "the patterns, song and knob motion"].filter(Boolean);
+    return `${parts.length ? parts.join(", ") : "an empty project"} (${total.toLocaleString("en")} bytes)`;
+  }
+
+  async function handshake(link, tries = 2) {
+    link.drain();
+    for (let t = 0; t < tries; t++) {
+      if (!link.send(HS_QUERY)) return null;
+      const end = Date.now() + DELAY.hs;
+      while (Date.now() < end) {
+        const p = await link.read(end - Date.now());
+        if (!p) break;
+        const id = parseIdentity(p);
+        if (id) return id;
+      }
+    }
+    return null;
+  }
+
+  // the first MIDI port pair that answers as an FM-1 (ports named X0X first); a Link from makeLink(input, output)
+  async function find(access, makeLink) {
+    const ins = [...access.inputs.values()].filter((p) => p.state !== "disconnected" &&
+      /x0x|fm-?1|tonic|felucca|composite|sinco|usb-midi/i.test(p.name || ""));             // never probe other gear
+    ins.sort((a, b) => /x0x|tonic/i.test(b.name) - /x0x|tonic/i.test(a.name));
+    const outs = [...access.outputs.values()];
+    const base = (s) => (s || "").replace(/\s+\d+$/, "");
+    let other = null;
+    for (const input of ins) {
+      const same = outs.filter((o) => base(o.name) === base(input.name));
+      const output = outs.find((o) => o.name === input.name) || (same.length === 1 ? same[0] : null) || (outs.length === 1 ? outs[0] : null);
+      if (!output) continue;
+      try { await input.open(); await output.open(); } catch (_) { continue; }
+      const link = makeLink(input, output);
+      const id = await handshake(link);
+      if (id && isTonic(id)) return { link, id, name: input.name };
+      if (id) other = other || id;
+      link.close();
+    }
+    if (other) throw fail("model", `The FM-1 runs other firmware (${other}), not FM1 Tonic. Install it first (Install FM1 Tonic Latest Version, above).`);
+    throw fail("notfound", "FM1 Tonic not found. Plug the FM-1 in with a USB data cable, close other apps that use its MIDI, and try again.");
+  }
+
+  // the device's backup frames until its end frame -> {image, flags} (checked)
+  async function backup(link, onProgress = () => {}) {
+    link.drain();
+    link.send(frame(BU_REQ, MAGIC));
+    const got = []; let last = Date.now(), first = true;
+    for (;;) {
+      const pkt = await link.read(DELAY.poll);
+      if (!pkt) {
+        if (link.lost) throw fail("lost", "The FM-1 was disconnected. Plug it in and press Back up again.");
+        if (Date.now() - last > (first ? DELAY.first : DELAY.idle)) {
+          throw fail("stopped", first ? "FM1 Tonic didn't answer. If it is an older firmware without backup, install FM1 Tonic again (above)."
+                                      : "FM1 Tonic stopped sending. Press Back up again.");
+        }
+        continue;
+      }
+      const f = parseFrame(pkt);
+      if (!f) continue;
+      last = Date.now();
+      if (f.cmd === BU_REQ && f.body.length >= 4) {
+        first = false;
+        if (u32(f.body, 0) !== got.length) throw fail("lost", "A piece of the backup went missing on the way. Press Back up again.");
+        for (let i = 4; i < f.body.length; i++) got.push(f.body[i]);
+        onProgress(got.length);
+      } else if (f.cmd === BU_END && f.body.length >= 10) {
+        const n = u32(f.body, 0), crc = u32(f.body, 4), status = f.body[8], flags = f.body[9];
+        if (status) throw fail("flash", `FM1 Tonic could not read its memory (status ${status}). Try again.`);
+        const image = Uint8Array.from(got);
+        if (n !== image.length || crc !== crc32(image)) throw fail("lost", "The backup arrived damaged. Press Back up again.");
+        try { parse(image); } catch (e) { throw fail("lost", `The backup arrived damaged (${e.message}). Press Back up again.`); }
+        return { image, flags };
+      }
+    }
+  }
+
+  // send a checked backup image: answer X0X's reads until it reports -> 0 restored, else its code (PLAYING, DECLINED, ...)
+  async function restore(link, image, onEvent = () => {}) {
+    parse(image);                                                  // (the page checked it already: never send a bad one)
+    link.drain();
+    link.send(frame(RS_REQ, [...le32(image.length), ...le32(crc32(image))]));
+    let last = Date.now(), idle = DELAY.first, asked = 0;
+    for (;;) {
+      const pkt = await link.read(DELAY.poll);
+      if (!pkt) {
+        if (link.lost) throw fail("lost", "The FM-1 was disconnected. Nothing changed, unless FM1 Tonic said RESTORED FROM USB.");
+        if (Date.now() - last > idle) {
+          throw fail("stopped", asked ? "FM1 Tonic stopped asking for the file. Nothing changed."
+                                      : "FM1 Tonic didn't answer. If it is an older firmware without restore, install FM1 Tonic again (above).");
+        }
+        continue;
+      }
+      const r = parseRequest(pkt);
+      if (!r) continue;
+      last = Date.now(); idle = DELAY.idle; asked++;
+      const top = (r.addr & 0xFF000000) >>> 0;
+      if (top === OK_ADDR || top === FAIL_ADDR || top === ASK_ADDR) {
+        link.send(response(r.addr, [0x73, 0x75, 0x63, 0x63, 0x65, 0x73, 0x73, 0], r.fl));   // "success\0"
+        if (r.addr === ASK_ADDR) { idle = DELAY.ask; onEvent("ask"); continue; }
+        return r.addr === OK_ADDR ? 0 : (r.addr & 0xFFFF) || 99;
+      }
+      if (r.len > MAXDATA || r.addr >= image.length) throw fail("badreq", `FM1 Tonic asked for a part outside the file (${r.addr.toString(16)}+${r.len}). Nothing changed.`);
+      const data = Array.from(image.subarray(r.addr, r.addr + r.len));
+      while (data.length < r.len) data.push(0);
+      if (!link.send(response(r.addr, data, r.fl))) throw fail("lost", "The FM-1 was disconnected. Nothing changed.");
+      onEvent("progress", Math.min(r.addr + r.len, image.length) * 100 / image.length);
+    }
+  }
+
+  // the user places 1-30 (slots 0..21 = places 9-30, slots 32..39 = places 1-8; firmware/src/backup.c, cmds 0x44..0x47; tested by tests/host/presets_page_test.mjs)
+  const PG_REQ = 0x44, PG_LIST = 0x45, PG_DATA = 0x46, PG_END = 0x47, PG_SLOTS = 32;
+  // wip670: places 1-8 are the device's slots 32..39 (list: sub 4); the SECOND SPOT of a place (song, knob moves, ARP notes) = the same requests with bit 0x80 on the slot byte (lists: sub 5 / 6)
+  const PG_X = 0x80;
+  const placeNo = (slot) => (slot >= 32 && slot < 40 ? slot - 31 : slot + 9);   // the number the FM-1 shows (1-30)
+  const PG_STATUS = { 1: "the slot is empty or damaged", 2: "the FM-1 could not read its memory", 3: "the FM-1 is busy (another transfer)" };
+  // which slots hold a preset -> {mask, lens[32]}; the FM-1 does not answer while it is busy: asked again, 3 times
+  async function presetList(link, ext = false) {
+    for (let t = 0; t < 3; t++) {
+      link.drain();
+      link.send(frame(PG_REQ, [ext ? 5 : 1, 0]));
+      const end = Date.now() + DELAY.first;
+      while (Date.now() < end) {
+        const pkt = await link.read(end - Date.now());
+        if (!pkt) { if (link.lost) throw fail("lost", "The FM-1 was disconnected. Plug it in and try again."); break; }
+        const f = parseFrame(pkt);
+        if (f && f.cmd === PG_LIST && f.body.length >= 4 + 2 * PG_SLOTS) {
+          const lens = [];
+          for (let i = 0; i < PG_SLOTS; i++) lens.push(f.body[4 + 2 * i] | f.body[5 + 2 * i] << 8);
+          return { mask: u32(f.body, 0), lens };
+        }
+      }
+    }
+    throw fail("stopped", "FM1 Tonic didn't answer. If it is an older firmware without preset backup, install FM1 Tonic again (above).");
+  }
+  // wip670: places 1-8 (slots 32..39): the answer has 17 bytes (u8 mask, 8 x u16 lengths); an older firmware does not answer: null (one try only)
+  async function presetListPlaces(link, ext = false) {
+    link.drain();
+    link.send(frame(PG_REQ, [ext ? 6 : 4, 0]));
+    const end = Date.now() + DELAY.first;
+    while (Date.now() < end) {
+      const pkt = await link.read(end - Date.now());
+      if (!pkt) { if (link.lost) throw fail("lost", "The FM-1 was disconnected. Plug it in and try again."); break; }
+      const f = parseFrame(pkt);
+      if (f && f.cmd === PG_LIST && f.body.length === 17) return { mask: f.body[0], lens: Array.from({ length: 8 }, (_, i) => f.body[1 + 2 * i] | f.body[2 + 2 * i] << 8) };
+    }
+    return null;
+  }
+  // one slot's preset (a TNP1 blob), checked: its length and CRC-32 as the FM-1 reports them
+  async function presetGet(link, slot, ext = false) {
+    const wire = slot | (ext ? PG_X : 0), what = ext ? "Song and notes of place " : "Place ";
+    link.drain();
+    link.send(frame(PG_REQ, [2, wire]));
+    const got = []; let last = Date.now(), first = true;
+    for (;;) {
+      const pkt = await link.read(DELAY.poll);
+      if (!pkt) {
+        if (link.lost) throw fail("lost", "The FM-1 was disconnected. Plug it in and try again.");
+        if (Date.now() - last > (first ? DELAY.first : DELAY.idle)) throw fail("stopped", "FM1 Tonic stopped sending. Try again.");
+        continue;
+      }
+      const f = parseFrame(pkt);
+      if (!f) continue;
+      if (f.cmd === PG_DATA && f.body.length >= 5 && f.body[0] === wire) {
+        last = Date.now(); first = false;
+        if (u32(f.body, 1) !== got.length) throw fail("lost", "A piece of a preset went missing on the way. Try again.");
+        for (let i = 5; i < f.body.length; i++) got.push(f.body[i]);
+      } else if (f.cmd === PG_END && f.body.length >= 10 && f.body[0] === wire) {
+        const n = u32(f.body, 1), crc = u32(f.body, 5), status = f.body[9];
+        if (status) throw fail("slot" + status, `${what}${placeNo(slot)}: ${PG_STATUS[status] || "error " + status}.`);
+        const blob = Uint8Array.from(got);
+        if (n !== blob.length || crc !== crc32(blob)) throw fail("lost", `${what}${placeNo(slot)} arrived damaged. Try again.`);
+        return blob;
+      }
+    }
+  }
+  // the preset's name (TNP1 header, 24 bytes at 16), safe in a file name
+  function presetName(blob) {
+    let s = "";
+    for (let i = 16; i < 40 && blob[i]; i++) s += String.fromCharCode(blob[i]);
+    s = s.replace(/[^A-Za-z0-9 _-]+/g, "_").replace(/\s+/g, " ").trim().replace(/^[_ ]+|[_ ]+$/g, "");
+    return s || "preset";
+  }
+  // every used place -> [{slot, number (1..30; older firmware: up to 40), name, blob, ext}]: places 1-8 first (slots 32..39, newer firmware), then 9-30;
+  // ext = the place's second spot (song, knob moves, ARP notes; 'TEX2' bytes) or null
+  async function presets(link, onProgress = () => {}) {
+    const { mask } = await presetList(link);
+    const pl = await presetListPlaces(link);                       // null: an older firmware (no places 1-8, no second spots)
+    const slots = [];
+    if (pl) for (let i = 0; i < 8; i++) if (pl.mask >>> i & 1) slots.push(32 + i);
+    for (let i = 0; i < PG_SLOTS; i++) if (mask >>> i & 1) slots.push(i);
+    let xmask = 0, xpl = null;
+    if (pl) { xmask = (await presetList(link, true)).mask; xpl = await presetListPlaces(link, true); }
+    const hasExt = (slot) => (slot >= 32 ? !!(xpl && xpl.mask >>> (slot - 32) & 1) : !!(xmask >>> slot & 1));
+    const out = [];
+    for (const slot of slots) {
+      onProgress(out.length, slots.length);
+      const blob = await presetGet(link, slot);
+      const ext = hasExt(slot) ? await presetGet(link, slot, true) : null;
+      out.push({ slot, number: placeNo(slot), name: presetName(blob), blob, ext });
+    }
+    onProgress(out.length, slots.length);
+    return out;
+  }
+
+  // ---- put one preset into a slot, erase one slot (firmware/src/backup.c, cmds 0x48 / 0x49)
+  const PG_PUT = 0x48, PG_ERASE = 0x49;
+  const PUT_ERRORS = {
+    1: "its size is not a preset's", 2: "a piece did not arrive (cable?)", 3: "it is not a FM1 Tonic preset (TNP1) or its size field is wrong",
+    4: "no such slot", 5: "its check (CRC) did not match", 7: "erasing the slot failed", 8: "writing the slot failed",
+    9: "reading back what was written failed", 10: "FM1 Tonic is playing: press STOP on the FM-1 first",
+  };
+  // a TNP1 blob as the firmware takes it: 'TNP1', npat 1..16, the u16 total at 4 == its length == 392 + 196 x npat (+ 80 with the 'TFX1' trailer, + 96 'TFX2', + 112 'TFX3')
+  function tnpOk(b) {
+    if (b.length < 40 || b[0] !== 0x54 || b[1] !== 0x4E || b[2] !== 0x50 || b[3] !== 0x31) return false;
+    const npat = b[9];
+    const base = 392 + 196 * npat;   // wip227: or + 80 with the compressor / reverb / delay trailer 'TFX1'
+    if (!(npat >= 1 && npat <= 16 && (b[4] | b[5] << 8) === b.length)) return false;
+    return b.length === base || (b.length === base + 80 && b[base] === 0x54 && b[base + 1] === 0x46 && b[base + 2] === 0x58 && b[base + 3] === 0x31) ||
+           (b.length === base + 96 && b[base] === 0x54 && b[base + 1] === 0x46 && b[base + 2] === 0x58 && b[base + 3] === 0x32) ||   // wip242: 'TFX2' = + the tracks' own sends
+           (b.length === base + 112 && b[base] === 0x54 && b[base + 1] === 0x46 && b[base + 2] === 0x58 && b[base + 3] === 0x33);   // wip316: 'TFX3' = + the tracks' shelving cuts (what SAVE AS writes since wip289)
+  }
+  // ---- Microtonic .mtpreset (text) -> TNP1 (wip243): a port of tools/tnp_pack.c + libpo32's po32_patch_import.c, in 32-bit float with the same
+  // log2 / exp2 tables as the C code, so the bytes are the same as tnp_pack's (tests/host/presets_page_test.mjs checks it against factory preset 1)
+  const f32 = Math.fround;
+  const EXP2T = new Float32Array(1024), LOG2T = new Float32Array(1024);
+  for (let i = 0; i < 1024; i++) { EXP2T[i] = Math.pow(2, i / 1024); LOG2T[i] = Math.log2(1 + i / 1024); }
+  const FB = new DataView(new ArrayBuffer(4));
+  function lutExp2(x) {
+    x = f32(x);
+    if (x < -126) return 0;
+    if (x > 127) return 3.4028234663852886e38;
+    let ip = Math.trunc(x); if (x < ip) ip--;
+    const fs = f32(f32(x - ip) * 1024); let i0 = Math.trunc(fs); const fr = f32(fs - i0);
+    let a, b;
+    if (i0 >= 1023) { i0 = 1023; a = EXP2T[1023]; b = 2; } else { a = EXP2T[i0]; b = EXP2T[i0 + 1]; }
+    FB.setUint32(0, ((ip + 127) << 23) >>> 0); const sc = FB.getFloat32(0);
+    return f32(f32(a + f32(fr * f32(b - a))) * sc);
+  }
+  function lutLog2(x) {
+    x = f32(x);
+    if (x <= 0) return -126;
+    FB.setFloat32(0, x); const u = FB.getUint32(0);
+    const ex = ((u >>> 23) & 0xFF) - 127;
+    const fs = f32(f32(u & 0x7FFFFF) * f32(1024 / 8388608)); let i0 = Math.trunc(fs); const fr = f32(fs - i0);
+    if (i0 >= 1023) { i0 = 1023; return f32(f32(ex + LOG2T[1023]) + f32(fr * f32(1 - LOG2T[1023]))); }
+    return f32(f32(ex + LOG2T[i0]) + f32(fr * f32(LOG2T[i0 + 1] - LOG2T[i0])));
+  }
+  const K_LN2 = f32(0.69314718055994530942), K_LOG10_2 = f32(0.30102999566398119521), K_LOG2_10 = f32(3.32192809488736234787);
+  const lutPow10 = (x) => lutExp2(f32(f32(x) * K_LOG2_10));
+  const lutLn = (x) => f32(lutLog2(x) * K_LN2);
+  const lutLog10 = (x) => f32(lutLog2(x) * K_LOG10_2);
+  const clamp01 = (x) => (x < 0 ? 0 : x > 1 ? 1 : x);
+  // libpo32's own float parser (po32_import_strtof): returns the number, or null when there is no digit
+  function mtStrtof(s) {
+    let p = 0, res = 0, frac = 0, fdiv = 1, sign = 1, got = false, nz = false, es = 1, ex = 0;
+    if (s[p] === "-") { sign = -1; p++; } else if (s[p] === "+") p++;
+    while (s[p] >= "0" && s[p] <= "9") { const d = s.charCodeAt(p) - 48; res = f32(f32(res * 10) + d); got = true; if (d) nz = true; p++; }
+    if (s[p] === ".") {
+      p++;
+      while (s[p] >= "0" && s[p] <= "9") { const d = s.charCodeAt(p) - 48; fdiv = f32(fdiv * 10); frac = f32(frac + f32(d / fdiv)); got = true; if (d) nz = true; p++; }
+    }
+    res = f32(sign * f32(res + frac));
+    if (got && (s[p] === "e" || s[p] === "E")) {
+      let hasd = false; p++;
+      if (s[p] === "-") { es = -1; p++; } else if (s[p] === "+") p++;
+      while (s[p] >= "0" && s[p] <= "9") { const d = s.charCodeAt(p) - 48; hasd = true; if (ex < 100) { const nx = ex * 10 + d; ex = nx > 100 ? 100 : nx; } p++; }
+      if (hasd) {
+        if (es > 0) { if (ex > 38) { if (nz) res = sign < 0 ? -3.4028234663852886e38 : 3.4028234663852886e38; } else res = f32(res * lutPow10(ex)); }
+        else if (ex > 45) res = 0;
+        else if (ex > 38) { res = f32(res / lutPow10(38)); res = f32(res / lutPow10(ex - 38)); }
+        else res = f32(res / lutPow10(ex));
+      }
+    }
+    return got ? res : null;
+  }
+  const mtTrim = (v) => {
+    v = v.replace(/^[ \t\r\n]+/, "").replace(/[ \t\r\n]+$/, "");
+    if (v.endsWith(",")) v = v.slice(0, -1).replace(/[ \t\r\n]+$/, "");
+    if (v.length >= 2 && v[0] === '"' && v[v.length - 1] === '"') v = v.slice(1, -1).replace(/^[ \t\r\n]+/, "").replace(/[ \t\r\n]+$/, "");
+    return v;
+  };
+  const mtNum = (v) => {                                     // po32_patch_import_parse_leading_float; null = parse error
+    v = mtTrim(v);
+    let n = 0; while (n < v.length && /[0-9+\-.eE]/.test(v[n])) n++;
+    if (!n || n >= 64) return null;
+    return mtStrtof(v.slice(0, n));
+  };
+  const hzParam = (hz) => clamp01(f32(lutLn(f32(hz / 20)) / lutLn(1000)));
+  const decayParam = (ms) => clamp01(f32(f32(lutLog10(f32(ms / 1000)) + 2) / 3));
+  function attackParam(ms) {
+    if (ms <= 0) return 0;
+    const sec = f32(ms / 1000); let lo = 0, hi = 1;
+    for (let i = 0; i < 32; i++) {
+      const mid = f32(f32(lo + hi) * 0.5);
+      const probe = mid === 0 ? 0 : f32(mid * lutPow10(f32(f32(f32(12 * mid) - 7) / 5)));
+      if (probe < sec) lo = mid; else hi = mid;
+    }
+    return clamp01(f32(f32(lo + hi) * 0.5));
+  }
+  function levelParam(db) {
+    if (db <= -500) return 0;
+    let lo = f32(0.0001), hi = 1;
+    for (let i = 0; i < 40; i++) {
+      const mid = f32(f32(lo + hi) * 0.5);
+      const probe = f32(f32(f32(60 * mid) - 49) - f32(1 / mid));
+      if (probe < db) lo = mid; else hi = mid;
+    }
+    return clamp01(f32(f32(lo + hi) * 0.5));
+  }
+  const MT_KEYS = ["OscWave", "OscFreq", "OscAtk", "OscDcy", "ModMode", "ModRate", "ModAmt", "NFilMod", "NFilFrq", "NFilQ", "NEnvMod",
+                   "NEnvAtk", "NEnvDcy", "Mix", "DistAmt", "EQFreq", "EQGain", "Level", "OscVel", "NVel", "ModVel"];
+  // the 21 normalised parameters of one drum from its "Key: value" lines (po32_patch_parse_mtdrum_text); throws on a value it cannot read
+  function mtDrum(lines) {
+    const P = new Float32Array(21), bad = (k) => fail("mtp", `the value of ${k} could not be read`);
+    let modHint = 0, nenvHint = 0, seen = 0;
+    for (const [key, raw] of lines) {
+      const value = mtTrim(raw), starts = (w) => value.startsWith(w);
+      const i = MT_KEYS.indexOf(key);
+      if (i < 0) continue;
+      seen++;
+      let r;
+      const need = (pos) => { r = mtNum(value); if (r === null || (pos && r <= 0)) throw bad(key); return r; };
+      switch (key) {
+        case "OscWave": P[0] = starts("Sine") ? 0 : starts("Triangle") ? 0.5 : starts("Saw") ? 1 : (() => { throw bad(key); })(); break;
+        case "OscFreq": P[1] = hzParam(need(true)); break;
+        case "OscAtk": P[2] = attackParam(need(false)); break;
+        case "OscDcy": P[3] = decayParam(need(true)); break;
+        case "ModMode":
+          if (starts("Decay")) { modHint = 1; P[4] = 0; } else if (starts("Sine")) { modHint = 2; P[4] = 0.5; } else if (starts("Noise")) { modHint = 3; P[4] = 1; } else throw bad(key);
+          break;
+        case "ModRate":
+          if (value.includes("ms") || modHint === 1) {
+            if (/^inf/i.test(value)) P[5] = 0; else P[5] = decayParam(need(true));
+          } else if (modHint === 2) P[5] = clamp01(f32(need(false) / 2000));
+          else { r = mtNum(value); if (r === null || r < 0) throw bad(key); P[5] = r === 0 ? 0 : hzParam(r); }
+          break;
+        case "ModAmt": P[6] = clamp01(f32(f32(need(false) / 192) + 0.5)); break;
+        case "NFilMod": P[7] = starts("LP") ? 0 : starts("BP") ? 0.5 : starts("HP") ? 1 : (() => { throw bad(key); })(); break;
+        case "NFilFrq": P[8] = hzParam(need(true)); break;
+        case "NFilQ": P[9] = clamp01(f32(lutLog10(f32(need(true) / f32(0.1))) / 5)); break;
+        case "NEnvMod":
+          if (starts("Exp")) { nenvHint = 1; P[10] = 0; } else if (starts("Lin")) { nenvHint = 2; P[10] = 0.5; } else if (starts("Mod")) { nenvHint = 3; P[10] = 1; } else throw bad(key);
+          break;
+        case "NEnvAtk": r = need(false); if (nenvHint === 2) r = f32(r * 1.5); P[11] = attackParam(r); break;
+        case "NEnvDcy": r = need(true); if (nenvHint === 2) r = f32(r * 1.5); P[12] = decayParam(r); break;
+        case "Mix": P[13] = clamp01(f32(1 - f32(need(false) / 100))); break;
+        case "DistAmt": P[14] = clamp01(f32(need(false) / 100)); break;
+        case "EQFreq": P[15] = hzParam(need(true)); break;
+        case "EQGain": P[16] = clamp01(f32(f32(need(false) + 40) / 80)); break;
+        case "Level": P[17] = /^-inf/i.test(value) ? 0 : levelParam(need(false)); break;
+        case "OscVel": P[18] = clamp01(f32(need(false) / 200)); break;
+        case "NVel": P[19] = clamp01(f32(need(false) / 200)); break;
+        case "ModVel": P[20] = clamp01(f32(need(false) / 200)); break;
+      }
+    }
+    if (!seen) throw fail("mtp", "no sound parameters found");
+    return P;
+  }
+  const catof = (s) => { const m = /^\s*[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?/.exec(s); return m ? Number(m[0]) : 0; };
+  const catoi = (s) => { const m = /^\s*[+-]?\d+/.exec(s); return m ? parseInt(m[0], 10) : 0; };
+  // text of a .mtpreset -> { blob: Uint8Array (TNP1, no trailer), name, notes: [..] }; throws a plain message. fallbackName names a preset that has no Name.
+  function mtpresetToTnp(text, fallbackName = "") {
+    text = text.replace(/^\uFEFF/, "");
+    if (text.length > 300000) throw fail("mtp", "the file is too big for a .mtpreset file");
+    if (!text.startsWith("MicroTonicPresetV3")) throw fail("mtp", "it is not a .mtpreset file (MicroTonicPresetV3)");
+    const HDR = 40, VOICE = 44, PATH = 196, PBASE = HDR + 8 * VOICE;
+    const out = new Uint8Array(HDR + 8 * VOICE + 12 * PATH);
+    const path = [], dtxt = Array.from({ length: 8 }, () => []), dpan = new Array(8).fill(0), have = new Array(12).fill(false), notes = [];
+    let depth = 0, tempo = 120, swing = 0, fillrate = 0, mast = 0, name = "", rate = "1/16";
+    for (const line of text.split(/[\r\n]+/)) {
+      const s = line.replace(/^[ \t]+/, "").replace(/[ \t]+$/, "");
+      if (!s) continue;
+      if (s[0] === "}") { if (depth > 0) depth--; continue; }
+      if (s.length >= 2 && s[s.length - 1] === "{") {
+        const c = s.indexOf(":"), k = Math.min(c >= 0 ? c : s.length - 1, 47);
+        if (depth < 8) { path[depth] = s.slice(0, k); depth++; }
+        continue;
+      }
+      const eq = s.indexOf(" = ");
+      if (eq < 0) continue;
+      const key = s.slice(0, eq), val = s.slice(eq + 3);
+      if (depth === 1) {
+        if (key === "Tempo") tempo = catof(val);
+        else if (key === "Swing") swing = catof(val);
+        else if (key === "FillRate") fillrate = catof(val);
+        else if (key === "MastVol") mast = catof(val);
+        else if (key === "Name") { const v = val[0] === '"' ? val.slice(1) : val; const q = v.indexOf('"'); name = (q < 0 ? v : v.slice(0, q)).slice(0, 63); }
+        else if (key === "StepRate") rate = val;
+      } else if (depth === 3 && path[1] === "DrumPatches") {
+        const v = catoi(path[2]) - 1;
+        if (v < 0 || v > 7) continue;
+        if (key === "Pan") dpan[v] = catof(val);
+        if (MT_KEYS.includes(key)) dtxt[v].push([key, val]);
+      } else if (depth === 3 && path[1] === "Patterns") {
+        const pi = (path[2] || "\0").charCodeAt(0) - 97;
+        if (pi < 0 || pi >= 12) continue;
+        if (key === "Length") { out[PBASE + pi * PATH] = catoi(val) & 255; have[pi] = true; }
+        else if (key === "Chained") out[PBASE + pi * PATH + 1] = val === "true" ? 1 : 0;
+      } else if (depth === 4 && path[1] === "Patterns") {
+        const pi = (path[2] || "\0").charCodeAt(0) - 97, pv = catoi(path[3]) - 1;
+        if (pi < 0 || pi >= 12 || pv < 0 || pv > 7) continue;
+        const pp = PBASE + pi * PATH, len = out[pp] ? out[pp] : 16;
+        const w = [0, 0];
+        for (let i = 0; i < len && i < 64 && i < val.length; i++) if (val[i] === "#") w[i >> 5] = (w[i >> 5] | (1 << (i & 31))) >>> 0;
+        const off = key === "Triggers" ? 0 : key === "Accents" ? 8 : key === "Fills" ? 16 : -1;
+        if (off >= 0) for (let h = 0; h < 2; h++) for (let b = 0; b < 4; b++) out[pp + 4 + 24 * pv + off + 4 * h + b] = (w[h] >>> (8 * b)) & 255;
+      }
+    }
+    let npat = 0;
+    for (let i = 0; i < 12; i++) if (have[i]) npat = i + 1;
+    if (!npat) throw fail("mtp", "no patterns found");
+    if (npat > 8) { notes.push(`${npat} patterns: the FM-1 keeps the first 8`); npat = 8; }
+    for (let i = 0; i < npat; i++) if (!have[i]) throw fail("mtp", `pattern ${String.fromCharCode(97 + i)} is missing (patterns must run a, b, c ...)`);
+    for (let v = 0; v < 8; v++) {
+      let P;
+      try { P = mtDrum(dtxt[v]); } catch (e) { throw fail("mtp", `drum ${v + 1}: ${e.message}`); }
+      for (let i = 0; i < 21; i++) { const q = Math.trunc(f32(f32(P[i] * 65535) + 0.5)); out[HDR + v * VOICE + 2 * i] = q & 255; out[HDR + v * VOICE + 2 * i + 1] = (q >> 8) & 255; }
+      const pan = Math.trunc(64 + dpan[v] * 0.63 + (dpan[v] < 0 ? -0.5 : 0.5));
+      out[HDR + v * VOICE + 42] = pan < 0 ? 0 : pan > 127 ? 127 : pan;
+    }
+    const total = HDR + 8 * VOICE + npat * PATH, u16 = (o, v) => { out[o] = v & 255; out[o + 1] = (v >> 8) & 255; };
+    out.set([0x54, 0x4E, 0x50, 0x31], 0);
+    u16(4, total);
+    u16(6, Math.trunc(tempo * 10 + 0.5));
+    out[8] = swing < 0 ? 0 : swing > 100 ? 100 : Math.trunc(swing + 0.5);
+    out[9] = npat;
+    const RATES = { "1/16": 0, "1/16T": 1, "1/32": 2, "1/8T": 3 };
+    if (rate in RATES) out[10] = RATES[rate]; else { out[10] = 0; notes.push(`step rate ${rate} is not supported, 1/16 used`); }
+    u16(12, Math.trunc(fillrate * 100 + 0.5));
+    u16(14, Math.trunc(mast * 10 + (mast < 0 ? -0.5 : 0.5)));
+    if (!name) name = fallbackName;
+    // wip320: 8 letters at most, the same as the made-up names of SAVE (so it shows as big as they do): a trailing " (121)" tag goes first, then the rest is cut
+    if (name.length > 8) { const t = name.lastIndexOf("("); if (t > 0 && name[t - 1] === " ") name = name.slice(0, t - 1); }
+    name = name.replace(/[^\x20-\x7E]/g, "?").slice(0, 8).replace(/ +$/, "");
+    for (let i = 0; i < name.length; i++) out[16 + i] = name.charCodeAt(i);
+    return { blob: out.slice(0, total), name: name || "preset", notes };
+  }
+  // ---- wip322: TNP1 -> text of a .mtpreset (the reverse of mtpresetToTnp). The 21 normalised parameters of each drum go back through the
+  // inverse of the import's curves (in plain doubles: re-importing gives the same 16-bit values, give or take one), then the patterns.
+  // Lost on the way out (a .mtpreset has no place for them): everything the Tonic added (ARP notes, late hits, per-track cuts and sends,
+  // compressor, reverb, delay) and the name's letters beyond what Microtonic keeps; a drum's own name is made up ("Drum n").
+  function tnpToMtpreset(blob) {
+    if (!(blob instanceof Uint8Array) || blob.length < 40 || blob[0] !== 0x54 || blob[1] !== 0x4E || blob[2] !== 0x50 || blob[3] !== 0x31) throw fail("tnp", "it is not a TNP1 preset");
+    const HDR = 40, VOICE = 44, PATH = 196, PBASE = HDR + 8 * VOICE;
+    const rd16 = (o) => blob[o] | (blob[o + 1] << 8);
+    const npat = blob[9];
+    if (!npat || npat > 16 || blob.length < PBASE + npat * PATH) throw fail("tnp", "the preset is cut short");
+    const num = (x) => { let t = Number(x.toPrecision(14)).toString(); if (/e/.test(t)) t = x.toFixed(12).replace(/0+$/, "").replace(/\.$/, ""); return t === "-0" ? "0" : t; };
+    const hzOf = (P) => 20 * Math.pow(1000, P);
+    const decMs = (P) => 1000 * Math.pow(10, 3 * P - 2);
+    const atkMs = (P) => (P <= 0 ? 0 : 1000 * P * Math.pow(10, (12 * P - 7) / 5));
+    const three = (P, a, b, c) => (P < 0.25 ? a : P < 0.75 ? b : c);
+    const lvl = (P) => { if (P <= 0) return "-inf"; const db = 60 * P - 49 - 1 / P; return db <= -500 ? "-inf" : num(db); };
+    const RATES = ["1/16", "1/16T", "1/32", "1/8T"];
+    let nm = ""; for (let i = 16; i < 40 && blob[i]; i++) nm += String.fromCharCode(blob[i] >= 32 && blob[i] < 127 && blob[i] !== 34 ? blob[i] : 63);
+    const L = [];
+    const T = (d, t) => L.push("\t".repeat(d) + t);
+    L.push("MicroTonicPresetV3: {");
+    T(1, `FillRate = ${num(rd16(12) / 100)}`);
+    T(1, `MastVol = ${num(((rd16(14) << 16) >> 16) / 10)}`);
+    T(1, `Name = "${nm || "preset"}"`);
+    T(1, "Pattern = a");
+    T(1, `StepRate = ${RATES[blob[10]] || "1/16"}`);
+    T(1, `Swing = ${num(blob[8])}`);
+    T(1, `Tempo = ${num(rd16(6) / 10)}`);
+    T(1, "Mutes: { Off, Off, Off, Off, Off, Off, Off, Off }");
+    T(1, "DrumPatches: {");
+    for (let v = 0; v < 8; v++) {
+      const P = []; for (let i = 0; i < 21; i++) P.push(rd16(HDR + v * VOICE + 2 * i) / 65535);
+      const modMode = three(P[4], "Decay", "Sine", "Noise"), nenv = three(P[10], "Exp", "Lin", "Mod");
+      const modRate = modMode === "Decay" ? (P[5] === 0 ? "inf" : num(decMs(P[5]))) : modMode === "Sine" ? num(P[5] * 2000) : (P[5] === 0 ? "0" : num(hzOf(P[5])));
+      const pv = blob[HDR + v * VOICE + 42];                    // the import rounds a negative pan down by one (trunc(64 + pan * 0.63 - 0.5)), so the left side is written one step over
+      const pan = pv > 63 ? (pv - 64) / 0.63 : pv === 63 ? -0.01 : (pv - 63) / 0.63;
+      T(2, `${v + 1}: {`);
+      T(3, `DistAmt = ${num(P[14] * 100)}`);
+      T(3, `EQFreq = ${num(hzOf(P[15]))}`);
+      T(3, `EQGain = ${num(P[16] * 80 - 40)}`);
+      T(3, `Level = ${lvl(P[17])}`);
+      T(3, `Mix = ${num((1 - P[13]) * 100)}`);
+      T(3, `ModAmt = ${num((P[6] - 0.5) * 192)}`);
+      T(3, `ModMode = ${modMode}`);
+      T(3, `ModRate = ${modRate}`);
+      T(3, `ModVel = ${num(P[20] * 200)}`);
+      T(3, `NEnvAtk = ${num(atkMs(P[11]))}`);   // (the import scales a Lin envelope by 1.5 only when NEnvMod comes BEFORE them; in a real file it comes after, so no scaling)
+      T(3, `NEnvDcy = ${num(decMs(P[12]))}`);
+      T(3, `NEnvMod = ${nenv}`);
+      T(3, `NFilFrq = ${num(hzOf(P[8]))}`);
+      T(3, `NFilMod = ${three(P[7], "LP", "BP", "HP")}`);
+      T(3, `NFilQ = ${num(0.1 * Math.pow(10, 5 * P[9]))}`);
+      T(3, "NStereo = Off");
+      T(3, `NVel = ${num(P[19] * 200)}`);
+      T(3, `Name = "Drum ${v + 1}"`);
+      T(3, `OscAtk = ${num(atkMs(P[2]))}`);
+      T(3, `OscDcy = ${num(decMs(P[3]))}`);
+      T(3, `OscFreq = ${num(hzOf(P[1]))}`);
+      T(3, `OscVel = ${num(P[18] * 200)}`);
+      T(3, `OscWave = ${three(P[0], "Sine", "Triangle", "Saw")}`);
+      T(3, "Output = A");
+      T(3, `Pan = ${num(pan)}`);
+      T(2, "}");
+    }
+    T(1, "}");
+    T(1, "Patterns: {");
+    for (let i = 0; i < npat; i++) {
+      const pp = PBASE + i * PATH, len = blob[pp] || 16;
+      T(2, `${String.fromCharCode(97 + i)}: {`);
+      T(3, `Chained = ${blob[pp + 1] ? "true" : "false"}`);
+      T(3, `Length = ${len}`);
+      for (let v = 0; v < 8; v++) {
+        const row = (off) => { let t = ""; for (let k = 0; k < len; k++) { const h = k >> 5, byte = blob[pp + 4 + 24 * v + off + 4 * h + ((k & 31) >> 3)]; t += (byte >> (k & 7)) & 1 ? "#" : "-"; } return t; };
+        T(3, `${v + 1}: {`);
+        T(4, `Accents = ${row(8)}`);
+        T(4, `Fills = ${row(16)}`);
+        T(4, `Triggers = ${row(0)}`);
+        T(3, "}");
+      }
+      T(2, "}");
+    }
+    T(1, "}");
+    L.push("}");
+    return L.join("\r\n") + "\r\n";
+  }
+  // slot 0..31: the FM-1 pulls the blob (answer its reads, twice) and reports -> 0 stored, else its code
+  // wip670: ext = true: the place's second spot ('TEX2' bytes, 21..3840) goes to the same slot number with bit 0x80
+  const extOk = (b) => b.length >= 21 && b.length <= 3840 && b[0] === 0x54 && b[1] === 0x45 && b[2] === 0x58 && b[3] === 0x32;
+  async function presetPut(link, slot, blob, onEvent = () => {}, ext = false) {
+    if (ext ? !extOk(blob) : !tnpOk(blob)) throw fail("head", ext ? "That is not a FM1 Tonic song and notes part (TEX2)." : "That is not a FM1 Tonic preset (.tnp).");
+    link.drain();
+    link.send(frame(PG_PUT, [slot | (ext ? PG_X : 0), ...le32(blob.length), ...le32(crc32(blob))]));
+    let last = Date.now(), idle = DELAY.first, asked = 0;
+    for (;;) {
+      const pkt = await link.read(DELAY.poll);
+      if (!pkt) {
+        if (link.lost) throw fail("lost", "The FM-1 was disconnected. The slot may be empty now: send the preset again.");
+        if (Date.now() - last > idle) {
+          throw fail("stopped", asked ? "FM1 Tonic stopped asking for the preset. The slot may be empty now: send it again."
+                                      : "FM1 Tonic didn't answer. If it is an older firmware without preset restore, install FM1 Tonic again (above).");
+        }
+        continue;
+      }
+      const r = parseRequest(pkt);
+      if (!r) continue;
+      last = Date.now(); idle = DELAY.idle; asked++;
+      const top = (r.addr & 0xFF000000) >>> 0;
+      if (top === OK_ADDR || top === FAIL_ADDR || top === ASK_ADDR) {
+        link.send(response(r.addr, [0x73, 0x75, 0x63, 0x63, 0x65, 0x73, 0x73, 0], r.fl));   // "success\0"
+        if (r.addr === ASK_ADDR) continue;
+        return r.addr === OK_ADDR ? 0 : (r.addr & 0xFFFF) || 99;
+      }
+      if (r.len > MAXDATA || r.addr >= blob.length) throw fail("badreq", `FM1 Tonic asked for a part outside the preset (${r.addr.toString(16)}+${r.len}).`);
+      const data = Array.from(blob.subarray(r.addr, r.addr + r.len));
+      while (data.length < r.len) data.push(0);
+      if (!link.send(response(r.addr, data, r.fl))) throw fail("lost", "The FM-1 was disconnected. The slot may be empty now: send the preset again.");
+      onEvent("progress", Math.min(r.addr + r.len, blob.length) * 100 / blob.length);
+    }
+  }
+  // slot 0..31 cleared -> 0; else a message (playing, failed, no answer). Asked twice: erasing again does no harm.
+  async function presetErase(link, slot, ext = false) {
+    const wire = slot | (ext ? PG_X : 0);
+    for (let t = 0; t < 2; t++) {
+      link.drain();
+      link.send(frame(PG_ERASE, [wire]));
+      const end = Date.now() + DELAY.first;
+      while (Date.now() < end) {
+        const pkt = await link.read(end - Date.now());
+        if (!pkt) { if (link.lost) throw fail("lost", "The FM-1 was disconnected. Plug it in and try again."); break; }
+        const f = parseFrame(pkt);
+        if (f && f.cmd === PG_END && f.body.length >= 10 && f.body[0] === wire) {
+          const st = f.body[9];
+          if (st === 0) return 0;
+          throw fail("slot" + st, st === 4 ? "FM1 Tonic is playing: press STOP on the FM-1 first." : st === 1 ? `No such slot (${placeNo(slot)}).` : `Clearing slot ${placeNo(slot)} failed.`);
+        }
+      }
+    }
+    throw fail("stopped", "FM1 Tonic didn't answer. If it is an older firmware without preset restore, install FM1 Tonic again (above).");
+  }
+  // wip673: place number (1..30) -> slot (1-8 -> 32..39, 9-30 -> 0..21); anything else -> -1
+  const slotOf = (n) => (n >= 1 && n <= 8 ? 31 + n : n >= 9 && n <= 30 ? n - 9 : -1);
+  // one place of a restore: the preset first, then its second spot (item.ext) or, when the item has none, the old second spot of that place is erased
+  // (newExt = false: an older firmware without second spots: nothing to erase). -> 0 stored, else the FM-1's code of the failed put
+  async function restorePlace(link, slot, item, onEvent = () => {}, newExt = true) {
+    const rc = await presetPut(link, slot, item.blob, onEvent);
+    if (rc) return rc;
+    if (item.ext) {
+      if (!newExt) throw fail("head", `${item.name} has a song and notes part, but this FM-1's firmware cannot take it. Install FM1 Tonic again (above).`);
+      return presetPut(link, slot, item.ext, onEvent, true);
+    }
+    if (newExt) await presetErase(link, slot, true);
+    return 0;
+  }
+  // which slots are filled: [{slot -> true}] as a Set of main-spot slots (0..31 and 32..39) and of second-spot slots, one look at the FM-1
+  async function presetFilled(link) {
+    const { mask } = await presetList(link), pl = await presetListPlaces(link);
+    const main = new Set(), ext = new Set();
+    for (let i = 0; i < PG_SLOTS; i++) if (mask >>> i & 1) main.add(i);
+    if (pl) {
+      for (let i = 0; i < 8; i++) if (pl.mask >>> i & 1) main.add(32 + i);
+      const xm = (await presetList(link, true)).mask, xp = await presetListPlaces(link, true);
+      for (let i = 0; i < PG_SLOTS; i++) if (xm >>> i & 1) ext.add(i);
+      if (xp) for (let i = 0; i < 8; i++) if (xp.mask >>> i & 1) ext.add(32 + i);
+    }
+    return { main, ext, places: !!pl };
+  }
+  // a .zip (stored or deflate) -> [{name, data}] (folders skipped); throws a plain message on anything else
+  async function unzip(bytes) {
+    const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength), bad = () => fail("zip", "That zip file could not be read.");
+    let e = -1;
+    for (let i = bytes.length - 22; i >= Math.max(0, bytes.length - 22 - 65535); i--) if (dv.getUint32(i, true) === 0x06054b50) { e = i; break; }
+    if (e < 0) throw bad();
+    const n = dv.getUint16(e + 10, true); let p = dv.getUint32(e + 16, true);
+    const out = [];
+    for (let k = 0; k < n; k++) {
+      if (p + 46 > bytes.length || dv.getUint32(p, true) !== 0x02014b50) throw bad();
+      const method = dv.getUint16(p + 10, true), csize = dv.getUint32(p + 20, true), usize = dv.getUint32(p + 24, true);
+      const nl = dv.getUint16(p + 28, true), xl = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true), lh = dv.getUint32(p + 42, true);
+      const name = new TextDecoder().decode(bytes.subarray(p + 46, p + 46 + nl));
+      p += 46 + nl + xl + cl;
+      if (name.endsWith("/")) continue;
+      if (lh + 30 > bytes.length || dv.getUint32(lh, true) !== 0x04034b50) throw bad();
+      const start = lh + 30 + dv.getUint16(lh + 26, true) + dv.getUint16(lh + 28, true);
+      if (start + csize > bytes.length) throw bad();
+      let data = bytes.subarray(start, start + csize);
+      if (method === 8) {
+        if (typeof DecompressionStream === "undefined") throw fail("zip", "This browser cannot open a compressed zip. Use Chrome or Edge, or a zip without compression.");
+        data = new Uint8Array(await new Response(new Blob([data]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).arrayBuffer());
+      } else if (method !== 0) throw bad();
+      if (data.length !== usize) throw bad();
+      out.push({ name, data: Uint8Array.from(data) });
+    }
+    return out;
+  }
+  // wip671 / wip672: ONE file per place: NN_name.tnp = the preset (TNP1, its length is the u16 at byte 4) followed by the place's second spot (song, knob moves,
+  // ARP notes: 'TEX2' bytes) when it has one. splitTnp takes such a file apart again; a plain .tnp (no second spot) is the same as before.
+  function splitTnp(b) {
+    if (b.length < 40) return { main: b, ext: null };
+    const n = b[4] | b[5] << 8;
+    if (n >= 40 && n < b.length && extOk(b.subarray(n))) return { main: b.subarray(0, n), ext: b.subarray(n) };
+    return { main: b, ext: null };
+  }
+  function presetBackupFiles(list) {
+    return list.map((p) => {
+      const d = new Uint8Array(p.blob.length + (p.ext ? p.ext.length : 0));
+      d.set(p.blob, 0);
+      if (p.ext) d.set(p.ext, p.blob.length);
+      return { name: `${String(p.number).padStart(2, "0")}_${p.name}.tnp`, data: d };
+    });
+  }
+  // zip, .tnp or .mtpreset -> [{number (9..40 or 0 = not in the name), name, blob, notes}] with a reason per skipped file (wip243: .mtpreset is converted here)
+  async function presetFiles(fileName, bytes) {
+    const items = [], skipped = [];
+    const add = (nm, data) => {
+      const base = nm.split("/").pop();
+      if (!base || base[0] === "." || /(^|\/)__MACOSX\//.test(nm)) return;                 // hidden files of a mac zip
+      const m = /^(\d{1,2})[_ -]/.exec(base), number = m ? +m[1] : 0;
+      let blob, name, notes = [], ext = null;
+      if (/\.tnp$/i.test(base)) {
+        const sp = splitTnp(data);
+        if (!tnpOk(sp.main)) { skipped.push(`${base}: not a FM1 Tonic preset`); return; }
+        blob = sp.main; name = presetName(blob); ext = sp.ext;
+      } else if (/\.mtpreset$/i.test(base)) {
+        try {
+          const r = mtpresetToTnp(new TextDecoder().decode(data), base.replace(/\.mtpreset$/i, "").replace(/^\d{1,2}[_ -]/, ""));
+          blob = r.blob; name = presetName(blob); notes = r.notes;
+        } catch (e) { skipped.push(`${base}: ${(e && e.message) || e}`); return; }
+        if (!tnpOk(blob)) { skipped.push(`${base}: the conversion did not give a valid preset`); return; }
+      } else { skipped.push(`${base}: not a .tnp or .mtpreset file`); return; }
+      if (m && (number < 1 || number > 30)) { skipped.push(`${base}: the number must be 1 to 30` + (number > 30 && number <= 40 ? " (an old backup: places 31-40 do not exist any more)" : "")); return; }
+      items.push({ number, name, file: base, blob, notes, ext });
+    };
+    if (/\.zip$/i.test(fileName)) { for (const f of await unzip(bytes)) add(f.name, f.data); }
+    else add(fileName, bytes);
+    return { items, skipped };
+  }
+
+  return { HS_QUERY, RS_REQ, BU_REQ, BU_END, OK_ADDR, ASK_ADDR, FAIL_ADDR, MAGIC, VERSION, NOBJ, PLAYING, DECLINED, DELAY, ERRORS,
+           pack7, unpack7, crc32, frame, parseFrame, response, parseRequest, parseIdentity, parse, summary, find, backup, restore, presetList, presetListPlaces, placeNo, slotOf, restorePlace, presetFilled, extOk, presetGet, presetName, presets, presetBackupFiles, splitTnp, tnpOk, mtpresetToTnp, tnpToMtpreset, presetPut, presetErase, unzip, presetFiles, PUT_ERRORS };
+})();
+// --- backup protocol: end
+class Link {
+  constructor(input, output) {
+    this.input = input; this.output = output; this.q = []; this.waiter = null;
+    input.onmidimessage = (ev) => {
+      if (ev.data[0] !== 0xF0) return;
+      this.q.push(Array.from(ev.data));
+      if (this.waiter) { const w = this.waiter; this.waiter = null; w(); }
+    };
+  }
+  get lost() { return this.input.state === "disconnected" || this.output.state === "disconnected"; }
+  send(bytes) { try { this.output.send(bytes); return true; } catch (_) { return false; } }
+  drain() { this.q.length = 0; }
+  async read(ms) {
+    if (!this.q.length) {
+      let tm;
+      await Promise.race([new Promise((r) => { this.waiter = r; }), new Promise((r) => { tm = setTimeout(r, Math.max(ms, 0)); })]);
+      clearTimeout(tm);
+      this.waiter = null;
+    }
+    return this.q.shift() || null;
+  }
+  close() { this.input.onmidimessage = null; }
+}
+</script>
+<script type="module">
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 Leo Kuroshita (@kurogedelic), Hügelton Instruments
+//
+// FM-1 .fwsc packages in the browser: the package identity and the image the
+// device reads during an update.
+
+const BLOCKS = 20, BLK = 0x30, KEEP = 0x2F;
+
+// the package identity ("FM-1_904"): one marker byte after each of the first 20 blocks
+function productOf(fwsc) {
+  if (fwsc.length < BLOCKS * BLK) throw new Error("not an FM-1 package (too short)");
+  let s = "";
+  for (let i = 0; i < BLOCKS; i++) {
+    const m = fwsc[i * BLK + KEEP];
+    if (m !== 0x7D) s += String.fromCharCode((m - i - 1) & 0xFF);
+  }
+  return s;
+}
+
+// the image the device addresses during an update: the .fwsc without the 20 marker bytes
+function logicalImage(fwsc) {
+  const out = new Uint8Array(fwsc.length - BLOCKS);
+  for (let i = 0; i < BLOCKS; i++) out.set(fwsc.subarray(i * BLK, i * BLK + KEEP), i * KEEP);
+  out.set(fwsc.subarray(BLOCKS * BLK), BLOCKS * KEEP);
+  return out;
+}
+
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 Leo Kuroshita (@kurogedelic), Hügelton Instruments
+//
+// The FM-1 USB-MIDI update protocol (M-UPGRADE compatible) over WebMIDI.
+// Step 1: the running firmware reads parts of the package and stages the update
+// loader. Step 2: the loader reads the whole image and writes it. In both steps
+// the device sends cmd 0x30 read requests on the logical image and we answer.
+
+const HS_QUERY = [0xF0, 0x00, 0x32, 0x45, 0x00, 0x00, 0x00, 0x40, 0x7F, 0xF7];
+const UPGRADE = [0xF0, 0x22, 0x24, 0x35, 0x7F, 0xF7];
+const MAXDATA = 512;
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const IS_OTA = (id) => /^ota-/i.test(id.model);
+
+// errors carry a code the pages translate: notfound, model, stopped, noloader, lost, noreturn,
+// mismatch (detail: the identity the device reports), badreq
+function fail(code, msg, detail = "") { const e = new Error(msg); e.code = code; e.detail = detail; return e; }
+
+function pack7(data) {
+  const out = []; let acc = 0, nb = 0;
+  for (const b of data) {
+    acc |= b << nb; nb += 8;
+    while (nb >= 7) { out.push(acc & 0x7F); acc >>>= 7; nb -= 7; }
+  }
+  if (nb) out.push(acc & 0x7F);
+  return out;
+}
+
+function unpack7(s) {
+  const out = []; let acc = 0, nb = 0;
+  for (const b of s) {
+    acc |= (b & 0x7F) << nb; nb += 7;
+    while (nb >= 8) { out.push(acc & 0xFF); acc >>>= 8; nb -= 8; }
+  }
+  return out;
+}
+
+function response(addr, data, fl = 0) {
+  const len = data.length;
+  const body = [0x00, 0x59, 0x30, (len + 8) & 0xFF, ((len + 8) >> 8) & 0xFF, 0, fl,
+    addr & 0xFF, (addr >>> 8) & 0xFF, (addr >>> 16) & 0xFF, (addr >>> 24) & 0xFF,
+    len & 0xFF, (len >> 8) & 0xFF, 0, ...data];
+  let s = 0;
+  for (let i = 6; i < body.length; i++) s += body[i];
+  body.push(~s & 0xFF);
+  return [0xF0, ...pack7(body), 0xF7];
+}
+
+function parseRequest(pkt) {
+  if (pkt[0] !== 0xF0 || pkt[pkt.length - 1] !== 0xF7) return null;
+  const u = unpack7(pkt.slice(1, -1));
+  if (u.length !== 15 || u[0] !== 0 || u[1] !== 0x59 || u[2] !== 0x30) return null;
+  let s = 0;
+  for (let i = 6; i < 14; i++) s += u[i];
+  if ((~s & 0xFF) !== u[14]) return null;
+  return { fl: u[6], addr: (u[7] | (u[8] << 8) | (u[9] << 16) | (u[10] << 24)) >>> 0, len: u[11] | (u[12] << 8) | (u[13] << 16) };
+}
+
+function parseIdentity(pkt) {
+  const d = unpack7(pkt.slice(1, -1));
+  if (d.length !== 34 || d[0] !== 0 || d[1] !== 0x59 || d[2] !== 0x11) return null;
+  const txt = String.fromCharCode(...d.slice(6, 33)).replace(/\0+$/, "");
+  const m = /^([^_]+)_(\d+)$/.exec(txt);
+  return m ? { text: txt, model: m[1], version: parseInt(m[2], 10) } : null;
+}
+
+// one MIDI in/out pair with a SysEx queue
+class Link {
+  constructor(input, output) {
+    this.input = input; this.output = output; this.q = []; this.waiter = null;
+    input.onmidimessage = (ev) => {
+      if (ev.data[0] !== 0xF0) return;
+      this.q.push(Array.from(ev.data));
+      if (this.waiter) { const w = this.waiter; this.waiter = null; w(); }
+    };
+  }
+  get lost() { return this.input.state === "disconnected" || this.output.state === "disconnected"; }
+  // false when the port is gone (unplugged): WebMIDI throws on a disconnected output
+  send(bytes) {
+    try { this.output.send(bytes); return true; } catch (_) { return false; }
+  }
+  drain() { this.q.length = 0; }
+  async read(ms) {
+    if (!this.q.length) {
+      let tm;
+      await Promise.race([new Promise((r) => { this.waiter = r; }), new Promise((r) => { tm = setTimeout(r, ms); })]);
+      clearTimeout(tm);
+      this.waiter = null;
+    }
+    return this.q.shift() || null;
+  }
+  close() { this.input.onmidimessage = null; }
+}
+
+async function handshake(link, tries = 3) {
+  link.drain();
+  for (let t = 0; t < tries; t++) {
+    if (!link.send(HS_QUERY)) return null;
+    const end = Date.now() + 1000;
+    while (Date.now() < end) {
+      const p = await link.read(end - Date.now());
+      if (!p) break;
+      const id = parseIdentity(p);
+      if (id) return id;
+    }
+  }
+  return null;
+}
+
+class Updater {
+  constructor(access, log) {
+    this.access = access;
+    this.log = log || (() => {});
+  }
+
+  // every in/out pair with the same port name that answers the handshake
+  async find(filter) {
+    const outs = [...this.access.outputs.values()];
+    for (const input of this.access.inputs.values()) {
+      if (input.state === "disconnected") continue;
+      if (!/x0x|fm-?1|tonic|felucca|ota|composite|sinco|usb-midi/i.test(input.name || "")) continue;   // never probe other gear
+      const output = outs.find((o) => o.name === input.name) || (outs.length === 1 ? outs[0] : null);
+      if (!output) continue;
+      try { await input.open(); await output.open(); } catch (_) { continue; }
+      const link = new Link(input, output);
+      const id = await handshake(link, 2);
+      if (id && (!filter || filter(id))) return { link, id, name: input.name };
+      link.close();
+    }
+    return null;
+  }
+
+  async waitFor(filter, ms) {
+    const end = Date.now() + ms;
+    while (Date.now() < end) {
+      const dev = await this.find(filter);
+      if (dev) return dev;
+      await sleep(1000);
+    }
+    return null;
+  }
+
+  // serve read requests until the device asks for one of the finish addresses; stops early
+  // when the port disappears (lost: true) instead of waiting out idleMs
+  async serve(link, image, finishAddr, idleMs, onProgress) {
+    let served = 0, last = Date.now();
+    for (;;) {
+      const pkt = await link.read(1000);
+      if (!pkt) {
+        if (link.lost) return { served, finished: false, lost: true };
+        if (Date.now() - last > idleMs) return { served, finished: false };
+        continue;
+      }
+      const r = parseRequest(pkt);
+      if (!r) continue;
+      last = Date.now();
+      if (r.addr === 0xE0000000 || r.addr === 0xF0000000) {
+        link.send(response(r.addr, [...new TextEncoder().encode("success"), 0]));
+        if (r.addr === finishAddr) return { served, finished: true };
+        continue;
+      }
+      if (r.len > MAXDATA || r.addr + r.len > image.length) throw fail("badreq", `bad request ${r.addr.toString(16)}+${r.len}`);
+      await sleep(10);
+      if (!link.send(response(r.addr, Array.from(image.subarray(r.addr, r.addr + r.len)), r.fl))) {
+        return { served, finished: false, lost: true };
+      }
+      served++;
+      if (onProgress) onProgress(served, r.addr);
+    }
+  }
+
+  // full install: running firmware -> loader -> new firmware
+  async install(image, product, onStep) {
+    const step = onStep || (() => {});
+    const dev = await this.find((id) => !IS_OTA(id));
+    if (!dev) throw fail("notfound", "FM-1 not found (USB cable, and no other app using it?)");
+    const [model] = product.split("_");
+    if (dev.id.model !== model) { dev.link.close(); throw fail("model", `the device is ${dev.id.text}, the package is for ${product}`); }
+    step("start", dev.id.text);
+    dev.link.send(UPGRADE);
+    await sleep(2000);
+    const s1 = await this.serve(dev.link, image, 0xE0000000, 8000, (n) => step("verify", n));
+    dev.link.close();
+    if (!s1.finished) throw fail(s1.lost ? "lost" : "stopped", `the device ${s1.lost ? "was disconnected" : "stopped"} after ${s1.served} requests: nothing was written`);
+    step("loader");
+    await sleep(3000);
+    const ota = await this.waitFor(IS_OTA, 30000);
+    if (!ota) throw fail("noloader", "the update loader did not appear. Replug the USB cable and press Install again: the device stays in update mode until it is finished.");
+    const s2 = await this.write(ota, image, step);
+    if (!s2.finished) throw fail(s2.lost ? "lost" : "stopped", `the loader ${s2.lost ? "was disconnected" : "stopped"} after ${s2.served} requests. Replug and press Install again to resume.`);
+    step("reboot");
+    await sleep(3000);
+    const back = await this.waitFor((id) => !IS_OTA(id), 40000);
+    if (!back) throw fail("noreturn", "the device did not come back: power-cycle it");
+    back.link.close();
+    if (back.id.text !== product) throw fail("mismatch", `installed, but the device reports ${back.id.text}`, back.id.text);
+    step("done", back.id.text);
+    return back.id.text;
+  }
+
+  // step 2 with the loader found by find()/waitFor()
+  async write(ota, image, step) {
+    ota.link.send(UPGRADE);
+    await sleep(2000);
+    const s2 = await this.serve(ota.link, image, 0xF0000000, 180000, (n) => step("write", n));
+    ota.link.close();
+    return s2;
+  }
+
+  // resume: the device is already in update mode (loader) -> true when the write finished
+  async resume(image, onStep) {
+    const ota = await this.find(IS_OTA);
+    if (!ota) return false;
+    return (await this.write(ota, image, onStep || (() => {}))).finished;
+  }
+}
+
+// Put FM1 Tonic on the FM-1 (WebMIDI update, the same code as the installer page). tools/make_pages.py inlines
+// fm1pkg.js + fm1ota.js at the first line of this script and the package's metadata at the FLASH_META line;
+// in a plain dev build both are missing and the section says so.
+const $f = (id) => document.getElementById(id);
+const fsay = (txt) => { $f("flash-status").textContent = txt; };
+const flog = (txt) => { const l = $f("flash-log"); l.hidden = false; l.textContent += txt + "\n"; };
+const FLASH_META = {"version": "1.8h", "product": "FM-1_77010808", "pkg": "../firmware/fm1-tonic-1.8h.fwsc"};
+const FLASH_ERR = {
+  denied: "MIDI (SysEx) access was not allowed. Allow MIDI in the site settings (address bar) and press Install again.",
+  notfound: "FM-1 not found. Check the USB cable (a data cable), close other apps that use MIDI, and press Install again.",
+  model: "The connected device is not an FM-1.",
+  lost: "The USB connection was lost. Replug it and press Install again.",
+  noloader: "The FM-1 in update mode was not found. Replug the USB cable and press Install again (it stays in update mode until it is finished).",
+  noreturn: "The FM-1 did not come back. Power-cycle it.",
+  mismatch: "Written, but the FM-1 reports another version: ",
+};
+let flashImage = null, flashWriting = false;
+window.addEventListener("beforeunload", (e) => { if (flashWriting) { e.preventDefault(); e.returnValue = "Writing. Do not close the page."; } });
+(async () => {
+  if (!FLASH_META || typeof Updater === "undefined") { fsay("The installer is on the published page, not in this local copy."); return; }
+  if (!navigator.requestMIDIAccess) { fsay("This browser cannot do it. Open the page in Chrome or Edge."); return; }
+  try {
+    const r = await fetch(FLASH_META.pkg);
+    if (!r.ok) throw new Error(`${FLASH_META.pkg}: HTTP ${r.status}`);
+    const pkg = new Uint8Array(await r.arrayBuffer());
+    if (productOf(pkg) !== FLASH_META.product) { fsay("The file to install is damaged. Reload the page."); return; }
+    flashImage = logicalImage(pkg);
+    fsay(`FM1 Tonic ${FLASH_META.version}: ready.`);
+    $f("flash-go").disabled = false;
+  } catch (e) { fsay("Could not load the update file: " + e.message); }
+})();
+// Install asks first: the update deletes the presets. The dialog offers the backup right there.
+const sure = $f("sure");
+$f("flash-go").addEventListener("click", () => { if (sure.showModal) sure.showModal(); else if (confirm("Are you sure? The firmware update deletes your presets. If you use FM1 Tonic now, press Back Up my Projects first.")) flashInstall(); });
+$f("sure-cancel").addEventListener("click", () => sure.close());
+$f("sure-install").addEventListener("click", () => { sure.close(); flashInstall(); });
+$f("sure-backup").addEventListener("click", () => { sure.close(); document.getElementById("pbk-go").click(); });
+async function flashInstall() {
+  const go = $f("flash-go"), bar = $f("flash-bar");
+  go.disabled = true;
+  let midi;
+  try { midi = await navigator.requestMIDIAccess({ sysex: true }); }
+  catch (e) { fsay(FLASH_ERR.denied); go.disabled = false; return; }
+  flashWriting = true;
+  const pct = (w, a) => `${w} ${Math.round(bar.value)}%`;
+  try {
+    const up = new Updater(midi, flog);
+    const total = 74 + 1167;
+    const step = (k, a) => {
+      flog(`${k} ${a ?? ""}`);
+      if (k === "start") fsay("Starting.");
+      if (k === "verify") { bar.value = (a / total) * 100; fsay(pct("Verifying")); }
+      if (k === "loader") fsay("Switching to update mode.");
+      if (k === "write") { bar.value = ((74 + a) / total) * 100; fsay(pct("Writing")); }
+      if (k === "reboot") fsay("Restarting.");
+      if (k === "done") { bar.value = 100; fsay("Done. FM1 Tonic is on your FM-1."); }
+    };
+    const ota = await up.find((id) => /^ota-/i.test(id.model));
+    if (ota) {
+      ota.link.close();
+      fsay((await up.resume(flashImage, step)) ? "Done. FM1 Tonic is on your FM-1." : "Stopped. Replug the USB cable and press Install again.");
+    } else {
+      await up.install(flashImage, FLASH_META.product, step);
+    }
+  } catch (e) {
+    if (e && e.code && FLASH_ERR[e.code]) fsay(FLASH_ERR[e.code] + (e.code === "mismatch" ? (e.detail || "") : ""));
+    else fsay("Error: " + (e && e.message));
+    flog(String((e && e.stack) || e));
+  }
+  flashWriting = false;
+  go.disabled = !flashImage;
+}
+</script>
+<script type="module">
+const NS = "http://www.w3.org/2000/svg";
+const BTN = { FX: 0, SEL: 1, ENV: 2, LFO: 3, EDIT: 4, GLO: 5, HOME: 6, SAVE: 7, ARP: 8, SEQ: 9, PLAY: 10, REC: 11, "OCT-": 12, "OCT+": 13 };
+const ENC = { SELECT: 0, ALGORITHM: 1, PRESETS: 2, KNOB1: 3, KNOB2: 4, KNOB3: 5, KNOB4: 6 };
+const WHITE_K = [0, 2, 4, 6, 7, 9, 11, 12, 14, 16, 18, 19, 21, 23, 24, 26];
+const BLACK_K = [1, 3, 5, 8, 10, 13, 15, 17, 20, 22, 25];
+const BLACK_AFTER = [0, 1, 2, 4, 5, 7, 8, 9, 11, 12, 14];
+const BODY = "#1d1d1f", TRAY = "#141415", KNOB = "#2a2a2d", BTNC = "#2a2a2d", EDGE = "#3a3a3e", LABEL = "#d6d6d8";   // the FM1 Tonic webapp's panel colours
+const DOT = "'DotGothic16', monospace";
+const STORE_KEY = "x0x-emu-store", PREFS_KEY = "x0x-emu-prefs";
+// what each control does (the manual's panel drawing), for its description
+const DOES = { MASTER: "Volume.", SELECT: "Page (on SEQ and ARP: the track).", PRESETS: "Pattern.", ALGORITHM: "Second page (on SEQ and ARP: the step page).", KNOB: "One of the page's four values.",
+  "OCT-": "16 steps back.", "OCT+": "16 steps forward.", FX: "Mix, EQ, distort; again: sends.", SEL: "List all.", ENV: "Hold: accent.", LFO: "Mixer.",
+  EDIT: "Noise envelope.", GLO: "Mixer; again: settings.", HOME: "Mix 2; again: perform, global.", SAVE: "Save; hold: copy.", ARP: "Keyboard.", SEQ: "Steps.",
+  PLAY: "Play and stop.", REC: "Record." };
+const TRACKS = ["bass drum", "snare", "low tom", "mid tom", "high tom", "rimshot", "clap", "closed hat", "open hat", "crash", "ride"];
+const SPOKEN = { "OCT-": "OCT minus", "OCT+": "OCT plus" };
+
+const $ = (id) => document.getElementById(id);
+const prefs = (() => { try { return JSON.parse(localStorage.getItem(PREFS_KEY) || "{}"); } catch { return {}; } })();
+const savePrefs = () => { try { localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); } catch { /* private window */ } };
+
+const svg = $("panel");
+function el(tag, attrs, parent = svg) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  parent.appendChild(e);
+  return e;
+}
+function text(parent, x, y, s, size, fill = "#202020", weight = 700) {
+  const t = el("text", { x, y, "text-anchor": "middle", "font-family": "Arial, Helvetica, sans-serif", "font-size": size, "font-weight": weight,
+                         fill, class: "btn", "pointer-events": "none" }, parent);
+  t.textContent = s;
+  return t;
+}
+
+// ---------------------------------------------------------------- the panel (a picture: the controls are over it)
+// wip391: drawn like the manual's panel (docs/img/fm1-tonic-panel.svg): same grey body, same coloured buttons and keys
+// with their names, same labels. viewBox 1000 x 700.
+const defs = el("defs", {});
+const bg = el("linearGradient", { id: "bodyg", x1: 0, y1: 0, x2: 0, y2: 1 }, defs);   // the logo box grey
+el("stop", { offset: 0, "stop-color": "#cdcdcd" }, bg);
+el("stop", { offset: 1, "stop-color": "#a9a9a9" }, bg);
+const kg = el("radialGradient", { id: "knobg", cx: .4, cy: .35, r: .8 }, defs);          // the logo knob: white to grey
+el("stop", { offset: 0, "stop-color": "#ffffff" }, kg);
+el("stop", { offset: 1, "stop-color": "#b4b4b4" }, kg);
+el("rect", { x: 4, y: 4, width: 992, height: 692, rx: 40, fill: "url(#bodyg)", stroke: "#6a6a6a", "stroke-width": 2 });
+el("rect", { x: 50, y: 260, width: 220, height: 50, rx: 14, fill: TRAY });
+el("rect", { x: 556, y: 156, width: 416, height: 158, rx: 14, fill: TRAY });
+el("rect", { x: 292, y: 44, width: 256, height: 256, rx: 18, fill: "#0b0b0c" });
+const knobs = {};
+function knob(x, y, r, label, role, sub) {
+  const g = el("g", { class: "ctl knob" });
+  el("circle", { cx: x, cy: y, r, fill: "url(#knobg)", stroke: "#7a7a7a", "stroke-width": 2 }, g);
+  const ind = el("line", { x1: x, y1: y, x2: x, y2: y - r * 0.8, stroke: "#2146c8", "stroke-width": 5, "stroke-linecap": "round" }, g);   // the logo pointer: centre to edge, blue
+  text(g, x, y - r - 24, label.replace(/^KNOB(\d)$/, "KNOB $1"), 14, "#202020", 700);
+  text(g, x, y - r - 9, sub, 10.5, "#3a3a3a", 600);
+  const hitEl = el("circle", { cx: x, cy: y, r: r + 12, fill: "transparent" }, g);
+  knobs[label] = { g, ind, x, y, angle: 0, role, label, hitEl };
+  return knobs[label];
+}
+knob(105, 110, 24, "MASTER", "master", "VOLUME");
+knob(215, 110, 24, "SELECT", ENC.SELECT, "PAGE / TRACK");
+knob(105, 215, 24, "PRESETS", ENC.PRESETS, "PRESET (40)");
+knob(215, 215, 24, "ALGORITHM", ENC.ALGORITHM, "2nd PAGE / STEP PAGE");
+for (let i = 0; i < 4; i++) knob(610 + i * 104, 110, 22, `KNOB${i + 1}`, ENC[`KNOB${i + 1}`], `VALUE ${i + 1}`);
+
+const buttons = {};
+// a lit / dim control gets a white veil over its colour (.glow); text is drawn after it
+function glow(g, x, y, w, h, rx) { el("rect", { x, y, width: w, height: h, rx, fill: "#fff", class: "glow", "pointer-events": "none" }, g); }
+function button(x, y, w, h, label, face, lines, size = 11.5, sub = label, subSize = 9) {
+  const g = el("g", { class: "ctl" + (label === "REC" ? " rec" : "") });
+  el("rect", { x, y, width: w, height: h, rx: 9, fill: face[0], stroke: face[1], "stroke-width": 2, class: "btnface" }, g);
+  glow(g, x, y, w, h, 9);
+  const cx = x + w / 2;
+  if (lines.length === 2) { text(g, cx, y + 23, lines[0], size, "#fff"); text(g, cx, y + 37, lines[1], size, "#fff"); }
+  else text(g, cx, y + 31, lines[0], size, "#fff");
+  text(g, cx, y + 55, sub, subSize, "#d6dae2", 600);
+  buttons[label] = { g, bit: BTN[label], label };
+}
+const TEAL = ["#1d6b73", "#45b3bd"], BLUE = ["#2b4a8c", "#6f93e0"], PURPLE = ["#6a3a8c", "#b080d8"], GREYB = ["#4a4f5c", "#8a90a0"],
+      BROWN = ["#8a5a12", "#d9a040"], GREEN = ["#2a7d32", "#5cc464"], REDB = ["#a32a24", "#ff6a60"];
+const ROW1 = [["FX", TEAL, ["MIX /", "SENDS"]], ["SEL", BLUE, ["PITCH", "MOD"]], ["ENV", BLUE, ["OSCILLATOR"], 8.8],
+              ["LFO", BLUE, ["NOISE"]], ["EDIT", BLUE, ["NOISE", "ENV"]], ["GLO", PURPLE, ["MASTER /", "MIXER"], 10.4]];
+const ROW2 = [["HOME", TEAL, ["MIX 2 /", "PERFORM"]], ["SAVE", GREYB, ["SAVE"]], ["ARP", BROWN, ["KEYBOARD"], 9.6],
+              ["SEQ", BROWN, ["STEPS"]], ["PLAY", GREEN, ["PLAY /", "STOP"]], ["REC", REDB, ["RECORD"]]];
+ROW1.forEach(([n, f, l, sz], i) => button(562 + i * 68, 162, 64, 64, n, f, l, sz));
+ROW2.forEach(([n, f, l, sz], i) => button(562 + i * 68, 240, 64, 64, n, f, l, sz));
+for (const [n, x, top] of [["OCT-", 60, "NO / DOWN"], ["OCT+", 170, "YES / UP"]]) {      // the two small buttons: dark, two lines
+  const g = el("g", { class: "ctl" });
+  el("rect", { x, y: 268, width: 90, height: 34, rx: 8, fill: "#2a2a2d", stroke: "#5a5a60", "stroke-width": 1.5, class: "btnface" }, g);
+  glow(g, x, 268, 90, 34, 8);
+  text(g, x + 45, 283, top, 12.5, "#fff"); text(g, x + 45, 295, n, 9.5, "#d6dae2", 600);
+  buttons[n] = { g, bit: BTN[n], label: n };
+}
+// the colour key under the buttons
+const leg = el("g", { "font-family": "Arial, Helvetica, sans-serif", "font-size": 14, "font-weight": 700, fill: "#202020" });
+for (const [x, y, c, t] of [[292, 322, "#2b4a8c", "SOUND OF THE TRACK"], [540, 322, "#1d6b73", "MIX AND EFFECTS"], [292, 344, "#6a3a8c", "GLOBAL"], [540, 344, "#8a5a12", "SEQUENCER"]]) {   // wip515: a 2 x 2 block (PLAY's Clear pattern button takes the right side)
+  el("rect", { x, y, width: 14, height: 14, rx: 3, fill: c }, leg);
+  const t2 = el("text", { x: x + 20, y: y + 13 }, leg); t2.textContent = t;
+}
+
+const keys = [];
+// black keys: TRACK 1 to 8, ACCENT, FILL, FUNC (the manual's colours)
+const BKEY = [...Array(8).fill(["#3b82d6", "#8dbcf0"]), ["#1c3f9a", "#6f8fe0"], ["#e0b000", "#ffe066"], ["#c0281c", "#ff8a80"]];
+(function keybed(x0, y0, w, h) {
+  el("rect", { x: x0, y: y0, width: w, height: h, rx: 18, fill: TRAY });
+  const pitch = (w - 24) / 16, kw = pitch * 0.78, kh = h * 0.425, sw = Math.max(3, kw * 0.14);
+  const key = (x, y, cls, face) => {
+    const g = el("g", { class: "ctl" }), top = y - kh / 2;
+    el("rect", { x: x - kw / 2, y: top, width: kw, height: kh, rx: kw / 2, fill: face[0], stroke: face[1], "stroke-width": 1.5, class: "keyface " + cls }, g);
+    glow(g, x - kw / 2, top, kw, kh, kw / 2);
+    return g;
+  };
+  for (let i = 0; i < 16; i++) {
+    const x = x0 + 12 + (i + 0.5) * pitch, g = key(x, y0 + h * 0.75, "white", ["#2c2c30", "#4a4a4e"]), top = y0 + h * 0.75 - kh / 2;
+    el("rect", { x: x - sw / 2, y: top + kw * 0.4, width: sw, height: kh - kw * 0.8, rx: sw / 2, class: "slit" }, g);   // the LED: a slit of light
+    text(svg, x, y0 + h + 12.4, String(i + 1), 15, "#202020", 700);
+    keys[WHITE_K[i]] = { g, label: `White key ${i + 1}`, does: `Step ${i + 1} (on HOME, pattern ${i + 1}).` };
+  }
+  BLACK_AFTER.forEach((a, k) => {
+    const x = x0 + 12 + (a + 1) * pitch, y = y0 + h * 0.25, g = key(x, y, "black", BKEY[k]);
+    if (k < 8) { text(g, x, y - 18, "TRACK", 10.5, "#fff"); text(g, x, y + 10, String(k + 1), 32, "#fff"); }
+    else if (k === 8) text(g, x, y + 2, "ACCENT", 9.2, "#fff");
+    else text(g, x, y + 2, k === 9 ? "FILL" : "FUNC", 12.5, k === 9 ? "#202020" : "#fff");
+    keys[BLACK_K[k]] = { g, label: `Black key ${k + 1}`, does: `Drum track ${k + 1}, ${TRACKS[k]}; on the break, slice ${k + 1}.` };
+  });
+})(36, 372, 928, 256);
+text(svg, 500, 680, "WHITE KEYS 1 TO 16 = STEPS 1 TO 16      FUNC + WHITE KEY = PATTERN 1 TO 16", 13, "#3a3a3a", 700);
+
+// ---------------------------------------------------------------- the controls
+// The drawing is only a picture (pointer-events: none). Each control gets an invisible HTML control over it, in
+// reading order: a knob a slider (MASTER) or a button you turn (the endless ones), a button or key a <button>.
+// Browsers (iOS Safari above all) honour touch-action and touchstart on HTML elements but not on SVG ones, so
+// the controls keep their touches while a finger anywhere else on the device scrolls the page natively.
+const device = $("device"), controls = $("controls"), descs = $("descs");
+const HOW = {
+  enc: "Endless knob: turn it with the arrow keys, faster with Page Up and Page Down.",
+  btn: "Space or Enter presses it for as long as you hold the key. Shift+Space keeps it held down until you press it again.",
+  key: "Space or Enter presses it for as long as you hold the key.",
+};
+for (const [id, t] of Object.entries(HOW)) { const d = document.createElement("span"); d.id = "how-" + id; d.textContent = t; descs.append(d); }
+let nDesc = 0;
+function hit(c, kind, name, does) {
+  const b = (c.hitEl || c.g).getBBox(), d = document.createElement(kind === "knob" ? "div" : "button");
+  d.className = "hit" + (kind === "knob" ? " knob" : "");
+  Object.assign(d.style, { left: `${b.x / 10}%`, top: `${b.y / 7}%`, width: `${b.width / 10}%`, height: `${b.height / 7}%` });
+  if (kind !== "knob") d.type = "button";
+  const own = document.createElement("span");
+  own.id = `does-${nDesc++}`;
+  own.textContent = does;
+  descs.append(own);
+  d.setAttribute("aria-label", name);
+  if (kind === "knob" && c.role === "master") {
+    Object.assign(d, { tabIndex: 0 });
+    d.setAttribute("role", "slider");
+    d.setAttribute("aria-valuemin", "0");
+    d.setAttribute("aria-valuemax", "100");
+    d.setAttribute("aria-describedby", own.id);
+  } else if (kind === "knob") {
+    d.tabIndex = 0;
+    d.setAttribute("role", "button");
+    d.setAttribute("aria-describedby", `${own.id} how-enc`);
+  } else {
+    d.setAttribute("aria-describedby", `${own.id} how-${kind}`);
+  }
+  d.addEventListener("touchstart", (e) => e.preventDefault(), { passive: false });
+  controls.append(d);
+  c.hit = d;
+  c.name = name;
+}
+for (const n of ["MASTER", "SELECT", "PRESETS", "ALGORITHM"]) hit(knobs[n], "knob", n, DOES[n]);
+for (const n of ["OCT-", "OCT+"]) hit(buttons[n], "btn", SPOKEN[n], DOES[n]);
+for (let i = 1; i <= 4; i++) hit(knobs[`KNOB${i}`], "knob", `KNOB ${i}`, DOES.KNOB);
+for (const n of [...ROW1, ...ROW2].map((r) => r[0])) hit(buttons[n], "btn", n, DOES[n]);
+for (const k of BLACK_K) hit(keys[k], "key", keys[k].label, keys[k].does);
+for (const k of WHITE_K) hit(keys[k], "key", keys[k].label, keys[k].does);
+
+// a control's name says its light: "PLAY, lit", "White key 5, dim"; a latched button "held down"
+function nameOf(c) { return c.name + (c.lit === 2 ? ", lit" : c.lit === 1 ? ", dim" : "") + (c.latched ? ", held down" : ""); }
+function setState(c, lit, latched = false) {
+  if (c.lit === lit && !!c.latched === latched) return;
+  c.lit = lit;
+  c.latched = latched;
+  c.hit.setAttribute("aria-label", nameOf(c));
+}
+
+// ---------------------------------------------------------------- state and input
+let ac0 = null, node = null, gain = null, btnMask = 0, keyMask = 0, latched = 0, latchedKeys = 0, master = 2800;
+const btnHeldBy = new Map(), keyHeldBy = new Map();      // pointer / key id -> bit
+let pendingTnp = null;   // wip520: a pasted preset waiting for the emulator to be switched on
+function send(m) { if (node) node.port.postMessage(m); }
+let litButtons = 0;
+let clrSeen = false;
+function syncButtons() {
+  let m = latched;
+  for (const b of btnHeldBy.values()) m |= 1 << b;
+  if (m !== btnMask) { btnMask = m; send({ type: "buttons", mask: m }); }
+  if (!clrSeen && (m & (1 << BTN.PLAY))) { clrSeen = true; const c = $("clrpat"); if (c) { c.classList.add("on", "blink"); } }   // wip515: first PLAY press shows Clear pattern
+  for (const b of Object.values(buttons)) {
+    b.g.classList.toggle("held", !!(m & (1 << b.bit)));
+    b.g.classList.toggle("latched", !!(latched & (1 << b.bit)));
+    b.hit.classList.toggle("latched", !!(latched & (1 << b.bit)));
+    setState(b, litButtons & (1 << b.bit) ? 2 : 0, !!(latched & (1 << b.bit)));
+  }
+}
+function syncKeys() {
+  let m = latchedKeys;
+  for (const k of keyHeldBy.values()) m |= 1 << k;
+  if (m !== keyMask) { keyMask = m; send({ type: "keys", mask: m }); }
+  keys.forEach((k, i) => k.g.classList.toggle("held", !!(m & (1 << i))));
+}
+// a press from a screen reader or a click without a pointer (no keydown, no pointerdown): a short tap
+function tap(map, id, bit, sync) {
+  map.set(id, bit);
+  sync();
+  setTimeout(() => { map.delete(id); sync(); }, 120);
+}
+const pointerAt = { t: -1e9 }, keyAt = { t: -1e9 };
+
+for (const b of Object.values(buttons)) {
+  b.hit.addEventListener("contextmenu", (e) => e.preventDefault());
+  b.hit.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    b.hit.focus({ preventScroll: true });
+    pointerAt.t = performance.now();
+    shiftCancel();
+    if (e.shiftKey || e.button === 2) { latched ^= 1 << b.bit; syncButtons(); return; }
+    if (latched & (1 << b.bit)) { latched &= ~(1 << b.bit); syncButtons(); return; }
+    b.hit.setPointerCapture(e.pointerId);
+    btnHeldBy.set("p" + e.pointerId, b.bit);
+    syncButtons();
+  });
+  b.hit.addEventListener("click", () => {
+    const now = performance.now();
+    if (now - pointerAt.t < 800 || now - keyAt.t < 800) return;
+    if (latched & (1 << b.bit)) { latched &= ~(1 << b.bit); syncButtons(); return; }
+    tap(btnHeldBy, "c" + b.bit, b.bit, syncButtons);
+  });
+}
+keys.forEach((k, i) => {
+  k.hit.addEventListener("contextmenu", (e) => e.preventDefault());
+  k.hit.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    k.hit.focus({ preventScroll: true });
+    pointerAt.t = performance.now();
+    if (e.shiftKey || e.button === 2) { latchedKeys ^= 1 << i; syncKeys(); return; }   // Shift-click: held until pressed again
+    if (latchedKeys & (1 << i)) { latchedKeys &= ~(1 << i); syncKeys(); return; }
+    k.hit.setPointerCapture(e.pointerId);
+    keyHeldBy.set("p" + e.pointerId, i);
+    syncKeys();
+  });
+  k.hit.addEventListener("click", () => {
+    const now = performance.now();
+    if (now - pointerAt.t < 800 || now - keyAt.t < 800) return;
+    if (latchedKeys & (1 << i)) { latchedKeys &= ~(1 << i); syncKeys(); return; }
+    tap(keyHeldBy, "c" + i, i, syncKeys);
+  });
+});
+// wip521: Clear pattern (WEB ONLY): one press clears the playing pattern at once, no question, and song mode goes off, so the
+// panel stays on the empty pattern (the wasm export web_clear_pattern, through the worklet). The device itself still asks (FUNC + PLAY).
+(function clearPatternButton() {
+  const b = $("clrpat"); if (!b) return;
+  let back = 0;
+  b.addEventListener("click", () => {
+    b.classList.remove("blink");
+    send({ type: "clearpat" });
+    b.textContent = "Pattern cleared";
+    clearTimeout(back); back = setTimeout(() => { b.textContent = "Clear pattern"; }, 1800);
+  });
+})();
+
+function pointerUp(e) {
+  const id = "p" + e.pointerId;
+  if (btnHeldBy.delete(id)) syncButtons();
+  if (keyHeldBy.delete(id)) syncKeys();
+}
+device.addEventListener("pointerup", pointerUp);
+device.addEventListener("pointercancel", pointerUp);
+device.addEventListener("lostpointercapture", pointerUp);
+device.addEventListener("pointerdown", (e) => { if (e.target === device || e.target === controls) device.focus({ preventScroll: true }); });
+
+function drawKnob(k) {
+  k.ind.setAttribute("transform", `rotate(${k.angle} ${k.x} ${k.y})`);
+}
+function masterValue(k) {
+  const pct = Math.round(master * 100 / 4096);
+  k.hit.setAttribute("aria-valuenow", String(pct));
+  k.hit.setAttribute("aria-valuetext", `${pct} percent`);
+}
+function turn(k, n) {
+  if (!n) return;
+  if (k.role === "master") {
+    master = Math.max(0, Math.min(4096, master + n * 64));
+    k.angle = -135 + 270 * master / 4096;
+    masterValue(k);
+    send({ type: "master", value: master });
+  } else {
+    k.angle = (k.angle + n * 18) % 360;
+    send({ type: "enc", role: k.role, n });
+  }
+  drawKnob(k);
+}
+for (const k of Object.values(knobs)) {
+  if (k.role === "master") { k.angle = -135 + 270 * master / 4096; drawKnob(k); masterValue(k); }
+  // wip448b: in the turned full screen (upright phone) panel-up is screen-right
+  const dragPos = (e) => (document.querySelector(".devicebox.app") && matchMedia("(orientation: portrait)").matches ? -e.clientX : e.clientY);
+  let drag = null, wheel = 0;
+  k.hit.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    k.hit.focus({ preventScroll: true });
+    k.hit.setPointerCapture(e.pointerId);
+    drag = { y: dragPos(e), acc: 0 };
+  });
+  k.hit.addEventListener("pointermove", (e) => {
+    if (!drag) return;
+    drag.acc += drag.y - dragPos(e);
+    drag.y = dragPos(e);
+    const step = k.role === "master" ? 3 : 7;
+    const n = Math.trunc(drag.acc / step);
+    if (n) { drag.acc -= n * step; turn(k, n); }
+  });
+  const end = () => { drag = null; };
+  k.hit.addEventListener("pointerup", end);
+  k.hit.addEventListener("pointercancel", end);
+  k.hit.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    const dy = e.deltaMode === 1 ? e.deltaY * 33 : e.deltaY;
+    if (Math.abs(dy) >= 50) { turn(k, dy < 0 ? 1 : -1); wheel = 0; return; }   // a mouse wheel notch: one detent
+    wheel -= dy;                                                                   // a trackpad: by distance
+    const n = Math.trunc(wheel / 25);
+    if (n) { wheel -= n * 25; turn(k, n); }
+  }, { passive: false });
+  k.hit.addEventListener("keydown", (e) => {
+    const n = { ArrowUp: 1, ArrowRight: 1, ArrowDown: -1, ArrowLeft: -1, PageUp: 8, PageDown: -8 }[e.key] ??
+              (k.role === "master" ? { Home: -64, End: 64 }[e.key] : undefined);
+    if (n === undefined) return;
+    turn(k, n);
+    e.preventDefault();
+    e.stopPropagation();
+  });
+}
+
+// keyboard: a focused button or key is pressed with Space or Enter; the playing shortcuts work only while the FM-1
+// (the panel) has focus, and can be turned off. Shift is SEL, but only once something else is pressed with it or
+// after a moment: Shift+Tab moves back without pressing SEL.
+const KEYMAP = {};
+"qwertyui".split("").forEach((c, i) => KEYMAP["Key" + c.toUpperCase()] = { key: WHITE_K[i] });
+"asdfghjk".split("").forEach((c, i) => KEYMAP["Key" + c.toUpperCase()] = { key: WHITE_K[8 + i] });
+"1234567890".split("").forEach((c, i) => KEYMAP["Digit" + c] = { key: BLACK_K[i] });
+KEYMAP.Minus = { key: BLACK_K[10] };
+Object.assign(KEYMAP, { Space: { btn: BTN.PLAY }, Enter: { btn: BTN.REC }, Escape: { btn: BTN.HOME }, KeyZ: { btn: BTN["OCT-"] }, KeyX: { btn: BTN["OCT+"] },
+  KeyC: { btn: BTN.SEL }, KeyV: { btn: BTN.FX }, KeyB: { btn: BTN.ENV }, KeyN: { btn: BTN.LFO }, KeyM: { btn: BTN.EDIT },
+  Comma: { btn: BTN.GLO }, Period: { btn: BTN.SAVE }, Slash: { btn: BTN.SEQ } });
+const shortcuts = $("shortcuts");
+if (prefs.shortcuts === false) shortcuts.checked = false;
+shortcuts.addEventListener("change", () => { prefs.shortcuts = shortcuts.checked; savePrefs(); });
+const inPanel = () => device.contains(document.activeElement);
+let shift = null;                                  // {code, timer, down}
+function shiftCommit() {
+  if (!shift || shift.down) return;
+  clearTimeout(shift.timer);
+  shift.down = true;
+  btnHeldBy.set("k" + shift.code, BTN.SEL);
+  syncButtons();
+}
+function shiftCancel() {
+  if (!shift) return;
+  clearTimeout(shift.timer);
+  if (shift.down && btnHeldBy.delete("k" + shift.code)) syncButtons();
+  shift = null;
+}
+function controlOf(t) {
+  for (const b of Object.values(buttons)) if (b.hit === t) return { btn: b.bit };
+  const i = keys.findIndex((k) => k && k.hit === t);
+  return i >= 0 ? { key: i } : null;
+}
+addEventListener("keydown", (e) => {
+  if (!node || e.metaKey || e.ctrlKey || e.altKey || !inPanel()) return;
+  if (e.key === "Tab") { shiftCancel(); return; }
+  const own = (e.code === "Space" || e.code === "Enter" || e.code === "NumpadEnter") ? controlOf(e.target) : null;
+  if (own) {                                       // the focused button or key
+    e.preventDefault();
+    keyAt.t = performance.now();
+    if (e.repeat) return;
+    if (e.shiftKey) {                                // Shift+Space: held down until pressed again
+      if (own.btn !== undefined) latched ^= 1 << own.btn; else latchedKeys ^= 1 << own.key;
+      syncButtons(); syncKeys();
+      return;
+    }
+    shiftCommit();
+    downAt.set("k" + e.code, performance.now());
+    if (own.key !== undefined) { keyHeldBy.set("k" + e.code, own.key); syncKeys(); }
+    else if (latched & (1 << own.btn)) { latched &= ~(1 << own.btn); syncButtons(); }
+    else { btnHeldBy.set("k" + e.code, own.btn); syncButtons(); }
+    return;
+  }
+  if (!shortcuts.checked) return;
+  if (e.code === "ShiftLeft" || e.code === "ShiftRight") return;   // Shift is not a button: it holds down what is pressed with it
+  if (e.code === "ArrowUp" || e.code === "ArrowDown") { shiftCommit(); turn(knobs.SELECT, e.code === "ArrowUp" ? 1 : -1); e.preventDefault(); return; }
+  const m = KEYMAP[e.code];
+  if (!m) return;
+  e.preventDefault();
+  if (e.repeat) return;
+  if (e.shiftKey) {                                 // Shift + a shortcut: held down until pressed again with Shift
+    if (m.key !== undefined) { latchedKeys ^= 1 << m.key; syncKeys(); }
+    else { latched ^= 1 << m.btn; syncButtons(); }
+    return;
+  }
+  if (m.key !== undefined && (latchedKeys & (1 << m.key))) { latchedKeys &= ~(1 << m.key); syncKeys(); return; }
+  if (m.btn !== undefined && (latched & (1 << m.btn))) { latched &= ~(1 << m.btn); syncButtons(); return; }
+  shiftCommit();
+  downAt.set("k" + e.code, performance.now());
+  if (m.key !== undefined) { keyHeldBy.set("k" + e.code, m.key); syncKeys(); }
+  else { btnHeldBy.set("k" + e.code, m.btn); syncButtons(); }
+});
+// a key let go at once (a screen reader's, or a fast typist's) is still held for 60 ms: the device reads its
+// inputs between audio blocks, and a press shorter than that would go unseen
+const downAt = new Map();
+function letGo(id) {
+  const wait = Math.max(0, 60 - (performance.now() - (downAt.get(id) || 0)));
+  downAt.delete(id);
+  setTimeout(() => {
+    if (keyHeldBy.delete(id)) syncKeys();
+    if (btnHeldBy.delete(id)) syncButtons();
+  }, wait);
+}
+addEventListener("keyup", (e) => {
+  if (shift && e.code === shift.code) {
+    if (!shift.down) {                              // Shift on its own, quickly: a SEL press
+      clearTimeout(shift.timer);
+      shift = null;
+      tap(btnHeldBy, "kshift", BTN.SEL, syncButtons);
+    } else shiftCancel();
+    return;
+  }
+  if (keyHeldBy.has("k" + e.code) || btnHeldBy.has("k" + e.code)) letGo("k" + e.code);
+  if (e.code === "Space" && controlOf(e.target)) e.preventDefault();
+});
+function letGoKeys() {
+  if (shift) { clearTimeout(shift.timer); shift = null; }
+  for (const id of [...btnHeldBy.keys()]) if (id[0] === "k") btnHeldBy.delete(id);
+  for (const id of [...keyHeldBy.keys()]) if (id[0] === "k") keyHeldBy.delete(id);
+  syncButtons(); syncKeys();
+}
+addEventListener("blur", letGoKeys);
+device.addEventListener("focusout", (e) => { if (!device.contains(e.relatedTarget)) letGoKeys(); });
+
+// ---------------------------------------------------------------- screen and lights
+const ctx = $("screen").getContext("2d");
+const img = ctx.createImageData(240, 240);
+function drawScreen(fb) {
+  const d = img.data;
+  for (let i = 0; i < 240 * 240; i++) {
+    const v = fb[i], p = ((v >> 8) | (v << 8)) & 0xFFFF;
+    d[i * 4] = ((p >> 11) & 31) * 255 / 31;
+    d[i * 4 + 1] = ((p >> 5) & 63) * 255 / 63;
+    d[i * 4 + 2] = (p & 31) * 255 / 31;
+    d[i * 4 + 3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+}
+function drawLights(b, k, d = 0) {
+  litButtons = b;
+  for (const x of Object.values(buttons)) {
+    x.g.classList.toggle("lit", !!(b & (1 << x.bit)));
+    setState(x, b & (1 << x.bit) ? 2 : 0, !!(latched & (1 << x.bit)));
+  }
+  keys.forEach((x, i) => {
+    const lit = !!(k & (1 << i)), dim = !lit && !!(d & (1 << i));
+    x.g.classList.toggle("lit", lit);
+    x.g.classList.toggle("dim", dim);
+    setState(x, lit ? 2 : dim ? 1 : 0);
+  });
+}
+
+// ---------------------------------------------------------------- storage
+function loadStore() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(STORE_KEY) || "{}"), out = {};
+    for (const [o, b64] of Object.entries(raw)) out[o] = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)).buffer;
+    return out;
+  } catch { return {}; }
+}
+function saveStore(store) {
+  try {
+    const raw = {};
+    for (const [o, u8] of Object.entries(store)) { let s = ""; for (const c of u8) s += String.fromCharCode(c); raw[o] = btoa(s); }
+    localStorage.setItem(STORE_KEY, JSON.stringify(raw));
+  } catch { /* storage unavailable: this session only */ }
+}
+
+// ---------------------------------------------------------------- switching on
+const status = $("status"), cpu = $("cpu");
+let muted = false;
+$("mute").addEventListener("click", () => {
+  muted = !muted;
+  $("mute").setAttribute("aria-pressed", String(muted));
+  if (gain) gain.gain.value = muted ? 0 : 1;
+});
+async function switchOn() {
+  const go = $("go");
+  go.disabled = true;
+  go.textContent = "Starting...";
+  $("alert").textContent = "";
+  try {
+    const ac = ac0 = new AudioContext({ sampleRate: 44100, latencyHint: "interactive" });
+    const [wasm] = await Promise.all([fetch("x0x.wasm").then((r) => { if (!r.ok) throw new Error(`x0x.wasm: ${r.status}`); return r.arrayBuffer(); }),
+                                      ac.audioWorklet.addModule("worklet.js")]);
+    node = new AudioWorkletNode(ac, "x0x", { numberOfInputs: 0, numberOfOutputs: 1, outputChannelCount: [2] });
+    gain = ac.createGain();
+    gain.gain.value = muted ? 0 : 1;
+    node.connect(gain).connect(ac.destination);
+    const ready = new Promise((res) => {
+      node.port.onmessage = (e) => {
+        const m = e.data;
+        if (m.type === "ready") { res(); if (pendingTnp) { send({ type: "preset", bytes: pendingTnp }); } }
+        else if (m.type === "preset") { const st = $("pb-status"); if (st && !prsBusy) st.textContent = m.rc === 0 ? "It is in the panel: play it. SEND TO FM1 TONIC puts it on your FM-1." : "The panel could not load it (code " + m.rc + "), but SEND TO FM1 TONIC still works."; }
+        else if (m.type === "hits") saveHits(m.voices);
+        else if (m.type === "frame") {
+          if (m.fb) drawScreen(m.fb);
+          drawLights(m.buttons, m.keys, m.dim);
+          window.x0xLast = m;
+          if (m.load !== undefined) cpu.textContent = `FM1 Tonic uses ${m.load}% of this computer's time`;
+          if (m.store) saveStore(m.store);
+        }
+      };
+    });
+    node.port.postMessage({ type: "load", wasm, store: loadStore(), master }, [wasm]);
+    await ready;
+    $("wavs").disabled = false;
+    await ac.resume();
+    $("start").hidden = true;
+    controls.inert = false;
+    device.focus({ preventScroll: true });          // the Switch on button is gone: the FM-1 has the focus
+    status.textContent = ac.sampleRate === 44100 ? "On." : `On (the browser runs audio at ${ac.sampleRate} Hz).`;
+    syncButtons(); syncKeys();
+  } catch (err) {
+    go.disabled = false;
+    go.textContent = "Switch on";
+    $("alert").textContent = "Could not start: " + (err && err.message || err) + ". Chrome, Edge, Firefox and Safari should all work.";
+  }
+}
+// Download the 8 voices: the device renders one dry hit of each voice from a copy of the sound playing now
+// (worklet "hits"); here the pieces become 16-bit stereo 44.1 kHz WAV files in one stored (uncompressed) zip.
+const CRC = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+function crc32(b) { let c = 0xFFFFFFFF; for (let i = 0; i < b.length; i++) c = CRC[(c ^ b[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+function wavBytes(pcm) {                            // pcm: interleaved Int16 stereo; the silent tail is cut (50 ms kept)
+  let n = pcm.length / 2;
+  while (n > 1 && pcm[2 * n - 2] === 0 && pcm[2 * n - 1] === 0) n--;
+  n = Math.min(pcm.length / 2, n + 2205);
+  const out = new Uint8Array(44 + n * 4), dv = new DataView(out.buffer);
+  const tag = (o, t) => { for (let i = 0; i < 4; i++) out[o + i] = t.charCodeAt(i); };
+  tag(0, "RIFF"); dv.setUint32(4, 36 + n * 4, true); tag(8, "WAVE"); tag(12, "fmt "); dv.setUint32(16, 16, true);
+  dv.setUint16(20, 1, true); dv.setUint16(22, 2, true); dv.setUint32(24, 44100, true); dv.setUint32(28, 44100 * 4, true);
+  dv.setUint16(32, 4, true); dv.setUint16(34, 16, true); tag(36, "data"); dv.setUint32(40, n * 4, true);
+  for (let i = 0; i < n * 2; i++) dv.setInt16(44 + 2 * i, pcm[i], true);
+  return out;
+}
+function zipStored(files) {                         // files: [{name, data: Uint8Array}]
+  const enc = new TextEncoder(), parts = [], central = [];
+  let off = 0;
+  for (const f of files) {
+    const nm = enc.encode(f.name), crc = crc32(f.data);
+    const lh = new DataView(new ArrayBuffer(30));
+    lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true);
+    lh.setUint32(14, crc, true); lh.setUint32(18, f.data.length, true); lh.setUint32(22, f.data.length, true); lh.setUint16(26, nm.length, true);
+    parts.push(new Uint8Array(lh.buffer), nm, f.data);
+    const ch = new DataView(new ArrayBuffer(46));
+    ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true);
+    ch.setUint32(16, crc, true); ch.setUint32(20, f.data.length, true); ch.setUint32(24, f.data.length, true);
+    ch.setUint16(28, nm.length, true); ch.setUint32(42, off, true);
+    central.push(new Uint8Array(ch.buffer), nm);
+    off += 30 + nm.length + f.data.length;
+  }
+  const csize = central.reduce((a, b) => a + b.length, 0), end = new DataView(new ArrayBuffer(22));
+  end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true);
+  end.setUint32(12, csize, true); end.setUint32(16, off, true);
+  return new Blob([...parts, ...central, new Uint8Array(end.buffer)], { type: "application/zip" });
+}
+function saveHits(voices) {
+  const files = voices.map((pcm, v) => ({ name: `fm1-tonic-voice-${v + 1}.wav`, data: wavBytes(pcm) }));
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(zipStored(files));
+  a.download = "fm1-tonic-8-voices.zip";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+  $("wavs").disabled = false;
+  status.textContent = "Downloaded fm1-tonic-8-voices.zip: one hit of each voice.";
+}
+$("wavs").addEventListener("click", () => { $("wavs").disabled = true; send({ type: "hits" }); });
+// Receive the project from the FM-1 (PB, from the classic script above): its backup image holds the objects as the
+// firmware stored them (format word first), the same bytes this page keeps as its saved objects. They replace the
+// project kept in this browser (not OBJ_PANEL, which the image does not carry), then the page restarts, so the
+// firmware here boots from them.
+const RNOTE_KEY = "x0x-emu-note";
+try { const n = sessionStorage.getItem(RNOTE_KEY); if (n) { sessionStorage.removeItem(RNOTE_KEY); $("recv-status").textContent = n; } } catch {}
+let recvBusy = false;
+window.addEventListener("beforeunload", (e) => { if (recvBusy) { e.preventDefault(); e.returnValue = ""; } });
+$("recv-go").addEventListener("click", async () => {
+  if (recvBusy) return;
+  const st = $("recv-status"), bar = $("recv-bar"), btn = $("recv-go");
+  recvBusy = true; btn.disabled = true;
+  let dev = null;
+  try {
+    if (!navigator.requestMIDIAccess) throw new Error("This browser cannot do it. Open the page in Chrome or Edge.");
+    let access;
+    try { access = await navigator.requestMIDIAccess({ sysex: true }); }
+    catch { throw new Error("MIDI with SysEx was not allowed. Allow MIDI in the site settings (the address bar), then try again."); }
+    st.textContent = "Looking for FM1 Tonic on the FM-1.";
+    dev = await PB.find(access, (i, o) => new Link(i, o));
+    st.textContent = "Receiving the project from the FM-1.";
+    bar.hidden = false; bar.removeAttribute("value");
+    const { image, flags } = await PB.backup(dev.link, (n) => { st.textContent = `Receiving the project: ${n.toLocaleString("en")} bytes.`; });
+    const { objs } = PB.parse(image);
+    const store = {};
+    for (const [o, buf] of Object.entries(loadStore())) store[o] = new Uint8Array(buf);       // (what the image does not carry stays)
+    for (const { obj, data } of objs) { if (data.length) store[obj] = data.slice(); else delete store[obj]; }
+    if (ac0) { try { await ac0.close(); } catch {} }                                           // no write from the running device over it
+    saveStore(store);
+    try {
+      sessionStorage.setItem(RNOTE_KEY, "Received the project from the FM-1" + (flags & 1 ? " (it was playing: changes not saved yet on the FM-1 are not in it)" : "") + ". Press Switch on to play it.");
+    } catch {}
+    location.reload();
+  } catch (e) {
+    st.textContent = (e && e.message) || String(e);
+    bar.hidden = true;
+  } finally {
+    if (dev) dev.link.close();
+    recvBusy = false; btn.disabled = false;
+  }
+});
+// Back up my projects: the used places 1-30 from the FM-1 (PB.presets) into one stored zip, NN_name.tnp each.
+let pbkBusy = false, pbkDone = false, prsBusy = false;
+window.addEventListener("beforeunload", (e) => { if (pbkBusy) { e.preventDefault(); e.returnValue = ""; } });
+$("pbk-go").addEventListener("click", async () => {
+  if (pbkBusy || recvBusy) return;
+  const st = $("pbk-status"), bar = $("pbk-bar"), btn = $("pbk-go");
+  pbkBusy = true; btn.disabled = true;
+  let dev = null;
+  try {
+    if (!navigator.requestMIDIAccess) throw new Error("This browser cannot do it. Open the page in Chrome or Edge.");
+    let access;
+    try { access = await navigator.requestMIDIAccess({ sysex: true }); }
+    catch { throw new Error("MIDI with SysEx was not allowed. Allow MIDI in the site settings (the address bar), then try again."); }
+    st.textContent = "Looking for FM1 Tonic on the FM-1.";
+    dev = await PB.find(access, (i, o) => new Link(i, o));
+    bar.hidden = false; bar.removeAttribute("value");
+    st.textContent = "Asking the FM-1 which slots hold a preset.";
+    const list = await PB.presets(dev.link, (n, total) => {
+      st.textContent = total ? `Receiving presets: ${n} of ${total}.` : "";
+      if (total) { bar.max = total; bar.value = n; }
+    });
+    if (!list.length) { st.textContent = "No presets saved in places 1-30 on this FM-1: nothing to back up."; return; }
+    const files = PB.presetBackupFiles(list);
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(zipStored(files));
+    a.download = "fm1-tonic-presets.zip";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+    pbkDone = true;
+    $("clr-go").disabled = false; $("clr-status").textContent = "A backup was downloaded: Clear all places is on. Check the zip first.";
+    st.textContent = `Downloaded fm1-tonic-presets.zip: ${list.length} preset${list.length === 1 ? "" : "s"} (places ${list.map((p) => p.number).join(", ")}), ${list.filter((p) => p.ext).length} with song and notes inside.`;
+  } catch (e) {
+    st.textContent = (e && e.message) || String(e);
+  } finally {
+    bar.hidden = true;
+    if (dev) dev.link.close();
+    pbkBusy = false; btn.disabled = false;
+  }
+});
+// Export my presets as .mtpreset (wip323): the used places 1-30 from the FM-1 (PB.presets / PB.presetGet), each turned into a .mtpreset
+// (PB.tnpToMtpreset) and saved as NN_name.mtpreset: all in one stored zip, or one slot as one file.
+(() => {
+  const sel = $("xmt-slot");
+  for (let n = 1; n <= 30; n++) sel.add(new Option(String(n).padStart(2, "0"), String(n)));
+  let busy = false;
+  function save(blob, name) {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+  }
+  const fileOf = (number, name) => `${String(number).padStart(2, "0")}_${name}.mtpreset`;
+  const textOf = (blob) => new TextEncoder().encode(PB.tnpToMtpreset(blob));
+  async function run(all) {
+    if (busy || pbkBusy || recvBusy || prsBusy) return;
+    const st = $("xmt-status"), bar = $("xmt-bar");
+    busy = true; $("xmt-all").disabled = $("xmt-one").disabled = true;
+    let dev = null;
+    try {
+      const slot = PB.slotOf(+sel.value);
+      const dev0 = await connectFm1(st); dev = dev0;
+      bar.hidden = false; bar.removeAttribute("value");
+      if (all) {
+        st.textContent = "Asking the FM-1 which places hold a preset.";
+        const list = await PB.presets(dev.link, (n, total) => {
+          st.textContent = total ? `Receiving presets: ${n} of ${total}.` : "";
+          if (total) { bar.max = total; bar.value = n; }
+        });
+        if (!list.length) { st.textContent = "No presets saved in places 1-30 on this FM-1: nothing to export."; return; }
+        const files = [], skipped = [];
+        for (const p of list) {
+          try { files.push({ name: fileOf(p.number, p.name), data: textOf(p.blob) }); }
+          catch (e) { skipped.push(`${p.number} (${(e && e.message) || e})`); }
+        }
+        if (!files.length) { st.textContent = "None of the presets could be converted: " + skipped.join("; ") + "."; return; }
+        save(zipStored(files), "fm1-tonic-mtpresets.zip");
+        st.textContent = `Downloaded fm1-tonic-mtpresets.zip: ${files.length} preset${files.length === 1 ? "" : "s"}.` +
+          (skipped.length ? ` Not converted: ${skipped.join("; ")}.` : "");
+      } else {
+        st.textContent = `Receiving place ${PB.placeNo(slot)}.`;
+        const blob = await PB.presetGet(dev.link, slot);
+        const name = fileOf(PB.placeNo(slot), PB.presetName(blob));
+        save(new Blob([textOf(blob)], { type: "text/plain" }), name);
+        st.textContent = `Downloaded ${name}.`;
+      }
+    } catch (e) {
+      st.textContent = (e && e.message) || String(e);
+    } finally {
+      bar.hidden = true;
+      if (dev) dev.link.close();
+      busy = false; $("xmt-all").disabled = $("xmt-one").disabled = false;
+    }
+  }
+  $("xmt-all").addEventListener("click", () => run(true));
+  $("xmt-one").addEventListener("click", () => run(false));
+})();
+// Restore my projects: a zip (or one .tnp) -> the slots named in the file names (PB.presetFiles), each put to the FM-1
+// (PB.presetPut), then the FM-1's list checked. Clear all places: only after a backup was downloaded on this page.
+let prsItems = [];
+async function connectFm1(st) {
+  if (!navigator.requestMIDIAccess) throw new Error("This browser cannot do it. Open the page in Chrome or Edge.");
+  let access;
+  try { access = await navigator.requestMIDIAccess({ sysex: true }); }
+  catch { throw new Error("MIDI with SysEx was not allowed. Allow MIDI in the site settings (the address bar), then try again."); }
+  st.textContent = "Looking for FM1 Tonic on the FM-1.";
+  return PB.find(access, (i, o) => new Link(i, o));
+}
+
+function prsRender() {                          // one row per preset: its name, notes and a place menu (first empty, 1-30)
+  const box = $("prs-list");
+  box.textContent = ""; box.hidden = !prsItems.length;
+  for (const it of prsItems) {
+    const row = document.createElement("div"), lab = document.createElement("span"), sel = document.createElement("select");
+    lab.textContent = `${it.name}${it.notes && it.notes.length ? "  [" + it.notes.join("; ") + "]" : ""}  goes into place `;
+    sel.setAttribute("aria-label", `Place for ${it.name}`);
+    sel.add(new Option("first empty", "0"));
+    for (let n = 1; n <= 30; n++) sel.add(new Option(String(n).padStart(2, "0"), String(n)));
+    sel.value = String(it.sel || 0);
+    sel.addEventListener("change", () => { it.sel = +sel.value; prsRefresh(); });
+    row.append(lab, sel); box.append(row);
+  }
+}
+function prsRefresh() {
+  const seen = new Map();
+  for (const it of prsItems) if (it.sel) seen.set(it.sel, (seen.get(it.sel) || 0) + 1);
+  const dup = [...seen.entries()].filter(([, c]) => c > 1).map(([n]) => n);
+  $("prs-go").disabled = prsBusy || !prsItems.length || dup.length > 0;
+  if (dup.length) $("prs-status").textContent = `Two presets want place ${dup.join(", ")}. Choose a different place for one of them.`;
+}
+async function prsLoad(files, other) {
+  const st = $("prs-status");
+  if (other) other.value = "";
+  prsItems = []; st.textContent = ""; prsRender(); prsRefresh();
+  if (!files.length) return;
+  const skipped = [];
+  try {
+    for (const f of files) {
+      const r = await PB.presetFiles(f.name, new Uint8Array(await f.arrayBuffer()));
+      prsItems.push(...r.items); skipped.push(...r.skipped);
+    }
+    prsItems.sort((x, y) => (x.number || 99) - (y.number || 99) || x.file.localeCompare(y.file));
+    for (const it of prsItems) it.sel = it.number || 0;
+    if (prsItems.length > 30) { skipped.push(`${prsItems.length - 30} more presets than the 30 places`); prsItems = prsItems.slice(0, 30); }
+    const n = prsItems.length;
+    st.textContent = (n ? `${n} preset${n === 1 ? "" : "s"} ready. ` : "No presets found in that. ") + (skipped.length ? `Skipped: ${skipped.join("; ")}.` : "");
+  } catch (e) { st.textContent = (e && e.message) || String(e); }
+  prsRender(); prsRefresh();
+}
+// wip518: paste anywhere on the page (Ctrl+V / Cmd+V). Patternarium's Copy button gives the same text as a .mtpreset file: it is loaded like a dropped file
+// (first empty slot) and the bar with SEND TO FM1 TONIC appears. Text that is not a preset is ignored; typing in a field is left alone.
+function pbShow(on) { $("pastebar").hidden = !on; }
+document.addEventListener("paste", async (e) => {
+  const tg = e.target;
+  if (tg && (tg.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(tg.tagName))) return;
+  const t = (e.clipboardData && e.clipboardData.getData("text")) || "";
+  if (!/^\uFEFF?\s*MicroTonicPresetV3/.test(t)) return;
+  e.preventDefault();
+  if (prsBusy) return;
+  $("prs-file").value = ""; $("prs-dir").value = "";
+  $("pb-status").textContent = "";
+  await prsLoad([new File([t.trim()], "pasted.mtpreset", { type: "text/plain" })], null);
+  const it = prsItems[0];
+  if (it) { pendingTnp = it.blob; if (node) send({ type: "preset", bytes: it.blob }); else $("pb-status").textContent = "Press Switch on: the preset goes into the panel."; $("pb-name").textContent = `Preset "${it.name}" is ready` + (it.notes && it.notes.length ? ` (${it.notes.join("; ")})` : ""); $("pb-send").disabled = false; pbShow(true); }
+  else { $("pb-name").textContent = "That preset could not be read"; $("pb-status").textContent = $("prs-status").textContent; $("pb-send").disabled = true; pbShow(true); }
+});
+$("pb-x").addEventListener("click", () => { if (!prsBusy) pbShow(false); });
+$("pb-send").addEventListener("click", () => $("prs-go").click());
+$("prs-file").addEventListener("change", () => prsLoad([...$("prs-file").files], $("prs-dir")));
+$("prs-dir").addEventListener("change", () => prsLoad([...$("prs-dir").files].filter((f) => !/^\./.test(f.name)), $("prs-file")));
+$("prs-go").addEventListener("click", async () => {
+  if (prsBusy || pbkBusy || recvBusy || !prsItems.length) return;
+  const mirror = (a, b, props) => { const o = {}; for (const k of props) Object.defineProperty(o, k, { get: () => a[k], set: (v) => { a[k] = v; b[k] = v; } }); return o; };
+  const st = mirror($("prs-status"), $("pb-status"), ["textContent"]), bar = mirror($("prs-bar"), $("pb-bar"), ["hidden", "max", "value"]), btn = $("prs-go");
+  const one = prsItems.length === 1, onlyEmpty = prsItems.every((it) => !it.sel);
+  $("pb-send").disabled = true;
+  const todo = prsItems.map((it) => ({ ...it, slot: it.sel ? PB.slotOf(it.sel) : -1 }));
+  prsBusy = true; btn.disabled = true; bar.hidden = false; bar.max = 100; bar.value = 0;
+  let dev = null, done = 0, ok = false;
+  try {
+    let filled = null;
+    if (todo.some((t) => t.slot < 0)) {          // files without a number take the first empty places of the FM-1 (place 1 first, then 2 ... 30)
+      dev = await connectFm1(st);
+      st.textContent = "Looking for empty places on the FM-1.";
+      filled = await PB.presetFilled(dev.link);
+      const taken = new Set(todo.filter((t) => t.slot >= 0).map((t) => t.slot));
+      const order = filled.places ? [...Array(8).keys()].map((i) => 32 + i).concat([...Array(22).keys()]) : [...Array(32).keys()];   // older firmware: no places 1-8
+      const free = order.filter((s) => !filled.main.has(s) && !taken.has(s));
+      const need = todo.filter((t) => t.slot < 0);
+      if (need.length > free.length) throw new Error(`${need.length} presets have no place number but the FM-1 has only ${free.length} empty place${free.length === 1 ? "" : "s"}. Name some files 01_..., 02_... to choose their places, or clear places first.`);
+      need.forEach((t, i) => { t.slot = free[i]; });
+    }
+    const names = todo.map((t) => PB.placeNo(t.slot)).join(", ");
+    if (!onlyEmpty && !confirm(`Write ${todo.length} preset${one ? "" : "s"} into place${one ? "" : "s"} ${names} of the FM-1? What is in ${one ? "that place" : "those places"} now (song and notes too) is replaced.`)) { st.textContent = "Cancelled. Nothing was written."; return; }
+    if (!dev) dev = await connectFm1(st);
+    if (!filled) filled = await PB.presetFilled(dev.link);
+    if (todo.some((t) => t.slot >= 32) && !filled.places) throw new Error("This FM-1's firmware has no places 1-8. Install FM1 Tonic again (above), or choose places 9-30.");
+    for (const t of todo) {
+      st.textContent = `Sending place ${PB.placeNo(t.slot)} (${t.name}): ${done} of ${todo.length} done.`;
+      const rc = await PB.restorePlace(dev.link, t.slot, t, (ev, pct) => { if (ev === "progress") bar.value = pct; }, filled.places);
+      if (rc) throw new Error(`Place ${PB.placeNo(t.slot)} (${t.name}) was not written: ${PB.PUT_ERRORS[rc] || "error " + rc}.${done ? ` ${done} place${done === 1 ? " was" : "s were"} written before.` : ""}`);
+      done++;
+    }
+    st.textContent = "Checking the FM-1's places.";
+    const after = await PB.presetFilled(dev.link);
+    const missing = todo.filter((t) => !after.main.has(t.slot) || (after.places && !!t.ext !== after.ext.has(t.slot)));
+    st.textContent = missing.length ? `Sent, but place${missing.length === 1 ? "" : "s"} ${missing.map((t) => PB.placeNo(t.slot)).join(", ")} did not show up right in the FM-1's list. Try again.`
+      : `Restored ${todo.length} preset${one ? "" : "s"} into place${one ? "" : "s"} ${names}` + (todo.some((t) => t.ext) ? ` (${todo.filter((t) => t.ext).length} with song and notes).` : ".");
+    ok = !missing.length;
+  } catch (e) { st.textContent = (e && e.message) || String(e); }
+  finally { bar.hidden = true; if (dev) dev.link.close(); prsBusy = false; prsRefresh(); $("pb-send").disabled = ok || !prsItems.length; }
+});
+let clrArmed = false;
+$("clr-go").addEventListener("click", async () => {
+  if (prsBusy || pbkBusy || recvBusy || !pbkDone) return;
+  const st = $("clr-status"), btn = $("clr-go");
+  if (!clrArmed) { clrArmed = true; btn.textContent = "Click again to clear all 30 places"; st.textContent = "This empties places 1-30 on the FM-1, songs and notes too."; return; }
+  clrArmed = false; btn.textContent = "Clear all places";
+  prsBusy = true; btn.disabled = true;
+  let dev = null;
+  try {
+    dev = await connectFm1(st);
+    const f = await PB.presetFilled(dev.link);
+    let n = 0;
+    for (const slot of [...f.main].sort((x, y) => PB.placeNo(x) - PB.placeNo(y))) {
+      st.textContent = `Clearing place ${PB.placeNo(slot)}.`;
+      await PB.presetErase(dev.link, slot);
+      n++;
+    }
+    for (const slot of f.ext) {                    // second spots (also of a place whose preset is gone)
+      st.textContent = `Clearing song and notes of place ${PB.placeNo(slot)}.`;
+      await PB.presetErase(dev.link, slot, true);
+    }
+    st.textContent = n || f.ext.size ? `Cleared ${n} place${n === 1 ? "" : "s"}. The FM-1 starts with a white canvas.` : "All places were empty already.";
+  } catch (e) { st.textContent = (e && e.message) || String(e); }
+  finally { if (dev) dev.link.close(); prsBusy = false; btn.disabled = !pbkDone; prsRefresh(); }
+});
+$("go").addEventListener("click", switchOn);
+$("reset").addEventListener("click", () => {
+  if ($("reset").dataset.armed) {
+    try { localStorage.removeItem(STORE_KEY); } catch {}
+    location.reload();
+  } else {
+    $("reset").dataset.armed = "1";
+    $("reset").textContent = "Click again to forget everything";
+  }
+});
+
+// ---- wip448: full screen only by the Full screen button (no auto start): native full screen + landscape lock, X / Esc / back leaves.
+(() => {
+  const box = document.getElementById("devicebox"), fsBtn = document.getElementById("fs"), x = document.getElementById("appx");
+  const on = () => box.classList.contains("app");
+  const enter = () => {
+    if (on()) return;
+    box.classList.add("app"); document.body.classList.add("appmode"); fsBtn.textContent = "Exit full screen"; scrollTo(0, 0);
+    // like YouTube: native full screen, then lock landscape (Android Chrome). iPhone Safari has neither: the CSS quarter turn (wip448b) does the same
+    const lock = () => { try { const o = screen.orientation; if (o && o.lock) o.lock("landscape").catch(() => {}); } catch (e) {} };
+    try { const r = box.requestFullscreen && box.requestFullscreen({ navigationUI: "hide" }); if (r && r.then) r.then(lock, () => {}); else lock(); } catch (e) {}
+  };
+  const leave = () => {
+    if (!on()) return;
+    box.classList.remove("app"); document.body.classList.remove("appmode"); fsBtn.textContent = "Full screen";
+    try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) {}
+    try { if (document.fullscreenElement) document.exitFullscreen().catch(() => {}); } catch (e) {}
+  };
+  fsBtn.addEventListener("click", () => (on() ? leave() : enter()));
+  x.addEventListener("click", leave);
+  document.addEventListener("fullscreenchange", () => { if (!document.fullscreenElement && on()) leave(); });   // the system back gesture / Esc leaves it too
+})();
+</script>
+</body>
+</html>
