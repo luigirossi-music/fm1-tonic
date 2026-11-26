@@ -1,14 +1,13 @@
-# wip317: the normal SAVE: SAVE HERE? (place + name) OCT+ YES saves at once into the loaded place and keeps the name; OCT- NO -> CHOOSE SLOT -> slot -> name.
+# wip317 / wip708: the normal SAVE = ONE screen, SAVE HERE?: SELECT = the spot, ALGORITHM = the name, OCT+ saves at once, OCT- cancels (CHOOSE SLOT and the slot screen are gone).
 wait 300
-# nothing loaded: starts at CHOOSE SLOT (4); HOME cancels
+# nothing loaded: starts at SAVE HERE? (3) on the first empty place; HOME cancels
 tap SAVE
-expect svstage 4
+expect svstage 3
+expect svhere 3
 tap HOME
 expect svstage -1
-# SAVE AS into the first empty place (3 since wip655; flash slot 34): CHOOSE SLOT, slot, name
+# the first save goes into the first empty place (3 since wip655; flash slot 34): one OCT+
 tap SAVE
-tap OCT+
-tap OCT+
 tap OCT+
 expect presetcur 3
 expect slotused34 1
@@ -42,16 +41,25 @@ tap OCT+
 wait 100
 expect presetcur 3
 expect vacc0.1.8 1
-# NO: CHOOSE SLOT; OCT+ the slot screen; OCT- back; OCT- EXIT SAVE
+# OCT- cancels at once; SELECT moves the spot (1-40, round); ALGORITHM makes another name; OCT+ saves into the spot shown
 tap SAVE
 tap OCT-
-expect svstage 4
-tap OCT+
-expect svstage 2
-tap OCT-
-expect svstage 4
-tap OCT-
 expect svstage -1
+tap SAVE
+turn SELECT 1
+expect svhere 4
+turn SELECT -2
+expect svhere 2
+turn SELECT 1
+expect svhere 3
+turn ALGO 1
+expect svstage 3
+expect svhere 3
+tap OCT+
+wait 200
+expect svstage -1
+expect presetcur 3
+expect slotused34 1
 # a demo place (1): SAVE HERE? YES saves over itself (override slot), the place stays 1 (two steps back from place 3)
 turn PRESET -1
 turn PRESET -1
@@ -90,26 +98,24 @@ wait 300
 tap SAVE
 expect svstage 3
 expect svhere 1
-turn ALGO 1
+turn SELECT 1
 expect svhere 2
 expect svstage 3
 expect presetcur 1
 shot save_here_other.png
-turn ALGO -1
-turn ALGO -1
+turn SELECT -1
+turn SELECT -1
 expect svhere 30
-turn ALGO 1
+turn SELECT 1
 expect svhere 1
-turn ALGO 1
+turn SELECT 1
 tap OCT+
 expect svstage -1
 expect presetcur 2
 expect dirty 0
-# NO, EXIT: OCT- on SAVE HERE? goes to CHOOSE SLOT, OCT- again leaves
+# OCT- on SAVE HERE? (another spot chosen) cancels, nothing is saved
 tap SAVE
-turn ALGO 1
-tap OCT-
-expect svstage 4
+turn SELECT 1
 tap OCT-
 expect svstage -1
 expect presetcur 2

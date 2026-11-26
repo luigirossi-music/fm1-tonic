@@ -41,7 +41,7 @@
 <rect x="556" y="156" width="416" height="158" rx="14" fill="#141415"/>
 <rect x="562" y="162" width="64" height="64" rx="9" fill="#1d6b73" stroke="#45b3bd" stroke-width="2"/>
 <text x="594.0" y="185" text-anchor="middle" font-size="11.5" font-weight="700" fill="#ffffff">MIX /</text>
-<text x="594.0" y="199" text-anchor="middle" font-size="11.5" font-weight="700" fill="#ffffff">PERFORM</text>
+<text x="594.0" y="199" text-anchor="middle" font-size="11.5" font-weight="700" fill="#ffffff">SENDS</text>
 <text x="594.0" y="217" text-anchor="middle" font-size="9" font-weight="600" fill="#d6dae2">FX</text>
 <rect x="630" y="162" width="64" height="64" rx="9" fill="#2b4a8c" stroke="#6f93e0" stroke-width="2"/>
 <text x="662.0" y="185" text-anchor="middle" font-size="11.5" font-weight="700" fill="#ffffff">PITCH</text>
@@ -63,7 +63,7 @@
 <text x="934.0" y="217" text-anchor="middle" font-size="9" font-weight="600" fill="#d6dae2">GLO</text>
 <rect x="562" y="240" width="64" height="64" rx="9" fill="#1d6b73" stroke="#45b3bd" stroke-width="2"/>
 <text x="594.0" y="263" text-anchor="middle" font-size="11.5" font-weight="700" fill="#ffffff">MIX 2 /</text>
-<text x="594.0" y="277" text-anchor="middle" font-size="11.5" font-weight="700" fill="#ffffff">SENDS</text>
+<text x="594.0" y="277" text-anchor="middle" font-size="11.5" font-weight="700" fill="#ffffff">PERFORM</text>
 <text x="594.0" y="295" text-anchor="middle" font-size="9" font-weight="600" fill="#d6dae2">HOME</text>
 <rect x="630" y="240" width="64" height="64" rx="9" fill="#4a4f5c" stroke="#8a90a0" stroke-width="2"/>
 <text x="662.0" y="271" text-anchor="middle" font-size="11.5" font-weight="700" fill="#ffffff">SAVE</text>

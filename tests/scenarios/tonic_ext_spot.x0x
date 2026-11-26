@@ -40,11 +40,9 @@ expect songlen 2
 expect playing 0
 expect slotused34 0
 expect extused34 0
-# SAVE AS (CHOOSE SLOT, slot 3, name): both spots are written
+# SAVE HERE? (wip708: one screen, the first empty place 3): both spots are written
 tap SAVE
-tap OCT+
 expect svhere 3
-tap OCT+
 tap OCT+
 expect svstage -1
 expect presetcur 3
@@ -75,11 +73,9 @@ expect lanes 2
 notepoke 0 0 0 9
 tap SAVE
 expect svstage 3
-tap OCT-
-expect svstage 4
-tap OCT+
+turn SELECT 1
 expect svhere 4
-tap OCT+
+turn ALGO 1                                   # wip708: a NEW name (SAVE AS made one at every save): the two main spots must differ
 tap OCT+
 expect svstage -1
 expect presetcur 4

@@ -1,4 +1,4 @@
-# wip251: the ARP page (step 1): ARP = the SEQ view with a piano for keys. SELECT chooses the voice, OCT- / OCT+ the keyboard octave
+# wip251: the ARP page (step 1): ARP = the SEQ view with a piano for keys. SELECT chooses the voice (wip699), OCT- / OCT+ the keyboard octave
 # (-3..+3), every key (white and black) plays the selected voice: key C (raw key 7) = its own pitch, key k = k - 7 semitones,
 # the octave moves it by 12. Nothing is stored (the patterns stay as they are); SEQ goes back to the SEQ page.
 wait 300
@@ -11,18 +11,18 @@ expect arp 1
 expect arpoct 0
 expect sel 0
 shot arp_page.png
-# wip287: ALGO chooses the voice (SELECT is the SEQ page's: it no longer changes the voice)
-turn ALGO 1
-expect sel 1
-turn ALGO 1
-turn ALGO -1
-turn ALGO -1
-expect sel 0
-turn ALGO -1
-expect sel 7
-turn ALGO 1
-expect sel 0
+# wip699: SELECT chooses the voice (ALGO is the step page's: it does not change the voice)
 turn SELECT 1
+expect sel 1
+turn SELECT 1
+turn SELECT -1
+turn SELECT -1
+expect sel 0
+turn SELECT -1
+expect sel 7
+turn SELECT 1
+expect sel 0
+turn ALGO 1
 expect sel 0
 expect acsel 0
 tapkey 7
@@ -72,5 +72,5 @@ tap ARP
 tap HOME
 tap SEQ
 expect arp 0
-# on the SEQ page a white key is a step again (and SELECT does not change the voice)
+# on the SEQ page a white key is a step again (and ALGO does not change the voice)
 expect sel 0

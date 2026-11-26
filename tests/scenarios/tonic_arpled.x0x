@@ -1,4 +1,4 @@
-# wip418: the ARP page: the CURRENT track's black key (1-8) blinks slowly, it follows ALGO (the voice)
+# wip418: the ARP page: the CURRENT track's black key (1-8) blinks slowly, it follows SELECT (the voice, wip699)
 wait 300
 tap ARP
 wait 50
@@ -11,7 +11,7 @@ wait 300
 leds
 wait 300
 leds
-turn ALGO 2
+turn SELECT 2
 expect sel 2
 wait 10
 leds

@@ -63,9 +63,7 @@ param 5 0 4 20
 param 4 0 1 30
 param 4 0 2 25
 tap SAVE
-tap OCT+
-expect svstage 2
-tap OCT+
+expect svstage 3
 tap OCT+
 expect svstage -1
 wait 500
@@ -81,9 +79,7 @@ param 4 0 1 41
 param 4 0 2 37
 tap SAVE
 expect svstage 3
-tap OCT-
-tap OCT+
-tap OCT+
+turn SELECT 1
 tap OCT+
 expect svstage -1
 wait 500

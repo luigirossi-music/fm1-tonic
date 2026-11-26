@@ -1,0 +1,31 @@
+# wip703: the ARP page: K2 = AUTOSCROLL (the same setting as on SEQ), K3 = the PAGE spot, K4 = the keyboard octave (was K2)
+wait 300
+expect autoscroll 0
+tap ARP
+expect arp 1
+wait 300
+shot arp_k2k4_0.png
+# K4 = the octave
+turn K4 1 80
+expect arpoct 1
+turn K4 -2 80
+expect arpoct -1
+turn K4 1 80
+expect arpoct 0
+# K2 = AUTOSCROLL on (shared with SEQ)
+turn K2 1 80
+expect autoscroll 1
+expect arpoct 0
+wait 300
+shot arp_k2k4_1.png
+tap SEQ
+expect arp 0
+expect autoscroll 1
+# and back: SEQ K2 off, the ARP page follows
+turn K2 -1 80
+expect autoscroll 0
+tap ARP
+expect autoscroll 0
+turn K2 1 80
+expect autoscroll 1
+expect arpoct 0

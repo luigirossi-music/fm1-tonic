@@ -26,10 +26,7 @@ key w8 up
 expect phit15.1.8 1
 # SAVE AS into the first empty place
 tap SAVE
-tap OCT+
-expect svstage 2
-tap OCT+
-expect svstage 1
+expect svstage 3
 tap OCT+
 expect svstage -1
 wait 300

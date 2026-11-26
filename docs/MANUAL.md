@@ -15,7 +15,7 @@ Inspired by Microtonic VST by Sonic Charge, FM1 TONIC is an 8-voice drum synthes
 
 **Sequencer**
 
-- 64-step sequencer, 16 patterns per project. Fixed length 8, 16, 32 or 64 steps, or a free length of 1 to 64.
+- 64-step sequencer, 16 patterns per project (plus a pattern bank 2, patterns 17-32, as a beta: FUNC + SELECT; a saved project still keeps only patterns 1-16). Fixed length 8, 16, 32 or 64 steps, or a free length of 1 to 64.
 - Song mode: bars with repeats (x1 to x8 or LOOP), edited on the SONG screen.
 - Global accent (+1 to +10) and per-track accent, fill with retrig (2x, 4x, 8x), and trig % (chance) on every step.
 - Parameter lock (limited: 3 knobs per track in each pattern).
@@ -58,10 +58,11 @@ Inspired by Microtonic VST by Sonic Charge, FM1 TONIC is an 8-voice drum synthes
 
 ![The FM1 TONIC panel: knobs MASTER, SELECT, PRESETS, ALGORITHM and KNOB 1 to 4; buttons FX, SEL, ENV, LFO, EDIT, GLO, HOME, SAVE, ARP, SEQ, PLAY, REC, OCT- and OCT+; black keys TRACK 1 to 8, ACCENT, FILL, FUNC; white keys 1 to 16](img/fm1-tonic-panel.svg "")
 
-- **Knobs.** MASTER is the volume. SELECT turns pages (in a list: up and down). PRESETS picks one of the 30 places. KNOB 1 to 4 set the four values of the page on the screen (the one you turn is enlarged). ALGORITHM turns to a second page or picks a voice, depending on the page (the page tables say which). A small blue triangle in a bottom corner of the screen means there is a second page behind ALGORITHM: right triangle = turn ALGORITHM right, left triangle = turn it left to go back.
+- **Knobs.** MASTER is the volume. SELECT turns pages (in a list: up and down; on SEQ and ARP: the track). PRESETS picks one of the 30 places. KNOB 1 to 4 set the four values of the page on the screen (the one you turn is enlarged). ALGORITHM turns to a second page, depending on the page (on SEQ and ARP it turns the step page; the page tables say which). A small blue triangle in a bottom corner of the screen means there is a second page behind ALGORITHM: right triangle = turn ALGORITHM right, left triangle = turn it left to go back.
 - **Black keys.** 1 to 8 are TRACK 1 to 8, 9 is ACCENT, 10 is FILL, 11 is FUNC.
 - **White keys 1 to 16** are the 16 steps of the selected track. A pattern can have up to 64 steps, shown 16 at a time (see SEQ).
 - **OCT- / OCT+** move the selected track's pitch one octave (on ARP: the keyboard's octave). In a question OCT+ = YES, OCT- = NO. On the SONG screen: OCT- deletes the line, OCT+ adds a line.
+- **The top bar** is the same on every page. On the left three chips: [P1] the playing pattern (in song mode S and the bar number; a pattern waiting to start blinks inside it, for example P1>2), [PATTERN BANK 1 / 2] and [TRACK n] the selected track. In bank 2 the chips are red. A button you press shows its message over the chips for a moment. On the right: the tempo, the play symbol, a red REC dot while recording (it blinks like the REC button) and the battery. The page name is not written in the bar.
 
 ### Contents
 
@@ -70,9 +71,14 @@ Inspired by Microtonic VST by Sonic Charge, FM1 TONIC is an 8-voice drum synthes
 3. Pages, button by button
   - Button combinations
 4. Playing
+  - Patterns
+  - Patterns cheat sheet
   - Record and sequencer mode
   - Song mode
+  - Song mode cheat sheet
 5. Presets and saving
+  - Saving
+  - Saving cheat sheet
 6. Lights, MIDI and USB
 7. Install, back up, recover
 8. The engine
@@ -96,6 +102,7 @@ Inspired by Microtonic VST by Sonic Charge, FM1 TONIC is an 8-voice drum synthes
 | {r:FUNC + ACCENT} / {r:FUNC + FILL} / {r:FUNC + PLAY} | Copies the pattern / pastes it (it asks PASTE PATTERN?) / clears it (it asks CLEAR PATTERN?). OCT+ = yes, OCT- = no. |
 | {r:FUNC + black key 1 to 8 held, then ACCENT / FILL / PLAY} | Copies that track's sound / pastes it / clears that track's pattern (it asks). |
 | {r:FUNC + SEQ} | Song mode on / off (it asks). |
+| {r:FUNC + SELECT} | Pattern bank 1 / 2 (patterns 1-16 / 17-32). Beta. |
 | {r:FUNC + ARP} | Deletes the song (it asks). |
 | {r:FUNC + SAVE} / {r:FUNC + HOME} | Quick save into the loaded place / renames the project. |
 | {r:FUNC + REC} | QUANTIZED REC / UNQUANTIZED REC. |
@@ -117,7 +124,7 @@ Exceptions: on PERFORM, MUTE / SOLO, the pattern page and the GLO mixer the blac
 | **CHOKE** (EDIT, ALGORITHM right) | Black keys 1 to 8 choose which tracks are in the choke group. |
 | **SONG and PATTERNS screens** (song mode) | White keys 1 to 16 write a pattern into the bar. FILL deletes the bar. |
 | **Copy-paste mode** (after FUNC + ACCENT) | White keys 1 to 16 are the places to paste into. |
-| **FUNC held** | White keys 1 to 16 are patterns 1 to 16; the keys light where a pattern or a track has notes. |
+| **FUNC held** | White keys 1 to 16 are patterns 1 to 16 (patterns 17 to 32 in bank 2, see FUNC + SELECT); the keys light where a pattern or a track has notes. |
 
 **Things that exist only on some pages.**
 
@@ -145,34 +152,36 @@ Every track makes its sound from scratch with the FM1 TONIC drum engine: a pitch
 
 A page with **track** values (knobs 1 to 4 of the sound pages) belongs to the selected track: change track with a black key 1 to 8 and the values change. EDIT or LFO held + {r:FUNC + ACCENT / FILL / PLAY} copies, pastes and resets **this page** of the track (track pages only).
 
+**Back where you left it.** Every button with more than one page (FX, HOME, GLO, SEQ, EDIT) remembers the page you were on. Go to another button's page, then press it again from anywhere: you come back to the page you left, with its MUTE / SOLO, DUCK or CHOKE screen if that was open.
+
 ### FX
 
-Press = MIX 1 → PERFORM → MIX 1. Hold (half a second) = REVERB. From another button's page, FX returns to the last FX page you left.
+Press = MIX 1 → SENDS → MIX 1. Hold (half a second) = REVERB. From another button's page, FX returns to the last FX page you left.
 
 | Page | Knob 1 · 2 · 3 · 4 | Also on this page |
 |---|---|---|
 | **MIX 1** (1st press) | OSC / NOISE mix · EQ FREQ (20 Hz-20 kHz) · DIST · EQ GAIN (64 = flat) | White key held + knob: p-lock. SAVE + knob: forgets that lock or motion. |
-| **PERFORM** (2nd press) | REVERB D/W · DELAY D/W (0-100 %, 0 at power-on) · MASTER LOW CUT (20-663 Hz) · ALL FX (right on, left off) | The big number is the playing pattern. When a pattern is cued, a purple box says PATTERN n (the one to come) and blinks above it. SELECT: next FX pages (stops at the ends). ALGORITHM right: MUTE / SOLO. Black keys 1 to 8: mute. White keys 1 to 16: next pattern (in song mode they do nothing: the song decides, and the purple box shows the next bar of the song). {r:FUNC tap}: MUTE mode, or unmute all. {o:FILL tap}: SOLO mode, or clear all solos. No p-locks. |
-| **MUTE / SOLO** (PERFORM, ALGORITHM right) | same as PERFORM | Eight boxes instead of the number: blue = the track plays. Black keys 1 to 8 mute (MUTE mode) or add / remove a solo (SOLO mode, several at once). ALGORITHM left: back. |
+| **SENDS** | REVERB SEND · DELAY SEND · SIDECHAIN THRESHOLD (in dB, like a compressor's: all the way right = 0.0 dB = nothing ducks, turning left goes down to -59 dB, and the very last step on the left is -INF) · SIDECHAIN INPUT (track 1 to 8, big number) | ALGORITHM right: the DUCK screen (below). Sends work whatever PERFORM's D/W and ALL FX say. |
+| **DUCK** (SENDS, ALGORITHM right) | - | Black keys 1 to 8: blue = ducked, grey = not, purple = the input. The input cannot be ducked. Nothing is ducked until you choose. ALGORITHM left or HOME: back. |
 | **REVERB** (hold FX) | DECAY · TONE | ALGORITHM right: REVERB 2. |
 | **REVERB 2** | LOW CUT (of what enters the reverb) · RETURN (level in the mix) | ALGORITHM left: back. |
 | **DELAY** (hold HOME too) | TIME (1/32 ... 1/2, with T and dotted values) · FEEDBACK · TONE · TAPE (first eighth = clean digital, then tape with more wear) | ALGORITHM right: DELAY 2. |
 | **DELAY 2** | LOW CUT · RETURN · PING-PONG (off / on) | ALGORITHM left: back. |
 
-ALL FX off silences PERFORM's two D/W sends and the master low cut; the tracks' own sends keep working. Mutes and solos are shared by PERFORM and MUTE / SOLO; solos are not saved and end when a preset loads. The mode you chose (MUTE or SOLO) stays when you leave the page and come back. On the black keys a muted track blinks, a soloed track blinks faster; the white key of the playing pattern blinks slowly; the keys do not flash at a hit on PERFORM, the pattern page and the GLO mixer. The effects pages are global (all tracks share them): SELECT walks PERFORM, REVERB, DELAY, REVERB 2, DELAY 2.
+The sidechain is a compressor with a side input: it listens to the input track and turns the ducked tracks down while the input is louder than the threshold (fixed: ratio 4:1, soft knee, attack 1 ms, release 30 ms). A long kick ducks for long; a muted input does not duck; the tracks' sends are ducked too. A normal kick starts to duck at about -10 dB and ducks strongly from -25 dB down, so most of the work is done in the left three quarters of the knob; at -INF everything the input plays ducks as much as the compressor can. A red dot shows a ducked track, a purple dot the input; the dot follows the real duck (with the knob all the way right nothing ducks and the dot stays dark). One sidechain for all tracks, saved with the preset (a preset made with an older version keeps its numbers, but it sounds different: the old value was a depth, now it is a threshold).
 
 ### HOME
 
-Press = MIX 2 → SENDS → GLOBAL → MIX 2. Hold = DELAY.
+Press = MIX 2 → PERFORM → GLOBAL → MIX 2. Hold = DELAY.
 
 | Page | Knob 1 · 2 · 3 · 4 | Also on this page |
 |---|---|---|
 | **MIX 2** | LEVEL · PAN · LOW CUT (20-663 Hz, never off) · HIGH CUT (20 kHz down to 1 kHz) | The two cuts are greyed in classic. |
-| **SENDS** | REVERB SEND · DELAY SEND · SIDECHAIN THRESHOLD (in dB, like a compressor's: all the way right = 0.0 dB = nothing ducks, turning left goes down to -59 dB, and the very last step on the left is -INF) · SIDECHAIN INPUT (track 1 to 8, big number) | ALGORITHM right: the DUCK screen (below). Sends work whatever PERFORM's D/W and ALL FX say. |
-| **DUCK** (SENDS, ALGORITHM right) | - | Black keys 1 to 8: blue = ducked, grey = not, purple = the input. The input cannot be ducked. Nothing is ducked until you choose. ALGORITHM left or HOME: back. |
-| **GLOBAL** | QUANTIZATION (1/8 ... 1/32) · SWING · FILL RATE (2x, 4x, 8x) · TEMPO | - |
+| **PERFORM** (2nd press) | REVERB D/W · DELAY D/W (0-100 %, 0 at power-on) · MASTER LOW CUT (20-663 Hz) · ALL FX (right on, left off) | The big number is the playing pattern. When a pattern is cued, a purple box says PATTERN n (the one to come) and blinks above it. SELECT: next FX pages (stops at the ends). ALGORITHM right: MUTE / SOLO. Black keys 1 to 8: mute. White keys 1 to 16: next pattern (in song mode they do nothing: the song decides, and the purple box shows the next bar of the song). {r:FUNC tap}: MUTE mode, or unmute all. {o:FILL tap}: SOLO mode, or clear all solos. No p-locks. |
+| **MUTE / SOLO** (PERFORM, ALGORITHM right) | same as PERFORM | Eight boxes instead of the number: blue = the track plays. Black keys 1 to 8 mute (MUTE mode) or add / remove a solo (SOLO mode, several at once). ALGORITHM left: back. |
+| **GLOBAL** | QUANTIZATION (1/8 ... 1/32) · SWING · FILL RATE (2x, 4x, 8x) · TEMPO | SWING is the same control as on SEQ: one value for all patterns (unless the SWING setting is PER PATTERN). |
 
-The sidechain is a compressor with a side input: it listens to the input track and turns the ducked tracks down while the input is louder than the threshold (fixed: ratio 4:1, soft knee, attack 1 ms, release 30 ms). A long kick ducks for long; a muted input does not duck; the tracks' sends are ducked too. A normal kick starts to duck at about -10 dB and ducks strongly from -25 dB down, so most of the work is done in the left three quarters of the knob; at -INF everything the input plays ducks as much as the compressor can. A red dot shows a ducked track, a purple dot the input; the dot follows the real duck (with the knob all the way right nothing ducks and the dot stays dark). One sidechain for all tracks, saved with the preset (a preset made with an older version keeps its numbers, but it sounds different: the old value was a depth, now it is a threshold).
+ALL FX off silences PERFORM's two D/W sends and the master low cut; the tracks' own sends keep working. Mutes and solos are shared by PERFORM and MUTE / SOLO; solos are not saved and end when a preset loads. The mode you chose (MUTE or SOLO) stays when you leave the page and come back. On the black keys a muted track blinks, a soloed track blinks faster; the white key of the playing pattern blinks slowly; the keys do not flash at a hit on PERFORM, the pattern page and the GLO mixer. The effects pages are global (all tracks share them): SELECT walks PERFORM, REVERB, DELAY, REVERB 2, DELAY 2.
 
 ### SEL, ENV, LFO, EDIT (the voice pages)
 
@@ -198,7 +207,7 @@ Press = VEL → MIXER → COMP → MEMORY → SETTINGS → VEL.
 | **MIXER** | LEVEL of the four tracks shown | Eight tall sliders; SELECT switches tracks 1 to 4 / 5 to 8 and, as the blue hint on the screen says, cycles level / pan (pan centre = red). A hit lights its slider. The keys are the PERFORM ones: {r:FUNC tap}: MUTE mode, or unmute all; {o:FILL tap}: SOLO mode, or clear all solos; black keys 1 to 8 mute (MUTE mode) or solo (SOLO mode) that track, and a track the solo silences is grey; white keys 1 to 16: next pattern (not in song mode). A red dot under a slider = ducked, purple = sidechain input. |
 | **COMP** | ATTACK · RELEASE · THRESHOLD · MAKE-UP | Master compressor, ratio 4:1, a needle shows gain reduction. Default: nothing compressed (0.0 dB / 0.0 dB). Kept only by SAVE. |
 | **MEMORY** | - | A battery shows how full the project memory is (patterns, song, motion, ARP notes). Purple from 90 %, FULL at 100 %: a save is then refused. |
-| **SETTINGS** | list (SELECT moves) | Rows: clock out, notes out, Tonic MIDI channel, output level, USB audio, key light, 4/4 LED, colour theme, zoom knob (yes / no), Tonic Engine, name projects, save, autosave, clear pattern, factory reset, performance, cores, about, battery. The non-obvious ones are explained just below. Changes are kept by themselves about a second and a half after you stop touching things (the sequencer must be stopped). |
+| **SETTINGS** | list (SELECT moves) | Rows: clock out, notes out, Tonic MIDI channel, output level, USB audio, key light, 4/4 LED, colour theme, zoom knob (yes / no), Tonic Engine, name projects, swing, save, autosave, clear pattern, factory reset, performance, cores, about, battery. The non-obvious ones are explained just below. Changes are kept by themselves about a second and a half after you stop touching things (the sequencer must be stopped). |
 
 #### GLO settings: the ones that are not obvious
 
@@ -212,6 +221,7 @@ Settings are in the GLO list (SELECT moves up and down, ALGORITHM changes the va
 | **4/4 LED** | OFF / **ON** | ON (the factory setting): white keys 1, 5, 9 and 13 glow faintly to mark the four beats of the bar (not on PERFORM). |
 | **ZOOM KNOB** | **YES** / NO | YES: the knob you turn is enlarged over the screen. NO: it is only highlighted, so the whole page stays visible. The SONG screen never zooms. |
 | **NAME PROJECTS** | **GENERATE** / MANUAL | GENERATE makes up the name of a saved project (ALGORITHM = another one). MANUAL: the name screen is a letter editor (see chapter 5). |
+| **SWING** | **GLOBAL** / PER PATTERN | GLOBAL (the factory setting): one swing for all patterns; turning SWING on SEQ or on GLOBAL sets it for every pattern. PER PATTERN: each pattern keeps its own swing and the knob changes only the playing pattern. Switching to GLOBAL copies the playing pattern's swing to all patterns; an older project that had different swings loads with the swing of pattern 1 for all. |
 | **TONIC ENGINE** | **ENHANCED** / CLASSIC | CLASSIC greys out and silences the FM1 TONIC extras (track cuts, sends, sidechain) so the sound uses only the settings a `.mtpreset` file can carry (chapters 2 and 8). |
 | **2ND CORE** | **ON** / OFF | The FM-1's chip has two cores and Tonic shares the sound rendering between them. It takes effect at the next power-on. If the FM-1 ever crashes with two cores it switches itself to OFF; turn it back ON here. |
 
@@ -219,9 +229,9 @@ Settings are in the GLO list (SELECT moves up and down, ALGORITHM changes the va
 
 | Page | Knob 1 · 2 · 3 · 4 | Also on this page |
 |---|---|---|
-| **SEQ** (1st press) | FIXED LEN (8, 16, 32, 64) · AUTOSCROLL · FREE LEN (1 to 64) · SWING | White keys: the steps. SELECT: the step pages (16 at a time; AUTOSCROLL off): the page (1-16, 17-32 ...) shows big on the third knob for a moment, then the knob is FREE LEN again. The page never stays on steps that do not exist: if the loop gets shorter than the page you were on, it falls back to the last page the length has. ALGORITHM: the voice (1 to 8, then AC = the global accent). Hold a step + ACCENT / FILL: flags (accent = dark blue, fill = yellow, both = green). {r:FUNC + SEQ}: song mode on / off (confirm with OCT+). {o:FILL + SEQ}: the SONG screen. |
+| **SEQ** (1st press) | FIXED LEN (8, 16, 32, 64) · AUTOSCROLL · FREE LEN (1 to 64) · SWING | White keys: the steps. SEQ and ARP show a big TRACK chip with the selected track (the pattern page, SEQ 2nd press, has none); while recording, a red dot and REC sit in it. ALGORITHM: the step pages (16 at a time; only with AUTOSCROLL off, with AUTOSCROLL on it does nothing here): the page (1-16, 17-32 ...) shows big on the third knob for a moment, then the knob is FREE LEN again. The page never stays on steps that do not exist: if the loop gets shorter than the page you were on, it falls back to the last page the length has. SELECT: the track (1 to 8, then AC = the global accent). Hold a step + ACCENT / FILL: flags (accent = dark blue, fill = yellow, both = green). {r:FUNC + SEQ}: song mode on / off (confirm with OCT+). {o:FILL + SEQ}: the SONG screen. |
 | **PATTERN** (SEQ, 2nd press) | SONG ON / OFF | Black keys 1 to 8 mute, white keys 1 to 16 pick the next pattern (not in song mode). A dark key = empty pattern, low light = has notes, slow blink = the current one, fast blink = the next one (cued). {r:FUNC tap} and {o:FILL tap} as on PERFORM. SEQ again: back. |
-| **ARP** | FIXED LEN · OCTAVE (also OCT- / OCT+, -3 to +3) · PAGE (1-16, 17-32 ...) · - | The SEQ screen, but every key (white and black) plays the selected voice like a keyboard. The C keys (dim) play the voice's own pitch at octave 0. ALGORITHM: the voice. SELECT: the step pages, shown on the third knob. With REC + PLAY every key records the hit and its note (patterns 1 to 16). SEQ: back. {r:FUNC + ARP}: delete the song (DELETE SONG?). |
+| **ARP** | FIXED LEN · AUTOSCROLL · PAGE (1-16, 17-32 ...) · OCTAVE (-3 to +3; also OCT- / OCT+) | The SEQ screen, but every key (white and black) plays the selected voice like a keyboard. The C keys (dim) play the voice's own pitch at octave 0. SELECT: the voice (1 to 8). ALGORITHM: the step pages (AUTOSCROLL off), shown on the third knob. AUTOSCROLL is the same setting as on SEQ. With REC + PLAY every key records the hit and its note (patterns 1 to 16). SEQ: back. {r:FUNC + ARP}: delete the song (DELETE SONG?). |
 
 Making a pattern longer copies what is there into the new part (8 to 16 copies steps 1 to 8 into 9 to 16); making it shorter only shortens it.
 
@@ -255,6 +265,7 @@ Every combination of buttons and keys, grouped by the button you hold first. Bla
 | {r:FUNC + EDIT or LFO held, then PLAY} | Resets this page of the track to its power-on values. No question; undo takes it back. | Pages that have track parameters (not GLO, HOME, SEQ) |
 | {r:FUNC + EDIT}, tapped alone | DELETE AUTOMATION?: removes the selected track's p-locks and recorded motion in the playing pattern (it asks). | Every page |
 | {r:FUNC + SEQ} | Song mode on / off (it asks: OCT+ = yes). | Every page |
+| {r:FUNC + SELECT (turn right / left)} | Switches the patterns the white keys reach: right = bank 2 (patterns 17-32), left = bank 1 (patterns 1-16). The top bar says PATTERN BANK 1 / 2, red in bank 2. Beta: a saved project still keeps only patterns 1-16, so patterns 17-32 are lost when you save and load. | SEQ, ARP, SONG, HOME |
 | {r:FUNC + ARP} | DELETE SONG?: deletes the whole song and leaves song mode (it asks). | Every page |
 | {r:FUNC + HOME} | Renames the project and saves it in the same place. | Every page |
 | {r:FUNC + SAVE} | Quick save into the loaded place. No question. | Every page |
@@ -345,25 +356,54 @@ Every combination of buttons and keys, grouped by the button you hold first. Bla
 - **Chains.** A pattern can be flagged to run into the next one when it ends (after pattern 8 comes 1). A flag only counts on a pattern with notes. A preset with chains loads playing through them (SONG ON); SEQ's pattern page knob 1 turns it off and the pattern loops.
 - **Song mode.** {r:FUNC + SEQ}, confirm with OCT+ (OCT- = back). With no song yet, the PATTERNS screen opens: white keys 1 to 16 add patterns, OCT- (or FUNC + a white key) takes the last off, OCT+ is OK. PLAY plays one bar per pattern, looping. The same gesture leaves song mode. On the **SONG screen** (one row per bar) knob 1 = the bar, knob 2 = its pattern, knob 3 = repeats (x1 to x8, then LOOP = until you stop); turning ALGORITHM moves the bar like knob 1; white keys write a pattern into the bar on the cursor and move on (lit = the pattern has notes, dark = empty, the cursor bar's pattern blinks); OCT+ adds a line after the cursor; OCT- or FILL (pressed and let go) deletes the line at once (the last bar deleted = the song is deleted and song mode ends). {r:FUNC + ARP} deletes the whole song.
 
+### Patterns
+
+A **pattern** is one loop of the sequencer: up to 64 steps for each of the 8 tracks, with their accents, fills, p-locks and recorded knob moves. Bank 1 holds patterns 1 to 16; bank 2 holds patterns 17 to 32 (beta: a saved project still keeps only patterns 1 to 16).
+
+**The pattern keys.** Hold FUNC and the white keys 1 to 16 become the patterns 1 to 16 (17 to 32 in bank 2). {r:FUNC + SELECT} turned right or left switches the bank; the top bar says PATTERN BANK 1 / 2, in red in bank 2. On the pattern page (SEQ, 2nd press) the keys show the patterns: a dark key is empty, a low light has notes, a slow blink is the pattern playing now, a fast blink is the next one, waiting for the end of the bar.
+
+**Changing pattern.** While the music plays, the new pattern starts at the end of the bar, so the music never breaks. On PERFORM and on the pattern page the white keys choose the next pattern without FUNC. In song mode the song decides, and these keys do nothing.
+
+**Copy, paste, clear.** {r:FUNC + ACCENT} copies the pattern you are in, {r:FUNC + FILL} pastes the copy into it (it asks first), {r:FUNC + PLAY} clears it (it asks first). With a black key 1 to 8 held as well, the same three gestures work on that track only.
+
+**Copy-paste on the fly.** {r:FUNC + ACCENT} also starts the copy-paste mode: every pattern key blinks and the screen says PRESS PATTERN TO PASTE. Press a pattern key and the copy lands there at once, with no question. To paste into many patterns, tap FUNC alone before you choose; SEQ leaves the mode. It works while the song plays.
+
+**Not on every page.** On ARP, FUNC, ACCENT and FILL are keyboard keys, and on the two PERFORM pages FUNC and FILL are the MUTE and SOLO keys, so these combinations do not work there.
+
+#### Patterns cheat sheet
+
+| BUTTONS | WHAT IT DOES |
+|---|---|
+| {r:FUNC + white key} | change pattern |
+| {r:FUNC + SELECT} (turn) | bank 1 / 2 |
+| {r:FUNC + ACCENT} | copy |
+| {r:FUNC + FILL} | paste (OCT+ = yes) |
+| {r:FUNC + FILL} + white key | paste there at once |
+| {r:FUNC + ACCENT}, tap FUNC, pattern keys | paste in many places (SEQ = exit) |
+| {r:FUNC + ACCENT} held + white key | that pattern is the copy |
+| {r:FUNC + PLAY} | clear (OCT+ = yes) |
+| {r:FUNC + black key 1-8} held + ACCENT / FILL / PLAY | that track: copy sound / paste / clear pattern |
+| White key (PERFORM, pattern page) | next pattern |
+
 ### Record and sequencer mode
 
 There are two ways to put notes into a pattern: **step entry** (you place steps one by one, the music can be stopped or playing) and **live recording** (you play the keys and turn the knobs while the pattern runs). This part is the step sequencer. Live recording follows below.
 
 #### The step sequencer
 
-The sequencer has 16 patterns per project. Each pattern has 8 tracks, and every track has up to 64 steps. The white keys 1 to 16 are the 16 steps of the page you see; the black keys 1 to 8 are the tracks.
+The sequencer has 16 patterns per project, plus a second bank of 16 (patterns 17 to 32, a beta: {r:FUNC + SELECT} switches the bank, the top bar says PATTERN BANK 1 / 2; a saved project still keeps only patterns 1-16). Each pattern has 8 tracks, and every track has up to 64 steps. The white keys 1 to 16 are the 16 steps of the page you see; the black keys 1 to 8 are the tracks.
 
 | You want to | You do |
 |---|---|
-| Pick a track | Black key 1 to 8 (it also plays the track). On the SEQ page ALGORITHM picks the voice too (1 to 8, then AC = the global accent). |
+| Pick a track | Black key 1 to 8 (it also plays the track). On the SEQ page SELECT picks the track too (1 to 8, then AC = the global accent). On the ARP page SELECT picks the voice. |
 | Put a step on or take it off | White key. |
 | Make a step loud (**accent**) | Hold the white key and press ACCENT (again = off). Or hold ACCENT first, then press white keys. Accent = dark blue. |
 | Make a step a **fill** | Hold the white key and press FILL (again = off). Or hold FILL first, then press white keys. Fill = yellow, accent and fill together = green (red in Grigiotonic). A filled step plays several times inside its step; GLO > FILL RATE sets how many (2x, 4x or 8x; four times unless you change it). |
 | Give a step a **chance** | Hold the white key and turn SELECT: from 100 % down in 5 % steps, then 1:2, 2:2, 1:3 ... 8:8. |
 | Give a step its own sound value (**p-lock**) | Hold the white key and turn a knob on a sound page. See Live recording below for the full explanation. |
 | Change the pattern length | SEQ page, knob 1 = FIXED LEN (8, 16, 32 or 64 steps), knob 3 = FREE LEN (any length from 1 to 64). |
-| See the other steps | SELECT turns the step pages (1-16, 17-32 ...). The page shows big on the third knob for a moment. With AUTOSCROLL on, the page follows the playing step. A page the pattern does not have is never shown. |
-| Make the groove swing | SEQ page, knob 4 = SWING (0 = straight, 100 = a heavy shuffle). Swing belongs to the pattern. GLO > SWING is the same control. |
+| See the other steps | ALGORITHM turns the step pages (1-16, 17-32 ...). The page shows big on the third knob for a moment. With AUTOSCROLL on, the page follows the playing step (ALGORITHM does nothing then). A page the pattern does not have is never shown. |
+| Make the groove swing | SEQ page, knob 4 = SWING (0 = straight, 100 = a heavy shuffle). Swing is global by default: one value for all patterns (set the GLO setting SWING to PER PATTERN to give each pattern its own). GLOBAL > SWING is the same control. |
 | Change the step length | GLO > QUANTIZATION: the grid of the pattern, 1/8 to 1/32. A finer grid means shorter steps. |
 | Change pattern | {r:FUNC + white key 1 to 16}: it changes at the end of the bar while playing. |
 | Copy, paste, clear | {r:FUNC + ACCENT} copies, {r:FUNC + FILL} pastes, {r:FUNC + PLAY} clears. With a black key held as well, only that track. See chapter 4, Patterns. |
@@ -455,7 +495,7 @@ The SONG screen shows five bars at a time, one row per bar: the bar number, the 
 
 - **PLAY** starts from the bar on the cursor (from bar 1 if the cursor is on END). A bar with a repeat plays that many times. After the last bar the song starts again from bar 1. While playing, the top bar shows the bar number.
 - **SONG ON / OFF.** On the pattern page (SEQ, 2nd press) knob 1 is SONG ON / OFF. OFF pauses the advance: the bar that is playing loops. ON: the song moves on.
-- **PERFORM in song mode** (FX, 2nd press): the big number is the pattern playing now, and a purple box that blinks says **PATTERN n**: the pattern the song plays at the end of this bar (the next bar; the same bar again with a repeat, LOOP or SONG OFF; bar 1 after the last bar). The box only shows when that pattern is different from the one playing, and not while stopped or recording. The white keys do nothing there.
+- **PERFORM in song mode** (HOME, 2nd press): the big number is the pattern playing now, and a purple box that blinks says **PATTERN n**: the pattern the song plays at the end of this bar (the next bar; the same bar again with a repeat, LOOP or SONG OFF; bar 1 after the last bar). The box only shows when that pattern is different from the one playing, and not while stopped or recording. The white keys do nothing there.
 - The patterns inside the bars play as they are: step pages, lengths, p-locks and automation of each pattern are heard. Copy and paste of patterns work while the song plays (see Copy-paste on the fly).
 - The SONG screen never zooms the knobs (GLO > ZOOM KNOB).
 
@@ -476,12 +516,27 @@ The SONG screen shows five bars at a time, one row per bar: the bar number, the 
 
 Turn **PRESETS** through the 30 places: 01 and 02 are demo presets, 03 to 30 are yours (an empty place loads with sounds and no pattern: 03 to 08 have their own sounds, 09 sounds like 01, 10 like 02, and so on in rotation). A question asks first: OCT+ loads it, OCT- keeps your sound. Loading is refused while playing.
 
-- **SAVE** asks SAVE HERE? with the loaded place. OCT+ saves there and keeps the name. ALGORITHM picks another place (1 to 30; amber shows who would be replaced). OCT- goes to CHOOSE SLOT, then the slot screen, then the name screen (ALGORITHM = another made-up name; OCT+ saves). HOME leaves without saving. If nothing was loaded since power-on, SAVE starts at CHOOSE SLOT.
+### Saving
+
+- **SAVE** shows ONE screen, SAVE HERE?: the place number and the project's name. **SELECT** picks another spot (1 to 30; amber shows who would be replaced, or EMPTY PLACE). **ALGORITHM** makes another made-up name (with NAME PROJECTS on MANUAL it opens the letter editor). **OCT+** saves, **OCT-** cancels, HOME leaves. If nothing was loaded since power-on, SAVE starts at the first empty place with a made-up name.
 - {r:FUNC + SAVE} quick-saves into the loaded place without asking for a slot, also while playing. An empty place saves at once as UNTITLED 01, 02 ...; a full one asks OVERWRITE SLOT? (OCT+ yes).
 - {r:FUNC + HOME} renames the loaded project (ALGORITHM = another name, OCT+ saves, OCT- or HOME cancels). With NAME PROJECTS set to MANUAL (GLO settings) the name screen becomes a letter editor: knob 4 cycles the characters, OCT+ (the screen says OK) takes the letter, OCT- deletes the last one, then press SAVE (8 letters at most; the screen shows PRESS SAVE and TURN KNOB 4 in big letters).
 - **What is saved.** With AUTOSAVE ON, your working project is saved 4 seconds after you stop touching things, except the compressor, the reverb and the delay: those are kept only by SAVE, inside the preset. PERFORM always starts clean at power-on (D/W 0 %, master low cut 20 Hz, ALL FX on). AUTOSAVE is OFF at the factory: press SAVE (or FUNC + SAVE) to keep your work. The settings are still kept by themselves. Turn AUTOSAVE ON in GLO > SETTINGS if you want the project kept by itself. Factory settings: clock out and notes out off, Tonic MIDI channel 10, remote MIDI channel off, CC mode off (CC CH BASE 1-8), output LOUD, USB audio follows knob, 4/4 LED on, theme GRIGIOTONIC (grey; TONIC is the dark blue one), zoom knob yes, name projects GENERATE, Tonic Engine ENHANCED, 2nd core ON. A new unit or a FACTORY RESET gets them; a unit that already holds a saved project keeps its own settings.
 
 **Back up, restore and clear (web page).** *Back up my presets* downloads one zip with one file per place, `01_name.tnp` to `30_name.tnp`; the song, the recorded knob moves and the ARP notes of a place are inside the same file, so one place is always one file. *Restore my presets* takes that zip, single `.tnp` files or `.mtpreset` files and writes each into the place in its file name (or into the first empty place); a file without a song part also clears the old song and notes of that place. Numbers 31 to 40 of old backups are skipped with a message. *Clear all places* empties places 1 to 30 and works only after a backup was downloaded. Press STOP on the FM-1 first: it refuses while playing.
+
+#### Saving cheat sheet
+
+| What | Buttons |
+|---|---|
+| **SAVE (it asks SAVE HERE?)** | **SAVE** |
+| **IN SAVE HERE?: OTHER SPOT** | **SELECT** |
+| **IN SAVE HERE?: OTHER NAME** | **ALGORITHM** |
+| **IN SAVE HERE?: SAVE** | **OCT+** |
+| **IN SAVE HERE?: CANCEL** | **OCT-** (or **HOME**) |
+| **QUICK SAVE (loaded place)** | {r:FUNC + SAVE} |
+| **RENAME THE PROJECT** | {r:FUNC + HOME} |
+| **LOAD A PLACE** | **PRESETS** knob, then **OCT+** |
 
 ## 6. Lights, MIDI and USB
 
@@ -640,8 +695,8 @@ It is steep: a small value already cuts a normal step a lot, and from about knob
 | **PAN** | HOME · knob 2 | 0 left, 64 centre, 127 right | Position in the stereo field. |
 | **LOW CUT** | HOME · knob 3 | 20 to 663 Hz | Takes out the lows (12 dB per octave). At 20 Hz it does nothing audible. |
 | **HIGH CUT** | HOME · knob 4 | 20 kHz down to 1 kHz | Takes out the highs (12 dB per octave). Fully right = open. |
-| **REVERB SEND** | HOME, 2nd press · knob 1 | 0 to 127 | How much of the track goes to the reverb. |
-| **DELAY SEND** | HOME, 2nd press · knob 2 | 0 to 127 | The same for the delay. |
+| **REVERB SEND** | FX, 2nd press · knob 1 | 0 to 127 | How much of the track goes to the reverb. |
+| **DELAY SEND** | FX, 2nd press · knob 2 | 0 to 127 | The same for the delay. |
 
 The sends leave after the cuts and the sidechain, before the pan, and work whatever PERFORM's D/W and ALL FX say.
 
@@ -650,7 +705,7 @@ The sends leave after the cuts and the sidechain, before the pan, and work whate
 Shared by all the tracks:
 
 - **Choke group** (EDIT, ALGORITHM right): a hit of one track in the group stops the others at once (closed hat stops open hat).
-- **Sidechain** (HOME, 2nd press): one input track makes the tracks you choose on the DUCK screen duck while it sounds; it is a compressor with a side input; the threshold knob (SENDS, knob 3) runs from 0.0 dB (all the way right = off) down to -59 dB, then -INF.
+- **Sidechain** (FX, 2nd press): one input track makes the tracks you choose on the DUCK screen duck while it sounds; it is a compressor with a side input; the threshold knob (SENDS, knob 3) runs from 0.0 dB (all the way right = off) down to -59 dB, then -INF.
 - **Master low cut** (PERFORM · knob 3, 20 to 663 Hz): a low cut on the whole mix, before the compressor.
 - **Compressor** (GLO · COMP): 4:1, soft knee, attack 0.1 to 100 ms, release 10 to 1500 ms, threshold -48 to 0 dB, make-up 0 to 24 dB. A limiter after it keeps the output below full scale.
 - **Reverb** (hold FX): decay, tone, low cut, return level; a grainy, early-digital room. **Delay** (hold HOME): tempo-synced time (1/32 to 1/2), feedback, tone, TAPE (clean digital to worn tape), low cut, return, ping-pong.
@@ -717,7 +772,7 @@ The same as the closed hat, with **EDIT DECAY 68**. Put the two hats in one **ch
 | **EDIT** | MODE CLAP | leave | ATTACK 0 | DECAY 60 |
 | **GLO** | OSC 0 | NOISE 0 | PITCH MOD 0 | leave |
 
-With these values you get 3 to 4 quick bursts in about a tenth of a second. EDIT DECAY lower = a tighter buzz, higher = slower, more separate claps and a longer tail (75 to 85). A little reverb send (HOME, 2nd press) makes it a room clap.
+With these values you get 3 to 4 quick bursts in about a tenth of a second. EDIT DECAY lower = a tighter buzz, higher = slower, more separate claps and a longer tail (75 to 85). A little reverb send (FX, 2nd press) makes it a room clap.
 
 #### Tom
 
@@ -743,7 +798,7 @@ Use the same sound on other tracks with a different FREQUENCY (80 Hz for a floor
 | **EDIT** | not heard (OSC/NOISE MIX 100.00/00.00), leave | | | |
 | **GLO** | OSC 0 | NOISE 0 | PITCH MOD 0 | leave |
 
-The pitch falls 4 octaves in about 0.3 s. Send it to the delay (HOME, 2nd press) for a classic laser.
+The pitch falls 4 octaves in about 0.3 s. Send it to the delay (FX, 2nd press) for a classic laser.
 
 #### Rimshot
 
@@ -795,7 +850,7 @@ A round tone with a very short noise slap (about 0.2 s in all). Raise FREQUENCY 
 | **EDIT** | MODE EXP | leave | ATTACK 0 | DECAY 100 |
 | **GLO** | OSC 0 | NOISE 0 | PITCH MOD 0 | leave |
 
-A cymbal of pure noise that lasts about 2.3 s. Lower DECAY (85 gives about 1 s) for a splash, or raise the LFO FREQUENCY for a thinner sound. Send it a little to the reverb (HOME, 2nd press).
+A cymbal of pure noise that lasts about 2.3 s. Lower DECAY (85 gives about 1 s) for a splash, or raise the LFO FREQUENCY for a thinner sound. Send it a little to the reverb (FX, 2nd press).
 
 #### Clave
 

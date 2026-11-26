@@ -1,4 +1,4 @@
-# wip287: SEQ page: ALGO = the voice (8 voices, then AC); on AC the white keys put trigs on the global accent; ARP: ALGO = voice (no AC)
+# wip287: SEQ page: SELECT = the voice (wip699) (8 voices, then AC); on AC the white keys put trigs on the global accent; ARP: SELECT = voice (no AC)
 wait 300
 tap HOME
 tap SEQ
@@ -6,10 +6,10 @@ wait 50
 expect view 7
 expect arp 0
 expect sel 0
-turn ALGO 1
+turn SELECT 1
 expect sel 1
-turn ALGO -1
-turn ALGO -1
+turn SELECT -1
+turn SELECT -1
 expect acsel 1
 expect sel 0
 shot seq_ac.png
@@ -23,27 +23,27 @@ expect gacc0.2 1
 tapkey w0
 wait 400
 expect gacc0.0 0
-turn ALGO 1
+turn SELECT 1
 expect acsel 0
 expect sel 0
-turn ALGO 1
-turn ALGO -1
-turn ALGO -1
+turn SELECT 1
+turn SELECT -1
+turn SELECT -1
 expect acsel 1
 tapkey b1
 expect acsel 0
 expect sel 1
 # from AC, ARP: AC is dropped (voice kept), the ARP page has the 8 voices only
-turn ALGO -1
-turn ALGO -1
+turn SELECT -1
+turn SELECT -1
 expect acsel 1
 tap ARP
 expect arp 1
 expect acsel 0
 expect sel 0
-turn ALGO -1
+turn SELECT -1
 expect sel 7
-turn ALGO 1
+turn SELECT 1
 expect sel 0
 expect acsel 0
 shot arp_knobs.png

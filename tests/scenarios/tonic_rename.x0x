@@ -8,8 +8,6 @@ expect svstage -1
 # SAVE AS puts the project into the first empty place (3 since wip655; flash slot 34)
 tap SAVE
 tap OCT+
-tap OCT+
-tap OCT+
 expect presetcur 3
 expect slotused34 1
 # a change of our own (track 1, step 9: accent and fill)
@@ -97,10 +95,8 @@ expect playing 1
 expect plmatch0 1
 tap PLAY
 wait 300
-# the ordinary SAVE after a rename is the normal SAVE again: SAVE HERE? first, OCT- goes on to CHOOSE SLOT, OCT- again exits
+# the ordinary SAVE after a rename is the normal SAVE again: SAVE HERE? (wip708: ONE screen), OCT- cancels
 tap SAVE
 expect svstage 3
-tap OCT-
-expect svstage 4
 tap OCT-
 expect svstage -1

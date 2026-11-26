@@ -128,14 +128,14 @@ turn ALGO -1
 turn ALGO -1
 turn ALGO -1
 expect ccmode 0
-# CLASSIC engine (GLO > TONIC ENGINE, row 17 here): the extras (reverb send CC 112 = hex 70, high cut CC 111 = hex 6F) are ignored,
+# CLASSIC engine (GLO > TONIC ENGINE, row 19 here (wip700: SWING sits before it)): the extras (reverb send CC 112 = hex 70, high cut CC 111 = hex 6F) are ignored,
 # the 21 parameters work (CC 21 = hex 15, OSC FREQ, pot 1)
 tap GLO
 tap GLO
 tap GLO
 tap GLO
 tap GLO
-turn SELECT 18
+turn SELECT 19
 turn ALGO 1
 expect classic 1
 ccmode 2 0

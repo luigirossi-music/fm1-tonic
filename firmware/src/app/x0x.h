@@ -56,6 +56,7 @@ typedef struct {
     uint8_t sc_int, sc_in, sc_mask;      /* wip353: the SIDECHAIN (intensity 0-127, input track 0-7, ducked tracks bit v): kept by the autosave and the presets (older projects: 0, track 1, none) */
     uint8_t cc_mode, cc_base;            /* wip386: GLO > CC MODE (0 OFF default, also older projects; 1 SELECTED TRACK, 2 CHANNELS, 3 BOTH) and CC CH BASE (0-8 = the first channel of the 8-channel block, 1-9 on the screen) */
     uint8_t gacc;                        /* wip612: GLO > GLOBAL ACCENT: 0 = 100 % (default, also older projects), else the percent - 9 (1..91 = 10..100 %): how much of its boost the TOTAL accent row keeps */
+    uint8_t swing_pp;                    /* wip700: GLO > SWING: 0 = GLOBAL (default, also older projects: one swing for every pattern), 1 = PER PATTERN */
 } settings_t;
 
 /* the song and the motion lanes: one blob, split across OBJ_SONG and OBJ_MOTION */

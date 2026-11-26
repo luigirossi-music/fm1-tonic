@@ -2,8 +2,18 @@
 The newest version first. Install it with the [web installer](../install/); the
 [manual](../manual/) covers everything in detail.
 
+## FM1 Tonic 1.8f · 26 November 2026
+
+- DONE (wip708, firmware 1.8f) **Simple SAVE: one screen.** SAVE shows SAVE HERE? with the place number and the project's name. SELECT picks another place (1-30), ALGORITHM makes another name (or opens the letter editor with NAME PROJECTS on MANUAL), OCT+ saves, OCT- cancels, HOME leaves. The old CHOOSE SLOT step is gone. QUICK SAVE (FUNC + SAVE) and RENAME (FUNC + HOME) are as before.
+- DONE (wip699, firmware 1.8f) **SELECT and ALGORITHM swapped on the SEQ and ARP pages.** SELECT = the track, ALGORITHM = the step page (AUTOSCROLL off).
+- DONE (wip704, firmware 1.8f) **ARP page: K2 = AUTOSCROLL** (the same setting as on SEQ), **K4 = OCTAVE**.
+- DONE (wip700, firmware 1.8f) **Swing is global by default.** New GLO setting SWING: GLOBAL / PER PATTERN.
+- DONE (wip703, wip706, wip707, firmware 1.8f) **Same top bar on every page:** three chips [P1] [PATTERN BANK n] [TRACK n] (red in bank 2), no page name; the big TRACK chip is also on the SEQ page; the battery is bigger.
+- ADDED (wip709-714, manual 1.8f2 to 1.8f6, six languages) **Saving section + Saving cheat sheet and Song mode cheat sheet** at the end of chapters 5 and 4 (also in the web / PDF cheat sheet); the manual now describes the SEQ / ARP knobs, swing, the pattern bank and the top bar.
+
 ## FM1 Tonic 1.8e · 25 November 2026
 
+- DONE (wip695-698, after 1.8e): **HOME 2nd press = PERFORM, FX 2nd press = SENDS** (swapped); **every button with more than one page (FX, HOME, GLO, SEQ, EDIT) comes back to the page you left**, with its MUTE / SOLO, DUCK or CHOKE screen if it was open. Manual (6 languages), panel drawing and web emulator labels updated.
 - DECLARED (wip694, firmware + manual number 1.8e1 + web page): **version 1.8e**. What's new in 1.8e on the web page: the ARP page's new look, the pattern bank (beta), the new top bar, the blinking REC dot; Future updates: pattern bank saved with the project, p-lock marks, a light spot on the ARP balls.
 - DONE (wip677-684, firmware 1.8e) **ARP page new look**: a piano keyboard on the left, notes as round balls with soft tails in the sequencer colours, the big TRACK chip, the octave you see moves with OCT- / OCT+ (K2 too), notes of another octave pale with +1 / -1.
 - DONE (wip685-687, firmware 1.8e) **Pattern bank (beta)**: FUNC + SELECT = patterns 1-16 / 17-32 on SEQ, ARP, SONG and HOME; the top bar shows PATTERN BANK 1 / 2 (red in bank 2). A saved project still keeps only patterns 1-16.

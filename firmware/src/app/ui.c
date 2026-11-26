@@ -62,6 +62,7 @@ typedef struct {
     uint8_t sv_slot;                   /* ... the chosen slot 0-31 */
     uint8_t sv_here;                   /* wip319: SAVE HERE?: the place it will save into (1-40; ALGORITHM changes it, starts as the loaded place) */
     char sv_pn[TNP_NAME_LEN + 1];      /* ... and the project's name = the loaded place's name (what is saved) */
+    uint8_t sv_newname;                /* wip708: SAVE HERE?: ALGORITHM made a new name (sv_pn) */
     uint8_t ch_n, ch_pat[CH_MAX];      /* CHAIN screen: the patterns chosen so far (0-15) */
     uint8_t songmode;                  /* Tonic: SONG MODE on (FUNC + SEQ, confirmed): PLAY plays the song; not saved */
     int8_t clip;                       /* Tonic: the pattern FUNC + ACCENT copied (0-31), -1 = none yet; not saved */
@@ -229,7 +230,7 @@ static void warn(const char *a, const char *b) { say_as(a, b, ANN_NOW | ANN_KEEP
 enum { R_NONE, R_ENG, R_SWING, R_DLEN, R_DRATE, R_BRKSET,
        R_BRKSLOT, R_TEMPO, R_ACCENT, R_CLKOUT, R_NOTEOUT, R_PALETTE, R_KEYLED, R_KEYSOUND, R_AUTOSAVE, R_ACT, R_SBAR, R_SPAT,
        R_SLEN, R_STALLS, R_HDR, R_TAPE, R_MIDICH, R_OUTLOUD, R_SREP, R_BATT, R_USBFULL, R_CORES,
-       R_QUANT, R_FILLR, R_ZOOM, R_FIXLEN, R_SCROLL, R_FXALL, R_BEAT, R_ARPO, R_SHLO, R_SHHI, R_CLASSIC, R_NAMEMODE, R_SCINT, R_SCIN, R_REMCH, R_CCMODE, R_CCBASE, R_GACC };   /* R_SHLO / R_SHHI (wip289): the track's low / high shelving cut (a = the track) */   /* R_ARPO (wip251): the ARP page's keyboard octave */   /* wip74, GLOBAL PARAMETERS: R_QUANT = the pattern's step grid (slider position 1/8 .. 1/32), R_FILLR = FILL RATE (2x 4x 8x) */   /* R_TAPE: FX's one-knob TAPE (DIGI .. worn tape) */          /* R_HDR: a list's section header (a = its group), never selected */
+       R_QUANT, R_FILLR, R_ZOOM, R_FIXLEN, R_SCROLL, R_FXALL, R_BEAT, R_ARPO, R_SHLO, R_SHHI, R_CLASSIC, R_NAMEMODE, R_SCINT, R_SCIN, R_REMCH, R_CCMODE, R_CCBASE, R_GACC, R_SWMODE };   /* R_SHLO / R_SHHI (wip289): the track's low / high shelving cut (a = the track) */   /* R_ARPO (wip251): the ARP page's keyboard octave */   /* wip74, GLOBAL PARAMETERS: R_QUANT = the pattern's step grid (slider position 1/8 .. 1/32), R_FILLR = FILL RATE (2x 4x 8x) */   /* R_TAPE: FX's one-knob TAPE (DIGI .. worn tape) */          /* R_HDR: a list's section header (a = its group), never selected */
 typedef struct { uint8_t kind, a, b, c; } pref_t;
 #define PR(k, a, b, c) ((pref_t){(k), (a), (b), (c)})
 #define NONE PR(R_NONE, 0, 0, 0)
@@ -281,6 +282,8 @@ static const x0x_param_t STALLS_P = {"STALLS", 1, 0, ONOFF_N};
 static const x0x_param_t REMCH_P = {"REMOTE MIDI CH", 16, 0, 0};   /* wip385: 0 = OFF, 1-16 (proj.set.midi_ch[4]) */
 static const char *const CCMODE_N[] = {"OFF", "SELECTED", "CHANNELS", "BOTH"};
 static const x0x_param_t CCMODE_P = {"CC MODE", 3, 0, CCMODE_N};   /* wip386: OFF (default) / SELECTED TRACK (CC on the Tonic channel) / CHANNELS (channel = track) / BOTH (proj.set.cc_mode) */
+static const char *const SWMODE_N[] = {"GLOBAL", "PER PATTERN"};
+static const x0x_param_t SWMODE_P = {"SWING", 1, 0, SWMODE_N};   /* wip700: GLO > SWING: GLOBAL (default, also older projects) = one swing for every pattern, PER PATTERN = each pattern has its own */
 static const x0x_param_t GACC_P = {"GLOBAL ACCENT", 9, 2, 0};   /* wip616: +1 .. +10 (index 0-9; +3 = 30 % default, +10 = full) of the total accent row's boost */
 static const x0x_param_t CCBASE_P = {"CC CH BASE", 8, 0, 0};          /* wip386: the first channel of the 8-channel block, 1-9 (proj.set.cc_base 0-8) */
 static const x0x_param_t MIDICH_P[NPARTS] = {   /* 0 = OFF (no notes in or out), 1-16 */
@@ -408,6 +411,7 @@ static const x0x_param_t *pref_desc(pref_t r)
     case R_CCMODE: return &CCMODE_P;
     case R_CCBASE: return &CCBASE_P;
     case R_GACC: return &GACC_P;
+    case R_SWMODE: return &SWMODE_P;
     case R_OUTLOUD: return &OUT_P;
     case R_USBFULL: return &USBA_P;
     case R_ZOOM: return &ZOOM_P;
@@ -461,6 +465,7 @@ static int pref_get(pref_t r)
     case R_KEYSOUND: return proj.set.keysound;
     case R_AUTOSAVE: return !proj.set.autosave_off;
     case R_NAMEMODE: return proj.set.name_manual;
+    case R_SWMODE: return proj.set.swing_pp;
     case R_SBAR: return ui.song_sel;
     case R_SPAT: {
         const song_t *sg = song();
@@ -575,7 +580,7 @@ static void pref_set(pref_t r, int v)
     }
     mark_dirty();
     switch (r.kind) {                                  /* wip321: the settings list (they live in proj.set): kept even when AUTOSAVE is off */
-    case R_PALETTE: case R_KEYLED: case R_KEYSOUND: case R_AUTOSAVE: case R_MIDICH: case R_REMCH: case R_CCMODE: case R_CCBASE: case R_GACC: case R_OUTLOUD: case R_USBFULL:
+    case R_PALETTE: case R_KEYLED: case R_KEYSOUND: case R_AUTOSAVE: case R_MIDICH: case R_REMCH: case R_CCMODE: case R_CCBASE: case R_GACC: case R_SWMODE: case R_OUTLOUD: case R_USBFULL:
     case R_ZOOM: case R_BEAT: case R_CLASSIC: case R_NAMEMODE: case R_SCROLL: case R_CORES: case R_CLKOUT: case R_NOTEOUT:
         ui.set_dirty = 1;
         break;
@@ -598,7 +603,22 @@ static void pref_set(pref_t r, int v)
             master_djf_pots(v, proj.sound.v[T_MST][0][MST_FTYPE], &proj.sound.v[T_MST][0][MST_MODE],
                             &proj.sound.v[T_MST][0][MST_CUTOFF]);
         break;
-    case R_SWING: pat_of(PART_909)->swing = (uint8_t)v; break;
+    case R_SWING:
+        pat_of(PART_909)->swing = (uint8_t)v;
+        if (!proj.set.swing_pp) {                      /* wip700: SWING GLOBAL: every pattern gets it */
+            int q;
+            for (q = 0; q < NPAT; q++)
+                proj.pat[q].swing = (uint8_t)v;
+        }
+        break;
+    case R_SWMODE:
+        proj.set.swing_pp = (uint8_t)v;
+        if (!v) {                                      /* wip700: back to GLOBAL: the playing pattern's swing goes to all */
+            int q;
+            for (q = 0; q < NPAT; q++)
+                proj.pat[q].swing = pat_of(PART_909)->swing;
+        }
+        break;
     case R_QUANT: pat_of(PART_909)->drum[PART_909].rate = QUANT_RATE[v]; break;
     case R_FILLR: pat_of(PART_909)->fill = FILL_CODE[v]; break;
     case R_DLEN: pat_of(r.a)->drum[r.a].len = (uint8_t)(v + 1); break;
@@ -1114,7 +1134,7 @@ static void build_pages(void)
     case V_SEQ:                                        /* the part's steps: how its pattern runs */
         pg_grp = GR_PAT;
         if (is_drum() && ui.arp)                       /* wip251: the ARP page: only the octave (the voice: SELECT) */
-            add_page("ARP", PR(R_FIXLEN, p, 0, 0), PR(R_ARPO, 0, 0, 0), NONE, NONE);   /* wip287: K1 = FIXED LEN (as on SEQ), K2 = the octave */
+            add_page("ARP", PR(R_FIXLEN, p, 0, 0), PR(R_SCROLL, 0, 0, 0), NONE, PR(R_ARPO, 0, 0, 0));   /* wip287: K1 = FIXED LEN (as on SEQ); wip703: K2 = AUTOSCROLL (the same setting as on SEQ), K3 = the PAGE spot (drawn, no value), K4 = the octave (was K2) */
         else if (is_drum())
             add_page("SEQUENCE", PR(R_FIXLEN, p, 0, 0), PR(R_SCROLL, 0, 0, 0), PR(R_DLEN, p, 0, 0), PR(R_SWING, 0, 0, 0));   /* numbers only (draw_knobs); RATE is QUANTIZATION on GLOBAL */
         else {
@@ -1336,7 +1356,7 @@ static void open_global(void)
     list_rows[ui.list_n++] = PR(R_HDR, GR_AUDIO, 0, 0);
     list_add(PR(R_OUTLOUD, 0, 0, 0));
     list_add(PR(R_USBFULL, 0, 0, 0));
-    list_add(PR(R_GACC, 0, 0, 0));                       /* wip612: GLOBAL ACCENT 10-100 % (100 by default = as before) */
+    list_add(PR(R_GACC, 0, 0, 0));                       /* wip612: GLOBAL ACCENT +1 .. +10 */
     list_rows[ui.list_n++] = PR(R_HDR, GR_KEYS, 0, 0);
     list_add(PR(R_KEYLED, 0, 0, 0));
     list_add(PR(R_BEAT, 0, 0, 0));
@@ -1346,6 +1366,7 @@ static void open_global(void)
     list_add(PR(R_ACT, ACT_SAVE, 0, 0));
     list_add(PR(R_AUTOSAVE, 0, 0, 0));
     list_add(PR(R_NAMEMODE, 0, 0, 0));
+    list_add(PR(R_SWMODE, 0, 0, 0));                     /* wip700: SWING GLOBAL / PER PATTERN */
     list_add(PR(R_ACT, ACT_CLEAR_PAT, 0, 0));
     list_add(PR(R_ACT, ACT_RESET, 0, 0));
     list_rows[ui.list_n++] = PR(R_HDR, GR_SYSTEM, 0, 0);
@@ -1753,8 +1774,8 @@ static int help_lines(int b, const char *l[HELP_LINES])
     int n = 0;
 #define L(s) (l[n++] = (s))
     switch (b) {
-    case B_ARP: L("THE KEYS ARE A PIANO"); L("FOR THE SELECTED VOICE."); L("ALGO: THE VOICE"); L("K1: FIXED LENGTH"); L("K2 / OCT- OCT+: THE OCTAVE"); L("FUNC + ARP: DELETE SONG"); break;
-    case B_FX: L("MIX: MIX, EQ FREQ, DISTORT,"); L("EQ GAIN. AGAIN: PERFORM."); L("HOLD: REVERB. HOLD HOME: DELAY"); L("FROM ANOTHER PAGE: THE LAST ONE"); break;   /* (wip223: FX / HOME have no hold-for-help: the card is not shown) */
+    case B_ARP: L("THE KEYS ARE A PIANO"); L("FOR THE SELECTED VOICE."); L("SELECT: THE VOICE"); L("K1: FIXED LENGTH"); L("K2: AUTOSCROLL. K4: OCTAVE"); L("FUNC + ARP: DELETE SONG"); break;
+    case B_FX: L("MIX: MIX, EQ FREQ, DISTORT,"); L("EQ GAIN. AGAIN: SENDS."); L("HOLD: REVERB. HOLD HOME: DELAY"); L("FROM ANOTHER PAGE: THE LAST ONE"); break;   /* (wip223: FX / HOME have no hold-for-help: the card is not shown) */
     case B_SEL: L("PITCH MOD: SHAPE, AMOUNT,"); L("RATE. IN A QUESTION: YES");
         break;
     case B_ENV:
@@ -1771,7 +1792,7 @@ static int help_lines(int b, const char *l[HELP_LINES])
         break;
     case B_GLO: L("VEL: OSC NOISE MOD"); L("AGAIN: MIXER, COMP,"); L("THEN: MEMORY, SETTINGS, SAVE."); L("GLO + ACCENT: UNDO"); L("GLO + FILL: REDO"); break;   /* wip417: undo / redo moved here from HOME + REC / PLAY */
     case B_HOME:
-        L("MIX 2: LEVEL PAN LOW HI CUT"); L("AGAIN: SENDS, GLOBAL");
+        L("MIX 2: LEVEL PAN LOW HI CUT"); L("AGAIN: PERFORM, GLOBAL");
         L("LIST: BACK   QUESTION: NO");
         if (tonic_part()) L("FUNC + HOME: RENAME PROJECT");
         break;
@@ -2418,7 +2439,15 @@ static void saveas_open(void)
             ui.sv_occ[k] = ui.sv_pn[k];
         ui.sv_occ[k] = 0;
     }
-    ask(ACT_SAVEAS, ui.preset_cur ? SV_HERE : SV_CHOOSE, "", "");   /* ask_arg = the screen: 3 SAVE HERE?, 4 CHOOSE SLOT, 2 the slot, 1 the name (0 not used any more) */
+    ui.sv_newname = 0;
+    if (!ui.preset_cur) {                               /* wip708: no place loaded: SAVE HERE? opens at the first empty place with a made-up name */
+        ui.sv_here = (uint8_t)next_free_place(0);
+        sv_sync();
+        sv_here_look();
+        put_s(ui.sv_pn, ui.sv_name);
+        ui.sv_newname = 1;
+    }
+    ask(ACT_SAVEAS, SV_HERE, "", "");   /* wip708: ONE screen, SAVE HERE?: SELECT = the spot, ALGORITHM = the name, OCT+ saves, OCT- cancels (CHOOSE SLOT and the slot screen are gone). ask_arg 1 = the letter editor (MANUAL names) */
 }
 
 /* wip652: SAVE AS / QUICK SAVE pack into pbuf (the preset-viewing buffer above, 3840 bytes, already in the pool): a save never runs while a
@@ -2808,19 +2837,71 @@ static int32_t accel(int role, int32_t s, int range)
     return s * (int32_t)m;
 }
 
+/* wip696: the 2nd-page states of a view (MUTE / SOLO, DUCK, CHOKE, pattern page) are kept when you leave it, and put back by restore_sub() when a button brings you back */
+static uint8_t sub_mem[NVIEWS];
+static uint8_t home_mem;               /* wip696: the last page of the HOME group: 0 MIX 2, 1 PERFORM, 2 GLOBAL */
+static uint8_t fx_pg;                  /* wip696: the effects page (V_FX page 1..4) last seen in the FX group (ui.fx_mem == 2) */
+
+static uint8_t glo_mem;                /* wip697: the last page of the GLO group: 0 VEL, 1 MIXER, 2 COMP, 3 MEMORY, 4 SETTINGS list */
+
+static void note_groups(void)          /* wip696: remember where each button group was left (called every frame and when HOME / FX is pressed) */
+{
+    if (ui.view == V_VEL && ui.overlay == O_NONE)
+        glo_mem = 0;
+    else if (ui.view == V_MIX && ui.overlay == O_NONE)
+        glo_mem = 1;
+    else if (ui.view == V_GLO)
+        glo_mem = ui.overlay == O_NONE ? 2 : ui.overlay == O_MEM ? 3 : ui.overlay == O_LIST ? 4 : glo_mem;
+    if (ui.overlay != O_NONE)
+        return;
+    switch (ui.view) {
+    case V_MIX1: ui.fx_mem = 0; break;
+    case V_MIX2:
+        if (cur_page() == 0)
+            home_mem = 0;
+        else if (cur_page() == 1)
+            ui.fx_mem = 1;
+        break;
+    case V_FX:
+        if (cur_page() == 0)
+            home_mem = 1;
+        else {
+            ui.fx_mem = 2;
+            fx_pg = (uint8_t)cur_page();
+        }
+        break;
+    case V_GLOB: home_mem = 2; break;
+    default: break;
+    }
+}
+
+static void restore_sub(int v)         /* wip696: after set_view(v) from a button: the 2nd-page state the view had when it was left */
+{
+    uint8_t m = sub_mem[v];
+    if (v != ui.view)
+        return;
+    if (v == V_FX && cur_page() == 0)
+        ui.msp = (uint8_t)(m & 1u);
+    if (v == V_MIX2 && cur_page() == 1)
+        ui.dck = (uint8_t)((m >> 1) & 1u);
+    if (v == V_NEV)
+        ui.chk = (uint8_t)((m >> 2) & 1u);
+    if (v == V_SEQ && !ui.arp)
+        ui.seqpat = (uint8_t)((m >> 3) & 1u);
+}
+
 static void set_view(int v)
 {
-    if (v != ui.view)
+    if (v != ui.view) {
+        if (!(ui.view == V_SEQ && ui.arp))
+            sub_mem[ui.view] = (uint8_t)((ui.msp & 1u) | ((ui.dck & 1u) << 1) | ((ui.chk & 1u) << 2) | ((ui.seqpat & 1u) << 3));
         ui.prev_view = ui.view;
+    }
     ui.view = (uint8_t)v;
     ui.chk = 0;                                        /* wip328: and the CHOKE screen closes */
     ui.dck = 0;                                        /* wip350: and the DUCK screen */
     ui.msp = 0;                                        /* wip272: any page change goes back to the first PERFORM page (ALGO selects the MUTE / SOLO one) */
                                                        /* wip606: the MUTE / SOLO mode is NOT reset by a page change: back on PERFORM (or the GLO mixer) it is as it was left (FILL lit = SOLO, tracks can keep being soloed) */
-    if (v == V_FX)
-        ui.fx_mem = 1;
-    else if (v == V_MIX1)
-        ui.fx_mem = 0;
     ui.seqpat = 0;
     ui.held_step = -1;
     ui.brk_held = -1;
@@ -3158,7 +3239,7 @@ static void step_flag(int k, int v, int s, int fill)
 }
 
 /* wip583: the step PAGE spot (1-16, 17-32 ...) on the 3rd knob's cell, in every skin: always on the ARP page (its K3 is free) and with AUTOSCROLL on (SEQ: the FREE LEN cell);
- * with AUTOSCROLL off the SEQ page keeps FREE LEN and shows the page for 1.2 s after a turn of SELECT */
+ * with AUTOSCROLL off the SEQ page keeps FREE LEN and shows the page for 1.2 s after a turn of ALGORITHM (wip699) */
 static uint32_t spage_until;
 static int spage_pages(void)                          /* the pages the track's pattern length has: 16 = 1, 32 = 2 ... */
 {
@@ -3951,7 +4032,7 @@ static void button_tap(int b)
             else if (b == B_OCTDN)
                 {
                     int fx = ui.sv_fixed;
-                    ask(ACT_SAVEAS, fx ? 1 : 2, "", "");
+                    ask(ACT_SAVEAS, fx ? 1 : SV_HERE, "", "");
                     if (fx)
                         name_enter();
                 }
@@ -3968,21 +4049,19 @@ static void button_tap(int b)
             if (b == B_OCTDN) {
                 if (st == 1 && proj.set.name_manual && name_delete()) {
                     ;                                          /* wip324: a letter taken back */
-                } else if (ui.sv_rename || st == SV_CHOOSE) {      /* RENAME has only the name screen; CHOOSE SLOT: EXIT SAVE */
+                } else if (ui.sv_rename || st == SV_CHOOSE || st == SV_HERE) {      /* RENAME has only the name screen; wip708: SAVE HERE? OCT- = cancel */
                     ui.overlay = O_NONE;
                     say("CANCELLED", 0);
-                } else if (st == SV_HERE)
-                    ui.ask_arg = SV_CHOOSE;
-                else if (st == 2)
-                    ui.ask_arg = SV_CHOOSE;
+                } else if (st == 2)
+                    ui.ask_arg = SV_HERE;
                 else if (st == 1) {
-                    ui.ask_arg = 2;
+                    ui.ask_arg = SV_HERE;                      /* wip708: the letter editor: OCT- with no letter goes back to SAVE HERE? */
                     sv_here_look();
                 }
             } else if (b == B_OCTUP) {
                 if (st == SV_HERE) {                       /* YES: the place shown (wip319: ALGORITHM may have changed it), the project's name, at once */
                     ui.overlay = O_NONE;
-                    if (ui.sv_here == ui.preset_cur)
+                    if (ui.sv_here == ui.preset_cur && !ui.sv_newname)
                         quick_write();
                     else
                         quick_write_to(ui.sv_here, ui.sv_pn);
@@ -4110,19 +4189,29 @@ static void button_tap(int b)
         ui.rec = !ui.rec;
         say(ui.rec ? "RECORD ON: KEYS + KNOBS" : "RECORD OFF", 0);
         break;
-    case B_HOME:                                      /* MIX PAGE 2; again: SENDS, GLOBAL PARAMETERS, then MIX PAGE 2 again (wip339) */
+    case B_HOME:                                      /* MIX PAGE 2, PERFORM, GLOBAL, MIX PAGE 2 again; from another page: the HOME page you left (wip696) */
+        note_groups();
         if (ui.overlay != O_NONE || ui.view == V_GLO)
             close_overlay();
-        else if (ui.view == V_MIX2 && cur_page() == 0) {  /* wip288: MIX PAGE 2 (level, pan) -> its SENDS page (reverb / delay send) */
-            *page_of(V_MIX2) = 1;
+        else if (ui.view == V_MIX2 && cur_page() == 0) {  /* wip695: MIX PAGE 2 (level, pan) -> PERFORM */
+            *page_of(V_FX) = 0;
+            set_view(V_FX);
+        } else if (ui.view == V_FX && cur_page() == 0) {  /* PERFORM -> GLOBAL */
+            set_view(V_GLOB);
+        } else if (ui.view == V_GLOB) {                   /* GLOBAL -> MIX PAGE 2 */
+            set_view(V_MIX2);
+            *page_of(V_MIX2) = 0;
             build_pages();
+        } else if (home_mem == 1) {                       /* wip696: from another page: PERFORM again (with its MUTE / SOLO page if that was open) */
+            *page_of(V_FX) = 0;
+            set_view(V_FX);
+            restore_sub(V_FX);
+        } else if (home_mem == 2) {
+            set_view(V_GLOB);
         } else {
-            int to = ui.view == V_MIX2 ? V_GLOB : V_MIX2;   /* wip339: the cycle ends at GLOBAL PARAMETERS (3rd press), the 4th press is MIX PAGE 2 again: the PATTERNS and SONG screens are no longer on HOME (song mode: FUNC + SEQ) */
-            set_view(to);                             /* MIX PAGE 2, its SENDS, GLOBAL, MIX PAGE 2 again */
-            if (to == V_MIX2) {
-                *page_of(V_MIX2) = 0;
-                build_pages();
-            }
+            set_view(V_MIX2);
+            *page_of(V_MIX2) = 0;
+            build_pages();
         }
         break;
     case B_SEL:
@@ -4138,8 +4227,10 @@ static void button_tap(int b)
             *page_of(V_PART) = (uint8_t)((cur_page() + 1) % pg.n);
         else if (!tonic_part())
             set_view(V_PART);
-        else
+        else {
             set_view(V_NEV);                          /* wip290: the Tonic: NOISE ENVELOPE (VEL moved to the GLO button, 1st press) */
+            restore_sub(V_NEV);                       /* wip696: and its CHOKE screen if you left it there */
+        }
         break;
     case B_ARP:                                       /* wip251: the ARP page: the SEQ view with a piano for keys */
         if (tonic_part() && !(ui.view == V_SEQ && ui.arp && ui.overlay == O_NONE)) {
@@ -4151,17 +4242,30 @@ static void button_tap(int b)
     case B_ENV:                                       /* OSCILLATOR (hold + knob / key keep their old jobs; a 2nd press: later) */
         set_view(V_OSC);
         break;
-    case B_FX:                                        /* MIX (Mix, EQ, Distort); again: the effects (the pages cycle, then MIX again); from another page: the last one left */
-        if (ui.view == V_MIX1 && ui.overlay == O_NONE) {
-            *page_of(V_FX) = 0;                        /* always start at PERFORM (it stayed on the last page, DELAY, before) */
-            set_view(V_FX);
+    case B_FX:                                        /* MIX; again: SENDS, then MIX; from another page: the last FX page you left (wip696) */
+        note_groups();
+        if (ui.view == V_MIX1 && ui.overlay == O_NONE) {   /* wip695: MIX -> SENDS */
+            set_view(V_MIX2);
+            *page_of(V_MIX2) = 1;
+            build_pages();
         }
-        else if (ui.view == V_FX && ui.overlay == O_NONE) {   /* wip223: PERFORM -> MIX; REVERB / DELAY (long press pages) -> MIX; wip272: either PERFORM page -> MIX (FX no longer opens the MUTE / SOLO page: ALGO does) */
+        else if (ui.view == V_MIX2 && cur_page() == 1 && ui.overlay == O_NONE) {   /* wip695: SENDS (and its DUCK screen) -> MIX */
+            set_view(V_MIX1);
+        }
+        else if (ui.view == V_FX && cur_page() != 0 && ui.overlay == O_NONE) {   /* REVERB / DELAY (long press pages) -> MIX */
             ui.msp = 0;
             set_view(V_MIX1);
         }
-        else
-            set_view(ui.fx_mem && ui.view != V_FX ? V_FX : V_MIX1);   /* from another page: back to the last one of this group, its effects page too (wip200); the end of the cycle = MIX */
+        else if (ui.fx_mem == 1) {                    /* wip696: from another page: SENDS again (its DUCK screen too if it was open) */
+            set_view(V_MIX2);
+            *page_of(V_MIX2) = 1;
+            build_pages();
+            restore_sub(V_MIX2);
+        } else if (ui.fx_mem == 2 && fx_pg >= 1) {    /* wip696: the REVERB / DELAY page you left */
+            *page_of(V_FX) = fx_pg;
+            set_view(V_FX);
+        } else
+            set_view(V_MIX1);
         break;
     case B_LFO:                                       /* NOISE (the old mixer / master pages are no longer reached from here; 2nd press: later) */
         set_view(V_NOISE);
@@ -4181,7 +4285,16 @@ static void button_tap(int b)
             set_view(V_MIX);                          /* VEL -> the MIXER */
         else {
             ui.part = PART_909;
-            set_view(V_VEL);
+            if (glo_mem == 1)                         /* wip697: from another page: the GLO page you left (MIXER, COMP, MEMORY, SETTINGS) */
+                set_view(V_MIX);
+            else if (glo_mem >= 2) {
+                set_view(V_GLO);
+                if (glo_mem == 3)
+                    ui.overlay = O_MEM;
+                else if (glo_mem == 4)
+                    open_global();
+            } else
+                set_view(V_VEL);
         }
         break;
     case B_SEQ:                                       /* the part's steps; again: the next page */
@@ -4197,8 +4310,10 @@ static void button_tap(int b)
             ui.seqpat ^= 1u;                          /* the Tonic: 2nd press = the pattern number screen, 3rd = back */
         else if (ui.view == V_SEQ && ui.overlay == O_NONE)
             *page_of(V_SEQ) = (uint8_t)((cur_page() + 1) % pg.n);
-        else
+        else {
             set_view(V_SEQ);
+            restore_sub(V_SEQ);                       /* wip696: the pattern page again if you left it there */
+        }
         break;
     case B_SAVE: saveas_open(); break;
     case B_OCTUP:
@@ -4330,7 +4445,7 @@ static void input(void)
     seq.song_hold = (uint8_t)(tonic_part() && ui.songmode && !seq.chain_on);   /* SONG OFF: loop this bar */
     seq.song_rec = (uint8_t)(seq.song_on && ui.rec);  /* the song + REC: the song is being written */
     if (ui.overlay == O_ASK && ui.ask_act == ACT_STOPFIRST && !seq.playing && !seq.req_stop)
-        ask(ACT_SAVEAS, 2, "", "");                    /* stopped: back to the slot screen, OCT+ saves */
+        ask(ACT_SAVEAS, SV_HERE, "", "");              /* stopped: back to SAVE HERE?, OCT+ saves (wip708) */
     if (ui.overlay == O_ASK) {                         /* a question: the knobs wait (the PRESETS knob moves a preset's choice) */
         for (i = 0; i < NE; i++) {
             int d = enc((int)i);
@@ -4339,14 +4454,25 @@ static void input(void)
             }
             if (d && i == EN_K4 && ui.ask_act == ACT_SAVEAS && name_manual_on())
                 name_turn(d);                              /* wip324: K4 cycles the blinking letter */
+            if (d && i == EN_SELECT && ui.ask_act == ACT_SAVEAS && ui.ask_arg == SV_HERE) {   /* wip708: SELECT = another spot (1-40, round); OCT+ saves there */
+                ui.sv_here = (uint8_t)((ui.sv_here - 1 + NPRESETS + (d > 0 ? 1 : -1)) % NPRESETS + 1);
+                sv_sync();
+                sv_here_look();
+            }
             if (d && i == EN_ALGO && ui.ask_act == ACT_SAVEAS) {
                 if (ui.ask_arg == 1) {
                     if (!proj.set.name_manual)
                         elf_name(ui.sv_name);
                 }
-                else if (ui.ask_arg == SV_HERE) {          /* wip319: another place to save into; YES saves there */
-                    ui.sv_here = (uint8_t)((ui.sv_here - 1 + NPRESETS + (d > 0 ? 1 : -1)) % NPRESETS + 1);
-                    sv_here_look();
+                else if (ui.ask_arg == SV_HERE) {          /* wip708: ALGORITHM = another name (MANUAL names: the letter editor) */
+                    if (proj.set.name_manual) {
+                        ui.ask_arg = 1;
+                        name_enter();
+                    } else {
+                        elf_name(ui.sv_name);
+                        put_s(ui.sv_pn, ui.sv_name);
+                        ui.sv_newname = 1;
+                    }
                 } else if (ui.ask_arg == 2) {
                     ui.sv_here = (uint8_t)((ui.sv_here - 1 + NPRESETS + (d > 0 ? 1 : -1)) % NPRESETS + 1);   /* wip343: 1-40, round */
                     sv_sync();
@@ -4377,8 +4503,30 @@ static void input(void)
             mark_dirty();
         } else if (ui.overlay == O_LIST) {
             list_move(e > 0 ? 1 : -1);
-        } else if (ui.view == V_SEQ && ui.overlay == O_NONE && tonic_part() && !ui.seqpat && !proj.set.autoscroll) {
-            char t[20];                               /* wip240: the SEQ page, AUTOSCROLL off: SELECT turns the step page 1-16 / 17-32 / 33-48 / 49-64 (round) */
+        } else if (ui.view == V_SEQ && ui.overlay == O_NONE && tonic_part() && !ui.seqpat) {   /* wip699: SEQ and ARP pages: SELECT = the track (round); on SEQ after track 8 comes AC (the global accent) (was ALGORITHM, wip287) */
+            if (!ui.help) {
+                int n = ui.arp ? NDRUM_TONIC : NDRUM_TONIC + 1, v = ui.ac ? NDRUM_TONIC : (int)ui.sel[PART_909];
+                v += e > 0 ? 1 : -1;
+                v = v < 0 ? n - 1 : v >= n ? 0 : v;
+                ui.ac = (uint8_t)(v == NDRUM_TONIC);
+                if (!ui.ac)
+                    ui.sel[PART_909] = (uint8_t)v;
+                build_pages();
+                say(ui.ac ? "ACCENT" : engine_voice_name(T_909, ui.sel[PART_909]), 0);
+            }
+        } else if (ui.view == V_MIX && ui.overlay == O_NONE && !ui.help && pg.n > 1) {
+            int p = cur_page() + (e > 0 ? 1 : -1);        /* wip334: the GLO mixer: 1 2 3 4 then 1 again (right), 4 3 2 1 then 4 (left): round */
+            *page_of(ui.view) = (uint8_t)(p < 0 ? pg.n - 1 : p >= pg.n ? 0 : p);
+        } else {
+            int p = cur_page() + (e > 0 ? 1 : -1);
+            *page_of(ui.view) = (uint8_t)(p < 0 ? 0 : p >= pg.n ? pg.n - 1 : p);
+        }
+    }
+    if ((e = enc(EN_ALGO)) != 0) {               /* ALGORITHM: the part; in a list, the value */
+        if (ui.overlay == O_LIST) {
+            turn_ref(list_rows[ui.list_sel], e, EN_ALGO);
+        } else if (ui.view == V_SEQ && ui.overlay == O_NONE && tonic_part() && !ui.seqpat && !proj.set.autoscroll) {   /* wip699: SEQ and ARP pages, AUTOSCROLL off: ALGORITHM turns the step page 1-16 / 17-32 / 33-48 / 49-64 (round) (was SELECT, wip240) */
+            char t[20];
             int n = (seq_part_len(&seq, TRK_DRUM + ui.part) + 15) / 16, pg_ = (int)ui.spage + (e > 0 ? 1 : -1);   /* wip241: only the pages the pattern length has (16 = one page, 32 = two ...) */
             if (n < 1)
                 n = 1;
@@ -4392,26 +4540,6 @@ static void input(void)
                 put_i(put_s(put_i(put_s(t, "STEPS "), ui.spage * 16 + 1), "-"), ui.spage * 16 + 16);
                 say(t, 0);
             }
-        } else if (ui.view == V_MIX && ui.overlay == O_NONE && !ui.help && pg.n > 1) {
-            int p = cur_page() + (e > 0 ? 1 : -1);        /* wip334: the GLO mixer: 1 2 3 4 then 1 again (right), 4 3 2 1 then 4 (left): round */
-            *page_of(ui.view) = (uint8_t)(p < 0 ? pg.n - 1 : p >= pg.n ? 0 : p);
-        } else {
-            int p = cur_page() + (e > 0 ? 1 : -1);
-            *page_of(ui.view) = (uint8_t)(p < 0 ? 0 : p >= pg.n ? pg.n - 1 : p);
-        }
-    }
-    if ((e = enc(EN_ALGO)) != 0) {               /* ALGORITHM: the part; in a list, the value */
-        if (ui.overlay == O_LIST) {
-            turn_ref(list_rows[ui.list_sel], e, EN_ALGO);
-        } else if (ui.view == V_SEQ && ui.overlay == O_NONE && tonic_part() && !ui.seqpat && !ui.help) {   /* wip287: SEQ and ARP pages: ALGO = the voice (round); on SEQ after voice 8 comes AC (the global accent) */
-            int n = ui.arp ? NDRUM_TONIC : NDRUM_TONIC + 1, v = ui.ac ? NDRUM_TONIC : (int)ui.sel[PART_909];
-            v += e > 0 ? 1 : -1;
-            v = v < 0 ? n - 1 : v >= n ? 0 : v;
-            ui.ac = (uint8_t)(v == NDRUM_TONIC);
-            if (!ui.ac)
-                ui.sel[PART_909] = (uint8_t)v;
-            build_pages();
-            say(ui.ac ? "ACCENT" : engine_voice_name(T_909, ui.sel[PART_909]), 0);
         } else if (ui.view == V_SONG && ui.overlay == O_NONE && tonic_part() && !ui.help) {   /* wip624: the SONG screen: ALGORITHM moves the bar row like K1 (0 .. END, stops at the ends) */
             int mx = song()->len < NSONG ? (int)song()->len : NSONG - 1, nr = (int)ui.song_sel + (e > 0 ? 1 : -1);
             ui.song_sel = (uint8_t)(nr < 0 ? 0 : nr > mx ? mx : nr);
@@ -5031,13 +5159,13 @@ static void draw_batt(void)
     uint16_t on = st == 4 ? C_SLBLUE : st == 3 ? RGB(60, 190, 90) : st == 2 ? RGB(240, 170, 30) : RGB(222, 58, 58);
     if (st <= 0)
         return;
-    cv_rect(217, 4, 19, 1, C_WHITE);                   /* the outline: 19 x 11, the nub 2 x 5 */
-    cv_rect(217, 14, 19, 1, C_WHITE);
-    cv_rect(217, 4, 1, 11, C_WHITE);
-    cv_rect(235, 4, 1, 11, C_WHITE);
-    cv_rect(236, 7, 2, 5, C_WHITE);
+    cv_rect(212, 2, 24, 1, C_WHITE);                   /* wip707: BIGGER: the outline 24 x 15 (was 19 x 11), as tall as the header chips, the nub 3 x 7 */
+    cv_rect(212, 16, 24, 1, C_WHITE);
+    cv_rect(212, 2, 1, 15, C_WHITE);
+    cv_rect(235, 2, 1, 15, C_WHITE);
+    cv_rect(236, 6, 3, 7, C_WHITE);
     for (i = 0; i < 3; i++)
-        cv_rect(219 + 5 * i, 6, 4, 7, i < n && !blink_off ? on : C_LINE);
+        cv_rect(214 + 7 * i, 4, 6, 11, i < n && !blink_off ? on : C_LINE);
 }
 static int rec_blink_on(void);                     /* wip690: defined below, the header's REC dot uses it too */
 static void draw_header(void)
@@ -5054,12 +5182,11 @@ static void draw_header(void)
         return;
     }
     ui.msg_until = 0;
-    if (tonic_part() && (ui.view != V_GLOB || grigio()) && (!fx_comp_page() || grigio())) {   /* the Tonic, any page: the selected track at the left ("TRACK 3"); GLOBAL and the master's COMP have none */
-        char pn[12];
-        uint16_t chip_col = ui.pbank && (ui.view == V_SEQ || ui.view == V_SONG || ui.view == V_HOME) ? RGB(222, 58, 58) : part_col();   /* wip686: PATTERN BANK 2: the top chip is RED */
-        const char *tn = ui.view == V_MIX && !grigio() ? preset_name_cur(pn) : engine_voice_name(T_909, ui.sel[PART_909]);   /* wip229: the GLO mixer is the master mix: the project's name, not "TRACK n" */
+    if (tonic_part()) {   /* the Tonic, EVERY page (wip705): the three chips [P1] [PATTERN BANK n] [TRACK n] */
+        uint16_t chip_col = ui.pbank ? RGB(222, 58, 58) : part_col();   /* wip705: red in bank 2 on every page */   /* wip686: PATTERN BANK 2: the top chip is RED */
+        const char *tn = engine_voice_name(T_909, ui.sel[PART_909]);   /* wip705: always the track (the old skin's GLO mixer showed the project name) */   /* wip229: the GLO mixer is the master mix: the project's name, not "TRACK n" */
         int32_t w = htw(&FONT_B, tn) + 12;
-        if (ui.view == V_SEQ) {                      /* wip687: [P1] [PATTERN BANK n] [TRACK n] (the track chip only on SEQ: ARP has the big one); all RED in bank 2 */
+        if (1) {                                     /* wip705: every page (was SEQ and ARP only). wip687: [P1] [PATTERN BANK n] [TRACK n] (the track chip only on SEQ: ARP has the big one); all RED in bank 2 */
             int part = PART_909, cue = seq_cue_of(&seq, part);
             char pt[12], *q = pt;
             int32_t cx = 2, cw;
@@ -5109,7 +5236,7 @@ static void draw_header(void)
         }
         if (ui.view == V_SEQ && !chips3)
             x = htext(x, &FONT_S, view_title(), C_HI) + 6;   /* (wip687: SEQ and ARP: no page name, three chips) */
-    } else {
+    } else if (!chips3) {                             /* (wip705: the three chips are on every page: no page name in the top bar) */
         {
             const felucca_font_t *vf = ui.view == V_MIX2 || ui.view == V_GLOB || ui.view == V_PMOD || ui.view == V_OSC || ui.view == V_NOISE || ui.view == V_NEV || ui.view == V_VEL ? &FONT_XS : &FONT_B;   /* (the long "MIX PAGE 2" must stop before the pattern tag) */
             const char *vt = grigio() && ui.view == V_OSC ? "OSC" : grigio() && ui.view == V_PMOD ? "PITCH" : grigio() && ui.view == V_NOISE ? "NOISE" : grigio() && ui.view == V_NEV ? "NOISE ENV" : grigio() && ui.view == V_MIX2 ? (cur_page() == 1 ? "SENDS" : "MIX 2") : grigio() && ui.view == V_GLOB ? "GLOBAL" : grigio() && ui.view == V_MIX ? "GLO MIX" : grigio() && fx_comp_page() ? "COMP" : view_title();   /* wip552: the OSC mockup's top bar says OSC (the page title says OSCILLATOR) */
@@ -5151,13 +5278,13 @@ static void draw_header(void)
             shown = (int)(avg + 0.5f);
         put_i(b, shown);
     }
-    htext_r(191, &FONT_S, b, seq.ext ? C_AMB : C_HI);   /* wip605: 21 px to the left, the battery has the corner */
+    htext_r(183, &FONT_S, b, seq.ext ? C_AMB : C_HI);   /* wip605: 21 px to the left, the battery has the corner (wip707: 8 px more, the battery is bigger) */
     if (seq.playing)
-        play_icon(196, 4, (eng_step[TRK_DRUM] & 3) == 0 ? C_WHITE : C_HI);
+        play_icon(188, 4, (eng_step[TRK_DRUM] & 3) == 0 ? C_WHITE : C_HI);
     if (ui.rec)
-        dot(210, 9, 4, rec_blink_on() ? RGB(222, 30, 30) : RGB(150, 120, 125));   /* wip690: blinks exactly like the REC LED (same test as the ARP chip's dot) */
+        dot(202, 9, 4, rec_blink_on() ? RGB(222, 30, 30) : RGB(150, 120, 125));   /* wip690: blinks exactly like the REC LED (same test as the ARP chip's dot) */
     else if (ui.dirty)
-        dot(212, 9, 1, C_GRAY);
+        dot(204, 9, 1, C_GRAY);
     draw_batt();
     cv_commit(0, 0, 0);
 }
@@ -5210,6 +5337,11 @@ static void arp_tail(int x0, int x1, int yc, uint16_t col)
     }
 }
 /* the BIG track chip of the mockup (screen x 112..232, y 144..170): it starts in the main canvas and ends in the knob canvas, so it is drawn in both (main coords, oy = the offset of the canvas) */
+/* wip703: the big track chip is on the ARP page AND on the SEQ page (not the pattern page); on SEQ it sits over the right part of the AC row (his choice: the AC row's trigs are thin lines) */
+static int bigchip_page(void)
+{
+    return tonic_part() && ui.view == V_SEQ && (ui.arp || !ui.seqpat);
+}
 static void arp_chip(int oy)
 {
     int v = ui.sel[PART_909];
@@ -5356,6 +5488,8 @@ static void draw_drum(int band)
                 cv_rect(x + 8, y + 1, 3, 3, C_BLACK);
         }
     }
+    if (bigchip_page())                                /* wip703: the big track chip on the SEQ page too (same place as ARP) */
+        arp_chip(-band * BAND_H);
 }
 
 static void draw_break(int band)
@@ -6157,7 +6291,7 @@ static void draw_saveas(int band)
     uint16_t purple = C_TBOTH;       /* the messages: the purple of a step with accent + fill */
     int st = (int)ui.ask_arg;
     const char *ok = st == 1 && proj.set.name_manual ? "OCT+  OK" : st == SV_HERE ? "OCT+  YES" : st == SV_CHOOSE ? "OCT+  CHOOSE SLOT" : st == 2 ? "OCT+  CONFIRM" : st == 1 ? "OCT+  SAVE" : "OCT+  OK";   /* OCT- left, OCT+ right: as on the device */
-    const char *back = st == 1 && proj.set.name_manual && ui.nm_len ? "OCT-  DELETE" : st == SV_HERE ? "OCT-  NO" : st == SV_CHOOSE ? "OCT-  NO, EXIT" : st == 0 || ui.sv_rename ? "OCT-  CANCEL" : "OCT-  BACK";
+    const char *back = st == 1 && proj.set.name_manual && ui.nm_len ? "OCT-  DELETE" : st == SV_HERE ? "OCT-  CANCEL" : st == SV_CHOOSE ? "OCT-  NO, EXIT" : st == 0 || ui.sv_rename ? "OCT-  CANCEL" : "OCT-  BACK";
     if (band == 0) {
         char t[40], *q = t;
         frame(6, 6, 228, 63, purple);
@@ -6169,7 +6303,13 @@ static void draw_saveas(int band)
             q = put_s(q, "  ");
             put_s(q, ui.sv_pn[0] ? ui.sv_pn : "UNTITLED");
             text_c(120, 8, &FONT_B, "SAVE HERE?", C_WHITE);
-            text_c(120, 40, &FONT_S, t, C_HI);
+            text_c(120, 36, &FONT_S, t, C_HI);
+            if (ui.sv_here != ui.preset_cur) {         /* wip708: another spot: who goes (amber), or an empty place */
+                char u[40], *w = put_s(u, ui.sv_occ[0] ? "REPLACES " : "EMPTY PLACE");
+                if (ui.sv_occ[0])
+                    put_s(w, ui.sv_occ);
+                text_c(120, 54, &FONT_XS, u, ui.sv_occ[0] ? C_AMB : C_GRAY);
+            }
         } else if (st == SV_CHOOSE) {
             text_c(120, 24, &FONT_B, "CHOOSE SLOT", C_WHITE);
         } else if (st == 0) {
@@ -6196,13 +6336,8 @@ static void draw_saveas(int band)
         if (st == 2) {
             q = put_s(t, "TURN ALGORITHM  ");
             put_s(q, ui.sv_occ[0] ? ui.sv_occ : "EMPTY");
-        } else if (st == SV_HERE) {
-            if (ui.sv_here != ui.preset_cur) {
-                q = put_s(t, ui.sv_occ[0] ? "REPLACES " : "EMPTY PLACE");
-                if (ui.sv_occ[0])
-                    put_s(q, ui.sv_occ);
-            } else
-                put_s(t, "ALGORITHM: OTHER PLACE");
+        } else if (st == SV_HERE) {                    /* wip708: the hint is always there: ALGORITHM = name, SELECT = spot; who is in another spot above it */
+            put_s(t, "ALGORITHM: NAME  SELECT: SPOT");
         } else if (st == SV_CHOOSE)
             put_s(t, "ANOTHER SLOT, OR EXIT");
         else
@@ -6429,8 +6564,8 @@ static uint16_t footer_text(const char **a, const char **b, const char **c)
         *b = "PAN CENTER = RED";
     } else if (ui.view == V_SEQ && ui.arp && tonic_part()) {      /* wip251 */
         *a = "KEYS: PIANO";
-        *b = "ALGO: VOICE";
-        *c = "K2/OCT: OCTAVE";
+        *b = "SELECT: VOICE";
+        *c = "K4/OCT: OCTAVE";
     } else if (ui.view == V_HOME) {
         *a = "FUNC+WHITE: PATTERN";
         *b = "FUNC+BLK: MUTE";
@@ -6665,10 +6800,10 @@ static uint32_t knobs_sig(void)
     MIXIN(ui.view);
     MIXIN(ui.part);
     MIXIN(ui.arp);
-    MIXIN(ui.arp ? (uint32_t)ui.rec | (uint32_t)rec_blink_on() << 1 : 0u);   /* wip684: the lower half of the ARP chip carries the REC dot */
+    MIXIN(bigchip_page() ? (uint32_t)ui.rec | (uint32_t)rec_blink_on() << 1 : 0u);   /* wip684 / wip703: the lower half of the big chip (ARP and SEQ) carries the REC dot */
     MIXIN(pgi);
     MIXIN(ui.touched);
-    MIXIN(ui.spage | proj.set.autoscroll << 8 | spage_spot() << 9);   /* wip567: the SEQ page spot follows the playhead (wip583: and it shows after SELECT) */
+    MIXIN(ui.spage | proj.set.autoscroll << 8 | spage_spot() << 9);   /* wip567: the SEQ page spot follows the playhead (wip583: and it shows after ALGORITHM) */
     MIXIN(ui.held_step);
     MIXIN(lock_step() + 1);
     MIXIN(proj.set.palette);
@@ -6761,10 +6896,10 @@ static void draw_knobs(void)
         knob_tag(t);
         if (ui.view == V_SONG)                         /* wip357: the SONG screen has no tag (BAR) */
             t[0] = 0;
-        if (ui.arp && tonic_part() && ui.view == V_SEQ)   /* wip683: the ARP page: no tag, no dots, the rule stops before the big chip */
+        if (bigchip_page())   /* wip683 / wip703: the ARP and SEQ pages: no tag, no dots, the rule stops before the big chip */
             t[0] = 0, dots = 0, xd = 237;
         xt = xd - (dots ? 5 : 0) - tw(&FONT_XS, t);
-        cv_rect(0, 5, (ui.arp && tonic_part() && ui.view == V_SEQ ? 100 : xt - 5), 1, C_LINE);
+        cv_rect(0, 5, (bigchip_page() ? 100 : xt - 5), 1, C_LINE);
         cv_text(xt, vc(&FONT_XS, 0, 11), &FONT_XS, t, C_HI);
         if (dots) {
             int k;
@@ -6772,7 +6907,7 @@ static void draw_knobs(void)
                 cv_rect(xd + k * 5, 4, 3, 3, k == cur_page() ? C_HI : C_LINE);
         }
     }
-    if (ui.arp && tonic_part() && ui.view == V_SEQ) {  /* wip683: the lower part of the big track chip */
+    if (bigchip_page()) {  /* wip683 / wip703: the lower part of the big track chip */
         cv_oy = -(KNOB_Y - MAIN_Y);
         arp_chip(0);
         cv_oy = 0;
@@ -6792,7 +6927,7 @@ static void draw_knobs(void)
         }
         if (i)
             cv_rect(i * 60, 14, 1, 50, C_LINE);
-        if (i == 2 && spage_spot() && (ui.arp || r.kind == R_DLEN)) {   /* wip583: also the ARP page (its K3 is free) and, with AUTOSCROLL off, for 1.2 s after SELECT   /* wip567: AUTOSCROLL on: the FREE LEN cell is the big PAGE spot (where the playhead is); turned = why the length stays */
+        if (i == 2 && spage_spot() && (ui.arp || r.kind == R_DLEN)) {   /* wip583: also the ARP page (its K3 is free) and, with AUTOSCROLL off, for 1.2 s after ALGORITHM   /* wip567: AUTOSCROLL on: the FREE LEN cell is the big PAGE spot (where the playhead is); turned = why the length stays */
             char pb[16];
             const felucca_font_t *pf = &FONT_L;
             box(i * 60 + 2, 11, 56, 56, dim(C_AMB, touched ? 3 : 2));
@@ -8868,7 +9003,7 @@ static void leds(void)
         b |= 1u << B_PLAY;
     if (rec_blink_on())                                /* wip684: the same test as the REC dot of the ARP chip */
         b |= 1u << B_REC;
-    if (ui.view == V_HOME || ui.view == V_SONG || ui.view == V_MIX2 || ui.view == V_GLOB || (seq.song_on && blink))
+    if (ui.view == V_HOME || ui.view == V_SONG || (ui.view == V_MIX2 && cur_page() == 0) || (ui.view == V_FX && cur_page() == 0) || ui.view == V_GLOB || (seq.song_on && blink))   /* wip695: PERFORM is HOME's 2nd page now */
         b |= 1u << B_HOME;
     if (ui.view == V_SEQ && ui.arp)
         b |= 1u << B_ARP;                              /* wip251 */
@@ -8885,7 +9020,7 @@ static void leds(void)
         b |= 1u << B_SEL;
     if (ui.view == V_OSC)
         b |= 1u << B_ENV;
-    if (ui.view == V_FX || ui.view == V_MIX1)
+    if ((ui.view == V_FX && cur_page() != 0) || ui.view == V_MIX1 || (ui.view == V_MIX2 && cur_page() == 1))   /* wip695: SENDS is FX's 2nd page now */
         b |= 1u << B_FX;
     if (ui.view == V_MIX || ui.view == V_NOISE)
         b |= 1u << B_LFO;
@@ -9312,7 +9447,7 @@ static void sp_front(int all)
             sp_cat(ui.sv_pn[0] ? ui.sv_pn : "UNTITLED");
             sp_cat(ui.sv_here == ui.preset_cur ? "" : ui.sv_occ[0] ? ". REPLACES " : ". EMPTY PLACE");
             sp_cat(ui.sv_here == ui.preset_cur ? "" : ui.sv_occ);
-            sp_cat(". ALGORITHM: OTHER PLACE. OCT+: YES, SAVE NOW. OCT-: NO, CHOOSE ANOTHER");
+            sp_cat(". ALGORITHM: NEW NAME. SELECT: OTHER SPOT. OCT+: YES, SAVE NOW. OCT-: CANCEL");
         } else if (ui.ask_arg == SV_CHOOSE) {
             sp_cat("CHOOSE SLOT. OCT+: CHOOSE A SLOT. OCT-: NO, EXIT SAVE");
         } else if (ui.ask_arg == 2) {
@@ -9822,17 +9957,18 @@ static void fs_editor(void)                           /* wip205: the SAVE AS scr
             if (ui.sv_here < 10)
                 *q++ = '0';
             put_i(q, ui.sv_here);
-            fs_big(46, &FONT_M, "SAVE HERE?", C_WHITE, big_w(&FONT_M, "SAVE HERE?", 2) <= 216 ? 2 : 1);
-            fs_big(90, &FONT_L, t, C_WHITE, 1);
-            fs_big(116, &FONT_M, pn, C_HI, 1);
+            fs_big(30, &FONT_M, "SAVE HERE?", C_WHITE, big_w(&FONT_M, "SAVE HERE?", 2) <= 216 ? 2 : 1);   /* wip708: moved up: two big hint lines under the name */
+            fs_big(66, &FONT_L, t, C_WHITE, 1);
+            fs_big(92, &FONT_M, pn, C_HI, 1);
             if (ui.sv_here != ui.preset_cur) {        /* another place: who goes (amber), or an empty place */
                 char u[40];
                 q = put_s(u, ui.sv_occ[0] ? "REPLACES " : "EMPTY PLACE");
                 if (ui.sv_occ[0])
                     put_s(q, ui.sv_occ);
-                text_c(120, vc(&FONT_S, 132, 20), tw(&FONT_S, u) <= 216 ? &FONT_S : &FONT_XS, u, ui.sv_occ[0] ? C_AMB : C_GRAY);
+                text_c(120, vc(&FONT_S, 108, 18), tw(&FONT_S, u) <= 216 ? &FONT_S : &FONT_XS, u, ui.sv_occ[0] ? C_AMB : C_GRAY);
             }
-            text_c(120, vc(&FONT_XS, 152, 14), &FONT_XS, "TURN ALGORITHM: OTHER PLACE", C_GRAY);
+            text_c(120, vc(&FONT_B, 128, 22), tw(&FONT_B, "ALGORITHM: NEW NAME") <= 216 ? &FONT_B : &FONT_S, "ALGORITHM: NEW NAME", C_WHITE);   /* wip708: the two hints, FONT_B white (was XS gray) */
+            text_c(120, vc(&FONT_B, 150, 22), tw(&FONT_B, "SELECT: OTHER SPOT") <= 216 ? &FONT_B : &FONT_S, "SELECT: OTHER SPOT", C_WHITE);
         } else if (st == SV_CHOOSE) {
             fs_big(86, &FONT_M, "CHOOSE SLOT", C_WHITE, big_w(&FONT_M, "CHOOSE SLOT", 2) <= 216 ? 2 : 1);
         } else if (st == 2) {                         /* the slot: the number big, what is in it under */
@@ -9877,7 +10013,7 @@ static void fs_editor(void)                           /* wip205: the SAVE AS scr
             }
             text_c(120, vc(&FONT_B, 138, 32), tw(&FONT_B, "ALGORITHM: NEW NAME") <= 216 ? &FONT_B : &FONT_S, "ALGORITHM: NEW NAME", C_WHITE);   /* wip248: bigger, white */
         }
-        l = st == 1 && proj.set.name_manual && ui.nm_len ? "OCT-  DELETE" : st == SV_HERE ? "OCT-  NO" : st == SV_CHOOSE ? "OCT-  NO, EXIT" : st == 0 || ui.sv_rename ? "OCT-  CANCEL" : "OCT-  BACK";
+        l = st == 1 && proj.set.name_manual && ui.nm_len ? "OCT-  DELETE" : st == SV_HERE ? "OCT-  CANCEL" : st == SV_CHOOSE ? "OCT-  NO, EXIT" : st == 0 || ui.sv_rename ? "OCT-  CANCEL" : "OCT-  BACK";
         r = st == 1 && proj.set.name_manual ? "OCT+  OK" : st == SV_HERE ? "OCT+  YES" : st == SV_CHOOSE ? "OCT+  CHOOSE SLOT" : st == 2 ? "OCT+  CONFIRM" : st == 1 ? "OCT+  SAVE" : "OCT+  OK";
     } else {                                          /* CHAIN: the chain as numbered squares, 8 to a row, the last 16 */
         int i, first = ui.ch_n > 16 ? ui.ch_n - 16 : 0;
@@ -10072,6 +10208,7 @@ void ui_frame(void)
     midi_queue_run();                                  /* wip385: first, so the remote keys are in this frame's input() */
     batt_update();                                     /* wip605 */
     input();
+    note_groups();                                     /* wip696 */
     if (ui.preset_pend && !seq.playing && !seq.req_stop) {   /* the preset chosen while playing: the sequencer has stopped, load it */
         int id = ui.preset_pend - 1;
         ui.preset_pend = 0;

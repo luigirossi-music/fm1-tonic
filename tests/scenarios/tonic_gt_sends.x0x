@@ -1,7 +1,7 @@
 # wip559: the GRIGIOTONIC HOME 2nd press page (SENDS: reverb / delay send sliders, knobs REV DLY, the sidechain input number, THRS).
 wait 300
-tap HOME
-tap HOME
+tap FX
+tap FX
 expect view 8
 shot gt_sends_a.png
 turn K1 40 80

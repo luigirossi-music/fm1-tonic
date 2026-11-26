@@ -15,7 +15,7 @@ Nach dem Vorbild von Microtonic VST von Sonic Charge ist FM1 TONIC ein Drum-Synt
 
 **Sequencer**
 
-- Sequencer mit 64 steps, 16 Patterns pro Projekt. Feste Länge von 8, 16, 32 oder 64 steps oder freie Länge von 1 bis 64.
+- Sequencer mit 64 steps, 16 Patterns pro Projekt (dazu eine Pattern-Bank 2, Patterns 17-32, als Beta: FUNC + SELECT; ein gespeichertes Projekt behält noch nur die Patterns 1-16). Feste Länge von 8, 16, 32 oder 64 steps oder freie Länge von 1 bis 64.
 - Song mode: Takte mit Wiederholungen (x1 bis x8 oder LOOP), bearbeitet auf dem SONG-Bildschirm.
 - Globaler accent (+1 bis +10) und accent pro Track, fill mit retrig (2x, 4x, 8x) und trig % (chance) auf jedem step.
 - Parameter lock (begrenzt: 3 knobs pro Track in jedem Pattern).
@@ -58,10 +58,11 @@ Nach dem Vorbild von Microtonic VST von Sonic Charge ist FM1 TONIC ein Drum-Synt
 
 ![Das Panel des FM1 TONIC: knobs MASTER, SELECT, PRESETS, ALGORITHM und KNOB 1 bis 4; Buttons FX, SEL, ENV, LFO, EDIT, GLO, HOME, SAVE, ARP, SEQ, PLAY, REC, OCT- und OCT+; schwarze Tasten TRACK 1 bis 8, ACCENT, FILL, FUNC; weiße Tasten 1 bis 16](img/fm1-tonic-panel.svg "")
 
-- **Knobs.** MASTER ist die Lautstärke. SELECT wechselt die Seite (in einer Liste: rauf und runter). PRESETS wählt einen der 30 Plätze. KNOB 1 bis 4 stellen die vier Werte der Seite ein, die auf dem Display zu sehen ist (der gedrehte wird größer angezeigt). ALGORITHM wechselt zu einer zweiten Seite oder wählt eine Stimme, je nach Seite (die Seitentabellen sagen es). Ein kleines blaues Dreieck in einer unteren Ecke des Displays bedeutet, dass hinter ALGORITHM eine zweite Seite liegt: Dreieck rechts = ALGORITHM nach rechts drehen, Dreieck links = nach links drehen, um zurückzukehren.
+- **Knobs.** MASTER ist die Lautstärke. SELECT wechselt die Seite (in einer Liste: rauf und runter; auf SEQ und ARP: der Track). PRESETS wählt einen der 30 Plätze. KNOB 1 bis 4 stellen die vier Werte der Seite ein, die auf dem Display zu sehen ist (der gedrehte wird größer angezeigt). ALGORITHM wechselt zu einer zweiten Seite, je nach Seite (auf SEQ und ARP wechselt er die step-Seite; die Seitentabellen sagen es). Ein kleines blaues Dreieck in einer unteren Ecke des Displays bedeutet, dass hinter ALGORITHM eine zweite Seite liegt: Dreieck rechts = ALGORITHM nach rechts drehen, Dreieck links = nach links drehen, um zurückzukehren.
 - **Schwarze Tasten.** 1 bis 8 sind TRACK 1 bis 8, 9 ist ACCENT, 10 ist FILL, 11 ist FUNC.
 - **Weiße Tasten 1 bis 16** sind die 16 steps des gewählten Tracks. Ein Pattern kann bis zu 64 steps haben, die jeweils 16 auf einmal angezeigt werden (siehe SEQ).
 - **OCT- / OCT+** verschieben die Tonhöhe des gewählten Tracks eine Oktave nach unten oder oben (auf ARP: die Oktave des Keyboards). Bei einer Frage ist OCT+ = YES, OCT- = NO. Auf dem SONG-Bildschirm: OCT- löscht die Zeile, OCT+ fügt eine Zeile hinzu.
+- **Die obere Leiste** ist auf jeder Seite gleich. Links drei Chips: [P1] das laufende Pattern (im Song mode S und die Taktnummer; ein Pattern, das auf den Start wartet, blinkt darin, zum Beispiel P1>2), [PATTERN BANK 1 / 2] und [TRACK n] der gewählte Track. In Bank 2 sind die Chips rot. Ein Button, den du drückst, zeigt seine Meldung kurz über den Chips. Rechts: das Tempo, das Play-Symbol, ein roter REC-Punkt beim Aufnehmen (er blinkt wie der REC-Button) und der Akku. Der Seitenname steht nicht in der Leiste.
 
 ### Inhalt
 
@@ -69,7 +70,12 @@ Nach dem Vorbild von Microtonic VST von Sonic Charge ist FM1 TONIC ein Drum-Synt
 2. Signalweg {#s2}
 3. Seiten, Button für Button {#s3}
 4. Spielen {#s4}
+  - Patterns
+  - Patterns-Spickzettel
+  - Song-mode-Spickzettel
 5. Presets und Speichern {#s5}
+  - Speichern
+  - Speichern-Spickzettel
 6. Lichter, MIDI und USB {#s6}
 7. Installieren, Backup, Wiederherstellen {#s7}
 8. Die Engine {#s8}
@@ -92,6 +98,7 @@ Nach dem Vorbild von Microtonic VST von Sonic Charge ist FM1 TONIC ein Drum-Synt
 | {r:FUNC + ACCENT} / {r:FUNC + FILL} / {r:FUNC + PLAY} | Pattern kopieren / einfügen (fragt PASTE PATTERN?) / löschen (fragt CLEAR PATTERN?). OCT+ = ja, OCT- = nein. |
 | {r:FUNC + schwarze Taste 1 bis 8 gehalten, dann ACCENT / FILL / PLAY} | Den Sound dieses Tracks kopieren / einfügen / das Pattern dieses Tracks löschen (fragt nach). |
 | {r:FUNC + SEQ} | Song mode an / aus (fragt nach). |
+| {r:FUNC + SELECT} | Pattern-Bank 1 / 2 (Patterns 1-16 / 17-32). Beta. |
 | {r:FUNC + ARP} | Löscht den Song (fragt nach). |
 | {r:FUNC + SAVE} / {r:FUNC + HOME} | Quick save in den geladenen Platz / benennt das Projekt um. |
 | {r:FUNC + REC} | QUANTIZED REC / UNQUANTIZED REC. |
@@ -113,7 +120,7 @@ Ausnahmen: Auf PERFORM, MUTE / SOLO, der Pattern-Seite und dem GLO-Mixer sind di
 | **CHOKE** (EDIT, ALGORITHM nach rechts) | Die schwarzen Tasten 1 bis 8 wählen, welche Tracks in der choke group sind. |
 | **SONG- und PATTERNS-Bildschirme** (Song mode) | Die weißen Tasten 1 bis 16 schreiben ein Pattern in den Takt. FILL löscht den Takt. |
 | **Kopieren-Einfügen-Modus** (nach FUNC + ACCENT) | Die weißen Tasten 1 bis 16 sind die Plätze zum Einfügen. |
-| **FUNC gehalten** | Die weißen Tasten 1 bis 16 sind die Patterns 1 bis 16; die Tasten leuchten dort, wo ein Pattern oder ein Track Noten hat. |
+| **FUNC gehalten** | Die weißen Tasten 1 bis 16 sind die Patterns 1 bis 16 (die Patterns 17 bis 32 in Bank 2, siehe FUNC + SELECT); die Tasten leuchten dort, wo ein Pattern oder ein Track Noten hat. |
 
 **Dinge, die es nur auf manchen Seiten gibt.**
 
@@ -140,34 +147,36 @@ Jeder Track erzeugt seinen Sound von Grund auf mit der Drum-Engine des FM1 TONIC
 
 Eine Seite mit **Track**-Werten (knobs 1 bis 4 der Sound-Seiten) gehört zum gewählten Track: Wechsle den Track mit einer schwarzen Taste 1 bis 8, und die Werte ändern sich. EDIT oder LFO gehalten + {r:FUNC + ACCENT / FILL / PLAY} kopiert, fügt ein und setzt **diese Seite** des Tracks zurück (nur Track-Seiten).
 
+**Zurück dort, wo du warst.** Jeder Button mit mehr als einer Seite (FX, HOME, GLO, SEQ, EDIT) merkt sich die Seite, auf der du warst. Geh auf die Seite eines anderen Buttons und tippe ihn dann von überall wieder an: du kommst zu der Seite zurück, die du verlassen hast, mit ihrem MUTE / SOLO-, DUCK- oder CHOKE-Bildschirm, falls er offen war.
+
 ### FX
 
-Tipp = MIX 1 → PERFORM → MIX 1. Halten (eine halbe Sekunde) = REVERB. Von der Seite eines anderen Buttons aus kehrt FX zur letzten FX-Seite zurück, die du verlassen hast.
+Tipp = MIX 1 → SENDS → MIX 1. Halten (eine halbe Sekunde) = REVERB. Von der Seite eines anderen Buttons aus kehrt FX zur letzten FX-Seite zurück, die du verlassen hast.
 
 | Seite | Knob 1 · 2 · 3 · 4 | Auch auf dieser Seite |
 |---|---|---|
 | **MIX 1** (1. Druck) | OSC- / NOISE-Mix · EQ FREQ (20 Hz-20 kHz) · DIST · EQ GAIN (64 = flat) | Weiße Taste gehalten + knob: p-lock. SAVE + knob: vergisst diesen Lock oder diese Bewegung. |
-| **PERFORM** (2. Druck) | REVERB D/W · DELAY D/W (0-100 %, 0 beim Einschalten) · MASTER LOW CUT (20-663 Hz) · ALL FX (rechts an, links aus) | Die große Zahl ist das laufende Pattern. Wenn ein Pattern vorgemerkt ist, blinkt darüber ein lila Kasten mit PATTERN n (das kommende). SELECT: die nächsten FX-Seiten (hält an den Enden an). ALGORITHM nach rechts: MUTE / SOLO. Schwarze Tasten 1 bis 8: mute. Weiße Tasten 1 bis 16: nächstes Pattern (im Song mode tun sie nichts: der Song entscheidet, und der lila Kasten zeigt den nächsten Takt des Songs). {r:FUNC Tipp}: MUTE-Modus, oder alle unmuten. {o:FILL Tipp}: SOLO-Modus, oder alle Solos löschen. Keine p-locks. |
-| **MUTE / SOLO** (PERFORM, ALGORITHM nach rechts) | wie PERFORM | Acht Kästchen statt der Zahl: blau = der Track spielt. Schwarze Tasten 1 bis 8 schalten stumm (MUTE-Modus) oder fügen ein Solo hinzu / entfernen es (SOLO-Modus, mehrere gleichzeitig). ALGORITHM nach links: zurück. |
+| **SENDS** | REVERB SEND · DELAY SEND · SIDECHAIN THRESHOLD (in dB, wie der eines Kompressors: ganz rechts = 0.0 dB = nichts wird geduckt, nach links geht er bis -59 dB hinunter, und die letzte Stufe links ist -INF) · SIDECHAIN INPUT (Track 1 bis 8, große Zahl) | ALGORITHM nach rechts: der DUCK-Bildschirm (unten). Die sends arbeiten, egal was D/W von PERFORM und ALL FX sagen. |
+| **DUCK** (SENDS, ALGORITHM nach rechts) | - | Schwarze Tasten 1 bis 8: blau = geduckt, grau = nicht, lila = der Input. Der Input kann nicht geduckt werden. Nichts wird geduckt, bevor du wählst. ALGORITHM nach links oder HOME: zurück. |
 | **REVERB** (FX halten) | DECAY · TONE | ALGORITHM nach rechts: REVERB 2. |
 | **REVERB 2** | LOW CUT (von dem, was in den Reverb geht) · RETURN (level im Mix) | ALGORITHM nach links: zurück. |
 | **DELAY** (HOME zusätzlich halten) | TIME (1/32 ... 1/2, mit T- und punktierten Werten) · FEEDBACK · TONE · TAPE (das erste Achtel = sauber digital, danach Tape mit mehr Verschleiß) | ALGORITHM nach rechts: DELAY 2. |
 | **DELAY 2** | LOW CUT · RETURN · PING-PONG (off / on) | ALGORITHM nach links: zurück. |
 
-ALL FX aus schaltet die beiden D/W-Sends von PERFORM und den Master-Low-Cut stumm; die eigenen sends der Tracks arbeiten weiter. Mutes und Solos teilen sich PERFORM und MUTE / SOLO; Solos werden nicht gespeichert und enden, wenn ein Preset geladen wird. Der gewählte Modus (MUTE oder SOLO) bleibt, wenn du die Seite verlässt und zurückkommst. Auf den schwarzen Tasten blinkt ein stummer Track, ein Solo-Track blinkt schneller; die weiße Taste des laufenden Patterns blinkt langsam; die Tasten blitzen bei einem Hit nicht auf PERFORM, der Pattern-Seite und dem GLO-Mixer. Die Effektseiten sind global (alle Tracks teilen sie): SELECT läuft durch PERFORM, REVERB, DELAY, REVERB 2, DELAY 2.
+Der Sidechain ist ein Kompressor mit seitlichem Eingang: Er hört auf den Input-Track und regelt die geduckten Tracks herunter, solange der Input lauter ist als der Threshold (fest: Ratio 4:1, soft knee, attack 1 ms, release 30 ms). Eine lange Kick duckt lange; ein stummgeschalteter Input duckt nicht; auch die sends der Tracks werden geduckt. Eine normale Kick beginnt bei etwa -10 dB zu ducken und duckt ab -25 dB abwärts stark, die Arbeit passiert also in den linken drei Vierteln des knobs; bei -INF duckt alles, was der Input spielt, so stark, wie der Kompressor kann. Ein roter Punkt zeigt einen geduckten Track, ein lila Punkt den Input; der Punkt folgt dem echten Ducking (mit dem knob ganz rechts wird nichts geduckt und der Punkt bleibt dunkel). Ein Sidechain für alle Tracks, mit dem Preset gespeichert (ein Preset aus einer älteren Version behält seine Zahlen, klingt aber anders: der alte Wert war eine Tiefe, jetzt ist er ein Threshold).
 
 ### HOME
 
-Tipp = MIX 2 → SENDS → GLOBAL → MIX 2. Halten = DELAY.
+Tipp = MIX 2 → PERFORM → GLOBAL → MIX 2. Halten = DELAY.
 
 | Seite | Knob 1 · 2 · 3 · 4 | Auch auf dieser Seite |
 |---|---|---|
 | **MIX 2** | LEVEL · PAN · LOW CUT (20-663 Hz, nie aus) · HIGH CUT (20 kHz bis hinunter zu 1 kHz) | Die beiden cuts sind in classic grau. |
-| **SENDS** | REVERB SEND · DELAY SEND · SIDECHAIN THRESHOLD (in dB, wie der eines Kompressors: ganz rechts = 0.0 dB = nichts wird geduckt, nach links geht er bis -59 dB hinunter, und die letzte Stufe links ist -INF) · SIDECHAIN INPUT (Track 1 bis 8, große Zahl) | ALGORITHM nach rechts: der DUCK-Bildschirm (unten). Die sends arbeiten, egal was D/W von PERFORM und ALL FX sagen. |
-| **DUCK** (SENDS, ALGORITHM nach rechts) | - | Schwarze Tasten 1 bis 8: blau = geduckt, grau = nicht, lila = der Input. Der Input kann nicht geduckt werden. Nichts wird geduckt, bevor du wählst. ALGORITHM nach links oder HOME: zurück. |
-| **GLOBAL** | QUANTIZATION (1/8 ... 1/32) · SWING · FILL RATE (2x, 4x, 8x) · TEMPO | - |
+| **PERFORM** (2. Druck) | REVERB D/W · DELAY D/W (0-100 %, 0 beim Einschalten) · MASTER LOW CUT (20-663 Hz) · ALL FX (rechts an, links aus) | Die große Zahl ist das laufende Pattern. Wenn ein Pattern vorgemerkt ist, blinkt darüber ein lila Kasten mit PATTERN n (das kommende). SELECT: die nächsten FX-Seiten (hält an den Enden an). ALGORITHM nach rechts: MUTE / SOLO. Schwarze Tasten 1 bis 8: mute. Weiße Tasten 1 bis 16: nächstes Pattern (im Song mode tun sie nichts: der Song entscheidet, und der lila Kasten zeigt den nächsten Takt des Songs). {r:FUNC Tipp}: MUTE-Modus, oder alle unmuten. {o:FILL Tipp}: SOLO-Modus, oder alle Solos löschen. Keine p-locks. |
+| **MUTE / SOLO** (PERFORM, ALGORITHM nach rechts) | wie PERFORM | Acht Kästchen statt der Zahl: blau = der Track spielt. Schwarze Tasten 1 bis 8 schalten stumm (MUTE-Modus) oder fügen ein Solo hinzu / entfernen es (SOLO-Modus, mehrere gleichzeitig). ALGORITHM nach links: zurück. |
+| **GLOBAL** | QUANTIZATION (1/8 ... 1/32) · SWING · FILL RATE (2x, 4x, 8x) · TEMPO | SWING ist dasselbe Bedienelement wie auf SEQ: ein Wert für alle Patterns (außer die Einstellung SWING steht auf PER PATTERN). |
 
-Der Sidechain ist ein Kompressor mit seitlichem Eingang: Er hört auf den Input-Track und regelt die geduckten Tracks herunter, solange der Input lauter ist als der Threshold (fest: Ratio 4:1, soft knee, attack 1 ms, release 30 ms). Eine lange Kick duckt lange; ein stummgeschalteter Input duckt nicht; auch die sends der Tracks werden geduckt. Eine normale Kick beginnt bei etwa -10 dB zu ducken und duckt ab -25 dB abwärts stark, die Arbeit passiert also in den linken drei Vierteln des knobs; bei -INF duckt alles, was der Input spielt, so stark, wie der Kompressor kann. Ein roter Punkt zeigt einen geduckten Track, ein lila Punkt den Input; der Punkt folgt dem echten Ducking (mit dem knob ganz rechts wird nichts geduckt und der Punkt bleibt dunkel). Ein Sidechain für alle Tracks, mit dem Preset gespeichert (ein Preset aus einer älteren Version behält seine Zahlen, klingt aber anders: der alte Wert war eine Tiefe, jetzt ist er ein Threshold).
+ALL FX aus schaltet die beiden D/W-Sends von PERFORM und den Master-Low-Cut stumm; die eigenen sends der Tracks arbeiten weiter. Mutes und Solos teilen sich PERFORM und MUTE / SOLO; Solos werden nicht gespeichert und enden, wenn ein Preset geladen wird. Der gewählte Modus (MUTE oder SOLO) bleibt, wenn du die Seite verlässt und zurückkommst. Auf den schwarzen Tasten blinkt ein stummer Track, ein Solo-Track blinkt schneller; die weiße Taste des laufenden Patterns blinkt langsam; die Tasten blitzen bei einem Hit nicht auf PERFORM, der Pattern-Seite und dem GLO-Mixer. Die Effektseiten sind global (alle Tracks teilen sie): SELECT läuft durch PERFORM, REVERB, DELAY, REVERB 2, DELAY 2.
 
 ### SEL, ENV, LFO, EDIT (die Stimmen-Seiten)
 
@@ -193,7 +202,7 @@ Tipp = VEL → MIXER → COMP → MEMORY → SETTINGS → VEL.
 | **MIXER** | LEVEL der vier angezeigten Tracks | Acht hohe Slider; SELECT wechselt zwischen den Tracks 1 bis 4 / 5 bis 8 und schaltet, wie der blaue Hinweis auf dem Bildschirm sagt, zwischen level / pan um (pan Mitte = rot). Ein Hit lässt seinen Slider aufleuchten. Die Tasten sind die von PERFORM: {r:FUNC Tipp}: MUTE-Modus oder alles entmuten; {o:FILL Tipp}: SOLO-Modus oder alle Solos löschen; schwarze Tasten 1 bis 8 schalten diesen Track stumm (MUTE-Modus) oder solo (SOLO-Modus), ein vom Solo zum Schweigen gebrachter Track ist grau; weiße Tasten 1 bis 16: nächstes Pattern (nicht im Song mode). Ein roter Punkt unter einem Slider = geduckt, lila = Sidechain-Input. |
 | **COMP** | ATTACK · RELEASE · THRESHOLD · MAKE-UP | Master-Kompressor, Ratio 4:1, eine Nadel zeigt die Pegelabsenkung. Standard: nichts komprimiert (0.0 dB / 0.0 dB). Wird nur von SAVE behalten. |
 | **MEMORY** | - | Eine Batterie zeigt, wie voll der Projektspeicher ist (Patterns, Song, Motion, ARP-Noten). Lila ab 90 %, FULL bei 100 %: Ein Speichern wird dann abgelehnt. |
-| **SETTINGS** | Liste (SELECT bewegt) | Zeilen: clock out, notes out, Tonic MIDI channel, output level, USB audio, key light, 4/4 LED, colour theme, zoom knob (yes / no), Tonic Engine, name projects, save, autosave, clear pattern, factory reset, performance, cores, about, battery. Die nicht offensichtlichen werden gleich unten erklärt. Änderungen werden etwa anderthalb Sekunden, nachdem du aufhörst, etwas zu berühren, von selbst behalten (der Sequencer muss gestoppt sein). |
+| **SETTINGS** | Liste (SELECT bewegt) | Zeilen: clock out, notes out, Tonic MIDI channel, output level, USB audio, key light, 4/4 LED, colour theme, zoom knob (yes / no), Tonic Engine, name projects, swing, save, autosave, clear pattern, factory reset, performance, cores, about, battery. Die nicht offensichtlichen werden gleich unten erklärt. Änderungen werden etwa anderthalb Sekunden, nachdem du aufhörst, etwas zu berühren, von selbst behalten (der Sequencer muss gestoppt sein). |
 
 #### GLO settings: die nicht offensichtlichen
 
@@ -207,6 +216,7 @@ Die Einstellungen stehen in der GLO-Liste (SELECT bewegt rauf und runter, ALGORI
 | **4/4 LED** | OFF / **ON** | ON (die Werkseinstellung): Die weißen Tasten 1, 5, 9 und 13 leuchten schwach, um die vier Schläge des Takts zu markieren (nicht auf PERFORM). |
 | **ZOOM KNOB** | **YES** / NO | YES: Der knob, den du drehst, wird über dem Bildschirm vergrößert. NO: Er wird nur hervorgehoben, sodass die ganze Seite sichtbar bleibt. Der SONG-Bildschirm zoomt nie. |
 | **NAME PROJECTS** | **GENERATE** / MANUAL | GENERATE erfindet den Namen eines gespeicherten Projekts (ALGORITHM = ein anderer). MANUAL: Der Namensbildschirm ist ein Buchstaben-Editor (siehe Kapitel 5). |
+| **SWING** | **GLOBAL** / PER PATTERN | GLOBAL (die Werkseinstellung): ein swing für alle Patterns; SWING auf SEQ oder auf GLOBAL zu drehen setzt ihn für jedes Pattern. PER PATTERN: Jedes Pattern behält seinen eigenen swing und der knob ändert nur das laufende Pattern. Beim Wechsel auf GLOBAL wird der swing des laufenden Patterns auf alle kopiert; ein älteres Projekt mit verschiedenen swings wird mit dem swing von Pattern 1 für alle geladen. |
 | **TONIC ENGINE** | **ENHANCED** / CLASSIC | CLASSIC macht die Extras des FM1 TONIC (Track-cuts, sends, Sidechain) grau und stumm, sodass der Sound nur die Einstellungen nutzt, die eine `.mtpreset`-Datei tragen kann (Kapitel 2 und 8). |
 | **2ND CORE** | **ON** / OFF | Der Chip des FM-1 hat zwei Kerne, und Tonic teilt das Sound-Rendering zwischen ihnen auf. Es gilt ab dem nächsten Einschalten. Wenn der FM-1 mit zwei Kernen jemals abstürzt, schaltet er sich selbst auf OFF; schalte es hier wieder auf ON. |
 
@@ -214,9 +224,9 @@ Die Einstellungen stehen in der GLO-Liste (SELECT bewegt rauf und runter, ALGORI
 
 | Seite | Knob 1 · 2 · 3 · 4 | Auch auf dieser Seite |
 |---|---|---|
-| **SEQ** (1. Druck) | FIXED LEN (8, 16, 32, 64) · AUTOSCROLL · FREE LEN (1 bis 64) · SWING | Weiße Tasten: die steps. SELECT: die step-Seiten (je 16; AUTOSCROLL aus): die Seite (1-16, 17-32 ...) erscheint kurz groß auf dem dritten knob, danach ist der knob wieder FREE LEN. Die Seite bleibt nie auf steps stehen, die es nicht gibt: wird der Loop kürzer als die Seite, auf der du warst, springt sie auf die letzte Seite zurück, die die Länge hat. ALGORITHM: die Stimme (1 bis 8, dann AC = der globale accent). Einen step halten + ACCENT / FILL: Flags (accent = dunkelblau, fill = gelb, beide = grün). {r:FUNC + SEQ}: Song mode an / aus (mit OCT+ bestätigen). {o:FILL + SEQ}: der SONG-Bildschirm. |
+| **SEQ** (1. Druck) | FIXED LEN (8, 16, 32, 64) · AUTOSCROLL · FREE LEN (1 bis 64) · SWING | Weiße Tasten: die steps. SEQ und ARP zeigen einen großen TRACK-Chip mit dem gewählten Track (die Pattern-Seite, SEQ 2. Druck, hat keinen); beim Aufnehmen sitzen ein roter Punkt und REC darin. ALGORITHM: die step-Seiten (je 16; nur mit AUTOSCROLL aus, mit AUTOSCROLL an tut er hier nichts): die Seite (1-16, 17-32 ...) erscheint kurz groß auf dem dritten knob, danach ist der knob wieder FREE LEN. Die Seite bleibt nie auf steps stehen, die es nicht gibt: wird der Loop kürzer als die Seite, auf der du warst, springt sie auf die letzte Seite zurück, die die Länge hat. SELECT: der Track (1 bis 8, dann AC = der globale accent). Einen step halten + ACCENT / FILL: Flags (accent = dunkelblau, fill = gelb, beide = grün). {r:FUNC + SEQ}: Song mode an / aus (mit OCT+ bestätigen). {o:FILL + SEQ}: der SONG-Bildschirm. |
 | **PATTERN** (SEQ, 2. Druck) | SONG ON / OFF | Schwarze Tasten 1 bis 8 schalten stumm, weiße Tasten 1 bis 16 wählen das nächste Pattern (nicht im Song mode). Eine dunkle Taste = leeres Pattern, schwaches Licht = hat Noten, langsames Blinken = das aktuelle, schnelles Blinken = das nächste (vorgemerkt). {r:FUNC Tipp} und {o:FILL Tipp} wie auf PERFORM. Nochmal SEQ: zurück. |
-| **ARP** | FIXED LEN · OCTAVE (auch OCT- / OCT+, -3 bis +3) · PAGE (1-16, 17-32 ...) · - | Der SEQ-Bildschirm, aber jede Taste (weiß und schwarz) spielt die gewählte Stimme wie ein Keyboard. Die C-Tasten (gedimmt) spielen die eigene Tonhöhe der Stimme in Oktave 0. ALGORITHM: die Stimme. SELECT: die step-Seiten, angezeigt auf dem dritten knob. Es wird nichts aufgenommen. SEQ: zurück. {r:FUNC + ARP}: den Song löschen (DELETE SONG?). |
+| **ARP** | FIXED LEN · AUTOSCROLL · PAGE (1-16, 17-32 ...) · OCTAVE (-3 bis +3; auch OCT- / OCT+) | Der SEQ-Bildschirm, aber jede Taste (weiß und schwarz) spielt die gewählte Stimme wie ein Keyboard. Die C-Tasten (gedimmt) spielen die eigene Tonhöhe der Stimme in Oktave 0. SELECT: die Stimme (1 bis 8). ALGORITHM: die step-Seiten (AUTOSCROLL aus), angezeigt auf dem dritten knob. AUTOSCROLL ist dieselbe Einstellung wie auf SEQ. Mit REC + PLAY nimmt jede Taste den Schlag und seine Note auf (patterns 1 bis 16). SEQ: zurück. {r:FUNC + ARP}: den Song löschen (DELETE SONG?). |
 
 Ein Pattern zu verlängern kopiert, was da ist, in den neuen Teil (8 auf 16 kopiert die steps 1 bis 8 nach 9 bis 16); es zu verkürzen kürzt es nur.
 
@@ -250,6 +260,7 @@ Jede Kombination aus Buttons und Tasten, gruppiert nach dem Button, den du zuers
 | {r:FUNC + EDIT oder LFO gehalten, dann PLAY} | Setzt diese Seite des Tracks auf ihre Werte beim Einschalten zurück. Keine Frage; Undo nimmt es zurück. | Seiten mit Track-Parametern (nicht GLO, HOME, SEQ) |
 | {r:FUNC + EDIT}, einmal getippt | DELETE AUTOMATION?: entfernt die p-locks und die aufgenommene Bewegung des gewählten Tracks im laufenden Pattern (es fragt nach). | Jede Seite |
 | {r:FUNC + SEQ} | Song mode an / aus (es fragt: OCT+ = ja). | Jede Seite |
+| {r:FUNC + SELECT (nach rechts / links drehen)} | Schaltet um, welche Patterns die weißen Tasten erreichen: rechts = Bank 2 (Patterns 17-32), links = Bank 1 (Patterns 1-16). Die obere Leiste sagt PATTERN BANK 1 / 2, rot in Bank 2. Beta: Ein gespeichertes Projekt behält noch nur die Patterns 1-16, die Patterns 17-32 gehen also beim Speichern und Laden verloren. | SEQ, ARP, SONG, HOME |
 | {r:FUNC + ARP} | DELETE SONG?: löscht den ganzen Song und verlässt den Song mode (es fragt nach). | Jede Seite |
 | {r:FUNC + HOME} | Benennt das Projekt um und speichert es am selben Platz. | Jede Seite |
 | {r:FUNC + SAVE} | Quick save in den geladenen Platz. Keine Frage. | Jede Seite |
@@ -340,6 +351,35 @@ Jede Kombination aus Buttons und Tasten, gruppiert nach dem Button, den du zuers
 - **Chains.** Ein Pattern kann so markiert werden, dass es am Ende ins nächste läuft (nach Pattern 8 kommt 1). Ein Flag zählt nur bei einem Pattern mit Noten. Ein Preset mit Chains wird spielend durch sie hindurch geladen (SONG ON); Knob 1 der Pattern-Seite von SEQ schaltet es aus, und das Pattern läuft in der Schleife.
 - **Song mode.** {r:FUNC + SEQ}, mit OCT+ bestätigen (OCT- = zurück). Wenn es noch keinen Song gibt, öffnet sich der PATTERNS-Bildschirm: Weiße Tasten 1 bis 16 fügen Patterns hinzu, OCT- (oder FUNC + eine weiße Taste) nimmt das letzte weg, OCT+ ist OK. PLAY spielt einen Takt pro Pattern, in der Schleife. Dieselbe Geste verlässt den Song mode. Auf dem **SONG-Bildschirm** (eine Zeile pro Takt) ist knob 1 = der Takt, knob 2 = sein Pattern, knob 3 = Wiederholungen (x1 bis x8, danach LOOP = bis du stoppst); ALGORITHM drehen bewegt den Takt wie knob 1; weiße Tasten schreiben ein Pattern in den Takt unter dem Cursor und rücken weiter (an = das Pattern hat Noten, aus = leer, das des Takts unter dem Cursor blinkt); auf PERFORM sagt ein blinkender lila Kasten PATTERN n = das Pattern, das der Song am Ende dieses Takts spielt (die weißen Tasten tun im Song mode nichts); OCT+ fügt eine Zeile nach dem Cursor ein; OCT- oder FILL (gedrückt und losgelassen) löscht die Zeile sofort (der zuletzt gelöschte Takt = der Song wird gelöscht und der Song mode endet). {r:FUNC + ARP} löscht den ganzen Song.
 
+### Patterns
+
+Ein **Pattern** ist eine Schleife des Sequencers: bis zu 64 Steps für jeden der 8 Tracks, mit ihren Accents, Fills, P-Locks und aufgenommenen Knob-Bewegungen. Bank 1 enthält die Patterns 1 bis 16; Bank 2 enthält die Patterns 17 bis 32 (Beta: Ein gespeichertes Projekt behält noch nur die Patterns 1 bis 16).
+
+**Die Pattern-Tasten.** Halte FUNC, dann werden die weißen Tasten 1 bis 16 zu den Patterns 1 bis 16 (17 bis 32 in Bank 2). {r:FUNC + SELECT} nach rechts oder links gedreht wechselt die Bank; die obere Leiste sagt PATTERN BANK 1 / 2, rot in Bank 2. Auf der Pattern-Seite (SEQ, 2. Druck) zeigen die Tasten die Patterns: Eine dunkle Taste ist leer, ein schwaches Licht hat Noten, langsames Blinken ist das Pattern, das jetzt läuft, schnelles Blinken ist das nächste, das auf das Taktende wartet.
+
+**Das Pattern wechseln.** Während die Musik läuft, startet das neue Pattern am Ende des Takts, die Musik reißt also nie ab. Auf PERFORM und auf der Pattern-Seite wählen die weißen Tasten das nächste Pattern ohne FUNC. Im Song mode entscheidet der Song, und diese Tasten tun nichts.
+
+**Kopieren, einfügen, löschen.** {r:FUNC + ACCENT} kopiert das Pattern, in dem du bist, {r:FUNC + FILL} fügt die Kopie darin ein (es fragt vorher), {r:FUNC + PLAY} löscht es (es fragt vorher). Mit zusätzlich gehaltener schwarzer Taste 1 bis 8 gelten dieselben drei Griffe nur für diesen Track.
+
+**Kopieren und einfügen im Lauf.** {r:FUNC + ACCENT} startet auch den Kopieren-Einfügen-Modus: Alle Pattern-Tasten blinken, und der Bildschirm sagt PRESS PATTERN TO PASTE. Drücke eine Pattern-Taste, und die Kopie landet sofort dort, ohne Frage. Um in viele Patterns einzufügen, tippe vor der Wahl FUNC allein an; SEQ verlässt den Modus. Es funktioniert, während der Song läuft.
+
+**Nicht auf jeder Seite.** Auf ARP sind FUNC, ACCENT und FILL Keyboard-Tasten, und auf den beiden PERFORM-Seiten sind FUNC und FILL die Tasten MUTE und SOLO, deshalb gehen diese Kombinationen dort nicht.
+
+#### Patterns-Spickzettel
+
+| TASTEN | WAS ES TUT |
+|---|---|
+| {r:FUNC + weiße Taste} | Pattern wechseln |
+| {r:FUNC + SELECT} (drehen) | Bank 1 / 2 |
+| {r:FUNC + ACCENT} | kopieren |
+| {r:FUNC + FILL} | einfügen (OCT+ = ja) |
+| {r:FUNC + FILL} + weiße Taste | fügt sofort dort ein |
+| {r:FUNC + ACCENT}, FUNC antippen, Pattern-Tasten | an vielen Orten einfügen (SEQ = verlassen) |
+| {r:FUNC + ACCENT} gehalten + weiße Taste | dieses Pattern ist die Kopie |
+| {r:FUNC + PLAY} | löschen (OCT+ = ja) |
+| {r:FUNC + schwarze Taste 1-8} gehalten + ACCENT / FILL / PLAY | dieser Track: Sound kopieren / einfügen / Pattern löschen |
+| Weiße Taste (PERFORM, Pattern-Seite) | nächstes Pattern |
+
 #### Song-mode-Spickzettel
 
 | WAS | TASTEN |
@@ -357,12 +397,27 @@ Jede Kombination aus Buttons und Tasten, gruppiert nach dem Button, den du zuers
 
 Drehe **PRESETS** durch die 30 Plätze: 01 und 02 sind Demo-Presets, 03 bis 30 gehören dir (ein leerer Platz lädt mit Sounds und ohne Pattern: 03 bis 08 haben eigene Sounds, 09 klingt wie 01, 10 wie 02, und so weiter im Kreis). Eine Frage kommt zuerst: OCT+ lädt es, OCT- behält deinen Sound. Das Laden wird während der Wiedergabe abgelehnt.
 
-- **SAVE** fragt SAVE HERE? mit dem geladenen Platz. OCT+ speichert dort und behält den Namen. ALGORITHM wählt einen anderen Platz (1 bis 30; Bernstein zeigt, wer ersetzt würde). OCT- geht zu CHOOSE SLOT, dann zum Slot-Bildschirm, dann zum Namensbildschirm (ALGORITHM = ein anderer erfundener Name; OCT+ speichert). HOME verlässt ohne Speichern. Wenn seit dem Einschalten nichts geladen wurde, beginnt SAVE bei CHOOSE SLOT.
+### Speichern
+
+- **SAVE** zeigt EINEN Bildschirm, SAVE HERE?: die Platznummer und den Namen des Projekts. **SELECT** wählt einen anderen Platz (1 bis 30; Bernstein zeigt, wer ersetzt würde, oder EMPTY PLACE). **ALGORITHM** macht einen anderen erfundenen Namen (mit NAME PROJECTS auf MANUAL öffnet er den Buchstaben-Editor). **OCT+** speichert, **OCT-** bricht ab, HOME verlässt. Wenn seit dem Einschalten nichts geladen wurde, beginnt SAVE beim ersten leeren Platz mit einem erfundenen Namen.
 - {r:FUNC + SAVE} speichert per Quick save in den geladenen Platz, ohne nach einem Platz zu fragen, auch während der Wiedergabe. Ein leerer Platz speichert sofort als UNTITLED 01, 02 ...; ein voller fragt OVERWRITE SLOT? (OCT+ ja).
 - {r:FUNC + HOME} benennt das geladene Projekt um (ALGORITHM = ein anderer Name, OCT+ speichert, OCT- oder HOME bricht ab). Wenn NAME PROJECTS auf MANUAL steht (GLO settings), wird der Namensbildschirm zu einem Buchstaben-Editor: Knob 4 schaltet durch die Zeichen, OCT+ (der Bildschirm sagt OK) übernimmt den Buchstaben, OCT- löscht den letzten, dann drücke SAVE (höchstens 8 Buchstaben; der Bildschirm zeigt PRESS SAVE und TURN KNOB 4 in großen Buchstaben).
 - **Was gespeichert wird.** Bei AUTOSAVE ON wird dein Arbeitsprojekt 4 Sekunden, nachdem du aufhörst, etwas zu berühren, gespeichert, außer dem Kompressor, dem Reverb und dem Delay: Diese werden nur von SAVE behalten, im Preset. PERFORM startet beim Einschalten immer sauber (D/W 0 %, Master-Low-Cut 20 Hz, ALL FX an). AUTOSAVE ist ab Werk OFF: Drücke SAVE (oder FUNC + SAVE), um deine Arbeit zu behalten. Die Einstellungen werden trotzdem von selbst behalten. Schalte AUTOSAVE in GLO > SETTINGS auf ON, wenn das Projekt von selbst behalten werden soll. Werkseinstellungen: clock out und notes out aus, Tonic MIDI channel 10, remote MIDI channel aus, CC mode aus (CC CH BASE 1-8), output LOUD, USB audio folgt dem knob, 4/4 LED an, theme TONIC, zoom knob yes, name projects GENERATE, Tonic Engine ENHANCED, 2nd core ON. Ein neues Gerät oder ein FACTORY RESET bekommt sie; ein Gerät, das schon ein gespeichertes Projekt hält, behält seine eigenen Einstellungen.
 
 **Sichern, wiederherstellen und leeren (Webseite).** *Back up my presets* lädt ein Zip mit einer Datei pro Platz herunter, von `01_name.tnp` bis `30_name.tnp`; der Song, die aufgenommenen Knob-Bewegungen und die ARP-Noten eines Platzes liegen in derselben Datei, ein Platz ist also immer eine Datei. *Restore my presets* nimmt dieses Zip, einzelne `.tnp`-Dateien oder `.mtpreset`-Dateien und schreibt jede in den Platz aus ihrem Dateinamen (oder in den ersten leeren Platz); eine Datei ohne Song-Teil löscht auch den alten Song und die alten Noten dieses Platzes. Die Nummern 31 bis 40 alter Backups werden mit einer Meldung übersprungen. *Clear all places* leert die Plätze 1 bis 30 und geht erst, nachdem ein Backup heruntergeladen wurde. Drücke vorher STOP am FM-1: er lehnt während der Wiedergabe ab.
+
+#### Speichern-Spickzettel
+
+| WAS | TASTEN |
+|---|---|
+| **SPEICHERN (fragt SAVE HERE?)** | **SAVE** |
+| **IN SAVE HERE?: ANDERER PLATZ** | **SELECT** |
+| **IN SAVE HERE?: ANDERER NAME** | **ALGORITHM** |
+| **IN SAVE HERE?: SPEICHERN** | **OCT+** |
+| **IN SAVE HERE?: ABBRECHEN** | **OCT-** (oder **HOME**) |
+| **QUICK SAVE (geladener Platz)** | {r:FUNC + SAVE} |
+| **PROJEKT UMBENENNEN** | {r:FUNC + HOME} |
+| **EINEN PLATZ LADEN** | **PRESETS**-Regler, dann **OCT+** |
 
 ## 6. Lichter, MIDI und USB
 
@@ -521,8 +576,8 @@ Sie ist steil: Ein kleiner Wert kürzt einen normalen step schon stark, und ab e
 | **PAN** | HOME · knob 2 | 0 links, 64 Mitte, 127 rechts | Position im Stereobild. |
 | **LOW CUT** | HOME · knob 3 | 20 bis 663 Hz | Nimmt die Tiefen weg (12 dB pro Oktave). Bei 20 Hz tut er nichts Hörbares. |
 | **HIGH CUT** | HOME · knob 4 | 20 kHz hinunter bis 1 kHz | Nimmt die Höhen weg (12 dB pro Oktave). Ganz rechts = offen. |
-| **REVERB SEND** | HOME, 2. Druck · knob 1 | 0 bis 127 | Wie viel vom Track in den Reverb geht. |
-| **DELAY SEND** | HOME, 2. Druck · knob 2 | 0 bis 127 | Dasselbe für das Delay. |
+| **REVERB SEND** | FX, 2. Druck · knob 1 | 0 bis 127 | Wie viel vom Track in den Reverb geht. |
+| **DELAY SEND** | FX, 2. Druck · knob 2 | 0 bis 127 | Dasselbe für das Delay. |
 
 Die sends gehen nach den cuts und dem Sidechain ab, vor dem pan, und arbeiten, egal was D/W von PERFORM und ALL FX sagen.
 
@@ -531,7 +586,7 @@ Die sends gehen nach den cuts und dem Sidechain ab, vor dem pan, und arbeiten, e
 Gemeinsam für alle Tracks:
 
 - **Choke group** (EDIT, ALGORITHM nach rechts): Ein Hit eines Tracks der Gruppe stoppt die anderen sofort (geschlossene Hi-Hat stoppt offene Hi-Hat).
-- **Sidechain** (HOME, 2. Druck): Ein Input-Track lässt die Tracks, die du auf dem DUCK-Bildschirm wählst, ducken, solange er klingt; er ist ein Kompressor mit seitlichem Eingang; der Threshold-knob (SENDS, knob 3) geht von 0.0 dB (ganz rechts = aus) bis -59 dB, dann -INF.
+- **Sidechain** (FX, 2. Druck): Ein Input-Track lässt die Tracks, die du auf dem DUCK-Bildschirm wählst, ducken, solange er klingt; er ist ein Kompressor mit seitlichem Eingang; der Threshold-knob (SENDS, knob 3) geht von 0.0 dB (ganz rechts = aus) bis -59 dB, dann -INF.
 - **Master Low Cut** (PERFORM · knob 3, 20 bis 663 Hz): ein Low Cut auf dem ganzen Mix, vor dem Kompressor.
 - **Kompressor** (GLO · COMP): 4:1, Soft Knee, Attack 0,1 bis 100 ms, Release 10 bis 1500 ms, Threshold -48 bis 0 dB, Make-up 0 bis 24 dB. Ein Limiter danach hält den Ausgang unter der Vollaussteuerung.
 - **Reverb** (FX halten): Decay, Tone, Low Cut, Return-Pegel; ein körniger Raum aus der Frühzeit der Digitaltechnik. **Delay** (HOME halten): tempo-synchrone Zeit (1/32 bis 1/2), Feedback, Tone, TAPE (sauber digital bis abgenutztes Band), Low Cut, Return, Ping-Pong.
@@ -598,7 +653,7 @@ Dasselbe wie die geschlossene Hi-Hat, mit **EDIT DECAY 68**. Lege die beiden Hi-
 | **EDIT** | MODE CLAP | so lassen | ATTACK 0 | DECAY 60 |
 | **GLO** | OSC 0 | NOISE 0 | PITCH MOD 0 | so lassen |
 
-Mit diesen Werten bekommst du 3 bis 4 schnelle Bursts in etwa einer Zehntelsekunde. EDIT DECAY niedriger = ein strafferes Schnarren, höher = langsamere, getrenntere Claps und ein längerer Ausklang (75 bis 85). Ein wenig Reverb send (HOME, 2. Druck) macht daraus einen Raum-Clap.
+Mit diesen Werten bekommst du 3 bis 4 schnelle Bursts in etwa einer Zehntelsekunde. EDIT DECAY niedriger = ein strafferes Schnarren, höher = langsamere, getrenntere Claps und ein längerer Ausklang (75 bis 85). Ein wenig Reverb send (FX, 2. Druck) macht daraus einen Raum-Clap.
 
 #### Tom
 
@@ -624,7 +679,7 @@ Nutze denselben Sound auf anderen Tracks mit einer anderen FREQUENCY (80 Hz für
 | **EDIT** | nicht hörbar (OSC/NOISE MIX 100.00/00.00), so lassen | | | |
 | **GLO** | OSC 0 | NOISE 0 | PITCH MOD 0 | so lassen |
 
-Die Tonhöhe fällt in etwa 0,3 s um 4 Oktaven. Schicke ihn ans Delay (HOME, 2. Druck) für einen klassischen Laser.
+Die Tonhöhe fällt in etwa 0,3 s um 4 Oktaven. Schicke ihn ans Delay (FX, 2. Druck) für einen klassischen Laser.
 
 #### Rimshot
 
@@ -676,7 +731,7 @@ Ein runder Ton mit einem sehr kurzen Noise-Schlag (insgesamt etwa 0,2 s). Erhöh
 | **EDIT** | MODE EXP | so lassen | ATTACK 0 | DECAY 100 |
 | **GLO** | OSC 0 | NOISE 0 | PITCH MOD 0 | so lassen |
 
-Ein Becken aus reinem Noise, das etwa 2,3 s dauert. Senke DECAY (85 ergibt etwa 1 s) für ein Splash, oder erhöhe die LFO FREQUENCY für einen dünneren Sound. Schicke es ein wenig in den Reverb (HOME, 2. Druck).
+Ein Becken aus reinem Noise, das etwa 2,3 s dauert. Senke DECAY (85 ergibt etwa 1 s) für ein Splash, oder erhöhe die LFO FREQUENCY für einen dünneren Sound. Schicke es ein wenig in den Reverb (FX, 2. Druck).
 
 #### Clave
 

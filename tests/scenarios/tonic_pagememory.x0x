@@ -1,0 +1,73 @@
+# wip696: coming back with a button finds the page you left (HOME group: MIX 2 / PERFORM / GLOBAL; FX group: MIX / SENDS / effects; SEQ pattern page)
+wait 300
+# HOME, HOME = PERFORM; leave to OSC; HOME = PERFORM again
+tap HOME
+tap HOME
+expect view 2
+expect fxpage 0
+tap ENV
+expect view 12
+tap HOME
+expect view 2
+expect fxpage 0
+# HOME again = GLOBAL; leave; HOME = GLOBAL
+tap HOME
+expect view 10
+tap LFO
+tap HOME
+expect view 10
+# HOME = MIX 2 (cycle), leave, HOME = MIX 2
+tap HOME
+expect view 8
+tap ENV
+tap HOME
+expect view 8
+# FX, FX = SENDS; leave; FX = SENDS
+tap FX
+tap FX
+expect view 8
+tap ENV
+tap FX
+expect view 8
+# FX again = MIX; leave; FX = MIX
+tap FX
+expect view 9
+tap ENV
+tap FX
+expect view 9
+# hold FX = REVERB; leave; FX = REVERB
+press FX
+wait 700
+release FX
+wait 100
+expect view 2
+expect fxpage 1
+tap ENV
+tap FX
+expect view 2
+expect fxpage 1
+# SEQ, SEQ = pattern page; leave; SEQ = pattern page
+tap SEQ
+tap SEQ
+expect seqpat 1
+tap ENV
+tap SEQ
+expect seqpat 1
+# wip697: GLO: VEL, MIXER, COMP, MEMORY, SETTINGS: leave on one, GLO comes back to it
+tap GLO
+expect view 15
+tap GLO
+expect view 3
+tap ENV
+tap GLO
+expect view 3
+tap GLO
+expect view 4
+tap ENV
+tap GLO
+expect view 4
+tap GLO
+tap GLO
+tap ENV
+tap GLO
+expect view 4

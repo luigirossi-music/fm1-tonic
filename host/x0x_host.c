@@ -1049,6 +1049,8 @@ static int expect(const char *what, const char *val)
         got = ui.page[V_FX][0];
     else if (!strcmp(what, "swing"))                 /* wip74: the 909 pattern's swing 0-100, step grid (RATE_*), fill code */
         got = proj.pat[seq.ppat[PART_909]].swing;
+    else if (!strncmp(what, "swingp", 6) && what[6])   /* wip700: swingpN = pattern N's swing (0-based); swingpp = the setting (0 GLOBAL, 1 PER PATTERN) */
+        got = !strcmp(what, "swingpp") ? proj.set.swing_pp : proj.pat[atoi(what + 6) % NPAT].swing;
     else if (!strcmp(what, "len0"))                  /* wip85: the 909 pattern's length */
         got = proj.pat[seq.ppat[PART_909]].drum[PART_909].len;
     else if (!strcmp(what, "grid"))

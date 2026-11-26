@@ -13,12 +13,10 @@ turn ALGO 1
 expect namemanual 1
 tap HOME
 wait 100
-# SAVE (nothing loaded yet): CHOOSE SLOT -> slot -> the letter editor
+# SAVE (nothing loaded yet): SAVE HERE? (wip708), ALGORITHM -> the letter editor
 tap SAVE
-expect svstage 4
-tap OCT+
-expect svstage 2
-tap OCT+
+expect svstage 3
+turn ALGO 1
 expect svstage 1
 expect nmlen 0
 expect nmcand 65

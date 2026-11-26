@@ -1,0 +1,46 @@
+# wip700: SWING is GLOBAL by default (one swing for every pattern); GLO > SWING: PER PATTERN keeps one swing per pattern.
+wait 300
+expect swingpp 0
+# GLOBAL page: K2 = swing 30 on pattern 1 -> every pattern has it
+tap HOME
+tap HOME
+tap HOME
+expect view 10
+turn K2 30 80
+expect swing 30
+expect swingp0 30
+expect swingp5 30
+expect swingp15 30
+# the setting: GLO settings list, the row after NAME PROJECTS
+tap GLO
+tap GLO
+tap GLO
+tap GLO
+tap GLO
+turn SELECT 16
+turn ALGO 1
+expect swingpp 1
+tap HOME
+wait 100
+# PER PATTERN: pattern 1 changes, the others keep 30 (HOME leaves the list, then MIX 2, PERFORM, GLOBAL)
+tap HOME
+tap HOME
+tap HOME
+tap HOME
+wait 100
+expect view 10
+turn K2 -10 80
+expect swing 20
+expect swingp0 20
+expect swingp5 30
+# back to GLOBAL: the pattern on screen goes to all (GLO comes back to the settings list, the page it was left on)
+tap GLO
+wait 100
+tap GLO
+tap GLO
+tap GLO
+turn SELECT 16
+turn ALGO -1
+expect swingpp 0
+expect swingp5 20
+expect swingp15 20
